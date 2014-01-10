@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Dart by f2prateek</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Dart</h1>
+        <p>Extra &quot;injection&quot; library for Android.</p>
+
+        <p class="view"><a href="https://github.com/f2prateek/dart">View the Project on GitHub <small>f2prateek/dart</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/f2prateek/dart/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/f2prateek/dart/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/f2prateek/dart">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="dart" class="anchor" href="#dart"><span class="octicon octicon-link"></span></a>Dart</h1>
+
+<p>Extra "injection" library for Android which uses annotation processing to
+generate code that does direct field assignment of your extras.</p>
+
+<p>Dart is inspired by <a href="http://jakewharton.github.io/butterknife/">ButterKnife</a>.</p>
+
+<div class="highlight highlight-java"><pre><span class="kd">class</span> <span class="nc">ExampleActivity</span> <span class="kd">extends</span> <span class="n">Activity</span> <span class="o">{</span>
+  <span class="nd">@InjectExtra</span><span class="o">(</span><span class="s">"key_1"</span><span class="o">)</span> <span class="n">String</span> <span class="n">extra1</span><span class="o">;</span>
+  <span class="nd">@InjectExtra</span><span class="o">(</span><span class="s">"key_2"</span><span class="o">)</span> <span class="kt">int</span> <span class="n">extra2</span><span class="o">;</span>
+  <span class="nd">@InjectExtra</span><span class="o">(</span><span class="s">"key_3"</span><span class="o">)</span> <span class="n">User</span> <span class="n">extra3</span><span class="o">;</span> <span class="c1">// User implements Parcelable</span>
+
+  <span class="nd">@Override</span> <span class="kd">public</span> <span class="kt">void</span> <span class="n">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+    <span class="n">setContentView</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">simple_activity</span><span class="o">);</span>
+    <span class="n">Dart</span><span class="o">.</span><span class="na">inject</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="c1">// TODO Use "injected" extras...</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>Simply call one of the <code>inject()</code> methods, which will delegate to generated code.
+You can inject from an Activity (which uses it's intent extras), Fragment (which use it's arguments)
+or directly from a Bundle.</p>
+
+<h2>
+<a name="optional-injection" class="anchor" href="#optional-injection"><span class="octicon octicon-link"></span></a>Optional Injection</h2>
+
+<p>By default all @InjectExtra fields are required. An exception will be thrown if the target extra cannot be found.</p>
+
+<p>To suppress this behavior and create an optional injection, add the <a href="https://github.com/Optional" class="user-mention">@Optional</a> annotation to the field or method.</p>
+
+<div class="highlight highlight-java"><pre><span class="nd">@Optional</span> <span class="n">InjectExtra</span><span class="o">(</span><span class="s">"key"</span><span class="o">)</span> <span class="n">String</span> <span class="n">title</span><span class="o">;</span>
+</pre></div>
+
+<h2>
+<a name="bonus" class="anchor" href="#bonus"><span class="octicon octicon-link"></span></a>Bonus</h2>
+
+<p>Also included is a <code>get()</code> method that simplifies code to retrieve extras from a Bundle.
+It uses generics to infer return type and automatically perform the cast.</p>
+
+<div class="highlight highlight-java"><pre><span class="n">Bundle</span> <span class="n">bundle</span> <span class="o">=</span> <span class="n">getIntent</span><span class="o">().</span><span class="na">getExtras</span><span class="o">();</span> <span class="c1">// getArguments() for a Fragment</span>
+<span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">Dart</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">bundle</span><span class="o">,</span> <span class="s">"key"</span><span class="o">);</span> <span class="c1">// User implements Parcelable</span>
+</pre></div>
+
+<h2>
+<a name="download" class="anchor" href="#download"><span class="octicon octicon-link"></span></a>Download</h2>
+
+<p>Download <a href="http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&amp;g=com.f2prateek.dart&amp;a=dart&amp;v=LATEST">the latest JAR</a> or grab via Maven:</p>
+
+<div class="highlight highlight-xml"><pre><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>com.f2prateek.dart<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>dart<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>(insert latest version)<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+
+<p>or Gradle:</p>
+
+<div class="highlight highlight-groovy"><pre><span class="n">compile</span> <span class="s1">'com.f2prateek.dart:dart:(insert latest version)'</span>
+</pre></div>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<pre><code>Copyright 2013 Jake Wharton
+Copyright 2014 Prateek Srivastava (@f2prateek)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+</code></pre>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/f2prateek">f2prateek</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
