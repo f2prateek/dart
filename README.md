@@ -4,11 +4,13 @@ Dart
 Extra "injection" library for Android which uses annotation processing to
 generate code that does direct field assignment of your extras.
 
+Dart is inspired by [ButterKnife][1].
+
 ```java
 class ExampleActivity extends Activity {
   @InjectExtra("key_1") String extra1;
   @InjectExtra("key_2") int extra2;
-  @InjectExtra("key_3") User extra3; // User extends Parcelable
+  @InjectExtra("key_3") User extra3; // User implements Parcelable
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -19,11 +21,36 @@ class ExampleActivity extends Activity {
 }
 ```
 
+Simply call one of the `inject()` methods, which will delegate to generated code.
+You can inject from an Activity (which uses it's intent extras), Fragment (which use it's arguments)
+or directly from a Bundle.
+
+Optional Injection
+------------------
+By default all @InjectExtra fields are required. An exception will be thrown if the target extra cannot be found.
+
+To suppress this behavior and create an optional injection, add the @Optional annotation to the field or method.
+
+```java
+@Optional InjectExtra("key") String title;
+```
+
+Bonus
+-----
+
+Also included is a `get()` method that simplifies code to retrieve extras from a Bundle.
+It uses generics to infer return type and automatically perform the cast.
+
+```java
+Bundle bundle = getIntent().getExtras(); // getArguments() for a Fragment
+User user = Dart.get(bundle, "key"); // User implements Parcelable
+```
+
 
 Download
 --------
 
-Download [the latest JAR][1] or grab via Maven:
+Download [the latest JAR][2] or grab via Maven:
 ```xml
 <dependency>
   <groupId>com.f2prateek.dart</groupId>
@@ -56,5 +83,5 @@ License
     limitations under the License.
 
 
-
- [1]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.f2prateek.dart&a=dart&v=LATEST
+ [1]: http://jakewharton.github.io/butterknife/
+ [2]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.f2prateek.dart&a=dart&v=LATEST
