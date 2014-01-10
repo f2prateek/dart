@@ -1,0 +1,24 @@
+language: java
+
+jdk: oraclejdk7
+
+branches:
+  except:
+    - gh-pages
+
+notifications:
+  email: false
+
+before_install:
+  # Install base Android SDK
+  - sudo apt-get update -qq
+  - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch > /dev/null; fi
+  - wget http://dl.google.com/android/android-sdk_r22.3-linux.tgz
+  - tar xzf android-sdk_r22.3-linux.tgz
+  - export ANDROID_HOME=$PWD/android-sdk-linux
+  - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
+
+  # Install required components.
+  - echo yes | android update sdk -a -t platform-tools,build-tools-19.0.0,android-19 --no-ui --force > /dev/null
+
+script: mvn verify
