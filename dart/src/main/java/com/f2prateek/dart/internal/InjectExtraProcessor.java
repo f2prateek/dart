@@ -27,7 +27,6 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
@@ -35,6 +34,7 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -171,50 +171,22 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     String key = element.getAnnotation(InjectExtra.class).value();
     TypeMirror type = element.asType();
     boolean required = element.getAnnotation(Optional.class) == null;
+    boolean parcel = isAnnotated(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
 
     ExtraInjector extraInjector = getOrCreateTargetClass(targetClassMap, enclosingElement);
-    extraInjector.addField(key, name, type, required);
+    extraInjector.addField(key, name, type, required, parcel);
 
     // Add the type-erased version to the valid injection targets set.
     TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
     erasedTargetTypes.add(erasedTargetType);
   }
 
-  private boolean isSubtypeOfType(TypeMirror typeMirror, String otherType) {
-    if (otherType.equals(typeMirror.toString())) {
-      return true;
-    }
-    if (!(typeMirror instanceof DeclaredType)) {
-      return false;
-    }
-    DeclaredType declaredType = (DeclaredType) typeMirror;
-    List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
-    if (typeArguments.size() > 0) {
-      StringBuilder typeString = new StringBuilder(declaredType.asElement().toString());
-      typeString.append('<');
-      for (int i = 0; i < typeArguments.size(); i++) {
-        if (i > 0) {
-          typeString.append(',');
+  private boolean isAnnotated(Element element, String annotationName) {
+    if (element != null) {
+      for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
+        if (annotationMirror.getAnnotationType().asElement().toString().equals(annotationName)) {
+          return true;
         }
-        typeString.append('?');
-      }
-      typeString.append('>');
-      if (typeString.toString().equals(otherType)) {
-        return true;
-      }
-    }
-    Element element = declaredType.asElement();
-    if (!(element instanceof TypeElement)) {
-      return false;
-    }
-    TypeElement typeElement = (TypeElement) element;
-    TypeMirror superType = typeElement.getSuperclass();
-    if (isSubtypeOfType(superType, otherType)) {
-      return true;
-    }
-    for (TypeMirror interfaceType : typeElement.getInterfaces()) {
-      if (isSubtypeOfType(interfaceType, otherType)) {
-        return true;
       }
     }
     return false;

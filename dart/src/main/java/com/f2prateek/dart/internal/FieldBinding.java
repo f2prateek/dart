@@ -23,11 +23,13 @@ final class FieldBinding implements Binding {
   private final String name;
   private final TypeMirror type;
   private final boolean required;
+  private final boolean parcel;
 
-  FieldBinding(String name, TypeMirror type, boolean required) {
+  FieldBinding(String name, TypeMirror type, boolean required, boolean parcel) {
     this.name = name;
     this.type = type;
     this.required = required;
+    this.parcel = parcel;
   }
 
   public String getName() {
@@ -44,5 +46,9 @@ final class FieldBinding implements Binding {
 
   @Override public boolean isRequired() {
     return required;
+  }
+
+  public boolean isParcel() {
+    return parcel;
   }
 }

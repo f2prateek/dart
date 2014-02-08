@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.parceler.Parcels;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
@@ -30,12 +31,14 @@ import static org.fest.assertions.api.Assertions.assertThat;
 public class SampleActivityTest {
   @Test public void verifyExtrasInjection() {
     ComplexParcelable parcelable = ComplexParcelable.random();
+    ExampleParcel parcel = new ExampleParcel("andy");
 
     Intent intent = new Intent(Robolectric.application, SampleActivity.class);
     Bundle bundle = new Bundle();
     intent.putExtra(SampleActivity.EXTRA_STRING, "test");
     intent.putExtra(SampleActivity.EXTRA_INT, 4);
     intent.putExtra(SampleActivity.EXTRA_PARCELABLE, parcelable);
+    intent.putExtra(SampleActivity.EXTRA_PARCEL, Parcels.wrap(parcel));
     intent.putExtras(bundle);
 
     SampleActivity activity =
@@ -44,5 +47,6 @@ public class SampleActivityTest {
     assertThat(activity.stringExtra).isEqualTo("test");
     assertThat(activity.intExtra).isEqualTo(4);
     assertThat(activity.parcelableExtra).isEqualTo(parcelable);
+    assertThat(activity.parcelExtra).isEqualTo(parcel);
   }
 }
