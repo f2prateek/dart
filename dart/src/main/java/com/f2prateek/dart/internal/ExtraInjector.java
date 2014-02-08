@@ -95,8 +95,8 @@ final class ExtraInjector {
     }
   }
 
-  void addField(String key, String name, TypeMirror type, boolean required) {
-    getOrCreateExtraBinding(key).addFieldBinding(new FieldBinding(name, type, required));
+  void addField(String key, String name, TypeMirror type, boolean required, boolean parcel) {
+    getOrCreateExtraBinding(key).addFieldBinding(new FieldBinding(name, type, required, parcel));
   }
 
   void setParentInjector(String parentInjector) {
@@ -175,8 +175,13 @@ final class ExtraInjector {
 
     for (FieldBinding fieldBinding : fieldBindings) {
       builder.append("    target.").append(fieldBinding.getName()).append(" = ");
-      emitCast(builder, fieldBinding.getType());
-      builder.append("object;\n");
+
+      if (fieldBinding.isParcel()) {
+        builder.append("org.parceler.Parcels.unwrap((android.os.Parcelable)object);\n");
+      } else {
+        emitCast(builder, fieldBinding.getType());
+        builder.append("object;\n");
+      }
     }
   }
 }

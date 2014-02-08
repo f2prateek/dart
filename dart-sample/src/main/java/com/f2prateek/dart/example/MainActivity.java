@@ -23,6 +23,7 @@ import android.os.Bundle;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.f2prateek.dart.Dart;
+import org.parceler.Parcels;
 
 public class MainActivity extends Activity {
 
@@ -40,6 +41,7 @@ public class MainActivity extends Activity {
     intent.putExtra(SampleActivity.EXTRA_STRING, "String");
     intent.putExtra(SampleActivity.EXTRA_INT, 4);
     intent.putExtra(SampleActivity.EXTRA_PARCELABLE, ComplexParcelable.random());
+    intent.putExtra(SampleActivity.EXTRA_PARCEL, Parcels.wrap(new ExampleParcel("Andy")));
     startActivity(intent);
   }
 }

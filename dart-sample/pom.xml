@@ -25,7 +25,17 @@
       <artifactId>butterknife</artifactId>
       <version>4.0.1</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.parceler</groupId>
+      <artifactId>parceler</artifactId>
+      <version>0.2.6</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.parceler</groupId>
+      <artifactId>parceler-api</artifactId>
+      <version>0.2.6</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

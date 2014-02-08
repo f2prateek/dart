@@ -32,16 +32,19 @@ public class SampleActivity extends Activity {
   public static final String EXTRA_INT = "ExtraInt";
   public static final String EXTRA_PARCELABLE = "ExtraParcelable";
   public static final String EXTRA_OPTIONAL = "ExtraOptional";
+  public static final String EXTRA_PARCEL = "ExtraParcel";
 
   @InjectExtra(EXTRA_STRING) String stringExtra;
   @InjectExtra(EXTRA_INT) int intExtra;
   @InjectExtra(EXTRA_PARCELABLE) ComplexParcelable parcelableExtra;
+  @InjectExtra(EXTRA_PARCEL) ExampleParcel parcelExtra;
   @Optional @InjectExtra(EXTRA_OPTIONAL) String optionalExtra;
 
   @InjectView(R.id.string_extra) TextView stringText;
   @InjectView(R.id.int_extra) TextView intText;
   @InjectView(R.id.parcelable_extra) TextView parcelableText;
   @InjectView(R.id.optional_extra) TextView optionalText;
+  @InjectView(R.id.parcel_extra) TextView parcelText;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -55,5 +58,6 @@ public class SampleActivity extends Activity {
     intText.setText(String.valueOf(intExtra));
     parcelableText.setText(String.valueOf(parcelableExtra));
     optionalText.setText(String.valueOf(optionalExtra));
+    parcelText.setText(String.valueOf(parcelExtra.getName()));
   }
 }
