@@ -170,18 +170,26 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     String name = element.getSimpleName().toString();
     String key = element.getAnnotation(InjectExtra.class).value();
     TypeMirror type = element.asType();
-    boolean required = element.getAnnotation(Optional.class) == null;
+    DefaultValue defaultValue = getDefault(type, element.getAnnotation(Optional.class));
     boolean parcel = isAnnotated(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
 
     ExtraInjector extraInjector = getOrCreateTargetClass(targetClassMap, enclosingElement);
-    extraInjector.addField(key, name, type, required, parcel);
+    extraInjector.addField(key, name, type, defaultValue, parcel);
 
     // Add the type-erased version to the valid injection targets set.
     TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
     erasedTargetTypes.add(erasedTargetType);
   }
 
-  private boolean isAnnotated(Element element, String annotationName) {
+    private DefaultValue getDefault(TypeMirror type, Optional optional) {
+        if (optional == null) {
+            return DefaultValue.REQUIRED_NO_DEFAULT_ALLOWED;
+        } else {
+            return DefaultValue.from(type, optional);
+        }
+    }
+
+    private boolean isAnnotated(Element element, String annotationName) {
     if (element != null) {
       for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
         if (annotationMirror.getAnnotationType().asElement().toString().equals(annotationName)) {

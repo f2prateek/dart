@@ -53,8 +53,9 @@ public class ExtraInjectorTest {
       return description;
     }
 
-    @Override public boolean isRequired() {
-      throw new AssertionError();
-    }
+      @Override
+      public DefaultValue getDefault() {
+          throw new AssertionError();
+      }
   }
 }

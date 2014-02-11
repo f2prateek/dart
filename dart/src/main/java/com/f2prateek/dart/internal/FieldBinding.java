@@ -22,10 +22,10 @@ import javax.lang.model.type.TypeMirror;
 final class FieldBinding implements Binding {
   private final String name;
   private final TypeMirror type;
-  private final boolean required;
+  private final DefaultValue required;
   private final boolean parcel;
 
-  FieldBinding(String name, TypeMirror type, boolean required, boolean parcel) {
+  FieldBinding(String name, TypeMirror type, DefaultValue required, boolean parcel) {
     this.name = name;
     this.type = type;
     this.required = required;
@@ -44,11 +44,12 @@ final class FieldBinding implements Binding {
     return "field '" + name + "'";
   }
 
-  @Override public boolean isRequired() {
-    return required;
-  }
+    @Override
+    public DefaultValue getDefault() {
+        return required;
+    }
 
-  public boolean isParcel() {
+    public boolean isParcel() {
     return parcel;
   }
 }
