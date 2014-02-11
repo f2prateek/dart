@@ -40,13 +40,7 @@ final class ExtraInjection {
   }
 
   public List<Binding> getRequiredBindings() {
-    List<Binding> requiredBindings = new ArrayList<Binding>();
-    for (FieldBinding fieldBinding : fieldBindings) {
-      if (fieldBinding.isRequired()) {
-        requiredBindings.add(fieldBinding);
-      }
-    }
-    return requiredBindings;
+      return new ArrayList<Binding>(fieldBindings);
   }
 
   public void addFieldBinding(FieldBinding fieldBinding) {

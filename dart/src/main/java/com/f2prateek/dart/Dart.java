@@ -19,6 +19,7 @@ package com.f2prateek.dart;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import com.f2prateek.dart.internal.InjectExtraProcessor;
@@ -172,22 +173,27 @@ public class Dart {
    */
   public enum Finder {
     ACTIVITY {
-      @Override public Object getExtra(Object source, String key) {
-        return ((Activity) source).getIntent().getExtras().get(key);
+      @Override public Object getExtra(Object source, String key, Object defaultValue) {
+            Intent intent = ((Activity) source).getIntent();
+            if (intent.hasExtra(key)) {
+                return intent.getExtras().get(key);
+            } else {
+                return defaultValue;
+            }
       }
     },
     FRAGMENT {
-      @Override public Object getExtra(Object source, String key) {
+      @Override public Object getExtra(Object source, String key, Object defaultValue) {
         return ((Fragment) source).getArguments().get(key);
       }
     },
     BUNDLE {
-      @Override public Object getExtra(Object source, String key) {
+      @Override public Object getExtra(Object source, String key, Object defaultValue) {
         return ((Bundle) source).get(key);
       }
     };
 
-    public abstract Object getExtra(Object source, String key);
+    public abstract Object getExtra(Object source, String key, Object defaultValue);
   }
 
   public static class UnableToInjectException extends RuntimeException {

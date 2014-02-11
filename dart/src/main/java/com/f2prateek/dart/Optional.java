@@ -17,6 +17,8 @@
 
 package com.f2prateek.dart;
 
+import android.os.Parcelable;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -32,4 +34,11 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  */
 @Retention(CLASS) @Target({ FIELD, METHOD })
 public @interface Optional {
+    String NULL = "com.f2prateek.dart.null";
+
+    boolean defaultBool() default false;
+    int defaultInt() default 0;
+    long defaultLong() default 0L;
+    String[] defaultStringArray() default {};
+    String defaultString() default NULL;
 }

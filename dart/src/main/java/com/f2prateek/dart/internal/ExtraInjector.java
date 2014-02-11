@@ -95,7 +95,7 @@ final class ExtraInjector {
     }
   }
 
-  void addField(String key, String name, TypeMirror type, boolean required, boolean parcel) {
+  void addField(String key, String name, TypeMirror type, DefaultValue required, boolean parcel) {
     getOrCreateExtraBinding(key).addFieldBinding(new FieldBinding(name, type, required, parcel));
   }
 
@@ -149,12 +149,15 @@ final class ExtraInjector {
   }
 
   private void emitExtraInjection(StringBuilder builder, ExtraInjection injection) {
-    builder.append("    object = finder.getExtra(source, \"")
-        .append(injection.getKey())
-        .append("\");\n");
 
     List<Binding> requiredBindings = injection.getRequiredBindings();
-    if (!requiredBindings.isEmpty()) {
+    builder.append("    object = finder.getExtra(source, \"")
+        .append(injection.getKey())
+        .append("\", ")
+        .append((requiredBindings.isEmpty()) ? null : requiredBindings.get(0).getDefault().getValue())
+        .append(");\n");
+
+    if (!requiredBindings.isEmpty() && requiredBindings.get(0).getDefault().isRequired()) {
       builder.append("    if (object == null) {\n")
           .append("      throw new IllegalStateException(\"Required extra with key '")
           .append(injection.getKey())
