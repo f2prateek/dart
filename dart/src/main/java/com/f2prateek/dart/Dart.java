@@ -113,7 +113,7 @@ public class Dart {
    * target} using the {@code source} {@link android.os.Bundle} as the source.
    *
    * @param target Target class for field injection.
-   * @param source View root on which IDs will be looked up.
+   * @param source Bundle source on which extras will be looked up.
    * @throws com.f2prateek.dart.Dart.UnableToInjectException if injection could not be
    * performed.
    */

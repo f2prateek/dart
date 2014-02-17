@@ -17,7 +17,7 @@
 
 package com.f2prateek.dart.internal;
 
-/** A field or method view injection binding. */
+/** A field or method extra injection binding. */
 interface Binding {
   /** A description of the binding in human readable form (e.g., "field 'foo'"). */
   String getDescription();

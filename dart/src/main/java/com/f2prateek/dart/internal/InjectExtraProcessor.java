@@ -105,7 +105,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
 
-        error(element, "Unable to generate view injector for @InjectExtra.\n\n%s",
+        error(element, "Unable to generate extra injector for @InjectExtra.\n\n%s",
             stackTrace.toString());
       }
     }

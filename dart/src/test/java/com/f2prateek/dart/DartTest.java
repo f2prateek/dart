@@ -31,7 +31,7 @@ import static org.fest.assertions.api.Assertions.entry;
 @RunWith(RobolectricTestRunner.class) @Config(manifest = Config.NONE)
 public class DartTest {
   @Before @After // Clear out cache of injectors  before and after each test.
-  public void resetViewsCache() {
+  public void resetExtrasCache() {
     Dart.INJECTORS.clear();
   }
 

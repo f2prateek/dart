@@ -137,10 +137,10 @@ final class ExtraInjector {
       builder.append("    ").append(parentInjector).append(".inject(finder, target, source);\n\n");
     }
 
-    // Local variable in which all views will be temporarily stored.
+    // Local variable in which all extras will be temporarily stored.
     builder.append("    Object object;\n");
 
-    // Loop over each view injection and emit it.
+    // Loop over each extras injection and emit it.
     for (ExtraInjection injection : injectionMap.values()) {
       emitExtraInjection(builder, injection);
     }
