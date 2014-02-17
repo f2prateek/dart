@@ -179,7 +179,8 @@ public class Dart {
   public enum Finder {
     ACTIVITY {
       @Override public Object getExtra(Object source, String key) {
-        return ((Activity) source).getIntent().getExtras().get(key);
+          Bundle extras = ((Activity) source).getIntent().getExtras();
+          return extras != null ? extras.get(key) : null;
       }
     },
     FRAGMENT {
