@@ -182,22 +182,18 @@ public class Dart {
     ACTIVITY {
       @Override public Object getExtra(Object source, String key) {
         Intent intent = ((Activity) source).getIntent();
-        if (intent == null) {
-          return null;
-        }
-        Bundle extras = intent.getExtras();
-        return extras == null ? null : Finder.BUNDLE.getExtra(extras, key);
+        return intent == null ? null : Finder.BUNDLE.getExtra(intent.getExtras(), key);
       }
     },
     FRAGMENT {
       @Override public Object getExtra(Object source, String key) {
         Bundle extras = ((Fragment) source).getArguments();
-        return extras == null ? null : Finder.BUNDLE.getExtra(extras, key);
+        return Finder.BUNDLE.getExtra(extras, key);
       }
     },
     BUNDLE {
       @Override public Object getExtra(Object source, String key) {
-        return ((Bundle) source).get(key);
+        return source == null ? null : ((Bundle) source).get(key);
       }
     };
 
