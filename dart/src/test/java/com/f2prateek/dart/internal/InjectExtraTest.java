@@ -132,7 +132,9 @@ public class InjectExtraTest {
             "  public static void inject(Finder finder, final test.Test target, Object source) {",
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
+            "    if (object != null) {", //
             "    target.extra = (java.lang.String) object;", //
+            "    }", //
             "  }", //
             "}" //
         ));

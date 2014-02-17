@@ -49,6 +49,12 @@ import java.util.Map;
  * <pre><code>
  * {@literal @}Optional {@literal @}InjectExtra("key") String extra;
  * </code></pre>
+ * <p>
+ * If you need to provide a default value for an extra, simply set an initial value
+ * while declaring the field, combined with the {@link Optional @Optional} annotation.
+ * <pre><code>
+ * {@literal @}Optional {@literal @}InjectExtra("key") String extra = "default_value";
+ * </code></pre>
  */
 public class Dart {
   static final Map<Class<?>, Method> INJECTORS = new LinkedHashMap<Class<?>, Method>();

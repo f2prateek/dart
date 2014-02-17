@@ -162,9 +162,14 @@ final class ExtraInjector {
       emitHumanDescription(builder, requiredBindings);
       builder.append(" was not found. If this extra is optional add '@Optional' annotation.\");\n")
           .append("    }\n");
+      emitFieldBindings(builder, injection);
+    } else {
+      // an optional extra, wrap it in a check to keep original value, if any
+      builder.append("    if (object != null) {\n");
+      // todo better indentation for this code
+      emitFieldBindings(builder, injection);
+      builder.append("    }\n");
     }
-
-    emitFieldBindings(builder, injection);
   }
 
   private void emitFieldBindings(StringBuilder builder, ExtraInjection injection) {

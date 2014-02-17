@@ -48,5 +48,6 @@ public class SampleActivityTest {
     assertThat(activity.intExtra).isEqualTo(4);
     assertThat(activity.parcelableExtra).isEqualTo(parcelable);
     assertThat(activity.parcelExtra).isEqualTo(parcel);
+    assertThat(activity.defaultExtra).isEqualTo(SampleActivity.DEFAULT_EXTRA_VALUE);
   }
 }
