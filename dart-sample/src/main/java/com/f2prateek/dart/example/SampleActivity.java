@@ -44,12 +44,12 @@ public class SampleActivity extends Activity {
   @Optional @InjectExtra(EXTRA_OPTIONAL) String optionalExtra;
   @Optional @InjectExtra(EXTRA_WITH_DEFAULT) String defaultExtra = DEFAULT_EXTRA_VALUE;
 
-  @InjectView(R.id.string_extra) TextView stringText;
-  @InjectView(R.id.int_extra) TextView intText;
-  @InjectView(R.id.parcelable_extra) TextView parcelableText;
-  @InjectView(R.id.optional_extra) TextView optionalText;
-  @InjectView(R.id.parcel_extra) TextView parcelText;
-  @InjectView(R.id.default_extra) TextView defaultText;
+  @InjectView(R.id.string_extra) TextView stringExtraTextView;
+  @InjectView(R.id.int_extra) TextView intExtraTextView;
+  @InjectView(R.id.parcelable_extra) TextView parcelableExtraTextView;
+  @InjectView(R.id.optional_extra) TextView optionalExtraTextView;
+  @InjectView(R.id.parcel_extra) TextView parcelExtraTextView;
+  @InjectView(R.id.default_extra) TextView defaultExtraTextView;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -59,11 +59,11 @@ public class SampleActivity extends Activity {
     Dart.inject(this);
 
     // Contrived code to use the "injected" extras.
-    stringText.setText(stringExtra);
-    intText.setText(String.valueOf(intExtra));
-    parcelableText.setText(String.valueOf(parcelableExtra));
-    optionalText.setText(String.valueOf(optionalExtra));
-    parcelText.setText(String.valueOf(parcelExtra.getName()));
-    defaultText.setText(String.valueOf(defaultExtra));
+    stringExtraTextView.setText(stringExtra);
+    intExtraTextView.setText(String.valueOf(intExtra));
+    parcelableExtraTextView.setText(String.valueOf(parcelableExtra));
+    optionalExtraTextView.setText(String.valueOf(optionalExtra));
+    parcelExtraTextView.setText(String.valueOf(parcelExtra.getName()));
+    defaultExtraTextView.setText(String.valueOf(defaultExtra));
   }
 }
