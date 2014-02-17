@@ -19,6 +19,7 @@ package com.f2prateek.dart;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import com.f2prateek.dart.internal.InjectExtraProcessor;
@@ -172,20 +173,26 @@ public class Dart {
   }
 
   /**
-   * A means of finding a view in either an {@link android.app.Activity}, {@link
+   * A means of finding an extra in either an {@link android.app.Activity}, {@link
    * android.app.Fragment} or a {@link android.os.Bundle}. Exposed for use only
    * by generated code.
+   * If any of the means to get a bundle are null, this will simply return a null.
    */
   public enum Finder {
     ACTIVITY {
       @Override public Object getExtra(Object source, String key) {
-          Bundle extras = ((Activity) source).getIntent().getExtras();
-          return extras != null ? extras.get(key) : null;
+        Intent intent = ((Activity) source).getIntent();
+        if (intent == null) {
+          return null;
+        }
+        Bundle extras = intent.getExtras();
+        return extras == null ? null : Finder.BUNDLE.getExtra(extras, key);
       }
     },
     FRAGMENT {
       @Override public Object getExtra(Object source, String key) {
-        return ((Fragment) source).getArguments().get(key);
+        Bundle extras = ((Fragment) source).getArguments();
+        return extras == null ? null : Finder.BUNDLE.getExtra(extras, key);
       }
     },
     BUNDLE {
