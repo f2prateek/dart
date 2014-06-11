@@ -61,6 +61,82 @@ public class InjectExtraTest {
         .generatesSources(expectedSource);
   }
 
+  @Test public void injectingAllPrimitives() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "public class Test extends Activity {", //
+        "    @InjectExtra(\"key_bool\") boolean aBool;", //
+        "    @InjectExtra(\"key_byte\") byte aByte;", //
+        "    @InjectExtra(\"key_short\") short aShort;", //
+        "    @InjectExtra(\"key_int\") int anInt;", //
+        "    @InjectExtra(\"key_long\") long aLong;", //
+        "    @InjectExtra(\"key_char\") char aChar;", //
+        "    @InjectExtra(\"key_float\") float aFloat;", //
+        "    @InjectExtra(\"key_double\") double aDouble;", //
+        "}" //
+    ));
+
+    JavaFileObject expectedSource =
+        JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
+            "package test;", //
+            "import com.f2prateek.dart.Dart.Finder;", //
+            "public class Test$$ExtraInjector {", //
+            "  public static void inject(Finder finder, final test.Test target, Object source) {",
+            "    Object object;", //
+            "    object = finder.getExtra(source, \"key_bool\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_bool' for field 'aBool' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "    }", //
+            "    target.aBool = (java.lang.Boolean) object;", //
+            "    object = finder.getExtra(source, \"key_byte\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_byte' for field 'aByte' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "    }", //
+            "    target.aByte = (java.lang.Byte) object;", //
+            "    object = finder.getExtra(source, \"key_short\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_short' for field 'aShort' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "    }", //
+            "    target.aShort = (java.lang.Short) object;", //
+            "    object = finder.getExtra(source, \"key_int\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_int' for field 'anInt' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "    }", //
+            "    target.anInt = (java.lang.Integer) object;", //
+            "    object = finder.getExtra(source, \"key_long\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_long' for field 'aLong' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "    }", //
+            "    target.aLong = (java.lang.Long) object;", //
+            "    object = finder.getExtra(source, \"key_char\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_char' for field 'aChar' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "    }", //
+            "    target.aChar = (java.lang.Character) object;", //
+            "    object = finder.getExtra(source, \"key_float\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_float' for field 'aFloat' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "    }", //
+            "    target.aFloat = (java.lang.Float) object;", //
+            "    object = finder.getExtra(source, \"key_double\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_double' for field 'aDouble' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "    }", //
+            "    target.aDouble = (java.lang.Double) object;", //
+            "  }", //
+            "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(dartProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(expectedSource);
+  }
+
   @Test public void oneFindPerKey() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //

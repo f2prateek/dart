@@ -18,6 +18,8 @@
 package com.f2prateek.dart.example;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import butterknife.ButterKnife;
@@ -25,17 +27,17 @@ import butterknife.InjectView;
 import com.f2prateek.dart.Dart;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.Optional;
+import org.parceler.Parcels;
 
 public class SampleActivity extends Activity {
-
   public static final String DEFAULT_EXTRA_VALUE = "a default value";
 
-  public static final String EXTRA_STRING = "ExtraString";
-  public static final String EXTRA_INT = "ExtraInt";
-  public static final String EXTRA_PARCELABLE = "ExtraParcelable";
-  public static final String EXTRA_OPTIONAL = "ExtraOptional";
-  public static final String EXTRA_PARCEL = "ExtraParcel";
-  public static final String EXTRA_WITH_DEFAULT = "ExtraWithDefault";
+  private static final String EXTRA_STRING = "ExtraString";
+  private static final String EXTRA_INT = "ExtraInt";
+  private static final String EXTRA_PARCELABLE = "ExtraParcelable";
+  private static final String EXTRA_OPTIONAL = "ExtraOptional";
+  private static final String EXTRA_PARCEL = "ExtraParcel";
+  private static final String EXTRA_WITH_DEFAULT = "ExtraWithDefault";
 
   @InjectExtra(EXTRA_STRING) String stringExtra;
   @InjectExtra(EXTRA_INT) int intExtra;
@@ -50,6 +52,16 @@ public class SampleActivity extends Activity {
   @InjectView(R.id.optional_extra) TextView optionalExtraTextView;
   @InjectView(R.id.parcel_extra) TextView parcelExtraTextView;
   @InjectView(R.id.default_extra) TextView defaultExtraTextView;
+
+  public static Intent getLaunchIntent(Context context, String string, int anInt,
+      ComplexParcelable complexParcelable, ExampleParcel exampleParcel) {
+    Intent intent = new Intent(context, SampleActivity.class);
+    intent.putExtra(SampleActivity.EXTRA_STRING, string);
+    intent.putExtra(SampleActivity.EXTRA_INT, anInt);
+    intent.putExtra(SampleActivity.EXTRA_PARCELABLE, complexParcelable);
+    intent.putExtra(SampleActivity.EXTRA_PARCEL, Parcels.wrap(exampleParcel));
+    return intent;
+  }
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
