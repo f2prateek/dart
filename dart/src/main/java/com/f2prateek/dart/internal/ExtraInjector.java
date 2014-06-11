@@ -56,7 +56,7 @@ final class ExtraInjector {
         case LONG:
           return "java.lang.Long";
         case CHAR:
-          return "java.lang.Char";
+          return "java.lang.Character";
         case FLOAT:
           return "java.lang.Float";
         case DOUBLE:
