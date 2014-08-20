@@ -233,7 +233,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
   * @return true if str is null or zero length
   */
   public static boolean isEmpty(String str) {
-    if (str == null || str.length() == 0){
+    if (str == null || str.length() == 0) {
       return true;
     }
     return false;
