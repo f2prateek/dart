@@ -174,7 +174,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     boolean parcel = isAnnotated(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
 
     ExtraInjector extraInjector = getOrCreateTargetClass(targetClassMap, enclosingElement);
-    extraInjector.addField(key, name, type, required, parcel);
+    extraInjector.addField(isEmpty(key) ? name : key, name, type);
 
     // Add the type-erased version to the valid injection targets set.
     TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
@@ -226,6 +226,18 @@ public final class InjectExtraProcessor extends AbstractProcessor {
       }
     }
   }
+
+  /**
+  * Returns true if the string is null or 0-length.
+  * @param str the string to be examined
+  * @return true if str is null or zero length
+  */
+  public static boolean isEmpty(String str) {
+    if (str == null || str.length() == 0)
+      return true;
+    else
+      return false;
+   }
 
   private boolean containsTypeMirror(Collection<TypeMirror> mirrors, TypeMirror query) {
     // Ensure we are checking against a type-erased version for normalization purposes.
