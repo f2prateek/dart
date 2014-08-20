@@ -37,11 +37,11 @@ public class SampleActivity extends Activity {
   public static final String EXTRA_PARCEL = "ExtraParcel";
   public static final String EXTRA_WITH_DEFAULT = "ExtraWithDefault";
 
+  @InjectExtra String defaultKey;
   @InjectExtra(EXTRA_STRING) String stringExtra;
   @InjectExtra(EXTRA_INT) int intExtra;
   @InjectExtra(EXTRA_PARCELABLE) ComplexParcelable parcelableExtra;
   @InjectExtra(EXTRA_PARCEL) ExampleParcel parcelExtra;
-  @InjectExtra String defaultKey;
   @Optional @InjectExtra(EXTRA_OPTIONAL) String optionalExtra;
   @Optional @InjectExtra(EXTRA_WITH_DEFAULT) String defaultExtra = DEFAULT_EXTRA_VALUE;
 
