@@ -174,6 +174,39 @@ public class InjectExtraTest {
         .generatesSources(expectedSource);
   }
 
+  @Test public void defaultKey() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "public class Test extends Activity {", //
+        "    @InjectExtra String key;", //
+        "}" //
+    ));
+
+    JavaFileObject expectedSource =
+        JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
+            "package test;", //
+            "import com.f2prateek.dart.Dart.Finder;", //
+            "public class Test$$ExtraInjector {", //
+            "  public static void inject(Finder finder, final test.Test target, Object source) {",
+            "    Object object;", "    object = finder.getExtra(source, \"key\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'key' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "    }", //
+            "    target.key = (java.lang.String) object;", //
+            "  }", //
+            "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(dartProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(expectedSource);
+  }
+
   @Test public void fieldVisibility() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //

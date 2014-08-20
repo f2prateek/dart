@@ -45,7 +45,9 @@ public class SampleActivity extends Activity {
   @InjectExtra(EXTRA_PARCEL) ExampleParcel parcelExtra;
   @Optional @InjectExtra(EXTRA_OPTIONAL) String optionalExtra;
   @Optional @InjectExtra(EXTRA_WITH_DEFAULT) String defaultExtra = DEFAULT_EXTRA_VALUE;
+  @InjectExtra String defaultKeyExtra;
 
+  @InjectView(R.id.default_key_extra) TextView defaultKeyExtraTextView;
   @InjectView(R.id.string_extra) TextView stringExtraTextView;
   @InjectView(R.id.int_extra) TextView intExtraTextView;
   @InjectView(R.id.parcelable_extra) TextView parcelableExtraTextView;
@@ -54,12 +56,13 @@ public class SampleActivity extends Activity {
   @InjectView(R.id.default_extra) TextView defaultExtraTextView;
 
   public static Intent getLaunchIntent(Context context, String string, int anInt,
-      ComplexParcelable complexParcelable, ExampleParcel exampleParcel) {
+      ComplexParcelable complexParcelable, ExampleParcel exampleParcel, String defaultKey) {
     Intent intent = new Intent(context, SampleActivity.class);
     intent.putExtra(SampleActivity.EXTRA_STRING, string);
     intent.putExtra(SampleActivity.EXTRA_INT, anInt);
     intent.putExtra(SampleActivity.EXTRA_PARCELABLE, complexParcelable);
     intent.putExtra(SampleActivity.EXTRA_PARCEL, Parcels.wrap(exampleParcel));
+    intent.putExtra("defaultKeyExtra", defaultKey);
     return intent;
   }
 
@@ -77,5 +80,6 @@ public class SampleActivity extends Activity {
     optionalExtraTextView.setText(String.valueOf(optionalExtra));
     parcelExtraTextView.setText(String.valueOf(parcelExtra.getName()));
     defaultExtraTextView.setText(String.valueOf(defaultExtra));
+    defaultKeyExtraTextView.setText(defaultKeyExtra);
   }
 }
