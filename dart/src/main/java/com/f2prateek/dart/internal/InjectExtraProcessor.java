@@ -174,7 +174,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     boolean parcel = isAnnotated(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
 
     ExtraInjector extraInjector = getOrCreateTargetClass(targetClassMap, enclosingElement);
-    extraInjector.addField(isEmpty(key) ? name : key, name, type);
+    extraInjector.addField(isEmpty(key) ? name : key, name, type, required, parcel);
 
     // Add the type-erased version to the valid injection targets set.
     TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
