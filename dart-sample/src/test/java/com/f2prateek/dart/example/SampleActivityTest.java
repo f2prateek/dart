@@ -35,6 +35,7 @@ public class SampleActivityTest {
 
     Intent intent = new Intent(Robolectric.application, SampleActivity.class);
     Bundle bundle = new Bundle();
+    intent.putExtra("defaultKey", "defaultKey");
     intent.putExtra(SampleActivity.EXTRA_STRING, "test");
     intent.putExtra(SampleActivity.EXTRA_INT, 4);
     intent.putExtra(SampleActivity.EXTRA_PARCELABLE, parcelable);
@@ -44,6 +45,7 @@ public class SampleActivityTest {
     SampleActivity activity =
         Robolectric.buildActivity(SampleActivity.class).withIntent(intent).create().get();
 
+    assertThat(activity.defaultKey).isEqualTo("defaultKey");
     assertThat(activity.stringExtra).isEqualTo("test");
     assertThat(activity.intExtra).isEqualTo(4);
     assertThat(activity.parcelableExtra).isEqualTo(parcelable);
