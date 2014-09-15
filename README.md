@@ -32,7 +32,7 @@ By default all @InjectExtra fields are required. An exception will be thrown if 
 To suppress this behavior and create an optional injection, add the @Optional annotation to the field or method.
 
 ```java
-@Optional InjectExtra("key") String title;
+@Optional @InjectExtra("key") String title;
 ```
 
 Bonus
