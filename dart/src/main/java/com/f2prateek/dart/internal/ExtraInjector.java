@@ -166,7 +166,7 @@ final class ExtraInjector {
     } else {
       // an optional extra, wrap it in a check to keep original value, if any
       builder.append("    if (object != null) {\n");
-      // todo better indentation for this code
+      builder.append("  ");
       emitFieldBindings(builder, injection);
       builder.append("    }\n");
     }
@@ -182,7 +182,7 @@ final class ExtraInjector {
       builder.append("    target.").append(fieldBinding.getName()).append(" = ");
 
       if (fieldBinding.isParcel()) {
-        builder.append("org.parceler.Parcels.unwrap((android.os.Parcelable)object);\n");
+        builder.append("org.parceler.Parcels.unwrap((android.os.Parcelable) object);\n");
       } else {
         emitCast(builder, fieldBinding.getType());
         builder.append("object;\n");

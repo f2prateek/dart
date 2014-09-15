@@ -167,7 +167,8 @@ public class Dart {
   }
 
   /** Simpler version of {@link android.os.Bundle#get(String)} which infers the target type. */
-  @SuppressWarnings({ "unchecked", "UnusedDeclaration" }) // Checked by runtime cast. Public API.
+  @SuppressWarnings({ "unchecked", "UnusedDeclaration" })
+  // Checked by runtime cast. Public API.
   public static <T> T get(Bundle bundle, String key) {
     return (T) bundle.get(key);
   }
