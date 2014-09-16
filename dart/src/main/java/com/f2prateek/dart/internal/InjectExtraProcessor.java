@@ -17,6 +17,7 @@
 
 package com.f2prateek.dart.internal;
 
+import android.text.TextUtils;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.Optional;
 import java.io.IOException;
@@ -232,8 +233,8 @@ public final class InjectExtraProcessor extends AbstractProcessor {
   * @param str the string to be examined
   * @return true if str is null or zero length
   */
-  public static boolean isEmpty(String str) {
-    if (str == null || str.length() == 0) {
+  public static boolean isNullOrEmpty(String str) {
+    if (str == null || TextUtils.getTrimmedLength(str) == 0) {
       return true;
     }
     return false;
