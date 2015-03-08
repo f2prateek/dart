@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
 
   @OnClick(R.id.button) public void onLaunchButtonClick() {
     Intent intent = SampleActivity.getLaunchIntent(this, "a string", 4, ComplexParcelable.random(),
-        new ExampleParcel("Andy"));
+        new ExampleParcel("Andy"), "defaultKeyExtra");
     startActivity(intent);
   }
 }

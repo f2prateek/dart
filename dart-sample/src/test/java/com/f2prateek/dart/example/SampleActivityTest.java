@@ -34,7 +34,7 @@ public class SampleActivityTest {
     ExampleParcel parcel = new ExampleParcel("andy");
 
     Intent intent =
-        SampleActivity.getLaunchIntent(Robolectric.application, "test", 4, parcelable, parcel);
+        SampleActivity.getLaunchIntent(Robolectric.application, "test", 4, parcelable, parcel, "defaultKeyExtra");
 
     SampleActivity activity =
         Robolectric.buildActivity(SampleActivity.class).withIntent(intent).create().get();
@@ -44,5 +44,6 @@ public class SampleActivityTest {
     assertThat(activity.parcelableExtra).isEqualTo(parcelable);
     assertThat(activity.parcelExtra).isEqualTo(parcel);
     assertThat(activity.defaultExtra).isEqualTo(SampleActivity.DEFAULT_EXTRA_VALUE);
+    assertThat(activity.defaultKeyExtra).isEqualTo("defaultKeyExtra");
   }
 }
