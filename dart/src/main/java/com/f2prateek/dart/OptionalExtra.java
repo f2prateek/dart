@@ -31,5 +31,5 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * </code></pre>
  */
 @Retention(CLASS) @Target({ FIELD, METHOD })
-public @interface Optional {
+public @interface OptionalExtra {
 }

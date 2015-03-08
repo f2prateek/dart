@@ -18,7 +18,7 @@
 package com.f2prateek.dart.internal;
 
 import com.f2prateek.dart.InjectExtra;
-import com.f2prateek.dart.Optional;
+import com.f2prateek.dart.OptionalExtra;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -170,7 +170,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     String name = element.getSimpleName().toString();
     String key = element.getAnnotation(InjectExtra.class).value();
     TypeMirror type = element.asType();
-    boolean required = element.getAnnotation(Optional.class) == null;
+    boolean required = element.getAnnotation(OptionalExtra.class) == null;
     boolean parcel = isAnnotated(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
 
     ExtraInjector extraInjector = getOrCreateTargetClass(targetClassMap, enclosingElement);
