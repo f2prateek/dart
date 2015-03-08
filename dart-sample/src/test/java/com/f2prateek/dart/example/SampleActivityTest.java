@@ -22,10 +22,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
+@Config(emulateSdk = 18, manifest = "src/main/AndroidManifest.xml")
 public class SampleActivityTest {
   @Test public void verifyExtrasInjection() {
     ComplexParcelable parcelable = ComplexParcelable.random();
