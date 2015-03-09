@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 1.2.0 *(In progress)*
+----------------------------
+
+* Use variable name as key if one is not provided in annotation.
+* Fix `char` injection.
+
 Version 1.1.0 *(2014-01-17)*
 ----------------------------
 
