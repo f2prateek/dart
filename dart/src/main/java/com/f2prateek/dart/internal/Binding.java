@@ -17,13 +17,15 @@
 
 package com.f2prateek.dart.internal;
 
+import com.f2prateek.dart.OptionalExtra;
+
 /** A field or method extra injection binding. */
 interface Binding {
   /** A description of the binding in human readable form (e.g., "field 'foo'"). */
   String getDescription();
 
   /**
-   * False if the {@link com.f2prateek.dart.Optional @Optional} annotation is present on the
+   * False if the {@link OptionalExtra @Optional} annotation is present on the
    * binding.
    */
   boolean isRequired();

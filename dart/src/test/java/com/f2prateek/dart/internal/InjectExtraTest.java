@@ -46,7 +46,7 @@ public class InjectExtraTest {
             "  public static void inject(Finder finder, final test.Test target, Object source) {",
             "    Object object;", "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.extra = (java.lang.String) object;", //
             "  }", //
@@ -87,42 +87,42 @@ public class InjectExtraTest {
             "    Object object;", //
             "    object = finder.getExtra(source, \"key_bool\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_bool' for field 'aBool' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key_bool' for field 'aBool' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.aBool = (java.lang.Boolean) object;", //
             "    object = finder.getExtra(source, \"key_byte\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_byte' for field 'aByte' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key_byte' for field 'aByte' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.aByte = (java.lang.Byte) object;", //
             "    object = finder.getExtra(source, \"key_short\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_short' for field 'aShort' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key_short' for field 'aShort' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.aShort = (java.lang.Short) object;", //
             "    object = finder.getExtra(source, \"key_int\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_int' for field 'anInt' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key_int' for field 'anInt' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.anInt = (java.lang.Integer) object;", //
             "    object = finder.getExtra(source, \"key_long\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_long' for field 'aLong' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key_long' for field 'aLong' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.aLong = (java.lang.Long) object;", //
             "    object = finder.getExtra(source, \"key_char\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_char' for field 'aChar' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key_char' for field 'aChar' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.aChar = (java.lang.Character) object;", //
             "    object = finder.getExtra(source, \"key_float\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_float' for field 'aFloat' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key_float' for field 'aFloat' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.aFloat = (java.lang.Float) object;", //
             "    object = finder.getExtra(source, \"key_double\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_double' for field 'aDouble' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key_double' for field 'aDouble' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.aDouble = (java.lang.Double) object;", //
             "  }", //
@@ -157,7 +157,7 @@ public class InjectExtraTest {
             "  public static void inject(Finder finder, final test.Test target, Object source) {",
             "    Object object;", "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1', field 'extra2', and field 'extra3' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1', field 'extra2', and field 'extra3' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.extra1 = (java.lang.String) object;", //
             "    target.extra2 = (java.lang.String) object;", //
@@ -192,7 +192,7 @@ public class InjectExtraTest {
             "  public static void inject(Finder finder, final test.Test target, Object source) {",
             "    Object object;", "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'key' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'key' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.key = (java.lang.String) object;", //
             "  }", //
@@ -227,9 +227,9 @@ public class InjectExtraTest {
         "package test;", //
         "import android.app.Activity;", //
         "import com.f2prateek.dart.InjectExtra;", //
-        "import com.f2prateek.dart.Optional;", //
+        "import com.f2prateek.dart.OptionalExtra;", //
         "public class Test extends Activity {", //
-        "  @Optional @InjectExtra(\"key\") String extra;", //
+        "  @OptionalExtra @InjectExtra(\"key\") String extra;", //
         "}" //
     ));
 
@@ -366,7 +366,7 @@ public class InjectExtraTest {
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.extra = (java.lang.String) object;", //
             "  }", //
@@ -383,7 +383,7 @@ public class InjectExtraTest {
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.extra1 = (java.lang.String) object;", //
             "  }", //
@@ -429,7 +429,7 @@ public class InjectExtraTest {
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.extra = (java.lang.String) object;", //
             "  }", //
@@ -445,7 +445,7 @@ public class InjectExtraTest {
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1' was not found. If this extra is optional add '@Optional' annotation.\");",
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1' was not found. If this extra is optional add '@OptionalExtra' annotation.\");",
             "    }", //
             "    target.extra1 = (java.lang.String) object;", //
             "  }", //

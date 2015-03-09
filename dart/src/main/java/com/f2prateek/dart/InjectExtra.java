@@ -33,7 +33,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  * {@literal @}InjectExtra String content; // "content" is the key for the extra
  * </code></pre>
  *
- * @see Optional
+ * @see OptionalExtra
  */
 @Retention(CLASS) @Target(FIELD)
 public @interface InjectExtra {
