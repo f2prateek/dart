@@ -170,7 +170,10 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     String name = element.getSimpleName().toString();
     String key = element.getAnnotation(InjectExtra.class).value();
     TypeMirror type = element.asType();
-    boolean required = element.getAnnotation(Optional.class) == null;
+    boolean dartOptional = element.getAnnotation(Optional.class) != null;
+    boolean butterKnifeOptional = element.getAnnotation(butterknife.Optional.class) != null;
+    
+    boolean required = !dartOptional && !butterKnifeOptional;
     boolean parcel = isAnnotated(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
 
     ExtraInjector extraInjector = getOrCreateTargetClass(targetClassMap, enclosingElement);
