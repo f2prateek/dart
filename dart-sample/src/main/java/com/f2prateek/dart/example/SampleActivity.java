@@ -43,7 +43,7 @@ public class SampleActivity extends Activity {
   @InjectExtra(EXTRA_INT) int intExtra;
   @InjectExtra(EXTRA_PARCELABLE) ComplexParcelable parcelableExtra;
   @InjectExtra(EXTRA_PARCEL) ExampleParcel parcelExtra;
-  @Optional @InjectExtra(EXTRA_OPTIONAL) String optionalExtra;
+  @butterknife.Optional @InjectExtra(EXTRA_OPTIONAL) String optionalExtra;
   @Optional @InjectExtra(EXTRA_WITH_DEFAULT) String defaultExtra = DEFAULT_EXTRA_VALUE;
   @InjectExtra String defaultKeyExtra;
 
