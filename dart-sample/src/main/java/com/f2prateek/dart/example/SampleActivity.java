@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import com.f2prateek.dart.Dart;
 import com.f2prateek.dart.InjectExtra;
-import com.f2prateek.dart.Optional;
+import com.f2prateek.dart.Nullable;
 import org.parceler.Parcels;
 
 public class SampleActivity extends Activity {
@@ -43,8 +43,8 @@ public class SampleActivity extends Activity {
   @InjectExtra(EXTRA_INT) int intExtra;
   @InjectExtra(EXTRA_PARCELABLE) ComplexParcelable parcelableExtra;
   @InjectExtra(EXTRA_PARCEL) ExampleParcel parcelExtra;
-  @Optional @InjectExtra(EXTRA_OPTIONAL) String optionalExtra;
-  @Optional @InjectExtra(EXTRA_WITH_DEFAULT) String defaultExtra = DEFAULT_EXTRA_VALUE;
+  @Nullable @InjectExtra(EXTRA_OPTIONAL) String optionalExtra;
+  @Nullable @InjectExtra(EXTRA_WITH_DEFAULT) String defaultExtra = DEFAULT_EXTRA_VALUE;
   @InjectExtra String defaultKeyExtra;
 
   @InjectView(R.id.default_key_extra) TextView defaultKeyExtraTextView;
