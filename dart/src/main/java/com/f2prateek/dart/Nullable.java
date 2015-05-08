@@ -24,17 +24,15 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.CLASS;
 
 /**
- * Annotation for fields which indicate that it should be looked up in the activity intent's extras
- * or fragment arguments.
- * The extra will automatically be cast to the field type. If no key is provided, the variable name
- * will be used.
+ * Denote that the extra specified by the injection is not required to be present.
  * <pre><code>
- * {@literal @}InjectExtra("key") String title;
- * {@literal @}InjectExtra String content; // "content" is the key for the extra
+ * {@literal @}Nullable InjectExtra("key") String title;
  * </code></pre>
+ * This annotation is deprecated, and will be removed in a future release. It is encouraged to use
+ * the {@code @Nullable} annotation from Android's "support-annotations" library.
  *
- * @see Nullable
+ * @see <a href="http://tools.android.com/tech-docs/support-annotations">Android Tools
+ * Project</a>
  */
-@Retention(CLASS) @Target(FIELD) public @interface InjectExtra {
-  String value() default "";
+@Deprecated @Retention(CLASS) @Target(FIELD) public @interface Nullable {
 }

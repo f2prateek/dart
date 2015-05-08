@@ -23,8 +23,7 @@ interface Binding {
   String getDescription();
 
   /**
-   * False if the {@link com.f2prateek.dart.Optional @Optional} annotation is present on the
-   * binding.
+   * False if any annotation named {@code Optional} or {@code Nullable} is present on the binding.
    */
   boolean isRequired();
 }

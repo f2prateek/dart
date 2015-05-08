@@ -46,15 +46,15 @@ import java.util.Map;
  * {@link #inject(Object, Bundle) bundle into another object}.
  * <p>
  * Be default, extras are required to be present in the bundle for field injections.
- * If an extra is optional add the {@link Optional @Optional} annotation.
+ * If an extra is optional add the {@link Nullable @Nullable} annotation.
  * <pre><code>
- * {@literal @}Optional {@literal @}InjectExtra("key") String extra;
+ * {@literal @}Nullable {@literal @}InjectExtra("key") String extra;
  * </code></pre>
  * <p>
  * If you need to provide a default value for an extra, simply set an initial value
- * while declaring the field, combined with the {@link Optional @Optional} annotation.
+ * while declaring the field, combined with the {@link Nullable @Nullable} annotation.
  * <pre><code>
- * {@literal @}Optional {@literal @}InjectExtra("key") String extra = "default_value";
+ * {@literal @}Nullable {@literal @}InjectExtra("key") String extra = "default_value";
  * </code></pre>
  */
 public class Dart {

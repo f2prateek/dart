@@ -29,10 +29,11 @@ Optional Injection
 ------------------
 By default all @InjectExtra fields are required. An exception will be thrown if the target extra cannot be found.
 
-To suppress this behavior and create an optional injection, add the @Optional annotation to the field or method.
+To suppress this behavior and create an optional injection, add the `@Nullable` annotation to the field or method.
+Any annotation with the class name `Nullable` is respected, including ones from the support library annotations and ButterKnife.
 
 ```java
-@Optional @InjectExtra("key") String title;
+@Nullable @InjectExtra("key") String title;
 ```
 
 Bonus

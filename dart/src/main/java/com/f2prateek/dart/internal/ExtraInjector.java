@@ -160,7 +160,7 @@ final class ExtraInjector {
           .append(injection.getKey())
           .append("' for ");
       emitHumanDescription(builder, requiredBindings);
-      builder.append(" was not found. If this extra is optional add '@Optional' annotation.\");\n")
+      builder.append(" was not found. If this extra is optional add '@Nullable' annotation.\");\n")
           .append("    }\n");
       emitFieldBindings(builder, injection);
     } else {
