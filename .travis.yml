@@ -11,6 +11,14 @@ jdk:
   - oraclejdk7
   - oraclejdk8
 
+after_success:
+  - .buildscript/deploy_snapshot.sh
+
+env:
+  global:
+    - secure: "S2ANsF5glMuPrjilyE6+JqVp/t9bEQgkLXNHN1quLebTaJcveNFgyCPCvcevKJLiHCb4USY0cteZYj1U0QOvVR3zi/chr6Pxuo1kwgrfKpdBCWa1oxzLt0ipkVgH60VwxQNWjoUQCleOhu3F16X7IvCx32Wu7OqpmenJ6FJZYUw="
+    - secure: "ZetM/udS7DJMVdsFlSTCf88D6J4zQPS6hY3qc/f0BfYJP6qpOkHMBuxfIJMxkyQ9Rwi45RAX5kFFHJg/4wYiCQhlCSKy1gZaf4PORbhxTQR+rJCRtUi5dfHz2S2og/qWZm8KgaCalKW1s+f6/shFIBLcHvw8gnQmKvcIv7BHNaQ="
+
 branches:
   except:
     - gh-pages
