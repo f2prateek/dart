@@ -38,6 +38,16 @@ public class MainActivity extends Activity {
   @OnClick(R.id.button) public void onLaunchButtonClick() {
     Intent intent = SampleActivity.getLaunchIntent(this, "a string", 4, ComplexParcelable.random(),
         new ExampleParcel("Andy"), "defaultKeyExtra");
+
+    /* Uncomment to use IntentBuilder
+    intent = new SampleActivityIntentBuilder(this).
+      withStringExtra("a string").
+      withIntExtra(4).
+      withParcelableExtra(ComplexParcelable.random()).
+      withParcelExtra(new ExampleParcel("Andy")).
+      withDefaultKeyExtra("defaultKeyExtra").build();
+    */
+
     startActivity(intent);
   }
 }

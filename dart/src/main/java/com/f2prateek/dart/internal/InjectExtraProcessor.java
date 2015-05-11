@@ -51,6 +51,7 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 
 public final class InjectExtraProcessor extends AbstractProcessor {
   public static final String SUFFIX = "$$ExtraInjector";
+  public static final String INTENT_BUILDER_SUFFIX = "IntentBuilder";
 
   private Elements elementUtils;
   private Types typeUtils;
@@ -85,6 +86,20 @@ public final class InjectExtraProcessor extends AbstractProcessor {
         writer.close();
       } catch (IOException e) {
         error(typeElement, "Unable to write injector for type %s: %s", typeElement, e.getMessage());
+      }
+
+      // Now write the IntentBuilder
+      try {
+        IntentBuilder intentBuilder = new IntentBuilder(extraInjector.getClassPackage(),
+            typeElement.getSimpleName()+INTENT_BUILDER_SUFFIX, extraInjector.getTargetClass(),
+            extraInjector.getInjectionMap());
+        JavaFileObject jfo = filer.createSourceFile(intentBuilder.getFqcn(), typeElement);
+        Writer writer = jfo.openWriter();
+        writer.write(intentBuilder.brewJava());
+        writer.flush();
+        writer.close();
+      } catch (IOException e) {
+        error(typeElement, "Unable to write intent builder for type %s: %s", typeElement, e.getMessage());
       }
     }
 

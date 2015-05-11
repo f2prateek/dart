@@ -189,4 +189,16 @@ final class ExtraInjector {
       }
     }
   }
+
+  public Map<String,ExtraInjection> getInjectionMap() {
+    return injectionMap;
+  }
+
+  public String getClassPackage() {
+    return classPackage;
+  }
+
+  public String getTargetClass() {
+    return targetClass;
+  }
 }
