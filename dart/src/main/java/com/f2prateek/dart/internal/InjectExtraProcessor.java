@@ -91,7 +91,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
       // Now write the IntentBuilder
       try {
         IntentBuilder intentBuilder = new IntentBuilder(extraInjector.getClassPackage(),
-            typeElement.getSimpleName()+INTENT_BUILDER_SUFFIX, extraInjector.getTargetClass(),
+            typeElement.getSimpleName() + INTENT_BUILDER_SUFFIX, extraInjector.getTargetClass(),
             extraInjector.getInjectionMap());
         JavaFileObject jfo = filer.createSourceFile(intentBuilder.getFqcn(), typeElement);
         Writer writer = jfo.openWriter();
@@ -99,7 +99,8 @@ public final class InjectExtraProcessor extends AbstractProcessor {
         writer.flush();
         writer.close();
       } catch (IOException e) {
-        error(typeElement, "Unable to write intent builder for type %s: %s", typeElement, e.getMessage());
+        error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,
+            e.getMessage());
       }
     }
 

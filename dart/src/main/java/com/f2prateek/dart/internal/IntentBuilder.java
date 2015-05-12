@@ -20,7 +20,8 @@ final class IntentBuilder {
   private final String className;
   private final String targetClass;
 
-  IntentBuilder(String classPackage, String className, String targetClass, Map<String, ExtraInjection> injectionMap) {
+  IntentBuilder(String classPackage, String className, String targetClass,
+        Map<String, ExtraInjection> injectionMap) {
     this.classPackage = classPackage;
     this.className = className;
     this.targetClass = targetClass;
@@ -50,7 +51,7 @@ final class IntentBuilder {
         .addStatement("Intent intent = new Intent(context, $N.class)", targetClass);
 
     for (ExtraInjection injection : injectionMap.values()) {
-      // TODO: Only doing first element.
+      // Only doing first element.
       // Not sure how usable is having several elements with the same key
       Iterator<FieldBinding> iter = injection.getFieldBindings().iterator();
       FieldBinding fb = iter.next();
@@ -82,7 +83,7 @@ final class IntentBuilder {
   }
 
   private String capitalize(String str) {
-    return str.substring(0,1).toUpperCase() + str.substring(1);
+    return str.substring(0, 1).toUpperCase() + str.substring(1);
   }
 
 }

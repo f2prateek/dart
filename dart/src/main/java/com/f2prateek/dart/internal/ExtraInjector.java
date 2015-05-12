@@ -190,7 +190,7 @@ final class ExtraInjector {
     }
   }
 
-  public Map<String,ExtraInjection> getInjectionMap() {
+  public Map<String, ExtraInjection> getInjectionMap() {
     return injectionMap;
   }
 
