@@ -1,7 +1,18 @@
 package com.f2prateek.dart.internal;
 
+import android.content.Context;
+import android.content.Intent;
+
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+
 import java.util.Iterator;
 import java.util.Map;
+
+import javax.lang.model.element.Modifier;
 
 final class IntentBuilder {
   private final Map<String, ExtraInjection> injectionMap;
@@ -21,66 +32,57 @@ final class IntentBuilder {
   }
 
   String brewJava() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("// Generated code from Dart. Do not modify!\n");
-    builder.append("package ").append(classPackage).append(";\n\n");
-    builder.append("import android.content.Context;\n");
-    builder.append("import android.content.Intent;\n\n");
 
-    builder.append("public class ").append(className).append(" {\n");
-    builder.append("  private final Context context;\n\n");
+    MethodSpec constructor = MethodSpec.constructorBuilder()
+        .addModifiers(Modifier.PUBLIC)
+        .addParameter(Context.class, "context")
+        .addStatement("this.$N = $N", "context", "context")
+        .build();
 
-    createConstructor(builder);
+    TypeSpec.Builder classTypeBuilder = TypeSpec.classBuilder(className)
+        .addModifiers(Modifier.PUBLIC)
+        .addField(Context.class, "context", Modifier.PRIVATE, Modifier.FINAL)
+        .addMethod(constructor);
+
+    MethodSpec.Builder buildBuilder = MethodSpec.methodBuilder("build")
+        .addModifiers(Modifier.PUBLIC)
+        .returns(Intent.class)
+        .addStatement("Intent intent = new Intent(context, $N.class)", targetClass);
 
     for (ExtraInjection injection : injectionMap.values()) {
-      createSetter(injection, builder);
+      // TODO: Only doing first element.
+      // Not sure how usable is having several elements with the same key
+      Iterator<FieldBinding> iter = injection.getFieldBindings().iterator();
+      FieldBinding fb = iter.next();
+
+      classTypeBuilder.addField(TypeName.get(fb.getType()), fb.getName(), Modifier.PRIVATE);
+
+      MethodSpec setter = MethodSpec.methodBuilder("with" + capitalize(fb.getName()))
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(TypeName.get(fb.getType()), fb.getName())
+            .returns(ClassName.get(classPackage, className))
+            .addStatement("this.$N = $N", fb.getName(), fb.getName())
+            .addStatement("return this")
+            .build();
+      classTypeBuilder.addMethod(setter);
+
+      if (!fb.isParcel()) {
+        buildBuilder.addStatement("intent.putExtra($S, $N)", injection.getKey(), fb.getName());
+      }
     }
 
-    createBuildMethod(builder);
+    buildBuilder.addStatement("return intent");
+    classTypeBuilder.addMethod(buildBuilder.build());
 
-    builder.append("}\n");
-    return builder.toString();
-  }
+    JavaFile javaFile = JavaFile.builder(classPackage, classTypeBuilder.build()).
+        addFileComment("Generated code from Dart. Do not modify!").
+        build();
 
-  private void createSetter(ExtraInjection injection, StringBuilder builder) {
-    // TODO: Only doing first element.
-    // Not sure how usable is having several elements with the same key
-    Iterator<FieldBinding> iter = injection.getFieldBindings().iterator();
-    FieldBinding fb = iter.next();
-
-    builder.append("  private ").append(fb.getType()).append(" ").append(fb.getName()).append(";\n");
-    builder.append("  public ").append(className).append(" with").append(capitalize(fb.getName())).
-            append("(").append(fb.getType()).append(" ").append(fb.getName()).append(") {\n");
-    builder.append("    this.").append(fb.getName()).append(" = ").append(fb.getName()).append(";\n");
-    builder.append("    return this;\n");
-    builder.append("  }\n\n");
+    return javaFile.toString();
   }
 
   private String capitalize(String str) {
     return str.substring(0,1).toUpperCase() + str.substring(1);
   }
 
-  private void createConstructor(StringBuilder builder) {
-    builder.append("  public ").append(className).append("(Context context) {\n");
-    builder.append("    this.context = context;\n");
-    builder.append("  }\n\n");
-  }
-
-  private void createBuildMethod(StringBuilder builder) {
-    builder.append("  public Intent build() {\n");
-    builder.append("    Intent intent = new Intent(context, ").append(targetClass).append(".class);\n");
-
-    for (ExtraInjection injection : injectionMap.values()) {
-        // FIXME: Ugly. Iterating again over the same list
-        Iterator<FieldBinding> iter = injection.getFieldBindings().iterator();
-        FieldBinding fb = iter.next();
-        if (!fb.isParcel()) {
-            builder.append("    intent.putExtra(\"").append(injection.getKey()).append("\", ").
-                    append(fb.getName()).append(");\n");
-        }
-    }
-
-    builder.append("    return intent;\n");
-    builder.append("  }\n\n");
-  }
 }
