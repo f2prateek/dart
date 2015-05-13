@@ -57,18 +57,29 @@ final class IntentBuilder {
       FieldBinding fb = iter.next();
 
       classTypeBuilder.addField(TypeName.get(fb.getType()), fb.getName(), Modifier.PRIVATE);
+      classTypeBuilder.addField(boolean.class, getIsSetName(fb.getName()), Modifier.PRIVATE);
 
       MethodSpec setter = MethodSpec.methodBuilder("with" + capitalize(fb.getName()))
             .addModifiers(Modifier.PUBLIC)
             .addParameter(TypeName.get(fb.getType()), fb.getName())
             .returns(ClassName.get(classPackage, className))
             .addStatement("this.$N = $N", fb.getName(), fb.getName())
+            .addStatement("$N = true", getIsSetName(fb.getName()))
             .addStatement("return this")
             .build();
       classTypeBuilder.addMethod(setter);
 
       if (!fb.isParcel()) {
+        buildBuilder.beginControlFlow("if ($N)", getIsSetName(fb.getName()));
         buildBuilder.addStatement("intent.putExtra($S, $N)", injection.getKey(), fb.getName());
+
+        if (fb.isRequired()) {
+            buildBuilder.nextControlFlow("else ");
+            buildBuilder.addStatement(
+                    "throw new IllegalStateException(\"Parameter $N is mandatory\")", fb.getName());
+        }
+
+        buildBuilder.endControlFlow();
       }
     }
 
@@ -82,8 +93,11 @@ final class IntentBuilder {
     return javaFile.toString();
   }
 
+  private String getIsSetName(String str) {
+      return str + "IsSet";
+  }
+
   private String capitalize(String str) {
     return str.substring(0, 1).toUpperCase() + str.substring(1);
   }
-
 }
