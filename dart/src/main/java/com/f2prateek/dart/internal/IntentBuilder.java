@@ -3,6 +3,7 @@ package com.f2prateek.dart.internal;
 import android.content.Context;
 import android.content.Intent;
 
+import android.os.Parcelable;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -56,31 +57,38 @@ final class IntentBuilder {
       Iterator<FieldBinding> iter = injection.getFieldBindings().iterator();
       FieldBinding fb = iter.next();
 
-      classTypeBuilder.addField(TypeName.get(fb.getType()), fb.getName(), Modifier.PRIVATE);
+      final String statement;
+      final TypeName fieldType;
+      if (fb.isParcel()) {
+          statement = "this.$N = org.parceler.Parcels.wrap($N)";
+          fieldType = TypeName.get(Parcelable.class);
+      } else {
+          statement = "this.$N = $N";
+          fieldType = TypeName.get(fb.getType());
+      }
+      classTypeBuilder.addField(fieldType, fb.getName(), Modifier.PRIVATE);
       classTypeBuilder.addField(boolean.class, getIsSetName(fb.getName()), Modifier.PRIVATE);
 
       MethodSpec setter = MethodSpec.methodBuilder("with" + capitalize(fb.getName()))
             .addModifiers(Modifier.PUBLIC)
             .addParameter(TypeName.get(fb.getType()), fb.getName())
             .returns(ClassName.get(classPackage, className))
-            .addStatement("this.$N = $N", fb.getName(), fb.getName())
+            .addStatement(statement, fb.getName(), fb.getName())
             .addStatement("$N = true", getIsSetName(fb.getName()))
             .addStatement("return this")
             .build();
       classTypeBuilder.addMethod(setter);
 
-      if (!fb.isParcel()) {
-        buildBuilder.beginControlFlow("if ($N)", getIsSetName(fb.getName()));
-        buildBuilder.addStatement("intent.putExtra($S, $N)", injection.getKey(), fb.getName());
+      buildBuilder.beginControlFlow("if ($N)", getIsSetName(fb.getName()));
+      buildBuilder.addStatement("intent.putExtra($S, $N)", injection.getKey(), fb.getName());
 
-        if (fb.isRequired()) {
-            buildBuilder.nextControlFlow("else ");
-            buildBuilder.addStatement(
-                    "throw new IllegalStateException(\"Parameter $N is mandatory\")", fb.getName());
-        }
-
-        buildBuilder.endControlFlow();
+      if (fb.isRequired()) {
+          buildBuilder.nextControlFlow("else ");
+          buildBuilder.addStatement(
+                "throw new IllegalStateException(\"Parameter $N is mandatory\")", fb.getName());
       }
+
+    buildBuilder.endControlFlow();
     }
 
     buildBuilder.addStatement("return intent");

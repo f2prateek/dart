@@ -18,8 +18,6 @@
 package com.f2prateek.dart.example;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import butterknife.ButterKnife;
@@ -27,7 +25,6 @@ import butterknife.InjectView;
 import com.f2prateek.dart.Dart;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.Nullable;
-import org.parceler.Parcels;
 
 public class SampleActivity extends Activity {
   public static final String DEFAULT_EXTRA_VALUE = "a default value";
