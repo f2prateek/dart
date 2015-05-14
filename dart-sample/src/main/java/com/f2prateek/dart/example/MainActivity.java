@@ -23,6 +23,7 @@ import android.os.Bundle;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.f2prateek.dart.Dart;
+import org.parceler.Parcels;
 
 public class MainActivity extends Activity {
 
@@ -36,8 +37,14 @@ public class MainActivity extends Activity {
   }
 
   @OnClick(R.id.button) public void onLaunchButtonClick() {
-    Intent intent = SampleActivity.getLaunchIntent(this, "a string", 4, ComplexParcelable.random(),
-        new ExampleParcel("Andy"), "defaultKeyExtra");
+    Intent intent = SampleActivityIntentBuilder
+        .withStringExtra("a string")
+        .withIntExtra(4)
+        .withParcelableExtra(ComplexParcelable.random())
+        .withParcelExra(new ExampleParcel("Andy"))
+        .build();
+
+    intent.putExtra("defaultKeyExtra", "defaultKeyExtra");
 
     /* Uncomment to use IntentBuilder
     intent = new SampleActivityIntentBuilder(this).

@@ -93,6 +93,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
         IntentBuilder intentBuilder = new IntentBuilder(extraInjector.getClassPackage(),
             typeElement.getSimpleName() + INTENT_BUILDER_SUFFIX, extraInjector.getTargetClass(),
             extraInjector.getInjectionMap());
+        System.out.println(intentBuilder.brewJava());
         JavaFileObject jfo = filer.createSourceFile(intentBuilder.getFqcn(), typeElement);
         Writer writer = jfo.openWriter();
         writer.write(intentBuilder.brewJava());
