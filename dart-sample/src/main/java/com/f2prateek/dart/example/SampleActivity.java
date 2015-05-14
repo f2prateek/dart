@@ -55,17 +55,6 @@ public class SampleActivity extends Activity {
   @InjectView(R.id.parcel_extra) TextView parcelExtraTextView;
   @InjectView(R.id.default_extra) TextView defaultExtraTextView;
 
-  public static Intent getLaunchIntent(Context context, String string, int anInt,
-      ComplexParcelable complexParcelable, ExampleParcel exampleParcel, String defaultKey) {
-    Intent intent = new Intent(context, SampleActivity.class);
-    intent.putExtra(SampleActivity.EXTRA_STRING, string);
-    intent.putExtra(SampleActivity.EXTRA_INT, anInt);
-    intent.putExtra(SampleActivity.EXTRA_PARCELABLE, complexParcelable);
-    intent.putExtra(SampleActivity.EXTRA_PARCEL, Parcels.wrap(exampleParcel));
-    intent.putExtra("defaultKeyExtra", defaultKey);
-    return intent;
-  }
-
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_sample);

@@ -20,6 +20,7 @@ package com.f2prateek.dart.example;
 import android.content.Intent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.parceler.Parcels;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -33,8 +34,14 @@ public class SampleActivityTest {
     ComplexParcelable parcelable = ComplexParcelable.random();
     ExampleParcel parcel = new ExampleParcel("andy");
 
-    Intent intent =
-        SampleActivity.getLaunchIntent(Robolectric.application, "test", 4, parcelable, parcel, "defaultKeyExtra");
+    Intent intent = SampleActivityIntentBuilder
+        .withStringExtra("test")
+        .withIntExtra(4)
+        .withParcelableExtra(complexParcelable)
+        .withParcelExra(Parcels.wrap(exampleParcel))
+        .build();
+
+    intent.putExtra("defaultKeyExtra", "defaultKeyExtra");
 
     SampleActivity activity =
         Robolectric.buildActivity(SampleActivity.class).withIntent(intent).create().get();
