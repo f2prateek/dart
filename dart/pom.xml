@@ -35,6 +35,12 @@
       <artifactId>compile-testing</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.parceler</groupId>
+      <artifactId>parceler-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
 
     <dependency>
         <groupId>com.squareup</groupId>

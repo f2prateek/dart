@@ -561,4 +561,76 @@ public class IntentBuilderTest {
         .and()
         .generatesSources(expectedSource1, expectedSource2);
   }
+
+    @Test public void injectingParcelExtra() {
+        JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+             "package test;", //
+             "import android.app.Activity;", //
+             "import com.f2prateek.dart.InjectExtra;", //
+             "import org.parceler.Parcel;", //
+             "import org.parceler.ParcelConstructor;", //
+             "@Parcel", //
+             "class ExampleParcel {", //
+             "", //
+             "  String name;", //
+             "", //
+             "  @ParcelConstructor", //
+             "  public ExampleParcel(String name) {", //
+             "    this.name = name;", //
+             "  }", //
+             "", //
+             "  public String getName() {", //
+             "    return name;", //
+             "  }", //
+             "}", //
+             "public class Test extends Activity {", //
+             "    @InjectExtra(\"key\") ExampleParcel extra;", //
+             "}" //
+        ));
+
+        JavaFileObject expectedSource =
+            JavaFileObjects.forSourceString("test/TestIntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+             "", //
+             "import android.content.Context;", //
+             "import android.content.Intent;", //
+             "import android.os.Parcelable;", //
+             "", //
+             "public class TestIntentBuilder {", //
+             "  private final Context context;", //
+             "", //
+             "  private Parcelable extra;", //
+             "", //
+             "  private boolean extraIsSet;", //
+             "", //
+             "  public TestIntentBuilder(Context context) {", //
+             "    this.context = context;", //
+             "  }", //
+             "", //
+             "  public TestIntentBuilder withExtra(ExampleParcel extra) {", //
+             "    this.extra = org.parceler.Parcels.wrap(extra);", //
+             "    extraIsSet = true;", //
+             "    return this;", //
+             "  }", //
+             "", //
+             "  public Intent build() {", //
+             "    Intent intent = new Intent(context, test.Test.class);", //
+             "    if (extraIsSet) {", //
+             "      intent.putExtra(\"key\", extra);", //
+             "    } else {", //
+             "      throw new IllegalStateException(\"Parameter extra is mandatory\");", //
+             "    }", //
+             "    return intent;", //
+             "  }", //
+             "}" //
+            ));
+
+
+        ASSERT.about(javaSource())
+            .that(source)
+            .processedWith(dartProcessors())
+            .compilesWithoutError()
+            .and()
+            .generatesSources(expectedSource);
+    }
 }

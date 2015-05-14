@@ -78,30 +78,46 @@ public final class InjectExtraProcessor extends AbstractProcessor {
       TypeElement typeElement = entry.getKey();
       ExtraInjector extraInjector = entry.getValue();
 
+      Writer writer = null;
       try {
         JavaFileObject jfo = filer.createSourceFile(extraInjector.getFqcn(), typeElement);
-        Writer writer = jfo.openWriter();
+        writer = jfo.openWriter();
         writer.write(extraInjector.brewJava());
-        writer.flush();
-        writer.close();
       } catch (IOException e) {
         error(typeElement, "Unable to write injector for type %s: %s", typeElement, e.getMessage());
+      } finally {
+        if (writer != null) {
+          try {
+            writer.close();
+          } catch (IOException e) {
+            error(typeElement, "Unable to close injector source file for type %s: %s", typeElement,
+                  e.getMessage());
+          }
+        }
       }
 
       // Now write the IntentBuilder
+      Writer writer2 = null;
       try {
         IntentBuilder intentBuilder = new IntentBuilder(extraInjector.getClassPackage(),
             typeElement.getSimpleName() + INTENT_BUILDER_SUFFIX, extraInjector.getTargetClass(),
             extraInjector.getInjectionMap());
-        System.out.println(intentBuilder.brewJava());
         JavaFileObject jfo = filer.createSourceFile(intentBuilder.getFqcn(), typeElement);
-        Writer writer = jfo.openWriter();
-        writer.write(intentBuilder.brewJava());
-        writer.flush();
-        writer.close();
+        writer2 = jfo.openWriter();
+        writer2.write(intentBuilder.brewJava());
       } catch (IOException e) {
         error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,
-            e.getMessage());
+              e.getMessage());
+      } finally {
+        if (writer2 != null) {
+          try {
+            writer2.close();
+          } catch (IOException e) {
+            error(typeElement, "Unable to close intent builder source file for type %s: %s",
+                  typeElement,
+                  e.getMessage());
+          }
+        }
       }
     }
 

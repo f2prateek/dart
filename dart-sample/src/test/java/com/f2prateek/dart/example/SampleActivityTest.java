@@ -43,8 +43,11 @@ public class SampleActivityTest {
       .withDefaultKeyExtra("defaultKeyExtra")
       .build();
 
-    SampleActivity activity =
-        Robolectric.buildActivity(SampleActivity.class).withIntent(intent).create().get();
+    SampleActivity activity = Robolectric
+      .buildActivity(SampleActivity.class)
+      .withIntent(intent)
+      .create()
+      .get();
 
     assertThat(activity.stringExtra).isEqualTo("test");
     assertThat(activity.intExtra).isEqualTo(4);
