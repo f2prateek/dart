@@ -30,12 +30,7 @@
     <dependency>
       <groupId>org.parceler</groupId>
       <artifactId>parceler</artifactId>
-      <version>0.2.6</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.parceler</groupId>
-      <artifactId>parceler-api</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

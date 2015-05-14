@@ -96,6 +96,11 @@
         <artifactId>parceler-api</artifactId>
         <version>${parceler.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.parceler</groupId>
+        <artifactId>parceler</artifactId>
+        <version>${parceler.version}</version>
+      </dependency>
 
     </dependencies>
   </dependencyManagement>
