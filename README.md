@@ -1,4 +1,4 @@
-Dart
+Dart [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart) 
 ============
 
 Extra "injection" library for Android which uses annotation processing to
