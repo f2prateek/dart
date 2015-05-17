@@ -50,8 +50,6 @@ import static javax.lang.model.element.Modifier.STATIC;
 import static javax.tools.Diagnostic.Kind.ERROR;
 
 public final class InjectExtraProcessor extends AbstractProcessor {
-  public static final String SUFFIX = "$$ExtraInjector";
-
   private Elements elementUtils;
   private Types typeUtils;
   private Filer filer;
@@ -71,16 +69,30 @@ public final class InjectExtraProcessor extends AbstractProcessor {
   }
 
   @Override public boolean process(Set<? extends TypeElement> elements, RoundEnvironment env) {
-    Map<TypeElement, ExtraInjector> targetClassMap = findAndParseTargets(env);
+    Map<TypeElement, InjectionTarget> targetClassMap = findAndParseTargets(env);
 
-    for (Map.Entry<TypeElement, ExtraInjector> entry : targetClassMap.entrySet()) {
+    for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
       TypeElement typeElement = entry.getKey();
-      ExtraInjector extraInjector = entry.getValue();
+      InjectionTarget injectionTarget = entry.getValue();
 
+      // Generate the ExtraInjector
       try {
+        ExtraInjector extraInjector = new ExtraInjector(injectionTarget);
         JavaFileObject jfo = filer.createSourceFile(extraInjector.getFqcn(), typeElement);
         Writer writer = jfo.openWriter();
         writer.write(extraInjector.brewJava());
+        writer.flush();
+        writer.close();
+      } catch (IOException e) {
+        error(typeElement, "Unable to write injector for type %s: %s", typeElement, e.getMessage());
+      }
+
+      // Generate the IntentBuilder
+      try {
+        BundlerBuilder intentBuilder = new BundlerBuilder(injectionTarget);
+        JavaFileObject jfo = filer.createSourceFile(intentBuilder.getFqcn(), typeElement);
+        Writer writer = jfo.openWriter();
+        writer.write(intentBuilder.brewJava());
         writer.flush();
         writer.close();
       } catch (IOException e) {
@@ -91,9 +103,9 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     return true;
   }
 
-  private Map<TypeElement, ExtraInjector> findAndParseTargets(RoundEnvironment env) {
-    Map<TypeElement, ExtraInjector> targetClassMap =
-        new LinkedHashMap<TypeElement, ExtraInjector>();
+  private Map<TypeElement, InjectionTarget> findAndParseTargets(RoundEnvironment env) {
+    Map<TypeElement, InjectionTarget> targetClassMap =
+        new LinkedHashMap<TypeElement, InjectionTarget>();
     Set<TypeMirror> erasedTargetTypes = new LinkedHashSet<TypeMirror>();
 
     // Process each @InjectExtra elements.
@@ -110,10 +122,10 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     }
 
     // Try to find a parent injector for each injector.
-    for (Map.Entry<TypeElement, ExtraInjector> entry : targetClassMap.entrySet()) {
+    for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
       String parentClassFqcn = findParentFqcn(entry.getKey(), erasedTargetTypes);
       if (parentClassFqcn != null) {
-        entry.getValue().setParentInjector(parentClassFqcn + SUFFIX);
+        entry.getValue().setParentTarget(parentClassFqcn);
       }
     }
 
@@ -122,7 +134,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
 
   private boolean isValidForGeneratedCode(Class<? extends Annotation> annotationClass,
       String targetThing, Element element) {
-    boolean hasError = false;
+    boolean valid = true;
     TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
 
     // Verify method modifiers.
@@ -131,7 +143,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
       error(element, "@%s %s must not be private or static. (%s.%s)",
           annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(),
           element.getSimpleName());
-      hasError = true;
+      valid = false;
     }
 
     // Verify containing type.
@@ -139,7 +151,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
       error(enclosingElement, "@%s %s may only be contained in classes. (%s.%s)",
           annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(),
           element.getSimpleName());
-      hasError = true;
+      valid = false;
     }
 
     // Verify containing class visibility is not private.
@@ -147,21 +159,18 @@ public final class InjectExtraProcessor extends AbstractProcessor {
       error(enclosingElement, "@%s %s may not be contained in private classes. (%s.%s)",
           annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(),
           element.getSimpleName());
-      hasError = true;
+      valid = false;
     }
 
-    return hasError;
+    return valid;
   }
 
-  private void parseInjectExtra(Element element, Map<TypeElement, ExtraInjector> targetClassMap,
+  private void parseInjectExtra(Element element, Map<TypeElement, InjectionTarget> targetClassMap,
       Set<TypeMirror> erasedTargetTypes) {
-    boolean hasError = false;
     TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
 
     // Verify common generated code restrictions.
-    hasError |= isValidForGeneratedCode(InjectExtra.class, "fields", element);
-
-    if (hasError) {
+    if (!isValidForGeneratedCode(InjectExtra.class, "fields", element)) {
       return;
     }
 
@@ -171,10 +180,10 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     TypeMirror type = element.asType();
     boolean required = isRequiredInjection(element);
     boolean parcel =
-        hasAnnotationWithFQCN(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
+        hasAnnotationWithFqcn(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
 
-    ExtraInjector extraInjector = getOrCreateTargetClass(targetClassMap, enclosingElement);
-    extraInjector.addField(isNullOrEmpty(key) ? name : key, name, type, required, parcel);
+    InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, enclosingElement);
+    injectionTarget.addField(isNullOrEmpty(key) ? name : key, name, type, required, parcel);
 
     // Add the type-erased version to the valid injection targets set.
     TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
@@ -208,7 +217,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
    * Returns {@code true} if the an annotation is found on the given element with the given class
    * name (must be a fully qualified class name).
    */
-  private static boolean hasAnnotationWithFQCN(Element element, String annotationClassNameName) {
+  private static boolean hasAnnotationWithFqcn(Element element, String annotationClassNameName) {
     if (element != null) {
       for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
         if (annotationMirror.getAnnotationType()
@@ -222,18 +231,18 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     return false;
   }
 
-  private ExtraInjector getOrCreateTargetClass(Map<TypeElement, ExtraInjector> targetClassMap,
+  private InjectionTarget getOrCreateTargetClass(Map<TypeElement, InjectionTarget> targetClassMap,
       TypeElement enclosingElement) {
-    ExtraInjector extraInjector = targetClassMap.get(enclosingElement);
-    if (extraInjector == null) {
+    InjectionTarget injectionTarget = targetClassMap.get(enclosingElement);
+    if (injectionTarget == null) {
       String targetType = enclosingElement.getQualifiedName().toString();
       String classPackage = getPackageName(enclosingElement);
-      String className = getClassName(enclosingElement, classPackage) + SUFFIX;
+      String className = getClassName(enclosingElement, classPackage);
 
-      extraInjector = new ExtraInjector(classPackage, className, targetType);
-      targetClassMap.put(enclosingElement, extraInjector);
+      injectionTarget = new InjectionTarget(classPackage, className, targetType);
+      targetClassMap.put(enclosingElement, injectionTarget);
     }
-    return extraInjector;
+    return injectionTarget;
   }
 
   private static String getClassName(TypeElement type, String packageName) {
