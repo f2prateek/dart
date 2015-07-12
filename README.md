@@ -55,7 +55,9 @@ If Proguard is enabled be sure to add these rules on your configuration:
 ```
 -dontwarn com.f2prateek.dart.internal.**
 -keep class **$$ExtraInjector { *; }
--keepnames class * { @com.f2prateek.dart.InjectExtra *;}
+-keepclasseswithmembernames class * {
+    @com.f2prateek.dart.* <fields>;
+}
 ```
 
 Download
