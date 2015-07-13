@@ -22,12 +22,17 @@
   <inceptionYear>2014</inceptionYear>
 
   <modules>
+    <!-- Runtime modules-->
     <module>dart-annotations</module>
+    <module>dart</module>
+    <module>henson</module>
+
+    <!-- Compile time modules-->
     <module>dart-common</module>
     <module>dart-processor</module>
     <module>henson-processor</module>
-    <module>dart</module>
-    <module>henson</module>
+
+    <!-- Sample module-->
     <module>dart-sample</module>
   </modules>
 
