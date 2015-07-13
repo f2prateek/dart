@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.f2prateek.dart</groupId>
     <artifactId>dart-parent</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>dart-sample</artifactId>
@@ -18,7 +18,22 @@
   <dependencies>
     <dependency>
       <groupId>com.f2prateek.dart</groupId>
+      <artifactId>dart-processor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.f2prateek.dart</groupId>
       <artifactId>dart</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.f2prateek.dart</groupId>
+      <artifactId>henson-processor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.f2prateek.dart</groupId>
+      <artifactId>henson</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -30,13 +45,7 @@
     <dependency>
       <groupId>org.parceler</groupId>
       <artifactId>parceler</artifactId>
-      <version>0.2.6</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.parceler</groupId>
-      <artifactId>parceler-api</artifactId>
-      <version>0.2.6</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -69,7 +78,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+        <groupId>com.simpligility.maven.plugins</groupId>
         <artifactId>android-maven-plugin</artifactId>
         <extensions>true</extensions>
       </plugin>

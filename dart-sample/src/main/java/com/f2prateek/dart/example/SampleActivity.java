@@ -18,8 +18,6 @@
 package com.f2prateek.dart.example;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import butterknife.ButterKnife;
@@ -27,7 +25,6 @@ import butterknife.InjectView;
 import com.f2prateek.dart.Dart;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.Nullable;
-import org.parceler.Parcels;
 
 public class SampleActivity extends Activity {
   public static final String DEFAULT_EXTRA_VALUE = "a default value";
@@ -54,17 +51,6 @@ public class SampleActivity extends Activity {
   @InjectView(R.id.optional_extra) TextView optionalExtraTextView;
   @InjectView(R.id.parcel_extra) TextView parcelExtraTextView;
   @InjectView(R.id.default_extra) TextView defaultExtraTextView;
-
-  public static Intent getLaunchIntent(Context context, String string, int anInt,
-      ComplexParcelable complexParcelable, ExampleParcel exampleParcel, String defaultKey) {
-    Intent intent = new Intent(context, SampleActivity.class);
-    intent.putExtra(SampleActivity.EXTRA_STRING, string);
-    intent.putExtra(SampleActivity.EXTRA_INT, anInt);
-    intent.putExtra(SampleActivity.EXTRA_PARCELABLE, complexParcelable);
-    intent.putExtra(SampleActivity.EXTRA_PARCEL, Parcels.wrap(exampleParcel));
-    intent.putExtra("defaultKeyExtra", defaultKey);
-    return intent;
-  }
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

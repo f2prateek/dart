@@ -15,25 +15,13 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart.example;
+package com.f2prateek.dart.henson;
 
-import android.app.Activity;
-import android.os.Bundle;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import com.f2prateek.dart.Dart;
+import java.util.Arrays;
+import javax.annotation.processing.Processor;
 
-public class MainActivity extends Activity {
-
-  @Override protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    setContentView(R.layout.activity_main);
-
-    ButterKnife.inject(this);
-    Dart.inject(this);
-  }
-
-  @OnClick(R.id.button) public void onLaunchButtonClick() {
+final class ProcessorTestUtilities {
+  static Iterable<? extends Processor> hensonProcessors() {
+    return Arrays.asList(new HensonExtraProcessor());
   }
 }

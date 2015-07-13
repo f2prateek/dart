@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.henson;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import com.f2prateek.dart.Nullable;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -41,7 +42,7 @@ import java.util.Map;
  * }
  * </code></pre>
  * You can inject an {@link #inject(Activity) activity directly}, {@link
- * #inject(android.app.Fragment) fragment directly}, or inject an
+ * #inject(Fragment) fragment directly}, or inject an
  * {@link #inject(Object, Bundle) bundle into another object}.
  * <p>
  * Be default, extras are required to be present in the bundle for field injections.
@@ -56,7 +57,7 @@ import java.util.Map;
  * {@literal @}Nullable {@literal @}InjectExtra("key") String extra = "default_value";
  * </code></pre>
  */
-public class Dart {
+public class Henson {
   public static final String INJECTOR_SUFFIX = "$$ExtraInjector";
 
   static final Map<Class<?>, Method> INJECTORS = new LinkedHashMap<Class<?>, Method>();
@@ -64,24 +65,24 @@ public class Dart {
   private static final String TAG = "Dart";
   private static boolean debug = false;
 
-  private Dart() {
+  private Henson() {
     // No instances.
   }
 
   /** Control whether debug logging is enabled. */
   public static void setDebug(boolean debug) {
-    Dart.debug = debug;
+    Henson.debug = debug;
   }
 
   /**
    * Inject fields annotated with {@link com.f2prateek.dart.InjectExtra} in the specified {@link
-   * android.app.Activity}.
+   * Activity}.
    * The intent that called this activity will be used as the source of the extras bundle.
    *
    * @param target Target activity for field injection.
-   * @throws com.f2prateek.dart.Dart.UnableToInjectException if injection could not be
+   * @throws com.f2prateek.dart.henson.Henson.UnableToInjectException if injection could not be
    * performed.
-   * @see android.content.Intent#getExtras()
+   * @see Intent#getExtras()
    */
   public static void inject(Activity target) {
     inject(target, target, Finder.ACTIVITY);
@@ -89,14 +90,14 @@ public class Dart {
 
   /**
    * Inject fields annotated with {@link com.f2prateek.dart.InjectExtra} in the specified {@link
-   * android.app.Fragment}.
+   * Fragment}.
    * The arguments that this fragment was called with will be used as the source of the extras
    * bundle.
    *
    * @param target Target fragment for field injection.
-   * @throws com.f2prateek.dart.Dart.UnableToInjectException if injection could not be
+   * @throws com.f2prateek.dart.henson.Henson.UnableToInjectException if injection could not be
    * performed.
-   * @see android.app.Fragment#getArguments()
+   * @see Fragment#getArguments()
    */
   public static void inject(Fragment target) {
     inject(target, target, Finder.FRAGMENT);
@@ -104,13 +105,13 @@ public class Dart {
 
   /**
    * Inject fields annotated with {@link com.f2prateek.dart.InjectExtra} in the specified {@code
-   * target} using the {@code source} {@link android.app.Activity}.
+   * target} using the {@code source} {@link Activity}.
    *
    * @param target Target class for field injection.
    * @param source Activity on which IDs will be looked up.
-   * @throws com.f2prateek.dart.Dart.UnableToInjectException if injection could not be
+   * @throws com.f2prateek.dart.henson.Henson.UnableToInjectException if injection could not be
    * performed.
-   * @see android.content.Intent#getExtras()
+   * @see Intent#getExtras()
    */
   public static void inject(Object target, Activity source) {
     inject(target, source, Finder.ACTIVITY);
@@ -118,11 +119,11 @@ public class Dart {
 
   /**
    * Inject fields annotated with {@link com.f2prateek.dart.InjectExtra} in the specified {@code
-   * target} using the {@code source} {@link android.os.Bundle} as the source.
+   * target} using the {@code source} {@link Bundle} as the source.
    *
    * @param target Target class for field injection.
    * @param source Bundle source on which extras will be looked up.
-   * @throws com.f2prateek.dart.Dart.UnableToInjectException if injection could not be
+   * @throws com.f2prateek.dart.henson.Henson.UnableToInjectException if injection could not be
    * performed.
    */
   public static void inject(Object target, Bundle source) {
@@ -167,7 +168,7 @@ public class Dart {
     return inject;
   }
 
-  /** Simpler version of {@link android.os.Bundle#get(String)} which infers the target type. */
+  /** Simpler version of {@link Bundle#get(String)} which infers the target type. */
   @SuppressWarnings({ "unchecked", "UnusedDeclaration" })
   // Checked by runtime cast. Public API.
   public static <T> T get(Bundle bundle, String key) {
@@ -175,8 +176,8 @@ public class Dart {
   }
 
   /**
-   * A means of finding an extra in either an {@link android.app.Activity}, {@link
-   * android.app.Fragment} or a {@link android.os.Bundle}. Exposed for use only
+   * A means of finding an extra in either an {@link Activity}, {@link
+   * Fragment} or a {@link Bundle}. Exposed for use only
    * by generated code.
    * If any of the means to get a bundle are null, this will simply return a null.
    */

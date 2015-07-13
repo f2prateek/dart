@@ -15,25 +15,15 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart.example;
+package com.f2prateek.dart;
 
-import android.app.Activity;
-import android.os.Bundle;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import com.f2prateek.dart.Dart;
+/** A field or method extra injection binding. */
+interface Binding {
+  /** A description of the binding in human readable form (e.g., "field 'foo'"). */
+  String getDescription();
 
-public class MainActivity extends Activity {
-
-  @Override protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    setContentView(R.layout.activity_main);
-
-    ButterKnife.inject(this);
-    Dart.inject(this);
-  }
-
-  @OnClick(R.id.button) public void onLaunchButtonClick() {
-  }
+  /**
+   * False if any annotation named {@code Optional} or {@code Nullable} is present on the binding.
+   */
+  boolean isRequired();
 }
