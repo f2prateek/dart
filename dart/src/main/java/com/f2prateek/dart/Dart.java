@@ -22,7 +22,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import com.f2prateek.dart.internal.InjectExtraProcessor;
+import com.f2prateek.dart.internal.ExtraInjector;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -155,7 +155,7 @@ public class Dart {
       return NO_OP;
     }
     try {
-      Class<?> injector = Class.forName(clsName + InjectExtraProcessor.SUFFIX);
+      Class<?> injector = Class.forName(clsName + ExtraInjector.INJECTOR_SUFFIX);
       inject = injector.getMethod("inject", Finder.class, cls, Object.class);
       if (debug) Log.d(TAG, "HIT: Class loaded injection class.");
     } catch (ClassNotFoundException e) {

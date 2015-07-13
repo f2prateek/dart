@@ -38,7 +38,7 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    JavaFileObject expectedSource =
+    JavaFileObject injectorSource =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
             "import com.f2prateek.dart.Dart.Finder;", //
@@ -53,12 +53,29 @@ public class InjectExtraTest {
             "}" //
         ));
 
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.os.Bundle;", //
+            "import com.f2prateek.dart.Bundler;", //
+            "public class Test_Bundler {", //
+            "  private final Bundler bundler = Bundler.create();", //
+            "  public Test_Bundler key(java.lang.String key) {", //
+            "    bundler.put(\"key\", key);", //
+            "    return this;", //
+            "  }", //
+            "  public Bundle get() {", //
+            "    return bundler.get()", //
+            "  }", //
+            "}" //
+        ));
+
     ASSERT.about(javaSource())
         .that(source)
         .processedWith(dartProcessors())
         .compilesWithoutError()
         .and()
-        .generatesSources(expectedSource);
+        .generatesSources(injectorSource, builderSource);
   }
 
   @Test public void injectingAllPrimitives() {
@@ -78,7 +95,7 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    JavaFileObject expectedSource =
+    JavaFileObject injectorSource =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
             "import com.f2prateek.dart.Dart.Finder;", //
@@ -129,12 +146,57 @@ public class InjectExtraTest {
             "}" //
         ));
 
+      JavaFileObject builderSource =
+          JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join( //
+              "package test;", //
+              "import android.os.Bundle;", //
+              "import com.f2prateek.dart.Bundler;", //
+              "public class Test_Bundler {", //
+              "  private final Bundler bundler = Bundler.create();", //
+              "  public Test_Bundler key_bool(java.lang.Boolean key_bool) {", //
+              "    bundler.put(\"key_bool\", key_bool);", //
+              "    return this;", //
+              "  }", //
+              "  public Test_Bundler key_byte(java.lang.Byte key_byte) {", //
+              "    bundler.put(\"key_byte\", key_byte);", //
+              "    return this;", //
+              "  }", //
+              "  public Test_Bundler key_short(java.lang.Short key_short) {", //
+              "    bundler.put(\"key_short\", key_short);", //
+              "    return this;", //
+              "  }", //
+              "  public Test_Bundler key_int(java.lang.Integer key_int) {", //
+              "    bundler.put(\"key_int\", key_int);", //
+              "    return this;", //
+              "  }", //
+              "  public Test_Bundler key_long(java.lang.Long key_long) {", //
+              "    bundler.put(\"key_long\", key_long);", //
+              "    return this;", //
+              "  }", //
+              "  public Test_Bundler key_char(java.lang.Character key_char) {", //
+              "    bundler.put(\"key_char\", key_char);", //
+              "    return this;", //
+              "  }", //
+              "  public Test_Bundler key_float(java.lang.Float key_float) {", //
+              "    bundler.put(\"key_float\", key_float);", //
+              "    return this;", //
+              "  }", //
+              "  public Test_Bundler key_double(java.lang.Double key_double) {", //
+              "    bundler.put(\"key_double\", key_double);", //
+              "    return this;", //
+              "  }", //
+              "  public Bundle get() {", //
+              "    return bundler.get()", //
+              "  }", //
+              "}" //
+          ));
+
     ASSERT.about(javaSource())
         .that(source)
         .processedWith(dartProcessors())
         .compilesWithoutError()
         .and()
-        .generatesSources(expectedSource);
+        .generatesSources(injectorSource, builderSource);
   }
 
   @Test public void oneFindPerKey() {
@@ -256,39 +318,39 @@ public class InjectExtraTest {
         .generatesSources(expectedSource);
   }
 
-    @Test public void nullable() {
-        JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+  @Test public void nullable() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "import com.f2prateek.dart.Nullable;", //
+        "public class Test extends Activity {", //
+        "  @Nullable @InjectExtra(\"key\") String extra;", //
+        "}" //
+    ));
+
+    JavaFileObject expectedSource =
+        JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import android.app.Activity;", //
-            "import com.f2prateek.dart.InjectExtra;", //
-            "import com.f2prateek.dart.Nullable;", //
-            "public class Test extends Activity {", //
-            "  @Nullable @InjectExtra(\"key\") String extra;", //
+            "import com.f2prateek.dart.Dart.Finder;", //
+            "public class Test$$ExtraInjector {", //
+            "  public static void inject(Finder finder, final test.Test target, Object source) {",
+            "    Object object;", //
+            "    object = finder.getExtra(source, \"key\");", //
+            "    if (object != null) {", //
+            "    target.extra = (java.lang.String) object;", //
+            "    }", //
+            "  }", //
             "}" //
         ));
 
-        JavaFileObject expectedSource =
-            JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
-                "package test;", //
-                "import com.f2prateek.dart.Dart.Finder;", //
-                "public class Test$$ExtraInjector {", //
-                "  public static void inject(Finder finder, final test.Test target, Object source) {",
-                "    Object object;", //
-                "    object = finder.getExtra(source, \"key\");", //
-                "    if (object != null) {", //
-                "    target.extra = (java.lang.String) object;", //
-                "    }", //
-                "  }", //
-                "}" //
-            ));
-
-        ASSERT.about(javaSource())
-            .that(source)
-            .processedWith(dartProcessors())
-            .compilesWithoutError()
-            .and()
-            .generatesSources(expectedSource);
-    }
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(dartProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(expectedSource);
+  }
 
   @Test public void failsIfInPrivateClass() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //

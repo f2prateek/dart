@@ -1,4 +1,4 @@
-Dart
+Dart [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Dart-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1444)
 ============
 
 Extra "injection" library for Android which uses annotation processing to
@@ -27,7 +27,7 @@ or directly from a Bundle.
 
 Optional Injection
 ------------------
-By default all @InjectExtra fields are required. An exception will be thrown if the target extra cannot be found.
+By default all `@InjectExtra` fields are required. An exception will be thrown if the target extra cannot be found.
 
 To suppress this behavior and create an optional injection, add the `@Nullable` annotation to the field or method.
 Any annotation with the class name `Nullable` is respected, including ones from the support library annotations and ButterKnife.
@@ -35,6 +35,14 @@ Any annotation with the class name `Nullable` is respected, including ones from 
 ```java
 @Nullable @InjectExtra("key") String title;
 ```
+
+Default Values
+--------------
+You can assign any values to your fields to be used as default values, just as you would in regular "injection"-free code.
+```java
+@InjectExtra String title = "Default Title";
+```
+This value will be overriden after you call `inject()`. Remember to use the `@Nullable` annotation, if this injection is optional.
 
 Bonus
 -----
@@ -55,7 +63,9 @@ If Proguard is enabled be sure to add these rules on your configuration:
 ```
 -dontwarn com.f2prateek.dart.internal.**
 -keep class **$$ExtraInjector { *; }
--keepnames class * { @com.f2prateek.dart.InjectExtra *;}
+-keepclasseswithmembernames class * {
+    @com.f2prateek.dart.* <fields>;
+}
 ```
 
 Download
