@@ -13,7 +13,7 @@
 
   <groupId>com.f2prateek.dart</groupId>
   <artifactId>dart-parent</artifactId>
-  <version>1.1.1-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Dart (Parent)</name>
@@ -22,7 +22,10 @@
   <inceptionYear>2014</inceptionYear>
 
   <modules>
+    <module>dart-annotations</module>
     <module>dart-common</module>
+    <module>dart-processor</module>
+    <module>henson-processor</module>
     <module>dart</module>
     <module>henson</module>
     <module>dart-sample</module>

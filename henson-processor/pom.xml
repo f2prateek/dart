@@ -11,8 +11,8 @@
     <version>2.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>dart</artifactId>
-  <name>Dart</name>
+  <artifactId>henson-processor</artifactId>
+  <name>Henson processor</name>
 
   <dependencies>
     <dependency>
@@ -45,6 +45,12 @@
     <dependency>
       <groupId>com.f2prateek.dart</groupId>
       <artifactId>dart-annotations</artifactId>
+      <version>2.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.f2prateek.dart</groupId>
+      <artifactId>dart-common</artifactId>
       <version>2.0.0-SNAPSHOT</version>
     </dependency>
 
