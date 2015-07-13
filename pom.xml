@@ -22,7 +22,9 @@
   <inceptionYear>2014</inceptionYear>
 
   <modules>
+    <module>dart-common</module>
     <module>dart</module>
+    <module>henson</module>
     <module>dart-sample</module>
   </modules>
 

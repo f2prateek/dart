@@ -11,8 +11,8 @@
     <version>1.1.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>dart</artifactId>
-  <name>Dart</name>
+  <artifactId>dart-common</artifactId>
+  <name>Dart common lib</name>
 
   <dependencies>
     <dependency>
@@ -41,12 +41,6 @@
       <scope>test</scope>
     </dependency>
 
-
-    <dependency>
-      <groupId>com.f2prateek.dart</groupId>
-      <artifactId>dart-common</artifactId>
-      <version>1.1.1-SNAPSHOT</version>
-    </dependency>
 
     <dependency>
         <groupId>com.squareup</groupId>
