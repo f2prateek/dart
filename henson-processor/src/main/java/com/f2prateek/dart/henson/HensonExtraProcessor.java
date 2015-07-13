@@ -31,12 +31,10 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
   @Override public boolean process(Set<? extends TypeElement> elements, RoundEnvironment env) {
     Map<TypeElement, InjectionTarget> targetClassMap = findAndParseTargets(env);
 
-    System.out.println("starting henson");
     for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
       TypeElement typeElement = entry.getKey();
       InjectionTarget injectionTarget = entry.getValue();
 
-      System.out.println("henson processes " + injectionTarget.className);
       // Now write the IntentBuilder
       Writer writer = null;
 
@@ -45,7 +43,6 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
         BundlerBuilder intentBuilder = new BundlerBuilder(injectionTarget);
         JavaFileObject jfo = filer.createSourceFile(intentBuilder.getFqcn(), typeElement);
         writer = jfo.openWriter();
-        System.out.println("henson creates " + intentBuilder.brewJava() + "in " + intentBuilder.getFqcn());
         writer.write(intentBuilder.brewJava());
       } catch (IOException e) {
         error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,
