@@ -20,6 +20,7 @@
       <groupId>com.f2prateek.dart</groupId>
       <artifactId>dart-processor</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.f2prateek.dart</groupId>
@@ -30,6 +31,7 @@
       <groupId>com.f2prateek.dart</groupId>
       <artifactId>henson-processor</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.f2prateek.dart</groupId>

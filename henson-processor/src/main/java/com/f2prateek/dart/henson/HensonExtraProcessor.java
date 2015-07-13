@@ -28,6 +28,7 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 
 public final class HensonExtraProcessor extends AbstractDartProcessor {
+
   @Override public boolean process(Set<? extends TypeElement> elements, RoundEnvironment env) {
     Map<TypeElement, InjectionTarget> targetClassMap = findAndParseTargets(env);
 
@@ -60,6 +61,7 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
       }
     }
 
-    return true;
+    //return false here to let dart process the annotations too
+    return false;
   }
 }
