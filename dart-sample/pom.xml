@@ -47,7 +47,6 @@
     <dependency>
       <groupId>org.parceler</groupId>
       <artifactId>parceler</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

@@ -44,7 +44,7 @@ public class BundlerBuilderTest {
           JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join( //
                                                                                      "package test;", //
                                                                                      "import android.os.Bundle;", //
-                                                                                     "import com.f2prateek.dart.Bundler;", //
+                                                                                     "import com.f2prateek.dart.henson.Bundler;", //
                                                                                      "public class Test_Bundler {", //
                                                                                      "  private final Bundler bundler = Bundler.create();", //
                                                                                      "  public Test_Bundler key(java.lang.String key) {", //
@@ -87,7 +87,7 @@ public class BundlerBuilderTest {
           JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join( //
                                                                                      "package test;", //
                                                                                      "import android.os.Bundle;", //
-                                                                                     "import com.f2prateek.dart.Bundler;", //
+                                                                                     "import com.f2prateek.dart.henson.Bundler;", //
                                                                                      "public class Test_Bundler {", //
                                                                                      "  private final Bundler bundler = Bundler.create();", //
                                                                                      "  public Test_Bundler key_bool(java.lang.Boolean key_bool) {", //
@@ -152,7 +152,7 @@ public class BundlerBuilderTest {
           JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join( //
                                                                                      "package test;", //
                                                                                      "import android.os.Bundle;", //
-                                                                                     "import com.f2prateek.dart.Bundler;", //
+                                                                                     "import com.f2prateek.dart.henson.Bundler;", //
                                                                                      "public class Test_Bundler {", //
                                                                                      "  private final Bundler bundler = Bundler.create();", //
                                                                                      "  public Test_Bundler key(java.lang.String key) {", //
@@ -187,7 +187,7 @@ public class BundlerBuilderTest {
           JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join( //
                                                                                      "package test;", //
                                                                                      "import android.os.Bundle;", //
-                                                                                     "import com.f2prateek.dart.Bundler;", //
+                                                                                     "import com.f2prateek.dart.henson.Bundler;", //
                                                                                      "public class Test_Bundler {", //
                                                                                      "  private final Bundler bundler = Bundler.create();", //
                                                                                      "  public Test_Bundler key(java.lang.String key) {", //
@@ -431,7 +431,7 @@ public class BundlerBuilderTest {
         JavaFileObject builderSource =
             JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join("package test;\n", //
                                                                                           "\n", //
-                                                                                          "import com.f2prateek.dart.Bundler, //;\n", //
+                                                                                          "import com.f2prateek.dart.henson.Bundler, //;\n", //
                                                                                           "public class Test_Bundler {\n", //
                                                                                           "  private final Bundler bundler = Bundler.create();\n", //
                                                                                           "  public Test_Bundler key(test.ExampleParcel key) {\n", //

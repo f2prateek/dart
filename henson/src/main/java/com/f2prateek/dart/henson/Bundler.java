@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.henson;
 
 import android.os.Bundle;
 import android.os.Parcelable;

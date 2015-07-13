@@ -24,7 +24,7 @@ public class BundlerBuilder {
     builder.append("// Generated code from Dart. Do not modify!\n");
     builder.append("package ").append(target.classPackage).append(";\n\n");
     builder.append("import android.os.Bundle;\n");
-    builder.append("import com.f2prateek.dart.Bundler;\n\n");
+    builder.append("import com.f2prateek.dart.henson.Bundler;\n\n");
     builder.append("public class ").append(builderClassName()).append(" {\n");
     builder.append("  private final Bundler bundler = Bundler.create();\n\n");
     emitSetters(builder);

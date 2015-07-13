@@ -18,6 +18,7 @@
 package com.f2prateek.dart.example;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -35,5 +36,16 @@ public class MainActivity extends Activity {
   }
 
   @OnClick(R.id.button) public void onLaunchButtonClick() {
+    Bundle bundle = new SampleActivity_Bundler()
+        .ExtraString("a string")
+        .ExtraInt(4)
+        .ExtraParcelable(ComplexParcelable.random())
+        .ExtraParcel(new ExampleParcel("Andy"))
+        .get();
+
+      bundle.putString("defaultKeyExtra", "defaultKeyExtra");
+      Intent intent = new Intent(this, SampleActivity.class);
+      intent.putExtras(bundle);
+      startActivity(intent);
   }
 }
