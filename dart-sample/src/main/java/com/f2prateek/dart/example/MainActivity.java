@@ -36,16 +36,14 @@ public class MainActivity extends Activity {
   }
 
   @OnClick(R.id.button) public void onLaunchButtonClick() {
-    Bundle bundle = new SampleActivity_Bundler()
+    Intent intent = new SampleActivity$$IntentBuilder(this)
         .ExtraString("a string")
         .ExtraInt(4)
         .ExtraParcelable(ComplexParcelable.random())
         .ExtraParcel(new ExampleParcel("Andy"))
         .get();
 
-      bundle.putString("defaultKeyExtra", "defaultKeyExtra");
-      Intent intent = new Intent(this, SampleActivity.class);
-      intent.putExtras(bundle);
+      intent.putExtra("defaultKeyExtra", "defaultKeyExtra");
       startActivity(intent);
   }
 }

@@ -6,12 +6,12 @@ import java.util.Collection;
 import com.f2prateek.dart.InjectionTarget;
 import javax.lang.model.type.TypeMirror;
 
-public class BundlerBuilder {
-  public static final String BUNDLE_BUILDER_SUFFIX = "_Bundler";
+public class IntentBuilder {
+  public static final String BUNDLE_BUILDER_SUFFIX = "$$IntentBuilder";
 
   private final InjectionTarget target;
 
-  public BundlerBuilder(InjectionTarget target) {
+  public IntentBuilder(InjectionTarget target) {
     this.target = target;
   }
 
@@ -24,9 +24,17 @@ public class BundlerBuilder {
     builder.append("// Generated code from Dart. Do not modify!\n");
     builder.append("package ").append(target.classPackage).append(";\n\n");
     builder.append("import android.os.Bundle;\n");
-    builder.append("import com.f2prateek.dart.henson.Bundler;\n\n");
+    builder.append("import com.f2prateek.dart.henson.Bundler;\n");
+    builder.append("import android.content.Context;\n");
+    builder.append("import android.content.Intent;\n\n");
     builder.append("public class ").append(builderClassName()).append(" {\n");
+    builder.append("  private final Intent intent;\n");
     builder.append("  private final Bundler bundler = Bundler.create();\n\n");
+    builder.append("  public ").append(builderClassName()).append("(Context context) {\n");
+    builder.append("    intent = new Intent(context, ")
+        .append(target.className)
+        .append(".class);\n");
+    builder.append("  }\n");
     emitSetters(builder);
     emitGetter(builder);
     builder.append("}\n");
@@ -34,8 +42,9 @@ public class BundlerBuilder {
   }
 
   private void emitGetter(StringBuilder builder) {
-    builder.append("  public Bundle get() {\n");
-    builder.append("    return bundler.get();\n");
+    builder.append("  public Intent get() {\n");
+    builder.append("    intent.putExtras(bundler.get());\n");
+    builder.append("    return intent;\n");
     builder.append("  }\n");
   }
 
