@@ -20,7 +20,6 @@ package com.f2prateek.dart.henson;
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.f2prateek.dart.henson.ProcessorTestUtilities.hensonProcessors;
@@ -39,29 +38,27 @@ public class IntentBuilderTest {
         "}" //
     ));
 
-
-      JavaFileObject builderSource =
-          JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join("package test;", //
-                                                                                               "import android.os.Bundle;", //
-                                                                                               "import com.f2prateek.dart.henson.Bundler;", //
-                                                                                               "import android.content.Context;", //
-                                                                                               "import android.content.Intent;", //
-                                                                                               "public class Test$$IntentBuilder {", //
-                                                                                               "  private final Intent intent;", //
-                                                                                               "  private final Bundler bundler = Bundler.create();", //
-                                                                                               "  public Test$$IntentBuilder(Context context) {", //
-                                                                                               "    intent = new Intent(context, Test.class);", //
-                                                                                               "  }", //
-                                                                                               "  public Test$$IntentBuilder key(java.lang.String key) {", //
-                                                                                               "    bundler.put(\"key\", key);", //
-                                                                                               "    return this;", //
-                                                                                               "  }", //
-                                                                                               "  public Intent get() {", //
-                                                                                               "    intent.putExtras(bundler.get());", //
-                                                                                               "    return intent;", //
-                                                                                               "  }", //
-                                                                                               "}"));
-
+    JavaFileObject builderSource = JavaFileObjects.forSourceString("test/Test$$IntentBuilder",
+        Joiner.on('\n').join("package test;", //
+            "import android.os.Bundle;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "public class Test$$IntentBuilder {", //
+            "  private final Intent intent;", //
+            "  private final Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Test$$IntentBuilder key(java.lang.String key) {", //
+            "    bundler.put(\"key\", key);", //
+            "    return this;", //
+            "  }", //
+            "  public Intent get() {", //
+            "    intent.putExtras(bundler.get());", //
+            "    return intent;", //
+            "  }", //
+            "}"));
 
     ASSERT.about(javaSource())
         .that(source)
@@ -88,57 +85,56 @@ public class IntentBuilderTest {
         "}" //
     ));
 
-      JavaFileObject builderSource =
-          JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
-                                                                                     "package test;", //
-                                                                                         "import android.os.Bundle;", //
-                                                                                         "import com.f2prateek.dart.henson.Bundler;", //
-                                                                                         "import android.content.Context;", //
-                                                                                         "import android.content.Intent;", //
-                                                                                         "public class Test$$IntentBuilder {", //
-                                                                                         "  private final Intent intent;", //
-                                                                                         "  private final Bundler bundler = Bundler.create();", //
-                                                                                         "  public Test$$IntentBuilder(Context context) {", //
-                                                                                         "    intent = new Intent(context, Test.class);", //
-                                                                                         "  }", //
-                                                                                         "  public Test$$IntentBuilder key_bool(java.lang.Boolean key_bool) {", //
-                                                                                         "    bundler.put(\"key_bool\", key_bool);", //
-                                                                                         "    return this;", //
-                                                                                         "  }", //
-                                                                                         "  public Test$$IntentBuilder key_byte(java.lang.Byte key_byte) {", //
-                                                                                         "    bundler.put(\"key_byte\", key_byte);", //
-                                                                                         "    return this;", //
-                                                                                         "  }", //
-                                                                                         "  public Test$$IntentBuilder key_short(java.lang.Short key_short) {", //
-                                                                                         "    bundler.put(\"key_short\", key_short);", //
-                                                                                         "    return this;", //
-                                                                                         "  }", //
-                                                                                         "  public Test$$IntentBuilder key_int(java.lang.Integer key_int) {", //
-                                                                                         "    bundler.put(\"key_int\", key_int);", //
-                                                                                         "    return this;", //
-                                                                                         "  }", //
-                                                                                         "  public Test$$IntentBuilder key_long(java.lang.Long key_long) {", //
-                                                                                         "    bundler.put(\"key_long\", key_long);", //
-                                                                                         "    return this;", //
-                                                                                         "  }", //
-                                                                                         "  public Test$$IntentBuilder key_char(java.lang.Character key_char) {", //
-                                                                                         "    bundler.put(\"key_char\", key_char);", //
-                                                                                         "    return this;", //
-                                                                                         "  }", //
-                                                                                         "  public Test$$IntentBuilder key_float(java.lang.Float key_float) {", //
-                                                                                         "    bundler.put(\"key_float\", key_float);", //
-                                                                                         "    return this;", //
-                                                                                         "  }", //
-                                                                                         "  public Test$$IntentBuilder key_double(java.lang.Double key_double) {", //
-                                                                                         "    bundler.put(\"key_double\", key_double);", //
-                                                                                         "    return this;", //
-                                                                                         "  }", //
-                                                                                         "  public Intent get() {", //
-                                                                                         "    intent.putExtras(bundler.get());", //
-                                                                                         "    return intent;", //
-                                                                                         "  }", //
-                                                                                         "}\n"
-          ));
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.os.Bundle;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "public class Test$$IntentBuilder {", //
+            "  private final Intent intent;", //
+            "  private final Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Test$$IntentBuilder key_bool(java.lang.Boolean key_bool) {", //
+            "    bundler.put(\"key_bool\", key_bool);", //
+            "    return this;", //
+            "  }", //
+            "  public Test$$IntentBuilder key_byte(java.lang.Byte key_byte) {", //
+            "    bundler.put(\"key_byte\", key_byte);", //
+            "    return this;", //
+            "  }", //
+            "  public Test$$IntentBuilder key_short(java.lang.Short key_short) {", //
+            "    bundler.put(\"key_short\", key_short);", //
+            "    return this;", //
+            "  }", //
+            "  public Test$$IntentBuilder key_int(java.lang.Integer key_int) {", //
+            "    bundler.put(\"key_int\", key_int);", //
+            "    return this;", //
+            "  }", //
+            "  public Test$$IntentBuilder key_long(java.lang.Long key_long) {", //
+            "    bundler.put(\"key_long\", key_long);", //
+            "    return this;", //
+            "  }", //
+            "  public Test$$IntentBuilder key_char(java.lang.Character key_char) {", //
+            "    bundler.put(\"key_char\", key_char);", //
+            "    return this;", //
+            "  }", //
+            "  public Test$$IntentBuilder key_float(java.lang.Float key_float) {", //
+            "    bundler.put(\"key_float\", key_float);", //
+            "    return this;", //
+            "  }", //
+            "  public Test$$IntentBuilder key_double(java.lang.Double key_double) {", //
+            "    bundler.put(\"key_double\", key_double);", //
+            "    return this;", //
+            "  }", //
+            "  public Intent get() {", //
+            "    intent.putExtras(bundler.get());", //
+            "    return intent;", //
+            "  }", //
+            "}\n"));
 
     ASSERT.about(javaSource())
         .that(source)
@@ -160,32 +156,28 @@ public class IntentBuilderTest {
         "}" //
     ));
 
-      JavaFileObject builderSource =
-          JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
-                                                                                     "package test;", //
-                                                                                         "", //
-                                                                                         "import android.os.Bundle;", //
-                                                                                         "import com.f2prateek.dart.henson.Bundler;", //
-                                                                                         "import android.content.Context;", //
-                                                                                         "import android.content.Intent;", //
-                                                                                         "", //
-                                                                                         "public class Test$$IntentBuilder {", //
-                                                                                         "  private final Intent intent;", //
-                                                                                         "  private final Bundler bundler = Bundler.create();", //
-                                                                                         "", //
-                                                                                         "  public Test$$IntentBuilder(Context context) {", //
-                                                                                         "    intent = new Intent(context, Test.class);", //
-                                                                                         "  }", //
-                                                                                         "  public Test$$IntentBuilder key(java.lang.String key) {", //
-                                                                                         "    bundler.put(\"key\", key);", //
-                                                                                         "    return this;", //
-                                                                                         "  }", //
-                                                                                         "  public Intent get() {", //
-                                                                                         "    intent.putExtras(bundler.get());", //
-                                                                                         "    return intent;", //
-                                                                                         "  }", //
-                                                                                         "}"
-          ));
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.os.Bundle;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "public class Test$$IntentBuilder {", //
+            "  private final Intent intent;", //
+            "  private final Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Test$$IntentBuilder key(java.lang.String key) {", //
+            "    bundler.put(\"key\", key);", //
+            "    return this;", //
+            "  }", //
+            "  public Intent get() {", //
+            "    intent.putExtras(bundler.get());", //
+            "    return intent;", //
+            "  }", //
+            "}"));
 
     ASSERT.about(javaSource())
         .that(source)
@@ -205,27 +197,28 @@ public class IntentBuilderTest {
         "}" //
     ));
 
-      JavaFileObject builderSource =
-          JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join("package test;", //
-                                                                                           "import android.os.Bundle;", //
-                                                                                           "import com.f2prateek.dart.henson.Bundler;", //
-                                                                                           "import android.content.Context;", //
-                                                                                           "import android.content.Intent;", //
-                                                                                           "public class Test$$IntentBuilder {", //
-                                                                                           "  private final Intent intent;", //
-                                                                                           "  private final Bundler bundler = Bundler.create();", //
-                                                                                           "  public Test$$IntentBuilder(Context context) {", //
-                                                                                           "    intent = new Intent(context, Test.class);", //
-                                                                                           "  }", //
-                                                                                           "  public Test$$IntentBuilder key(java.lang.String key) {", //
-                                                                                           "    bundler.put(\"key\", key);", //
-                                                                                           "    return this;", //
-                                                                                           "  }", //
-                                                                                           "  public Intent get() {", //
-                                                                                           "    intent.putExtras(bundler.get());", //
-                                                                                           "    return intent;", //
-                                                                                           "  }", //
-                                                                                           "}"));
+    JavaFileObject builderSource = JavaFileObjects.forSourceString("test/Test$$IntentBuilder",
+        Joiner.on('\n').join( //
+            "package test;", //
+            "import android.os.Bundle;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "public class Test$$IntentBuilder {", //
+            "  private final Intent intent;", //
+            "  private final Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Test$$IntentBuilder key(java.lang.String key) {", //
+            "    bundler.put(\"key\", key);", //
+            "    return this;", //
+            "  }", //
+            "  public Intent get() {", //
+            "    intent.putExtras(bundler.get());", //
+            "    return intent;", //
+            "  }", //
+            "}"));
 
     ASSERT.about(javaSource())
         .that(source)
@@ -235,7 +228,7 @@ public class IntentBuilderTest {
         .generatesSources(builderSource);
   }
 
-  @Test @Ignore("Sorry, but I can't find the issue here") public void superclass() {
+  @Test public void superclass() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
         "import android.app.Activity;", //
@@ -253,35 +246,22 @@ public class IntentBuilderTest {
     JavaFileObject expectedSource1 =
         JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join( //
             "package test;", //
-            "", //
+            "import android.os.Bundle;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
             "import android.content.Context;", //
             "import android.content.Intent;", //
-            "import java.lang.String;", //
-            "", //
-            "public class Test_Bundler {", //
-            "  private final Context context;", //
-            "", //
-            "  private String extra;", //
-            "", //
-            "  private boolean extraIsSet;", //
-            "", //
-            "  public Test_Bundler(Context context) {", //
-            "    this.context = context;", //
+            "public class Test$$IntentBuilder {", //
+            "  private final Intent intent;", //
+            "  private final Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
             "  }", //
-            "", //
-            "  public Test_Bundler withExtra(String extra) {", //
-            "    this.extra = extra;", //
-            "    extraIsSet = true;", //
+            "  public Test$$IntentBuilder key(java.lang.String key) {", //
+            "    bundler.put(\"key\", key);", //
             "    return this;", //
             "  }", //
-            "", //
-            "  public Intent build() {", //
-            "    Intent intent = new Intent(context, test.Test.class);", //
-            "    if (extraIsSet) {", //
-            "      intent.putExtra(\"key\", extra);", //
-            "    } else {", //
-            "      throw new IllegalStateException(\"Parameter extra is mandatory\");", //
-            "    }", //
+            "  public Intent get() {", //
+            "    intent.putExtras(bundler.get());", //
             "    return intent;", //
             "  }", //
             "}" //
@@ -290,38 +270,25 @@ public class IntentBuilderTest {
     JavaFileObject expectedSource2 =
         JavaFileObjects.forSourceString("test/TestOne_Bundler", Joiner.on('\n').join( //
             "package test;", //
-             "", //
-             "import android.content.Context;", //
-             "import android.content.Intent;", //
-             "import java.lang.String;", //
-             "", //
-             "public class TestOne_Bundler {", //
-             "  private final Context context;", //
-             "", //
-             "  private String extra1;", //
-             "", //
-             "  private boolean extra1IsSet;", //
-             "", //
-             "  public TestOne_Bundler(Context context) {", //
-             "    this.context = context;", //
-             "  }", //
-             "", //
-             "  public TestOne_Bundler withExtra1(String extra1) {", //
-             "    this.extra1 = extra1;", //
-             "    extra1IsSet = true;", //
-             "    return this;", //
-             "  }", //
-             "", //
-             "  public Intent build() {", //
-             "    Intent intent = new Intent(context, test.TestOne.class);", //
-             "    if (extra1IsSet) {", //
-             "      intent.putExtra(\"key\", extra1);", //
-             "    } else {", //
-             "      throw new IllegalStateException(\"Parameter extra1 is mandatory\");", //
-             "    }", //
-             "    return intent;", //
-             "  }", //
-             "}" //
+            "import android.os.Bundle;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "public class TestOne$$IntentBuilder {", //
+            "  private final Intent intent;", //
+            "  private final Bundler bundler = Bundler.create();", //
+            "  public TestOne$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, TestOne.class);", //
+            "  }", //
+            "  public TestOne$$IntentBuilder key(java.lang.String key) {", //
+            "    bundler.put(\"key\", key);", //
+            "    return this;", //
+            "  }", //
+            "  public Intent get() {", //
+            "    intent.putExtras(bundler.get());", //
+            "    return intent;", //
+            "  }", //
+            "}" //
         ));
 
     ASSERT.about(javaSource())
@@ -332,7 +299,7 @@ public class IntentBuilderTest {
         .generatesSources(expectedSource1, expectedSource2);
   }
 
-    @Test @Ignore("Sorry, but I can't find the issue here") public void genericSuperclass() {
+  @Test public void genericSuperclass() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
         "import android.app.Activity;", //
@@ -347,135 +314,117 @@ public class IntentBuilderTest {
         "}" //
     ));
 
-      JavaFileObject expectedSource1 =
-          JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join( //
-              "package test;", //
-              "", //
-              "import android.content.Context;", //
-              "import android.content.Intent;", //
-              "import java.lang.String;", //
-              "", //
-              "public class Test_Bundler {", //
-              "  private final Context context;", //
-              "", //
-              "  private String extra;", //
-              "", //
-              "  private boolean extraIsSet;", //
-              "", //
-              "  public Test_Bundler(Context context) {", //
-              "    this.context = context;", //
-              "  }", //
-              "", //
-              "  public Test_Bundler withExtra(String extra) {", //
-              "    this.extra = extra;", //
-              "    extraIsSet = true;", //
-              "    return this;", //
-              "  }", //
-              "", //
-              "  public Intent build() {", //
-              "    Intent intent = new Intent(context, test.Test.class);", //
-              "    if (extraIsSet) {", //
-              "      intent.putExtra(\"key\", extra);", //
-              "    } else {", //
-              "      throw new IllegalStateException(\"Parameter extra is mandatory\");", //
-              "    }", //
-              "    return intent;", //
-              "  }", //
-              "}" //
-          ));
+    JavaFileObject expectedSource1 =
+        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.os.Bundle;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "public class Test$$IntentBuilder {", //
+            "  private final Intent intent;", //
+            "  private final Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Test$$IntentBuilder key(java.lang.String key) {", //
+            "    bundler.put(\"key\", key);", //
+            "    return this;", //
+            "  }", //
+            "  public Intent get() {", //
+            "    intent.putExtras(bundler.get());", //
+            "    return intent;", //
+            "  }", //
+            "}" //
+        ));
 
-      JavaFileObject expectedSource2 =
-          JavaFileObjects.forSourceString("test/TestOne_Bundler", Joiner.on('\n').join( //
-              "package test;", //
-              "", //
-              "import android.content.Context;", //
-              "import android.content.Intent;", //
-              "import java.lang.String;", //
-              "", //
-              "public class TestOne_Bundler {", //
-              "  private final Context context;", //
-              "", //
-              "  private String extra1;", //
-              "", //
-              "  private boolean extra1IsSet;", //
-               "", //
-              "  public TestOne_Bundler(Context context) {", //
-              "    this.context = context;", //
-              "  }", //
-              "", //
-              "  public TestOne_Bundler withExtra1(String extra1) {", //
-              "    this.extra1 = extra1;", //
-              "    extra1IsSet = true;", //
-              "    return this;", //
-              "  }", //
-              "", //
-              "  public Intent build() {", //
-              "    Intent intent = new Intent(context, test.TestOne.class);", //
-              "    if (extra1IsSet) {", //
-              "      intent.putExtra(\"key\", extra1);", //
-              "    } else {", //
-              "      throw new IllegalStateException(\"Parameter extra1 is mandatory\");", //
-              "    }", //
-              "    return intent;", //
-              "  }", //
-              "}" //
-          ));
+    JavaFileObject expectedSource2 =
+        JavaFileObjects.forSourceString("test/TestOne_Bundler", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.os.Bundle;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "public class TestOne$$IntentBuilder {", //
+            "  private final Intent intent;", //
+            "  private final Bundler bundler = Bundler.create();", //
+            "  public TestOne$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, TestOne.class);", //
+            "  }", //
+            "  public TestOne$$IntentBuilder key(java.lang.String key) {", //
+            "    bundler.put(\"key\", key);", //
+            "    return this;", //
+            "  }", //
+            "  public Intent get() {", //
+            "    intent.putExtras(bundler.get());", //
+            "    return intent;", //
+            "  }", //
+            "}" //
+        ));
 
-        ASSERT.about(javaSource())
+    ASSERT.about(javaSource())
         .that(source)
         .processedWith(hensonProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);
-    }
+  }
 
-    @Test @Ignore("Sorry, but I can't find the issue here") public void injectingParcelExtra() {
-        JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
-             "package test;", //
-             "import android.app.Activity;", //
-             "import com.f2prateek.dart.InjectExtra;", //
-             "import org.parceler.Parcel;", //
-             "import org.parceler.ParcelConstructor;", //
-             "@Parcel", //
-             "class ExampleParcel {", //
-             "", //
-             "  String name;", //
-             "", //
-             "  @ParcelConstructor", //
-             "  public ExampleParcel(String name) {", //
-             "    this.name = name;", //
-             "  }", //
-             "", //
-             "  public String getName() {", //
-             "    return name;", //
-             "  }", //
-             "}", //
-             "public class Test extends Activity {", //
-             "    @InjectExtra(\"key\") ExampleParcel extra;", //
-             "}" //
+  @Test public void injectingParcelExtra() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "import org.parceler.Parcel;", //
+        "import org.parceler.ParcelConstructor;", //
+        "@Parcel", //
+        "class ExampleParcel {", //
+        "", //
+        "  String name;", //
+        "", //
+        "  @ParcelConstructor", //
+        "  public ExampleParcel(String name) {", //
+        "    this.name = name;", //
+        "  }", //
+        "", //
+        "  public String getName() {", //
+        "    return name;", //
+        "  }", //
+        "}", //
+        "public class Test extends Activity {", //
+        "    @InjectExtra(\"key\") ExampleParcel extra;", //
+        "}" //
+    ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.os.Bundle;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "public class Test$$IntentBuilder {", //
+            "  private final Intent intent;", //
+            "  private final Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Test$$IntentBuilder key(test.ExampleParcel key) {", //
+            "    bundler.put(\"key\", org.parceler.Parcels.wrap(key));", //
+            "    return this;", //
+            "  }", //
+            "  public Intent get() {", //
+            "    intent.putExtras(bundler.get());", //
+            "    return intent;", //
+            "  }", //
+            "}" //
         ));
 
-        JavaFileObject builderSource =
-            JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join("package test;\n", //
-                                                                                          "\n", //
-                                                                                          "import com.f2prateek.dart.henson.Bundler, //;\n", //
-                                                                                          "public class Test_Bundler {\n", //
-                                                                                          "  private final Bundler bundler = Bundler.create();\n", //
-                                                                                          "  public Test_Bundler key(test.ExampleParcel key) {\n", //
-                                                                                          "    bundler.put(\"key\", org.parceler.Parcels.wrap(key));\n", //
-                                                                                          "    return this;\n", //
-                                                                                          "   }\n", //
-                                                                                          "   public Bundle get() {\n", //
-                                                                                          "     return bundler.get();\n", //
-                                                                                          "   }\n", //
-                                                                                          "}\n" //
-            ));
-
-        ASSERT.about(javaSource())
-            .that(source)
-            .processedWith(hensonProcessors())
-            .compilesWithoutError()
-            .and()
-            .generatesSources(builderSource);
-    }
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
 }
