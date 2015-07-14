@@ -21,8 +21,13 @@ import com.f2prateek.dart.common.Binding;
 import com.f2prateek.dart.common.ExtraInjection;
 import com.f2prateek.dart.common.FieldBinding;
 import com.f2prateek.dart.common.InjectionTarget;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
 import java.util.Collection;
 import java.util.List;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
 public class ExtraInjector {
@@ -34,83 +39,78 @@ public class ExtraInjector {
   }
 
   String brewJava() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("// Generated code from Dart. Do not modify!\n");
-    builder.append("package ").append(target.classPackage).append(";\n\n");
-    builder.append("import com.f2prateek.dart.Dart.Finder;\n\n");
-    builder.append("public class ").append(target.className + Dart.INJECTOR_SUFFIX).append(" {\n");
-    emitInject(builder);
-    builder.append("}\n");
-    return builder.toString();
+    TypeSpec.Builder injectorTypeSpec =
+        TypeSpec.classBuilder(target.className + Dart.INJECTOR_SUFFIX);
+    emitInject(injectorTypeSpec);
+    JavaFile javaFile = JavaFile.builder(target.classPackage, injectorTypeSpec.build()).
+        addFileComment("Generated code from Dart. Do not modify!").
+        build();
+    return javaFile.toString();
   }
 
-  private void emitInject(StringBuilder builder) {
-    builder.append("  public static void inject(Finder finder, final ")
-        .append(target.targetClass)
-        .append(" target, Object source) {\n");
+  private void emitInject(TypeSpec.Builder builder) {
+    MethodSpec.Builder injectBuilder = MethodSpec.methodBuilder("inject")
+        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addParameter(ClassName.get(Dart.Finder.class), "finder")
+        .addParameter(ClassName.bestGuess(target.targetClass), "target")
+        .addParameter(ClassName.get(Object.class), "source");
 
-    // Emit a call to the superclass injector, if any.
     if (target.parentTarget != null) {
-      builder.append("    ")
-          .append(target.parentTarget + Dart.INJECTOR_SUFFIX)
-          .append(".inject(finder, target, source);\n\n");
+      // Emit a call to the superclass injector, if any.
+      injectBuilder.addStatement("$T.inject(finder, target, source)",
+          ClassName.bestGuess(target.parentTarget + Dart.INJECTOR_SUFFIX));
     }
 
     // Local variable in which all extras will be temporarily stored.
-    builder.append("    Object object;\n");
+    injectBuilder.addStatement("Object object");
 
     // Loop over each extras injection and emit it.
     for (ExtraInjection injection : target.injectionMap.values()) {
-      emitExtraInjection(builder, injection);
+      emitExtraInjection(injectBuilder, injection);
     }
 
-    builder.append("  }\n");
+    builder.addMethod(injectBuilder.build());
   }
 
-  private void emitExtraInjection(StringBuilder builder, ExtraInjection injection) {
-    builder.append("    object = finder.getExtra(source, \"")
-        .append(injection.getKey())
-        .append("\");\n");
+  private void emitExtraInjection(MethodSpec.Builder builder, ExtraInjection injection) {
+    builder.addStatement("object = finder.getExtra(source, $S)", injection.getKey());
 
     List<Binding> requiredBindings = injection.getRequiredBindings();
     if (!requiredBindings.isEmpty()) {
-      builder.append("    if (object == null) {\n")
-          .append("      throw new IllegalStateException(\"Required extra with key '")
-          .append(injection.getKey())
-          .append("' for ");
-      emitHumanDescription(builder, requiredBindings);
-      builder.append(" was not found. If this extra is optional add '@Nullable' annotation.\");\n")
-          .append("    }\n");
+      builder.beginControlFlow("if (object == null)")
+          .addStatement("throw new IllegalStateException(\"Required extra with key '$L' for $L "
+                  + "was not found. If this extra is optional add '@Nullable' annotation.\")",
+              injection.getKey(), emitHumanDescription(requiredBindings))
+          .endControlFlow("");
       emitFieldBindings(builder, injection);
     } else {
       // an optional extra, wrap it in a check to keep original value, if any
-      builder.append("    if (object != null) {\n");
-      builder.append("  ");
+      builder.beginControlFlow("if (object != null)");
       emitFieldBindings(builder, injection);
-      builder.append("    }\n");
+      builder.endControlFlow("");
     }
   }
 
-  private void emitFieldBindings(StringBuilder builder, ExtraInjection injection) {
+  private void emitFieldBindings(MethodSpec.Builder builder, ExtraInjection injection) {
     Collection<FieldBinding> fieldBindings = injection.getFieldBindings();
     if (fieldBindings.isEmpty()) {
       return;
     }
 
     for (FieldBinding fieldBinding : fieldBindings) {
-      builder.append("    target.").append(fieldBinding.getName()).append(" = ");
+      builder.addCode("target.$L = ", fieldBinding.getName());
 
       if (fieldBinding.isParcel()) {
-        builder.append("org.parceler.Parcels.unwrap((android.os.Parcelable) object);\n");
+        builder.addCode("org.parceler.Parcels.unwrap((android.os.Parcelable) object);\n");
       } else {
         emitCast(builder, fieldBinding.getType());
-        builder.append("object;\n");
+        builder.addCode("object;\n");
       }
     }
   }
 
-  static void emitCast(StringBuilder builder, TypeMirror fieldType) {
-    builder.append('(').append(getType(fieldType)).append(") ");
+  static void emitCast(MethodSpec.Builder builder, TypeMirror fieldType) {
+    builder.addCode("($T)", ClassName.bestGuess(getType(fieldType)));
   }
 
   static String getType(TypeMirror type) {
@@ -142,7 +142,8 @@ public class ExtraInjector {
     }
   }
 
-  public static void emitHumanDescription(StringBuilder builder, List<Binding> bindings) {
+  public static String emitHumanDescription(List<Binding> bindings) {
+    StringBuilder builder = new StringBuilder();
     switch (bindings.size()) {
       case 1:
         builder.append(bindings.get(0).getDescription());
@@ -165,6 +166,7 @@ public class ExtraInjector {
         }
         break;
     }
+    return builder.toString();
   }
 
   public String getFqcn() {
