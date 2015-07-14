@@ -40,14 +40,18 @@ public class InjectExtraTest {
     JavaFileObject injectorSource =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import com.f2prateek.dart.Dart.Finder;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "import java.lang.String;", //
             "public class Test$$ExtraInjector {", //
-            "  public static void inject(Finder finder, final test.Test target, Object source) {",
-            "    Object object;", "    object = finder.getExtra(source, \"key\");", //
+            "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+            "    Object object;", //
+            "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.extra = (java.lang.String) object;", //
+            "    target.extra = (String) object;", //
             "  }", //
             "}" //
         ));
@@ -80,50 +84,67 @@ public class InjectExtraTest {
     JavaFileObject injectorSource =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import com.f2prateek.dart.Dart.Finder;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Boolean;", //
+            "import java.lang.Byte;", //
+            "import java.lang.Character;", //
+            "import java.lang.Double;", //
+            "import java.lang.Float;", //
+            "import java.lang.Integer;", //
+            "import java.lang.Long;", //
+            "import java.lang.Object;", //
+            "import java.lang.Short;", //
             "public class Test$$ExtraInjector {", //
-            "  public static void inject(Finder finder, final test.Test target, Object source) {",
+            "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key_bool\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key_bool' for field 'aBool' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.aBool = (java.lang.Boolean) object;", //
+            "    target.aBool = (Boolean) object;", //
             "    object = finder.getExtra(source, \"key_byte\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key_byte' for field 'aByte' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.aByte = (java.lang.Byte) object;", //
+            "    target.aByte = (Byte) object;", //
             "    object = finder.getExtra(source, \"key_short\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key_short' for field 'aShort' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.aShort = (java.lang.Short) object;", //
+            "    target.aShort = (Short) object;", //
             "    object = finder.getExtra(source, \"key_int\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key_int' for field 'anInt' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.anInt = (java.lang.Integer) object;", //
+            "    target.anInt = (Integer) object;", //
             "    object = finder.getExtra(source, \"key_long\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key_long' for field 'aLong' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.aLong = (java.lang.Long) object;", //
+            "    target.aLong = (Long) object;", //
             "    object = finder.getExtra(source, \"key_char\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key_char' for field 'aChar' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.aChar = (java.lang.Character) object;", //
+            "    target.aChar = (Character) object;", //
             "    object = finder.getExtra(source, \"key_float\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key_float' for field 'aFloat' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.aFloat = (java.lang.Float) object;", //
+            "    target.aFloat = (Float) object;", //
             "    object = finder.getExtra(source, \"key_double\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key_double' for field 'aDouble' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.aDouble = (java.lang.Double) object;", //
+            "    target.aDouble = (Double) object;", //
             "  }", //
             "}" //
         ));
@@ -151,16 +172,20 @@ public class InjectExtraTest {
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import com.f2prateek.dart.Dart.Finder;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "import java.lang.String;", //
             "public class Test$$ExtraInjector {", //
-            "  public static void inject(Finder finder, final test.Test target, Object source) {",
-            "    Object object;", "    object = finder.getExtra(source, \"key\");", //
+            "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+            "    Object object;", //
+            "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1', field 'extra2', and field 'extra3' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.extra1 = (java.lang.String) object;", //
-            "    target.extra2 = (java.lang.String) object;", //
-            "    target.extra3 = (java.lang.String) object;", //
+            "    target.extra1 = (String) object;", //
+            "    target.extra2 = (String) object;", //
+            "    target.extra3 = (String) object;", //
             "  }", //
             "}" //
         ));
@@ -178,6 +203,8 @@ public class InjectExtraTest {
         "package test;", //
         "import android.app.Activity;", //
         "import com.f2prateek.dart.InjectExtra;", //
+        "import java.lang.Object;", //
+        "import java.lang.String;", //
         "public class Test extends Activity {", //
         "    @InjectExtra String key;", //
         "}" //
@@ -186,14 +213,18 @@ public class InjectExtraTest {
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import com.f2prateek.dart.Dart.Finder;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "import java.lang.String;", //
             "public class Test$$ExtraInjector {", //
-            "  public static void inject(Finder finder, final test.Test target, Object source) {",
-            "    Object object;", "    object = finder.getExtra(source, \"key\");", //
+            "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+            "    Object object;", //
+            "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key' for field 'key' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.key = (java.lang.String) object;", //
+            "    target.key = (String) object;", //
             "  }", //
             "}" //
         ));
@@ -211,6 +242,8 @@ public class InjectExtraTest {
         "package test;", //
         "import android.app.Activity;", //
         "import com.f2prateek.dart.InjectExtra;", //
+        "import java.lang.Object;", //
+        "import java.lang.String;", //
         "public class Test extends Activity {", //
         "    @InjectExtra(\"key_1\") String extra1;", //
         "    @InjectExtra(\"key_2\") String extra2;", //
@@ -218,7 +251,10 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    ASSERT.about(javaSource()).that(source).processedWith(ProcessorTestUtilities.dartProcessors()).compilesWithoutError();
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .compilesWithoutError();
   }
 
   @Test public void optional() {
@@ -235,13 +271,15 @@ public class InjectExtraTest {
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import com.f2prateek.dart.Dart.Finder;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "import java.lang.String;", //
             "public class Test$$ExtraInjector {", //
-            "  public static void inject(Finder finder, final test.Test target, Object source) {",
+            "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
             "    if (object != null) {", //
-            "    target.extra = (java.lang.String) object;", //
+            "      target.extra = (String) object;", //
             "    }", //
             "  }", //
             "}" //
@@ -261,6 +299,8 @@ public class InjectExtraTest {
         "import android.app.Activity;", //
         "import com.f2prateek.dart.InjectExtra;", //
         "import com.f2prateek.dart.Nullable;", //
+        "import java.lang.Object;", //
+        "import java.lang.String;", //
         "public class Test extends Activity {", //
         "  @Nullable @InjectExtra(\"key\") String extra;", //
         "}" //
@@ -269,13 +309,15 @@ public class InjectExtraTest {
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import com.f2prateek.dart.Dart.Finder;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "import java.lang.String;", //
             "public class Test$$ExtraInjector {", //
-            "  public static void inject(Finder finder, final test.Test target, Object source) {",
+            "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
             "    if (object != null) {", //
-            "    target.extra = (java.lang.String) object;", //
+            "      target.extra = (String) object;", //
             "    }", //
             "  }", //
             "}" //
@@ -393,15 +435,18 @@ public class InjectExtraTest {
     JavaFileObject expectedSource1 =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import com.f2prateek.dart.Dart.Finder;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "import java.lang.String;", //
             "public class Test$$ExtraInjector {", //
-            "  public static void inject(Finder finder, final test.Test target, Object source) {",
+            "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.extra = (java.lang.String) object;", //
+            "    target.extra = (String) object;", //
             "  }", //
             "}" //
         ));
@@ -409,26 +454,22 @@ public class InjectExtraTest {
     JavaFileObject expectedSource2 =
         JavaFileObjects.forSourceString("test/TestOne$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import com.f2prateek.dart.Dart.Finder;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "import java.lang.String;", //
             "public class TestOne$$ExtraInjector {", //
-            "  public static void inject(Finder finder, final test.TestOne target, Object source) {",
-            "    test.Test$$ExtraInjector.inject(finder, target, source);", //
+            "  public static void inject(Dart.Finder finder, TestOne target, Object source) {", //
+            "    Test$$ExtraInjector.inject(finder, target, source);", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.extra1 = (java.lang.String) object;", //
+            "    target.extra1 = (String) object;", //
             "  }", //
             "}" //
         ));
-
-    ASSERT.about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource1, expectedSource2);
 
     ASSERT.about(javaSource())
         .that(source)
@@ -456,34 +497,42 @@ public class InjectExtraTest {
     JavaFileObject expectedSource1 =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import com.f2prateek.dart.Dart.Finder;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "import java.lang.String;", //
             "public class Test$$ExtraInjector {", //
-            "  public static void inject(Finder finder, final test.Test target, Object source) {",
+            "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
             "    if (object == null) {", //
             "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
             "    }", //
-            "    target.extra = (java.lang.String) object;", //
+            "    target.extra = (String) object;", //
             "  }", //
             "}" //
         ));
 
-    JavaFileObject expectedSource2 = JavaFileObjects.forSourceString("test/TestOne$$ExtraInjector",
-        Joiner.on('\n').join("package test;", //
-            "import com.f2prateek.dart.Dart.Finder;", //
-            "public class TestOne$$ExtraInjector {", //
-            "  public static void inject(Finder finder, final test.TestOne target, Object source) {",
-            "    test.Test$$ExtraInjector.inject(finder, target, source);", //
-            "    Object object;", //
-            "    object = finder.getExtra(source, \"key\");", //
-            "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1' was not found. If this extra is optional add '@Nullable' annotation.\");",
-            "    }", //
-            "    target.extra1 = (java.lang.String) object;", //
-            "  }", //
-            "}" //
-        ));
+    JavaFileObject expectedSource2 =
+        JavaFileObjects.forSourceString("test/TestOne$$ExtraInjector", Joiner.on('\n').join( //
+                "package test;", //
+                "import com.f2prateek.dart.Dart;", //
+                "import java.lang.Object;", //
+                "import java.lang.String;", //
+                "public class TestOne$$ExtraInjector {", //
+                "  public static void inject(Dart.Finder finder, TestOne target, Object source) {",
+                //
+                "    Test$$ExtraInjector.inject(finder, target, source);", //
+                "    Object object;", //
+                "    object = finder.getExtra(source, \"key\");", //
+                "    if (object == null) {", //
+                "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1' was not found. If this extra is optional add '@Nullable' annotation.\");",
+                //
+                "    }", //
+                "    target.extra1 = (String) object;", //
+                "  }", //
+                "}" //
+            ));
 
     ASSERT.about(javaSource())
         .that(source)

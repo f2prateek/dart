@@ -40,7 +40,8 @@ public class ExtraInjector {
 
   String brewJava() {
     TypeSpec.Builder injectorTypeSpec =
-        TypeSpec.classBuilder(target.className + Dart.INJECTOR_SUFFIX);
+        TypeSpec.classBuilder(target.className + Dart.INJECTOR_SUFFIX)
+        .addModifiers(Modifier.PUBLIC);
     emitInject(injectorTypeSpec);
     JavaFile javaFile = JavaFile.builder(target.classPackage, injectorTypeSpec.build()).
         addFileComment("Generated code from Dart. Do not modify!").
@@ -81,13 +82,13 @@ public class ExtraInjector {
           .addStatement("throw new IllegalStateException(\"Required extra with key '$L' for $L "
                   + "was not found. If this extra is optional add '@Nullable' annotation.\")",
               injection.getKey(), emitHumanDescription(requiredBindings))
-          .endControlFlow("");
+          .endControlFlow();
       emitFieldBindings(builder, injection);
     } else {
       // an optional extra, wrap it in a check to keep original value, if any
       builder.beginControlFlow("if (object != null)");
       emitFieldBindings(builder, injection);
-      builder.endControlFlow("");
+      builder.endControlFlow();
     }
   }
 
@@ -110,7 +111,7 @@ public class ExtraInjector {
   }
 
   static void emitCast(MethodSpec.Builder builder, TypeMirror fieldType) {
-    builder.addCode("($T)", ClassName.bestGuess(getType(fieldType)));
+    builder.addCode("($T) ", ClassName.bestGuess(getType(fieldType)));
   }
 
   static String getType(TypeMirror type) {
