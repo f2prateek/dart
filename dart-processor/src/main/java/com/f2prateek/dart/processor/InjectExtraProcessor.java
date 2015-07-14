@@ -40,7 +40,6 @@ public final class InjectExtraProcessor extends AbstractDartProcessor {
       // Generate the ExtraInjector
       try {
         ExtraInjector extraInjector = new ExtraInjector(injectionTarget);
-        System.out.println("Creating file " + extraInjector.getFqcn());
         JavaFileObject jfo = filer.createSourceFile(extraInjector.getFqcn(), typeElement);
         //TODO this should be turned on by a processor option
         //to debug : un-comment this line
