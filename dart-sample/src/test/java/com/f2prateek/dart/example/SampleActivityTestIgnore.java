@@ -18,10 +18,8 @@
 package com.f2prateek.dart.example;
 
 import android.content.Intent;
-import android.os.Parcelable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.parceler.Parcels;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -31,29 +29,26 @@ import static org.fest.assertions.api.Assertions.assertThat;
 @RunWith(RobolectricTestRunner.class)
 @Config(emulateSdk = 18, manifest = "src/main/AndroidManifest.xml")
 public class SampleActivityTestIgnore {
-  //@Test public void verifyExtrasInjection() {
-  //  ComplexParcelable parcelable = ComplexParcelable.random();
-  //  ExampleParcel parcel = new ExampleParcel("andy");
-  //
-  //  Intent intent = new SampleActivityIntentBuilder(Robolectric.application)
-  //    .withStringExtra("test")
-  //    .withIntExtra(4)
-  //    .withParcelableExtra(parcelable)
-  //    .withParcelExtra(parcel)
-  //    .withDefaultKeyExtra("defaultKeyExtra")
-  //    .build();
-  //
-  //  SampleActivity activity = Robolectric
-  //    .buildActivity(SampleActivity.class)
-  //    .withIntent(intent)
-  //    .create()
-  //    .get();
-  //
-  //  assertThat(activity.stringExtra).isEqualTo("test");
-  //  assertThat(activity.intExtra).isEqualTo(4);
-  //  assertThat(activity.parcelableExtra).isEqualTo(parcelable);
-  //  assertThat(activity.parcelExtra).isEqualTo(parcel);
-  //  assertThat(activity.defaultExtra).isEqualTo(SampleActivity.DEFAULT_EXTRA_VALUE);
-  //  assertThat(activity.defaultKeyExtra).isEqualTo("defaultKeyExtra");
-  //}
+  @Test public void verifyExtrasInjection() {
+    ComplexParcelable parcelable = ComplexParcelable.random();
+    ExampleParcel parcel = new ExampleParcel("andy");
+
+    Intent intent = new SampleActivity$$IntentBuilder(Robolectric.application)
+        .ExtraString("test")
+        .ExtraInt(4)
+        .ExtraParcelable(parcelable)
+        .ExtraParcel(parcel)
+        .defaultKeyExtra("defaultKeyExtra")
+        .get();
+
+    SampleActivity activity =
+        Robolectric.buildActivity(SampleActivity.class).withIntent(intent).create().get();
+
+    assertThat(activity.stringExtra).isEqualTo("test");
+    assertThat(activity.intExtra).isEqualTo(4);
+    assertThat(activity.parcelableExtra).isEqualTo(parcelable);
+    assertThat(activity.parcelExtra).isEqualTo(parcel);
+    assertThat(activity.defaultExtra).isEqualTo(SampleActivity.DEFAULT_EXTRA_VALUE);
+    assertThat(activity.defaultKeyExtra).isEqualTo("defaultKeyExtra");
+  }
 }
