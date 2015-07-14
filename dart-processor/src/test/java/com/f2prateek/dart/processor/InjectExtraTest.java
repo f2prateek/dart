@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.processor;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
-import static com.f2prateek.dart.ProcessorTestUtilities.dartProcessors;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
@@ -55,7 +54,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(injectorSource);
@@ -131,7 +130,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(injectorSource);
@@ -168,7 +167,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource);
@@ -201,7 +200,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource);
@@ -219,7 +218,7 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    ASSERT.about(javaSource()).that(source).processedWith(dartProcessors()).compilesWithoutError();
+    ASSERT.about(javaSource()).that(source).processedWith(ProcessorTestUtilities.dartProcessors()).compilesWithoutError();
   }
 
   @Test public void optional() {
@@ -250,7 +249,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource);
@@ -284,7 +283,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource);
@@ -304,7 +303,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .failsToCompile()
         .withErrorContaining(
             String.format("@InjectExtra fields may not be contained in private classes. (%s)",
@@ -325,7 +324,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .failsToCompile()
         .withErrorContaining(
             String.format("@InjectExtra fields must not be private or static. (%s)",
@@ -346,7 +345,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .failsToCompile()
         .withErrorContaining(
             String.format("@InjectExtra fields must not be private or static. (%s)",
@@ -367,7 +366,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .failsToCompile()
         .withErrorContaining(
             String.format("@InjectExtra fields may only be contained in classes. (%s)",
@@ -426,14 +425,14 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);
@@ -488,7 +487,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);

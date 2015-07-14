@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.common;
 
 import java.util.ArrayList;
 import java.util.Collection;

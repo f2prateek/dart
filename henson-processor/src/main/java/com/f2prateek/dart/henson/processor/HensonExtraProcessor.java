@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart.henson;
+package com.f2prateek.dart.henson.processor;
 
-import com.f2prateek.dart.AbstractDartProcessor;
-import com.f2prateek.dart.InjectionTarget;
+import com.f2prateek.dart.common.AbstractDartProcessor;
+import com.f2prateek.dart.common.InjectionTarget;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
@@ -44,7 +44,9 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
         IntentBuilder intentBuilder = new IntentBuilder(injectionTarget);
         JavaFileObject jfo = filer.createSourceFile(intentBuilder.getFqcn(), typeElement);
         writer = jfo.openWriter();
-        System.out.println(intentBuilder.brewJava());
+        //TODO this should be turned on by a processor option
+        //to debug : un-comment this line
+        //System.out.println(intentBuilder.brewJava());
         writer.write(intentBuilder.brewJava());
       } catch (IOException e) {
         error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,

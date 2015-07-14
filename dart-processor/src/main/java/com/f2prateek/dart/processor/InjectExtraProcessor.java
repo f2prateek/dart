@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.processor;
 
+import com.f2prateek.dart.common.AbstractDartProcessor;
+import com.f2prateek.dart.common.InjectionTarget;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;

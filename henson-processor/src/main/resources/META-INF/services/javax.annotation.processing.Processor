@@ -15,4 +15,4 @@
 # limitations under the License.
 #
 
-com.f2prateek.dart.henson.HensonExtraProcessor
+com.f2prateek.dart.henson.processor.HensonExtraProcessor

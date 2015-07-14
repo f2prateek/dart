@@ -1,9 +1,9 @@
-package com.f2prateek.dart.henson;
+package com.f2prateek.dart.henson.processor;
 
-import com.f2prateek.dart.ExtraInjection;
-import com.f2prateek.dart.FieldBinding;
+import com.f2prateek.dart.common.ExtraInjection;
+import com.f2prateek.dart.common.FieldBinding;
 import java.util.Collection;
-import com.f2prateek.dart.InjectionTarget;
+import com.f2prateek.dart.common.InjectionTarget;
 import javax.lang.model.type.TypeMirror;
 
 public class IntentBuilder {

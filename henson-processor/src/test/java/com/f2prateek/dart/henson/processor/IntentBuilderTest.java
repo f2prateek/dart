@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart.henson;
+package com.f2prateek.dart.henson.processor;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
-import static com.f2prateek.dart.henson.ProcessorTestUtilities.hensonProcessors;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
@@ -62,7 +61,7 @@ public class IntentBuilderTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -138,7 +137,7 @@ public class IntentBuilderTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -181,7 +180,7 @@ public class IntentBuilderTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -222,7 +221,7 @@ public class IntentBuilderTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -293,7 +292,7 @@ public class IntentBuilderTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);
@@ -364,7 +363,7 @@ public class IntentBuilderTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);
@@ -422,7 +421,7 @@ public class IntentBuilderTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);

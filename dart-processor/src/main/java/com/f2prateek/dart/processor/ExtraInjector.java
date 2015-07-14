@@ -14,8 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.f2prateek.dart;
+package com.f2prateek.dart.processor;
 
+import com.f2prateek.dart.Dart;
+import com.f2prateek.dart.common.Binding;
+import com.f2prateek.dart.common.ExtraInjection;
+import com.f2prateek.dart.common.FieldBinding;
+import com.f2prateek.dart.common.InjectionTarget;
 import java.util.Collection;
 import java.util.List;
 import javax.lang.model.type.TypeMirror;
@@ -137,7 +142,7 @@ public class ExtraInjector {
     }
   }
 
-  static void emitHumanDescription(StringBuilder builder, List<Binding> bindings) {
+  public static void emitHumanDescription(StringBuilder builder, List<Binding> bindings) {
     switch (bindings.size()) {
       case 1:
         builder.append(bindings.get(0).getDescription());

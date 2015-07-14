@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.processor;
 
-import com.f2prateek.dart.AbstractDartProcessor;
+import com.f2prateek.dart.processor.InjectExtraProcessor;
 import java.util.Arrays;
 import javax.annotation.processing.Processor;
 

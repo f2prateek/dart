@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.henson.processor;
 
-/** A field or method extra injection binding. */
-interface Binding {
-  /** A description of the binding in human readable form (e.g., "field 'foo'"). */
-  String getDescription();
+import com.f2prateek.dart.henson.processor.HensonExtraProcessor;
+import java.util.Arrays;
+import javax.annotation.processing.Processor;
 
-  /**
-   * False if any annotation named {@code Optional} or {@code Nullable} is present on the binding.
-   */
-  boolean isRequired();
+final class ProcessorTestUtilities {
+  static Iterable<? extends Processor> hensonProcessors() {
+    return Arrays.asList(new HensonExtraProcessor());
+  }
 }

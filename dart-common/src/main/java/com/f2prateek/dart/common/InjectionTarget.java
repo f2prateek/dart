@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.common;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ public final class InjectionTarget {
   public final String classPackage;
   public final String className;
   public final String targetClass;
-  String parentTarget;
+  public String parentTarget;
 
   InjectionTarget(String classPackage, String className, String targetClass) {
     this.classPackage = classPackage;

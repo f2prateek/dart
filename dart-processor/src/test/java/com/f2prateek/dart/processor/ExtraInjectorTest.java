@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.processor;
 
+import com.f2prateek.dart.common.Binding;
 import org.junit.Test;
 
-import static com.f2prateek.dart.ExtraInjector.emitHumanDescription;
+import static com.f2prateek.dart.processor.ExtraInjector.emitHumanDescription;
 import static java.util.Arrays.asList;
 import static org.fest.assertions.api.Assertions.assertThat;
 
