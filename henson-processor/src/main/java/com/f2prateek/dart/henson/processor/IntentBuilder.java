@@ -116,7 +116,8 @@ public class IntentBuilder {
           if (builderStateClass != builder) {
             builder.addType(builderStateClass.build());
           }
-          builderStateClass = TypeSpec.classBuilder(nextStateClassName);
+          builderStateClass = TypeSpec.classBuilder(nextStateClassName)
+              .addModifiers(Modifier.PUBLIC);
         }
       }
     }
