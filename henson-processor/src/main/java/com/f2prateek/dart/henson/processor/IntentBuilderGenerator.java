@@ -19,10 +19,10 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
-public class IntentBuilderBuilder extends BaseGenerator {
+public class IntentBuilderGenerator extends BaseGenerator {
   public static final String BUNDLE_BUILDER_SUFFIX = "$$IntentBuilder";
 
-  public IntentBuilderBuilder(InjectionTarget target) {
+  public IntentBuilderGenerator(InjectionTarget target) {
     super(target);
   }
 

@@ -31,9 +31,9 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
-public class ExtraInjector extends BaseGenerator {
+public class ExtraInjectionGenerator extends BaseGenerator {
 
-  public ExtraInjector(InjectionTarget target) {
+  public ExtraInjectionGenerator(InjectionTarget target) {
     super(target);
   }
 

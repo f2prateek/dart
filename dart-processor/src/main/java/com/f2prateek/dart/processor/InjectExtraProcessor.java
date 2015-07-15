@@ -39,13 +39,13 @@ public final class InjectExtraProcessor extends AbstractDartProcessor {
       Writer writer = null;
       // Generate the ExtraInjector
       try {
-        ExtraInjector extraInjector = new ExtraInjector(injectionTarget);
-        JavaFileObject jfo = filer.createSourceFile(extraInjector.getFqcn(), typeElement);
+        ExtraInjectionGenerator extraInjectionGenerator = new ExtraInjectionGenerator(injectionTarget);
+        JavaFileObject jfo = filer.createSourceFile(extraInjectionGenerator.getFqcn(), typeElement);
         //TODO this should be turned on by a processor option
         //to debug : un-comment this line
         //System.out.println("Writing file " + extraInjector.brewJava());
         writer = jfo.openWriter();
-        writer.write(extraInjector.brewJava());
+        writer.write(extraInjectionGenerator.brewJava());
       } catch (IOException e) {
         error(typeElement, "Unable to write injector for type %s: %s", typeElement, e.getMessage());
       } finally {

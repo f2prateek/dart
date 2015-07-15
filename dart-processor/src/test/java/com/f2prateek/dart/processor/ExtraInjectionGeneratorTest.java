@@ -25,13 +25,13 @@ import org.junit.Test;
 import static java.util.Arrays.asList;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class ExtraInjectorTest {
+public class ExtraInjectionGeneratorTest {
 
-  ExtraInjector extraInjector;
+  ExtraInjectionGenerator extraInjectionGenerator;
 
   @Before
   public void setup() {
-    extraInjector = new ExtraInjector(new InjectionTarget("foo", "bar","qurtz"));
+    extraInjectionGenerator = new ExtraInjectionGenerator(new InjectionTarget("foo", "bar","qurtz"));
   }
 
   @Test public void humanDescriptionJoinWorks() {
@@ -39,13 +39,13 @@ public class ExtraInjectorTest {
     Binding two = new TestBinding("two");
     Binding three = new TestBinding("three");
 
-    String actual1 = extraInjector.emitHumanDescription(asList(one));
+    String actual1 = extraInjectionGenerator.emitHumanDescription(asList(one));
     assertThat(actual1).isEqualTo("one");
 
-    String actual2 = extraInjector.emitHumanDescription(asList(one, two));
+    String actual2 = extraInjectionGenerator.emitHumanDescription(asList(one, two));
     assertThat(actual2).isEqualTo("one and two");
 
-    String actual3 = extraInjector.emitHumanDescription(asList(one, two, three));
+    String actual3 = extraInjectionGenerator.emitHumanDescription(asList(one, two, three));
     assertThat(actual3).isEqualTo("one, two, and three");
   }
 

@@ -25,7 +25,7 @@ import org.junit.Test;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
-public class IntentBuilderBuilderTest {
+public class IntentBuilderGeneratorTest {
 
   @Test public void injectingExtra() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
