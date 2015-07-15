@@ -2,6 +2,7 @@ package com.f2prateek.dart.henson.processor;
 
 import android.content.Context;
 import android.content.Intent;
+import com.f2prateek.dart.common.BaseGenerator;
 import com.f2prateek.dart.common.ExtraInjection;
 import com.f2prateek.dart.common.FieldBinding;
 import com.f2prateek.dart.common.InjectionTarget;
@@ -18,24 +19,33 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
-public class IntentBuilder {
+public class IntentBuilderBuilder extends BaseGenerator {
   public static final String BUNDLE_BUILDER_SUFFIX = "$$IntentBuilder";
 
-  private final InjectionTarget target;
-
-  public IntentBuilder(InjectionTarget target) {
-    this.target = target;
+  public IntentBuilderBuilder(InjectionTarget target) {
+    super(target);
   }
 
   private String builderClassName() {
     return target.className + BUNDLE_BUILDER_SUFFIX;
   }
 
-  String brewJava() {
+  @Override public String brewJava() {
     TypeSpec.Builder intentBuilderTypeBuilder =
         TypeSpec.classBuilder(builderClassName()).addModifiers(Modifier.PUBLIC);
 
-    //fields
+    emitFields(intentBuilderTypeBuilder);
+    emitConstructor(intentBuilderTypeBuilder);
+    emitGettersAndSetters(intentBuilderTypeBuilder);
+
+    //build
+    JavaFile javaFile = JavaFile.builder(target.classPackage, intentBuilderTypeBuilder.build())
+        .addFileComment("Generated code from Dart. Do not modify!")
+        .build();
+    return javaFile.toString();
+  }
+
+  private void emitFields(TypeSpec.Builder intentBuilderTypeBuilder) {
     FieldSpec.Builder intentFieldBuilder =
         FieldSpec.builder(Intent.class, "intent", Modifier.PRIVATE);
     intentBuilderTypeBuilder.addField(intentFieldBuilder.build());
@@ -43,14 +53,17 @@ public class IntentBuilder {
         FieldSpec.builder(Bundler.class, "bundler", Modifier.PRIVATE);
     bundlerFieldBuilder.initializer("Bundler.create()");
     intentBuilderTypeBuilder.addField(bundlerFieldBuilder.build());
+  }
 
-    //constructor
+  private void emitConstructor(TypeSpec.Builder intentBuilderTypeBuilder) {
     MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder()
         .addModifiers(Modifier.PUBLIC)
         .addParameter(Context.class, "context")
         .addStatement("intent = new Intent(context, $L)", target.className + ".class");
     intentBuilderTypeBuilder.addMethod(constructorBuilder.build());
+  }
 
+  private void emitGettersAndSetters(TypeSpec.Builder intentBuilderTypeBuilder) {
     //separate required extras from optional extras and sort both sublists.
     List<ExtraInjection> requiredInjections = new ArrayList<>();
     List<ExtraInjection> optionalInjections = new ArrayList<>();
@@ -82,12 +95,10 @@ public class IntentBuilder {
     if (lastStateClassBuilder != intentBuilderTypeBuilder) {
       intentBuilderTypeBuilder.addType(lastStateClassBuilder.build());
     }
+  }
 
-    //build
-    JavaFile javaFile = JavaFile.builder(target.classPackage, intentBuilderTypeBuilder.build()).
-        addFileComment("Generated code from Dart. Do not modify!").
-        build();
-    return javaFile.toString();
+  @Override public String getFqcn() {
+    return target.getFqcn() + BUNDLE_BUILDER_SUFFIX;
   }
 
   private void emitGetter(TypeSpec.Builder builder) {
@@ -107,24 +118,22 @@ public class IntentBuilder {
 
     for (int indexInjection = 0; indexInjection < injectionList.size(); indexInjection++) {
       ExtraInjection injection = injectionList.get(indexInjection);
-      if (injection.getRequiredBindings().isEmpty() == isOptional) {
-        String nextStateClassName =
-            emitSetter(builderStateClass, injection, indexInjection == injectionList.size() - 1,
-                isOptional, areAllExtrasOptional);
+      String nextStateClassName =
+          emitSetter(builderStateClass, injection, indexInjection == injectionList.size() - 1,
+              isOptional, areAllExtrasOptional);
 
-        if (!isOptional) {
-          if (builderStateClass != builder) {
-            builder.addType(builderStateClass.build());
-          }
-          builderStateClass = TypeSpec.classBuilder(nextStateClassName)
-              .addModifiers(Modifier.PUBLIC);
+      if (!isOptional) {
+        if (builderStateClass != builder) {
+          builder.addType(builderStateClass.build());
         }
+        builderStateClass = TypeSpec.classBuilder(nextStateClassName).addModifiers(Modifier.PUBLIC);
       }
     }
   }
 
   private String emitSetter(TypeSpec.Builder builder, ExtraInjection injection,
       boolean isLastMandatorySetter, boolean isOptional, boolean areAllExtrasOptional) {
+
     Collection<FieldBinding> fieldBindings = injection.getFieldBindings();
     if (fieldBindings.isEmpty()) {
       return null;
@@ -146,6 +155,7 @@ public class IntentBuilder {
     final ClassName nextStateClassName;
     final String nextStateSimpleClassName;
     final String nextStateName;
+
     if (isOptional) {
       if (areAllExtrasOptional) {
         nextStateName = builderClassName();
@@ -191,41 +201,12 @@ public class IntentBuilder {
     }
 
     char firstUpper = Character.toUpperCase(key.charAt(0));
-    String rest = key.length() == 1 ? "" : key.substring(1);
-    return firstUpper + rest;
-  }
-
-  public String getFqcn() {
-    return target.getFqcn() + BUNDLE_BUILDER_SUFFIX;
-  }
-
-  static String getType(TypeMirror type) {
-    if (type.getKind().isPrimitive()) {
-      // Get wrapper for primitive types
-      switch (type.getKind()) {
-        case BOOLEAN:
-          return "java.lang.Boolean";
-        case BYTE:
-          return "java.lang.Byte";
-        case SHORT:
-          return "java.lang.Short";
-        case INT:
-          return "java.lang.Integer";
-        case LONG:
-          return "java.lang.Long";
-        case CHAR:
-          return "java.lang.Character";
-        case FLOAT:
-          return "java.lang.Float";
-        case DOUBLE:
-          return "java.lang.Double";
-        default:
-          // Shouldn't happen
-          throw new RuntimeException();
-      }
-    } else {
-      return type.toString();
+    if (key.length() == 1) {
+      return Character.toString(firstUpper);
     }
+
+    String rest = key.substring(1);
+    return firstUpper + rest;
   }
 
   private static class ExtraInjectionComparator implements Comparator<ExtraInjection> {

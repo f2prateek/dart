@@ -18,25 +18,34 @@
 package com.f2prateek.dart.processor;
 
 import com.f2prateek.dart.common.Binding;
+import com.f2prateek.dart.common.InjectionTarget;
+import org.junit.Before;
 import org.junit.Test;
 
-import static com.f2prateek.dart.processor.ExtraInjector.emitHumanDescription;
 import static java.util.Arrays.asList;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class ExtraInjectorTest {
+
+  ExtraInjector extraInjector;
+
+  @Before
+  public void setup() {
+    extraInjector = new ExtraInjector(new InjectionTarget("foo", "bar","qurtz"));
+  }
+
   @Test public void humanDescriptionJoinWorks() {
     Binding one = new TestBinding("one");
     Binding two = new TestBinding("two");
     Binding three = new TestBinding("three");
 
-    String actual1 = emitHumanDescription(asList(one));
+    String actual1 = extraInjector.emitHumanDescription(asList(one));
     assertThat(actual1).isEqualTo("one");
 
-    String actual2 = emitHumanDescription(asList(one, two));
+    String actual2 = extraInjector.emitHumanDescription(asList(one, two));
     assertThat(actual2).isEqualTo("one and two");
 
-    String actual3 = emitHumanDescription(asList(one, two, three));
+    String actual3 = extraInjector.emitHumanDescription(asList(one, two, three));
     assertThat(actual3).isEqualTo("one, two, and three");
   }
 

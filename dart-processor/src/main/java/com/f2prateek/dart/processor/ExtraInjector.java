@@ -20,6 +20,7 @@ import com.f2prateek.dart.Dart;
 import com.f2prateek.dart.common.Binding;
 import com.f2prateek.dart.common.ExtraInjection;
 import com.f2prateek.dart.common.FieldBinding;
+import com.f2prateek.dart.common.BaseGenerator;
 import com.f2prateek.dart.common.InjectionTarget;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -30,23 +31,27 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
-public class ExtraInjector {
-
-  private final InjectionTarget target;
+public class ExtraInjector extends BaseGenerator {
 
   public ExtraInjector(InjectionTarget target) {
-    this.target = target;
+    super(target);
   }
 
-  String brewJava() {
+  @Override
+  public String brewJava() {
     TypeSpec.Builder injectorTypeSpec =
         TypeSpec.classBuilder(target.className + Dart.INJECTOR_SUFFIX)
         .addModifiers(Modifier.PUBLIC);
     emitInject(injectorTypeSpec);
-    JavaFile javaFile = JavaFile.builder(target.classPackage, injectorTypeSpec.build()).
-        addFileComment("Generated code from Dart. Do not modify!").
-        build();
+    JavaFile javaFile = JavaFile.builder(target.classPackage, injectorTypeSpec.build())
+        .addFileComment("Generated code from Dart. Do not modify!")
+        .build();
     return javaFile.toString();
+  }
+
+  @Override
+  public String getFqcn() {
+    return target.getFqcn() + Dart.INJECTOR_SUFFIX;
   }
 
   private void emitInject(TypeSpec.Builder builder) {
@@ -110,40 +115,12 @@ public class ExtraInjector {
     }
   }
 
-  static void emitCast(MethodSpec.Builder builder, TypeMirror fieldType) {
+  private void emitCast(MethodSpec.Builder builder, TypeMirror fieldType) {
     builder.addCode("($T) ", ClassName.bestGuess(getType(fieldType)));
   }
 
-  static String getType(TypeMirror type) {
-    if (type.getKind().isPrimitive()) {
-      // Get wrapper for primitive types
-      switch (type.getKind()) {
-        case BOOLEAN:
-          return "java.lang.Boolean";
-        case BYTE:
-          return "java.lang.Byte";
-        case SHORT:
-          return "java.lang.Short";
-        case INT:
-          return "java.lang.Integer";
-        case LONG:
-          return "java.lang.Long";
-        case CHAR:
-          return "java.lang.Character";
-        case FLOAT:
-          return "java.lang.Float";
-        case DOUBLE:
-          return "java.lang.Double";
-        default:
-          // Shouldn't happen
-          throw new RuntimeException();
-      }
-    } else {
-      return type.toString();
-    }
-  }
-
-  public static String emitHumanDescription(List<Binding> bindings) {
+  //TODO add android annotations dependency to get that annotation plus others.
+  /** Visible for testing*/ String emitHumanDescription(List<Binding> bindings) {
     StringBuilder builder = new StringBuilder();
     switch (bindings.size()) {
       case 1:
@@ -168,9 +145,5 @@ public class ExtraInjector {
         break;
     }
     return builder.toString();
-  }
-
-  public String getFqcn() {
-    return target.getFqcn() + Dart.INJECTOR_SUFFIX;
   }
 }

@@ -28,7 +28,7 @@ public final class InjectionTarget {
   public final String targetClass;
   public String parentTarget;
 
-  InjectionTarget(String classPackage, String className, String targetClass) {
+  public InjectionTarget(String classPackage, String className, String targetClass) {
     this.classPackage = classPackage;
     this.className = className;
     this.targetClass = targetClass;

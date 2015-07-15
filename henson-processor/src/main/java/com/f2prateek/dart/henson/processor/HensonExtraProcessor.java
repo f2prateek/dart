@@ -41,13 +41,13 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
 
       // Generate the IntentBuilder
       try {
-        IntentBuilder intentBuilder = new IntentBuilder(injectionTarget);
-        JavaFileObject jfo = filer.createSourceFile(intentBuilder.getFqcn(), typeElement);
+        IntentBuilderBuilder intentBuilderBuilder = new IntentBuilderBuilder(injectionTarget);
+        JavaFileObject jfo = filer.createSourceFile(intentBuilderBuilder.getFqcn(), typeElement);
         writer = jfo.openWriter();
         //TODO this should be turned on by a processor option
         //to debug : un-comment this line
-        System.out.println("Writing file " + intentBuilder.brewJava());
-        writer.write(intentBuilder.brewJava());
+        //System.out.println("Writing file " + intentBuilderBuilder.brewJava());
+        writer.write(intentBuilderBuilder.brewJava());
       } catch (IOException e) {
         error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,
               e.getMessage());
