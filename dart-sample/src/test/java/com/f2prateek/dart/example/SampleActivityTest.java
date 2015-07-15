@@ -34,15 +34,18 @@ public class SampleActivityTest {
     ExampleParcel parcel = new ExampleParcel("andy");
 
     Intent intent = new SampleActivity$$IntentBuilder(Robolectric.application)
-        .ExtraInt(4)
-        .ExtraParcel(parcel)
-        .ExtraParcelable(parcelable)
-        .ExtraString("test")
         .defaultKeyExtra("defaultKeyExtra")
+        .extraInt(4)
+        .extraParcel(parcel)
+        .extraParcelable(parcelable)
+        .extraString("test")
         .get();
 
     SampleActivity activity =
-        Robolectric.buildActivity(SampleActivity.class).withIntent(intent).create().get();
+        Robolectric.buildActivity(SampleActivity.class)
+            .withIntent(intent)
+            .create()
+            .get();
 
     assertThat(activity.stringExtra).isEqualTo("test");
     assertThat(activity.intExtra).isEqualTo(4);

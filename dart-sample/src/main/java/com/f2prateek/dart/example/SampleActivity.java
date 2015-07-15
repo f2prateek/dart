@@ -29,12 +29,12 @@ import com.f2prateek.dart.Nullable;
 public class SampleActivity extends Activity {
   public static final String DEFAULT_EXTRA_VALUE = "a default value";
 
-  private static final String EXTRA_STRING = "ExtraString";
-  private static final String EXTRA_INT = "ExtraInt";
-  private static final String EXTRA_PARCELABLE = "ExtraParcelable";
-  private static final String EXTRA_OPTIONAL = "ExtraOptional";
-  private static final String EXTRA_PARCEL = "ExtraParcel";
-  private static final String EXTRA_WITH_DEFAULT = "ExtraWithDefault";
+  private static final String EXTRA_STRING = "extraString";
+  private static final String EXTRA_INT = "extraInt";
+  private static final String EXTRA_PARCELABLE = "extraParcelable";
+  private static final String EXTRA_OPTIONAL = "extraOptional";
+  private static final String EXTRA_PARCEL = "extraParcel";
+  private static final String EXTRA_WITH_DEFAULT = "extraWithDefault";
 
   @InjectExtra(EXTRA_STRING) String stringExtra;
   @InjectExtra(EXTRA_INT) int intExtra;
