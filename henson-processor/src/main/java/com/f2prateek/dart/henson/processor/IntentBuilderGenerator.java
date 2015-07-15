@@ -113,26 +113,44 @@ public class IntentBuilderGenerator extends BaseGenerator {
   private void emitSetters(TypeSpec.Builder builder, List<ExtraInjection> injectionList,
       boolean isOptional, boolean areAllExtrasOptional) {
 
-    // Loop over each extras injection and emit it.
+    //allow to rotate between states
     TypeSpec.Builder builderStateClass = builder;
 
     for (int indexInjection = 0; indexInjection < injectionList.size(); indexInjection++) {
       ExtraInjection injection = injectionList.get(indexInjection);
+      final boolean isLastMandatorySetter = indexInjection == injectionList.size() - 1;
+
       String nextStateClassName =
-          emitSetter(builderStateClass, injection, indexInjection == injectionList.size() - 1,
+          emitSetter(builderStateClass, injection, isLastMandatorySetter,
               isOptional, areAllExtrasOptional);
 
+      //optional fields do not rotate
+      //they all return the intent builder itself
       if (!isOptional) {
         if (builderStateClass != builder) {
           builder.addType(builderStateClass.build());
         }
-        builderStateClass = TypeSpec.classBuilder(nextStateClassName).addModifiers(Modifier.PUBLIC);
+        //prepare next state class
+        builderStateClass = TypeSpec.classBuilder(nextStateClassName)
+            .addModifiers(Modifier.PUBLIC);
       }
     }
   }
 
+  //TODO this method is too long, needs smart refactor
+
+  /**
+   *
+   * @param builder the intent builder in which to emit.
+   * @param injection the injection to emit.
+   * @param isLastMandatorySetter whether or not the injection is the last mandatory one.
+   * @param isOptional whether or not it is optional
+   * @param areAllInjectionsOptional whether or not all injections are optional. i.e. the class
+   * only as optional injections.
+   * @return the name of the next state class to create
+   */
   private String emitSetter(TypeSpec.Builder builder, ExtraInjection injection,
-      boolean isLastMandatorySetter, boolean isOptional, boolean areAllExtrasOptional) {
+      boolean isLastMandatorySetter, boolean isOptional, boolean areAllInjectionsOptional) {
 
     Collection<FieldBinding> fieldBindings = injection.getFieldBindings();
     if (fieldBindings.isEmpty()) {
@@ -145,19 +163,15 @@ public class IntentBuilderGenerator extends BaseGenerator {
     FieldBinding firstFieldBinding = fieldBindings.iterator().next();
     TypeMirror extraType = firstFieldBinding.getType();
 
-    final String value;
-    if (firstFieldBinding.isParcel()) {
-      value = "org.parceler.Parcels.wrap(" + injection.getKey() + ')';
-    } else {
-      value = injection.getKey();
-    }
+    final String value = extractValue(injection, firstFieldBinding);
 
+    //TODO clean this if possible
     final ClassName nextStateClassName;
     final String nextStateSimpleClassName;
     final String nextStateName;
 
     if (isOptional) {
-      if (areAllExtrasOptional) {
+      if (areAllInjectionsOptional) {
         nextStateName = builderClassName();
         nextStateSimpleClassName = builderClassName();
       } else {
@@ -189,6 +203,16 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
     builder.addMethod(setterBuilder.build());
     return nextStateSimpleClassName;
+  }
+
+  private String extractValue(ExtraInjection injection, FieldBinding firstFieldBinding) {
+    final String value;
+    if (firstFieldBinding.isParcel()) {
+      value = "org.parceler.Parcels.wrap(" + injection.getKey() + ')';
+    } else {
+      value = injection.getKey();
+    }
+    return value;
   }
 
   private String capitalize(String key) {
