@@ -2,6 +2,9 @@ package com.f2prateek.dart.common;
 
 import javax.lang.model.type.TypeMirror;
 
+/**
+ * Base class of code generators.
+ */
 public abstract class BaseGenerator {
 
   protected final InjectionTarget target;

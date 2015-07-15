@@ -19,8 +19,13 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
+/**
+ * TODO docs
+ */
 public class IntentBuilderGenerator extends BaseGenerator {
   public static final String BUNDLE_BUILDER_SUFFIX = "$$IntentBuilder";
+  public static final String STATE_CLASS_INTERMEDIARY_PREFIX = "AfterSetting";
+  public static final String STATE_CLASS_FINAL_STATE = "AllSet";
 
   public IntentBuilderGenerator(InjectionTarget target) {
     super(target);
@@ -127,17 +132,22 @@ public class IntentBuilderGenerator extends BaseGenerator {
       //optional fields do not rotate
       //they all return the intent builder itself
       if (!isOptional) {
-        if (builderStateClass != builder) {
-          builder.addType(builderStateClass.build());
-        }
-        //prepare next state class
-        builderStateClass = TypeSpec.classBuilder(nextStateClassName)
-            .addModifiers(Modifier.PUBLIC);
+        builderStateClass = rotateBuilderStateClass(builder, builderStateClass, nextStateClassName);
       }
     }
   }
 
-  //TODO this method is too long, needs smart refactor
+  private TypeSpec.Builder rotateBuilderStateClass(TypeSpec.Builder builder,
+      TypeSpec.Builder builderStateClass, String nextStateClassName) {
+    if (builderStateClass != builder) {
+      builder.addType(builderStateClass.build());
+    }
+    //prepare next state class
+    builderStateClass = TypeSpec.classBuilder(nextStateClassName)
+        .addModifiers(Modifier.PUBLIC);
+    return builderStateClass;
+  }
+
 
   /**
    *
@@ -149,6 +159,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
    * only as optional injections.
    * @return the name of the next state class to create
    */
+  //TODO this method is too long, needs smart refactor
   private String emitSetter(TypeSpec.Builder builder, ExtraInjection injection,
       boolean isLastMandatorySetter, boolean isOptional, boolean areAllInjectionsOptional) {
 
@@ -165,40 +176,41 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
     final String value = extractValue(injection, firstFieldBinding);
 
-    //TODO clean this if possible
-    final ClassName nextStateClassName;
     final String nextStateSimpleClassName;
-    final String nextStateName;
+    final boolean isInnerClass;
 
     if (isOptional) {
       if (areAllInjectionsOptional) {
-        nextStateName = builderClassName();
+        isInnerClass = false;
         nextStateSimpleClassName = builderClassName();
       } else {
+        isInnerClass = true;
         nextStateSimpleClassName = "AllSet";
-        nextStateName = builderClassName() + "." + nextStateSimpleClassName;
       }
     } else {
+      isInnerClass = true;
       if (isLastMandatorySetter) {
-        nextStateSimpleClassName = "AllSet";
+        nextStateSimpleClassName = STATE_CLASS_FINAL_STATE;
       } else {
-        nextStateSimpleClassName = "AfterSetting" + capitalize(injection.getKey());
+        nextStateSimpleClassName = STATE_CLASS_INTERMEDIARY_PREFIX + capitalize(injection.getKey());
       }
-
-      nextStateName = builderClassName() + "." + nextStateSimpleClassName;
     }
-    nextStateClassName = ClassName.bestGuess(nextStateName);
+
+    String nextStateClassName = builderClassName();
+    if (isInnerClass) {
+      nextStateClassName += "." + nextStateSimpleClassName;
+    }
 
     MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder(injection.getKey())
         .addModifiers(Modifier.PUBLIC)
-        .returns(nextStateClassName)
+        .returns(ClassName.bestGuess(nextStateClassName))
         .addParameter(ClassName.bestGuess(getType(extraType)), injection.getKey())
         .addStatement("bundler.put($S,$L)", injection.getKey(), value);
 
     if (isOptional) {
       setterBuilder.addStatement("return this");
     } else {
-      setterBuilder.addStatement("return new $L()", nextStateName);
+      setterBuilder.addStatement("return new $L()", nextStateClassName);
     }
 
     builder.addMethod(setterBuilder.build());

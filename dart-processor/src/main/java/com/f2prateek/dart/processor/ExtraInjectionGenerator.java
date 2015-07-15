@@ -31,6 +31,9 @@ import java.util.List;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
+/**
+ * TODO docs
+ */
 public class ExtraInjectionGenerator extends BaseGenerator {
 
   public ExtraInjectionGenerator(InjectionTarget target) {
