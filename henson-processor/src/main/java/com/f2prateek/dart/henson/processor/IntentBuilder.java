@@ -11,7 +11,10 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
@@ -48,9 +51,37 @@ public class IntentBuilder {
         .addStatement("intent = new Intent(context, $L)", target.className + ".class");
     intentBuilderTypeBuilder.addMethod(constructorBuilder.build());
 
+    //separate required extras from optional extras and sort both sublists.
+    List<ExtraInjection> requiredInjections = new ArrayList<>();
+    List<ExtraInjection> optionalInjections = new ArrayList<>();
+    for (ExtraInjection extraInjection : target.injectionMap.values()) {
+      if (!extraInjection.getRequiredBindings().isEmpty()) {
+        requiredInjections.add(extraInjection);
+      } else {
+        optionalInjections.add(extraInjection);
+      }
+    }
+
+    final ExtraInjectionComparator extraInjectionComparator = new ExtraInjectionComparator();
+    requiredInjections.sort(extraInjectionComparator);
+    optionalInjections.sort(extraInjectionComparator);
+
     //getters and setters
-    emitSetters(intentBuilderTypeBuilder);
-    emitGetter(intentBuilderTypeBuilder);
+    emitSetters(intentBuilderTypeBuilder, requiredInjections, false, false);
+
+    final TypeSpec.Builder lastStateClassBuilder;
+    if (!requiredInjections.isEmpty()) {
+      lastStateClassBuilder = TypeSpec.classBuilder("AllSet").addModifiers(Modifier.PUBLIC);
+    } else {
+      lastStateClassBuilder = intentBuilderTypeBuilder;
+    }
+
+    emitSetters(lastStateClassBuilder, optionalInjections, true, requiredInjections.isEmpty());
+
+    emitGetter(lastStateClassBuilder);
+    if (lastStateClassBuilder != intentBuilderTypeBuilder) {
+      intentBuilderTypeBuilder.addType(lastStateClassBuilder.build());
+    }
 
     //build
     JavaFile javaFile = JavaFile.builder(target.classPackage, intentBuilderTypeBuilder.build()).
@@ -68,17 +99,34 @@ public class IntentBuilder {
     builder.addMethod(getBuilder.build());
   }
 
-  private void emitSetters(TypeSpec.Builder builder) {
+  private void emitSetters(TypeSpec.Builder builder, List<ExtraInjection> injectionList,
+      boolean isOptional, boolean areAllExtrasOptional) {
+
     // Loop over each extras injection and emit it.
-    for (ExtraInjection injection : target.injectionMap.values()) {
-      emitSetter(builder, injection);
+    TypeSpec.Builder builderStateClass = builder;
+
+    for (int indexInjection = 0; indexInjection < injectionList.size(); indexInjection++) {
+      ExtraInjection injection = injectionList.get(indexInjection);
+      if (injection.getRequiredBindings().isEmpty() == isOptional) {
+        String nextStateClassName =
+            emitSetter(builderStateClass, injection, indexInjection == injectionList.size() - 1,
+                isOptional, areAllExtrasOptional);
+
+        if (!isOptional) {
+          if (builderStateClass != builder) {
+            builder.addType(builderStateClass.build());
+          }
+          builderStateClass = TypeSpec.classBuilder(nextStateClassName);
+        }
+      }
     }
   }
 
-  private void emitSetter(TypeSpec.Builder builder, ExtraInjection injection) {
+  private String emitSetter(TypeSpec.Builder builder, ExtraInjection injection,
+      boolean isLastMandatorySetter, boolean isOptional, boolean areAllExtrasOptional) {
     Collection<FieldBinding> fieldBindings = injection.getFieldBindings();
     if (fieldBindings.isEmpty()) {
-      return;
+      return null;
     }
 
     // We can have the same extra key bound to multiple fields. We generate builders by key name,
@@ -94,13 +142,56 @@ public class IntentBuilder {
       value = injection.getKey();
     }
 
+    final ClassName nextStateClassName;
+    final String nextStateSimpleClassName;
+    final String nextStateName;
+    if (isOptional) {
+      if (areAllExtrasOptional) {
+        nextStateName = builderClassName();
+        nextStateSimpleClassName = builderClassName();
+      } else {
+        nextStateSimpleClassName = "AllSet";
+        nextStateName = builderClassName() + "." + nextStateSimpleClassName;
+      }
+    } else {
+      if (isLastMandatorySetter) {
+        nextStateSimpleClassName = "AllSet";
+      } else {
+        nextStateSimpleClassName = "AfterSetting" + capitalize(injection.getKey());
+      }
+
+      nextStateName = builderClassName() + "." + nextStateSimpleClassName;
+    }
+    nextStateClassName = ClassName.bestGuess(nextStateName);
+
     MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder(injection.getKey())
         .addModifiers(Modifier.PUBLIC)
-        .returns(ClassName.bestGuess(builderClassName()))
+        .returns(nextStateClassName)
         .addParameter(ClassName.bestGuess(getType(extraType)), injection.getKey())
-        .addStatement("bundler.put($S,$L)", injection.getKey(), value)
-        .addStatement("return this");
+        .addStatement("bundler.put($S,$L)", injection.getKey(), value);
+
+    if (isOptional) {
+      setterBuilder.addStatement("return this");
+    } else {
+      setterBuilder.addStatement("return new $L()", nextStateName);
+    }
+
     builder.addMethod(setterBuilder.build());
+    return nextStateSimpleClassName;
+  }
+
+  private String capitalize(String key) {
+    if (key == null) {
+      throw new IllegalArgumentException("Key can't be null.");
+    }
+
+    if (key.length() == 0) {
+      return "";
+    }
+
+    char firstUpper = Character.toUpperCase(key.charAt(0));
+    String rest = key.length() == 1 ? "" : key.substring(1);
+    return firstUpper + rest;
   }
 
   public String getFqcn() {
@@ -133,6 +224,12 @@ public class IntentBuilder {
       }
     } else {
       return type.toString();
+    }
+  }
+
+  private static class ExtraInjectionComparator implements Comparator<ExtraInjection> {
+    @Override public int compare(ExtraInjection o1, ExtraInjection o2) {
+      return o1.getKey().compareTo(o2.getKey());
     }
   }
 }

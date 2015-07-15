@@ -46,7 +46,7 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
         writer = jfo.openWriter();
         //TODO this should be turned on by a processor option
         //to debug : un-comment this line
-        //System.out.println("Writing file " + intentBuilder.brewJava());
+        System.out.println("Writing file " + intentBuilder.brewJava());
         writer.write(intentBuilder.brewJava());
       } catch (IOException e) {
         error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,

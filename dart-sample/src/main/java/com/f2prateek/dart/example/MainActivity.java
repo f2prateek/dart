@@ -37,13 +37,13 @@ public class MainActivity extends Activity {
 
   @OnClick(R.id.button) public void onLaunchButtonClick() {
     Intent intent = new SampleActivity$$IntentBuilder(this)
-        .ExtraString("a string")
         .ExtraInt(4)
-        .ExtraParcelable(ComplexParcelable.random())
         .ExtraParcel(new ExampleParcel("Andy"))
+        .ExtraParcelable(ComplexParcelable.random())
+        .ExtraString("a string")
+        .defaultKeyExtra("defaultKeyExtra")
         .get();
 
-      intent.putExtra("defaultKeyExtra", "defaultKeyExtra");
       startActivity(intent);
   }
 }

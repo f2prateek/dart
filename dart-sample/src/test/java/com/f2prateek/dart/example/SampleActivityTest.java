@@ -28,16 +28,16 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(emulateSdk = 18, manifest = "src/main/AndroidManifest.xml")
-public class SampleActivityTestIgnore {
+public class SampleActivityTest {
   @Test public void verifyExtrasInjection() {
     ComplexParcelable parcelable = ComplexParcelable.random();
     ExampleParcel parcel = new ExampleParcel("andy");
 
     Intent intent = new SampleActivity$$IntentBuilder(Robolectric.application)
-        .ExtraString("test")
         .ExtraInt(4)
-        .ExtraParcelable(parcelable)
         .ExtraParcel(parcel)
+        .ExtraParcelable(parcelable)
+        .ExtraString("test")
         .defaultKeyExtra("defaultKeyExtra")
         .get();
 
