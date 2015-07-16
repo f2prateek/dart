@@ -10,10 +10,11 @@ public abstract class BaseGenerator {
   protected final InjectionTarget target;
 
   public BaseGenerator(InjectionTarget target) {
-    if (target == null) {
-      throw new IllegalArgumentException("The target can't be null");
-    }
     this.target = target;
+  }
+
+  public BaseGenerator() {
+    this(null);
   }
 
   public abstract String brewJava();

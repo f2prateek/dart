@@ -1,0 +1,150 @@
+package com.f2prateek.dart.henson.processor;
+
+import android.content.Context;
+import com.f2prateek.dart.common.BaseGenerator;
+import com.f2prateek.dart.common.InjectionTarget;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+import java.util.Collection;
+import java.util.HashSet;
+import javax.lang.model.element.Modifier;
+
+/**
+ * TODO docs
+ */
+public class HensonNavigatorGenerator extends BaseGenerator {
+  public static final String HENSON_NAVIGATOR_CLASS_NAME = "Henson";
+  public static final String WITH_CONTEXT_SET_STATE_CLASS_NAME = "WithContextSetState";
+  private String packageName;
+  private Collection<String> targetClassNames;
+
+  public HensonNavigatorGenerator(String packageName, Collection<InjectionTarget> targets) {
+    super();
+    for (InjectionTarget target : targets) {
+      System.out.println("Class " + target.getFqcn());
+    }
+
+    if (packageName != null) {
+      this.packageName = packageName;
+    } else {
+      this.packageName = findCommonPackage(targets);
+    }
+    System.out.println("Package Name :" + this.packageName);
+
+    this.targetClassNames = getAllClassNames(targets);
+  }
+
+  private String hensonNavigatorClassName() {
+    return HENSON_NAVIGATOR_CLASS_NAME;
+  }
+
+  @Override public String brewJava() {
+    TypeSpec.Builder hensonNavigatorTypeBuilder =
+        TypeSpec.classBuilder(hensonNavigatorClassName()).addModifiers(Modifier.PUBLIC);
+
+    emitConstructor(hensonNavigatorTypeBuilder);
+    emitWith(hensonNavigatorTypeBuilder);
+    emitNavigationMethods(hensonNavigatorTypeBuilder);
+
+    //build
+    System.out.println("Packagename :" + packageName);
+    JavaFile javaFile = JavaFile.builder(packageName, hensonNavigatorTypeBuilder.build())
+        .addFileComment("Generated code from Dart. Do not modify!")
+        .build();
+    return javaFile.toString();
+  }
+
+  private void emitConstructor(TypeSpec.Builder intentBuilderTypeBuilder) {
+    MethodSpec.Builder constructorBuilder =
+        MethodSpec.constructorBuilder().addModifiers(Modifier.PRIVATE);
+    intentBuilderTypeBuilder.addMethod(constructorBuilder.build());
+  }
+
+  private void emitNavigationMethods(TypeSpec.Builder hensonNavigatorTypeBuilder) {
+    TypeSpec.Builder withContextSetStateBuilder =
+        TypeSpec.classBuilder(WITH_CONTEXT_SET_STATE_CLASS_NAME)
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+    withContextSetStateBuilder.addField(
+        FieldSpec.builder(Context.class, "context", Modifier.PRIVATE).build());
+    withContextSetStateBuilder.addMethod(MethodSpec.constructorBuilder()
+        .addModifiers(Modifier.PRIVATE)
+        .addParameter(Context.class, "context")
+        .addStatement("this.context = context")
+        .build());
+    //separate required extras from optional extras and sort both sublists.
+    for (String targetClassName : targetClassNames) {
+      emitNavigationMethod(withContextSetStateBuilder, targetClassName);
+    }
+    hensonNavigatorTypeBuilder.addType(withContextSetStateBuilder.build());
+  }
+
+  @Override public String getFqcn() {
+    return packageName + "." + HENSON_NAVIGATOR_CLASS_NAME;
+  }
+
+  private void emitWith(TypeSpec.Builder builder) {
+    TypeName withContextSetStateClassName =
+        ClassName.get(packageName, HENSON_NAVIGATOR_CLASS_NAME, WITH_CONTEXT_SET_STATE_CLASS_NAME);
+    MethodSpec.Builder gotoMethodBuilder = MethodSpec.methodBuilder("with")
+        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addParameter(Context.class, "context")
+        .returns(withContextSetStateClassName)
+        .addStatement("return new $L(context)", withContextSetStateClassName);
+    builder.addMethod(gotoMethodBuilder.build());
+  }
+
+  private void emitNavigationMethod(TypeSpec.Builder builder, String targetClassName) {
+    TypeName intentBuilderClassName =
+        ClassName.bestGuess(targetClassName + IntentBuilderGenerator.BUNDLE_BUILDER_SUFFIX);
+    String simpleTargetClassName = targetClassName.substring(targetClassName.lastIndexOf('.') + 1);
+    MethodSpec.Builder gotoMethodBuilder = MethodSpec.methodBuilder("goto" + simpleTargetClassName)
+        .addModifiers(Modifier.PUBLIC)
+        .returns(intentBuilderClassName)
+        .addStatement("return new $L(context)", intentBuilderClassName);
+    builder.addMethod(gotoMethodBuilder.build());
+  }
+
+  private String findCommonPackage(Collection<InjectionTarget> targets) {
+    String commonPackageName = null;
+    for (InjectionTarget target : targets) {
+      final String packageName = target.getFqcn().substring(0, target.getFqcn().lastIndexOf('.'));
+      if (commonPackageName == null) {
+        commonPackageName = packageName;
+      } else {
+        commonPackageName = findCommonPackage(commonPackageName, packageName);
+      }
+    }
+
+    System.out.println("Package Name found :" + commonPackageName);
+
+    return commonPackageName;
+  }
+
+  private String findCommonPackage(String commonPackageName, String packageName) {
+    int indexCommon = 0;
+    int maxLength = Math.min(commonPackageName.length(), packageName.length());
+    for (; indexCommon < maxLength; indexCommon++) {
+      if (commonPackageName.charAt(indexCommon) != packageName.charAt(indexCommon)) {
+        break;
+      }
+    }
+    String commonRoot = packageName.substring(0, indexCommon);
+    final int lastDotIndex = commonRoot.lastIndexOf('.');
+    if (lastDotIndex != -1) {
+      commonRoot = commonRoot.substring(lastDotIndex);
+    }
+    return commonRoot;
+  }
+
+  private Collection<String> getAllClassNames(Collection<InjectionTarget> targets) {
+    Collection<String> classNames = new HashSet<>();
+    for (InjectionTarget injectionTarget : targets) {
+      classNames.add(injectionTarget.targetClass);
+    }
+    return classNames;
+  }
+}

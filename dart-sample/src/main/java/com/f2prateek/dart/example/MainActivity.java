@@ -36,7 +36,8 @@ public class MainActivity extends Activity {
   }
 
   @OnClick(R.id.button) public void onLaunchButtonClick() {
-    Intent intent = new SampleActivity$$IntentBuilder(this)
+    Intent intent = Henson.with(this)
+        .gotoSampleActivity()
         .defaultKeyExtra("defaultKeyExtra")
         .extraInt(4)
         .extraParcel(new ExampleParcel("Andy"))
