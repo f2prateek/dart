@@ -55,7 +55,7 @@ public class IntentBuilderGeneratorTest {
                 "    return new Test$$IntentBuilder.AllSet();", //
                 "  }", //
                 "  public class AllSet {", //
-                "    public Intent get() {", //
+                "    public Intent build() {", //
                 "      intent.putExtras(bundler.get());", //
                 "      return intent;", //
                 "    }", //
@@ -155,7 +155,7 @@ public class IntentBuilderGeneratorTest {
             "    }", //
             "  }", //
             "  public class AllSet {", //
-            "    public Intent get() {", //
+            "    public Intent build() {", //
             "      intent.putExtras(bundler.get());", //
             "      return intent;", //
             "    }", //
@@ -201,7 +201,7 @@ public class IntentBuilderGeneratorTest {
                 "    return new Test$$IntentBuilder.AllSet();", //
                 "  }", //
                 "  public class AllSet {", //
-                "    public Intent get() {", //
+                "    public Intent build() {", //
                 "      intent.putExtras(bundler.get());", //
                 "      return intent;", //
                 "    }", //
@@ -245,7 +245,7 @@ public class IntentBuilderGeneratorTest {
                 "    return new Test$$IntentBuilder.AllSet();", //
                 "  }", //
                 "  public class AllSet {", //
-                "    public Intent get() {", //
+                "    public Intent build() {", //
                 "      intent.putExtras(bundler.get());", //
                 "      return intent;", //
                 "    }", //
@@ -294,7 +294,7 @@ public class IntentBuilderGeneratorTest {
                 "    return new Test$$IntentBuilder.AllSet();", //
                 "  }", //
                 "  public class AllSet {", //
-                "    public Intent get() {", //
+                "    public Intent build() {", //
                 "      intent.putExtras(bundler.get());", //
                 "      return intent;", //
                 "    }", //
@@ -320,7 +320,7 @@ public class IntentBuilderGeneratorTest {
                 "    return new TestOne$$IntentBuilder.AllSet();", //
                 "  }", //
                 "  public class AllSet {", //
-                "    public Intent get() {", //
+                "    public Intent build() {", //
                 "      intent.putExtras(bundler.get());", //
                 "      return intent;", //
                 "    }", //
@@ -369,7 +369,7 @@ public class IntentBuilderGeneratorTest {
             "    return new Test$$IntentBuilder.AllSet();", //
             "  }", //
             "  public class AllSet {", //
-            "    public Intent get() {", //
+            "    public Intent build() {", //
             "      intent.putExtras(bundler.get());", //
             "      return intent;", //
             "    }", //
@@ -396,7 +396,7 @@ public class IntentBuilderGeneratorTest {
             "    return new TestOne$$IntentBuilder.AllSet();", //
             "  }", //
             "  public class AllSet {", //
-            "    public Intent get() {", //
+            "    public Intent build() {", //
             "      intent.putExtras(bundler.get());", //
             "      return intent;", //
             "    }", //
@@ -455,7 +455,7 @@ public class IntentBuilderGeneratorTest {
             "    return new Test$$IntentBuilder.AllSet();", //
             "  }", //
             "  public class AllSet {", //
-            "    public Intent get() {", //
+            "    public Intent build() {", //
             "      intent.putExtras(bundler.get());", //
             "      return intent;", //
             "    }", //
@@ -505,7 +505,7 @@ public class IntentBuilderGeneratorTest {
             "      bundler.put(\"key2\",key2);", //
             "      return this;", //
             "    }", //
-            "    public Intent get() {", //
+            "    public Intent build() {", //
             "      intent.putExtras(bundler.get());", //
             "      return intent;", //
             "    }", //
@@ -549,7 +549,7 @@ public class IntentBuilderGeneratorTest {
             "    bundler.put(\"key\",key);", //
             "    return this;", //
             "  }", //
-            "  public Intent get() {", //
+            "  public Intent build() {", //
             "    intent.putExtras(bundler.get());", //
             "    return intent;", //
             "  }", //

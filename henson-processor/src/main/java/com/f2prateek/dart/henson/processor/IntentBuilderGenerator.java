@@ -96,7 +96,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
     emitSetters(lastStateClassBuilder, optionalInjections, true, requiredInjections.isEmpty());
 
-    emitGetter(lastStateClassBuilder);
+    emitBuildMethod(lastStateClassBuilder);
     if (lastStateClassBuilder != intentBuilderTypeBuilder) {
       intentBuilderTypeBuilder.addType(lastStateClassBuilder.build());
     }
@@ -106,8 +106,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
     return target.getFqcn() + BUNDLE_BUILDER_SUFFIX;
   }
 
-  private void emitGetter(TypeSpec.Builder builder) {
-    MethodSpec.Builder getBuilder = MethodSpec.methodBuilder("get")
+  private void emitBuildMethod(TypeSpec.Builder builder) {
+    MethodSpec.Builder getBuilder = MethodSpec.methodBuilder("build")
         .addModifiers(Modifier.PUBLIC)
         .returns(Intent.class)
         .addStatement("intent.putExtras(bundler.get())")

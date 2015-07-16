@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
         .extraParcel(new ExampleParcel("Andy"))
         .extraParcelable(ComplexParcelable.random())
         .extraString("a string")
-        .get();
+        .build();
 
       startActivity(intent);
   }

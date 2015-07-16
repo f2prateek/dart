@@ -39,7 +39,7 @@ public class SampleActivityTest {
         .extraParcel(parcel)
         .extraParcelable(parcelable)
         .extraString("test")
-        .get();
+        .build();
 
     SampleActivity activity =
         Robolectric.buildActivity(SampleActivity.class)
