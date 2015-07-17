@@ -42,9 +42,10 @@ public final class InjectExtraProcessor extends AbstractDartProcessor {
         ExtraInjectionGenerator extraInjectionGenerator =
             new ExtraInjectionGenerator(injectionTarget);
         JavaFileObject jfo = filer.createSourceFile(extraInjectionGenerator.getFqcn(), typeElement);
-        //TODO this should be turned on by a processor option
-        //to debug : un-comment this line
-        //System.out.println("Writing file " + extraInjector.brewJava());
+        if (isDebugEnabled) {
+          System.out.println(
+              "Extra Injector generated:\n" + extraInjectionGenerator.brewJava() + "---");
+        }
         writer = jfo.openWriter();
         writer.write(extraInjectionGenerator.brewJava());
       } catch (IOException e) {
@@ -55,7 +56,7 @@ public final class InjectExtraProcessor extends AbstractDartProcessor {
             writer.close();
           } catch (IOException e) {
             error(typeElement, "Unable to close injector source file for type %s: %s", typeElement,
-                  e.getMessage());
+                e.getMessage());
           }
         }
       }

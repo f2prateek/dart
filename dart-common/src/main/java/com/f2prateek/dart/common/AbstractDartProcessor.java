@@ -46,10 +46,19 @@ import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 import static javax.tools.Diagnostic.Kind.ERROR;
 
+/**
+ * Base class of the annotation processors of Dart.
+ * It collects all information about extra injections to be performed
+ * when scanning the {@link @InjectExtra} annotations of given source files.
+ * The collected information is stored in a collection of {@code InjectionTarget}.
+ * @see #findAndParseTargets(RoundEnvironment)
+ */
 public abstract class AbstractDartProcessor extends AbstractProcessor {
+  public static final String DART_DEBUG = "dart.debug";
   private Elements elementUtils;
   private Types typeUtils;
   protected Filer filer;
+  protected boolean isDebugEnabled;
 
   @Override public synchronized void init(ProcessingEnvironment env) {
     super.init(env);
@@ -57,12 +66,26 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     elementUtils = env.getElementUtils();
     typeUtils = env.getTypeUtils();
     filer = env.getFiler();
+
+    final Map<String, String> options = env.getOptions();
+    isDebugEnabled = options.containsKey(DART_DEBUG)
+        && Boolean.parseBoolean(options.get(DART_DEBUG));
   }
 
   @Override public Set<String> getSupportedAnnotationTypes() {
     Set<String> supportTypes = new LinkedHashSet<String>();
     supportTypes.add(InjectExtra.class.getCanonicalName());
     return supportTypes;
+  }
+
+  @Override public SourceVersion getSupportedSourceVersion() {
+    return SourceVersion.latestSupported();
+  }
+
+  @Override public Set<String> getSupportedOptions() {
+    Set<String> supportedOptions = new LinkedHashSet<String>();
+    supportedOptions.add(DART_DEBUG);
+    return supportedOptions;
   }
 
   protected Map<TypeElement, InjectionTarget> findAndParseTargets(RoundEnvironment env) {
@@ -249,10 +272,6 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
       }
     }
     return false;
-  }
-
-  @Override public SourceVersion getSupportedSourceVersion() {
-    return SourceVersion.latestSupported();
   }
 
   protected void error(Element element, String message, Object... args) {

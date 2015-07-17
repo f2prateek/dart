@@ -45,9 +45,10 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
         IntentBuilderGenerator intentBuilderGenerator = new IntentBuilderGenerator(injectionTarget);
         JavaFileObject jfo = filer.createSourceFile(intentBuilderGenerator.getFqcn(), typeElement);
         writer = jfo.openWriter();
-        //TODO this should be turned on by a processor option
-        //to debug : un-comment this line
-        //System.out.println("Writing file " + intentBuilderGenerator.brewJava());
+        if (isDebugEnabled) {
+          System.out.println(
+              "IntentBuilder generated:\n" + intentBuilderGenerator.brewJava() + "---");
+        }
         writer.write(intentBuilderGenerator.brewJava());
       } catch (IOException e) {
         error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,
@@ -74,9 +75,10 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
             new HensonNavigatorGenerator(null, targetClassMap.values());
         JavaFileObject jfo = filer.createSourceFile(hensonNavigatorGenerator.getFqcn(), allTypes);
         writer = jfo.openWriter();
-        //TODO this should be turned on by a processor option
-        //to debug : un-comment this line
-        //System.out.println("Writing file " + hensonNavigatorGenerator.brewJava());
+        if (isDebugEnabled) {
+          System.out.println(
+              "Henson navigator generated:\n" + hensonNavigatorGenerator.brewJava() + "---");
+        }
         writer.write(hensonNavigatorGenerator.brewJava());
       } catch (IOException e) {
         e.printStackTrace();
