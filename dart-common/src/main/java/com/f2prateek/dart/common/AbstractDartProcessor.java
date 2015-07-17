@@ -51,6 +51,8 @@ import static javax.tools.Diagnostic.Kind.ERROR;
  * It collects all information about extra injections to be performed
  * when scanning the {@link @InjectExtra} annotations of given source files.
  * The collected information is stored in a collection of {@code InjectionTarget}.
+ * All annotations processors in Dart support the option {@code #OPTION_DART_DEBUG}
+ * that will log information about annotation processor and generated code.
  * @see #findAndParseTargets(RoundEnvironment)
  */
 public abstract class AbstractDartProcessor extends AbstractProcessor {
