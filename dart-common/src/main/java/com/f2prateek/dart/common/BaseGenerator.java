@@ -4,19 +4,14 @@ import javax.lang.model.type.TypeMirror;
 
 /**
  * Base class of code generators.
+ * They generate java code.
  */
 public abstract class BaseGenerator {
 
-  protected final InjectionTarget target;
-
-  public BaseGenerator(InjectionTarget target) {
-    this.target = target;
-  }
-
-  public BaseGenerator() {
-    this(null);
-  }
-
+  /**
+   * Create all Java code
+   * @return
+   */
   public abstract String brewJava();
   public abstract String getFqcn();
 

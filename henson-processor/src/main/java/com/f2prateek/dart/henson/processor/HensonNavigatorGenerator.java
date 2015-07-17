@@ -3,6 +3,7 @@ package com.f2prateek.dart.henson.processor;
 import android.content.Context;
 import com.f2prateek.dart.common.BaseGenerator;
 import com.f2prateek.dart.common.InjectionTarget;
+import com.f2prateek.dart.henson.Henson;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -14,7 +15,11 @@ import java.util.HashSet;
 import javax.lang.model.element.Modifier;
 
 /**
- * TODO docs
+ * Creates Java code to invoke intent builders
+ * without having to know them explicitly.
+ * This generator creates the Henson class.
+ * The intent builders are created by {@link IntentBuilderGenerator}.
+ * @see Henson to use this code at runtime.
  */
 public class HensonNavigatorGenerator extends BaseGenerator {
   public static final String HENSON_NAVIGATOR_CLASS_NAME = "Henson";
@@ -23,17 +28,11 @@ public class HensonNavigatorGenerator extends BaseGenerator {
   private Collection<String> targetClassNames;
 
   public HensonNavigatorGenerator(String packageName, Collection<InjectionTarget> targets) {
-    super();
-    for (InjectionTarget target : targets) {
-      System.out.println("Class " + target.getFqcn());
-    }
-
     if (packageName != null) {
       this.packageName = packageName;
     } else {
       this.packageName = findCommonPackage(targets);
     }
-    System.out.println("Package Name :" + this.packageName);
 
     this.targetClassNames = getAllClassNames(targets);
   }
@@ -51,7 +50,6 @@ public class HensonNavigatorGenerator extends BaseGenerator {
     emitNavigationMethods(hensonNavigatorTypeBuilder);
 
     //build
-    System.out.println("Packagename :" + packageName);
     JavaFile javaFile = JavaFile.builder(packageName, hensonNavigatorTypeBuilder.build())
         .addFileComment("Generated code from Dart. Do not modify!")
         .build();
@@ -118,8 +116,6 @@ public class HensonNavigatorGenerator extends BaseGenerator {
         commonPackageName = findCommonPackage(commonPackageName, packageName);
       }
     }
-
-    System.out.println("Package Name found :" + commonPackageName);
 
     return commonPackageName;
   }

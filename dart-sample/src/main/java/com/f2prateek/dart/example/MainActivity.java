@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.f2prateek.dart.Dart;
 
 public class MainActivity extends Activity {
 
@@ -32,7 +31,6 @@ public class MainActivity extends Activity {
     setContentView(R.layout.activity_main);
 
     ButterKnife.inject(this);
-    Dart.inject(this);
   }
 
   @OnClick(R.id.button) public void onLaunchButtonClick() {

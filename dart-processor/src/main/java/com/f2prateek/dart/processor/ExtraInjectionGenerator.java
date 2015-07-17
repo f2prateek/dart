@@ -32,12 +32,16 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
 /**
- * TODO docs
+ * Creates Java code to inject extras into an activity
+ * or a Bundle.
+ * @see Dart to use this code at runtime.
  */
 public class ExtraInjectionGenerator extends BaseGenerator {
 
+  private final InjectionTarget target;
+
   public ExtraInjectionGenerator(InjectionTarget target) {
-    super(target);
+    this.target = target;
   }
 
   @Override
