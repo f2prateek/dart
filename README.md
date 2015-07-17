@@ -99,6 +99,7 @@ If Proguard is enabled be sure to add these rules on your configuration:
 Download
 --------
 
+For Dart 1.x :
 Download [the latest JAR][2] or grab via Maven:
 ```xml
 <dependency>
@@ -112,7 +113,45 @@ or Gradle:
 compile 'com.f2prateek.dart:dart:(insert latest version)'
 ```
 
+For Dart 2.x :
+```xml
+<dependency>
+  <groupId>com.f2prateek.dart</groupId>
+  <artifactId>dart</artifactId>
+  <version>(insert latest version)</version>
+</dependency>
+<dependency>
+  <groupId>com.f2prateek.dart</groupId>
+  <artifactId>dart-processor</artifactId>
+  <version>(insert latest version)</version>
+  <scope>provided</scope>
+</dependency>
+```
+or Gradle:
+```groovy
+compile 'com.f2prateek.dart:dart:(insert latest version)'
+provided 'com.f2prateek.dart:dart-processor:(insert latest version)'
+```
 
+And for using Henson : 
+```xml
+<dependency>
+  <groupId>com.f2prateek.dart</groupId>
+  <artifactId>henson</artifactId>
+  <version>(insert latest version)</version>
+</dependency>
+<dependency>
+  <groupId>com.f2prateek.dart</groupId>
+  <artifactId>henson-processor</artifactId>
+  <version>(insert latest version)</version>
+  <scope>provided</scope>
+</dependency>
+```
+or Gradle:
+```groovy
+compile 'com.f2prateek.dart:henson:(insert latest version)'
+provided 'com.f2prateek.dart:henson-processor:(insert latest version)'
+```
 License
 -------
 
