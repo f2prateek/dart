@@ -71,7 +71,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     filer = env.getFiler();
 
     final Map<String, String> options = env.getOptions();
-    isDebugEnabled = options.containsKey(OPTION_DART_DEBUG)
+    isDebugEnabled |= options.containsKey(OPTION_DART_DEBUG)
         && Boolean.parseBoolean(options.get(OPTION_DART_DEBUG));
   }
 
@@ -89,6 +89,11 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     Set<String> supportedOptions = new LinkedHashSet<String>();
     supportedOptions.add(OPTION_DART_DEBUG);
     return supportedOptions;
+  }
+
+  @SuppressWarnings("This method is only used when debugging/creating tests.")
+  public void setIsDebugEnabled(boolean isDebugEnabled) {
+    this.isDebugEnabled = isDebugEnabled;
   }
 
   protected Map<TypeElement, InjectionTarget> findAndParseTargets(RoundEnvironment env) {

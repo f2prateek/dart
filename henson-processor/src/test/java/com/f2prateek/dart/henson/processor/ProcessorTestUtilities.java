@@ -17,7 +17,6 @@
 
 package com.f2prateek.dart.henson.processor;
 
-import com.f2prateek.dart.henson.processor.HensonExtraProcessor;
 import java.util.Arrays;
 import javax.annotation.processing.Processor;
 
