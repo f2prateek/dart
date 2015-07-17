@@ -1,9 +1,9 @@
 package com.f2prateek.dart.henson.processor;
 
 import android.content.Context;
+import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.common.BaseGenerator;
 import com.f2prateek.dart.common.InjectionTarget;
-import com.f2prateek.dart.henson.Henson;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -19,7 +19,7 @@ import javax.lang.model.element.Modifier;
  * without having to know them explicitly.
  * This generator creates the Henson class.
  * The intent builders are created by {@link IntentBuilderGenerator}.
- * @see Henson to use this code at runtime.
+ * @see {@link com.f2prateek.dart.henson.Henson} to use this code at runtime.
  */
 public class HensonNavigatorGenerator extends BaseGenerator {
   public static final String HENSON_NAVIGATOR_CLASS_NAME = "Henson";
@@ -106,6 +106,17 @@ public class HensonNavigatorGenerator extends BaseGenerator {
     builder.addMethod(gotoMethodBuilder.build());
   }
 
+  /**
+   * Finds the common package of all classes that contain {@link InjectExtra} annotations.
+   * Example 1 : {@code foo.ActivityA} and {@code foo.ActivityB} --> package foo.
+   * Example 2 : {@code foo.ActivityA} and {@code foo.bar.ActivityB} --> package foo.
+   * Example 3 : {@code foo.ActivityA} and {@code bar.ActivityB} --> default package.
+   * In example 3, you would be better to use the annotation processor option
+   * {@link HensonExtraProcessor#OPTION_HENSON_PACKAGE}.
+   * @see HensonExtraProcessor
+   * @param targets the collection of all {@link InjectExtra} annotation bindings.
+   * @return the name of the common package. Can be empty, but not null.
+   */
   private String findCommonPackage(Collection<InjectionTarget> targets) {
     String commonPackageName = null;
     for (InjectionTarget target : targets) {

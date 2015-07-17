@@ -7,7 +7,6 @@ import com.f2prateek.dart.common.ExtraInjection;
 import com.f2prateek.dart.common.FieldBinding;
 import com.f2prateek.dart.common.InjectionTarget;
 import com.f2prateek.dart.henson.Bundler;
-import com.f2prateek.dart.henson.Henson;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -27,7 +26,7 @@ import javax.lang.model.type.TypeMirror;
  * The intent builders are invoked by Henson, which is
  * created by {@link HensonNavigatorGenerator}.
 
- * @see Henson to use this code at runtime.
+ * @see {@link com.f2prateek.dart.henson.Henson} to use this code at runtime.
  */
 public class IntentBuilderGenerator extends BaseGenerator {
   public static final String BUNDLE_BUILDER_SUFFIX = "$$IntentBuilder";

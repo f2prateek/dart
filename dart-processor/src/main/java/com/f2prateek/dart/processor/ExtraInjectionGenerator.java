@@ -16,6 +16,7 @@
  */
 package com.f2prateek.dart.processor;
 
+import android.os.Bundle;
 import com.f2prateek.dart.Dart;
 import com.f2prateek.dart.common.Binding;
 import com.f2prateek.dart.common.ExtraInjection;
@@ -33,8 +34,8 @@ import javax.lang.model.type.TypeMirror;
 
 /**
  * Creates Java code to inject extras into an activity
- * or a Bundle.
- * @see Dart to use this code at runtime.
+ * or a {@link Bundle}.
+ * @see {@link Dart} to use this code at runtime.
  */
 public class ExtraInjectionGenerator extends BaseGenerator {
 

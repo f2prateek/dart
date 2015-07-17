@@ -17,18 +17,48 @@
 
 package com.f2prateek.dart.henson.processor;
 
+import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.common.AbstractDartProcessor;
 import com.f2prateek.dart.common.InjectionTarget;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 
+/**
+ * Henson annotation processor.
+ * It will process all annotations : {@link InjectExtra} and
+ * invoke {@link IntentBuilderGenerator} and {@link HensonNavigatorGenerator}.
+ * It supports the annotation processor option {@code #OPTION_HENSON_PACKAGE}
+ * that lets you determine in which package the generated {@Code Henson} navigator class
+ * will be generated.
+ * If this option is not present, then the annotation processor tries to find a common
+ * package between all classes that contain the {@link InjectExtra} annotation.
+ * @see HensonNavigatorGenerator#findCommonPackage(java.util.Collection)
+ */
 public final class HensonExtraProcessor extends AbstractDartProcessor {
+
+  public static final String OPTION_HENSON_PACKAGE = "dart.henson.package";
+  private String hensonPackage;
+
+  @Override public Set<String> getSupportedOptions() {
+    Set<String> supportedOptions = new LinkedHashSet<String>();
+    supportedOptions.addAll(super.getSupportedOptions());
+    supportedOptions.add(OPTION_HENSON_PACKAGE);
+    return supportedOptions;
+  }
+
+  @Override public synchronized void init(ProcessingEnvironment env) {
+    super.init(env);
+
+    hensonPackage = env.getOptions().get(OPTION_HENSON_PACKAGE);
+  }
 
   @Override public boolean process(Set<? extends TypeElement> elements, RoundEnvironment env) {
     Map<TypeElement, InjectionTarget> targetClassMap = findAndParseTargets(env);
@@ -72,7 +102,7 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
       Element[] allTypes = targetClassMap.keySet().toArray(new Element[targetClassMap.size()]);
       try {
         HensonNavigatorGenerator hensonNavigatorGenerator =
-            new HensonNavigatorGenerator(null, targetClassMap.values());
+            new HensonNavigatorGenerator(hensonPackage, targetClassMap.values());
         JavaFileObject jfo = filer.createSourceFile(hensonNavigatorGenerator.getFqcn(), allTypes);
         writer = jfo.openWriter();
         if (isDebugEnabled) {

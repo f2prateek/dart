@@ -54,7 +54,8 @@ import static javax.tools.Diagnostic.Kind.ERROR;
  * @see #findAndParseTargets(RoundEnvironment)
  */
 public abstract class AbstractDartProcessor extends AbstractProcessor {
-  public static final String DART_DEBUG = "dart.debug";
+  public static final String OPTION_DART_DEBUG = "dart.debug";
+
   private Elements elementUtils;
   private Types typeUtils;
   protected Filer filer;
@@ -68,8 +69,8 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     filer = env.getFiler();
 
     final Map<String, String> options = env.getOptions();
-    isDebugEnabled = options.containsKey(DART_DEBUG)
-        && Boolean.parseBoolean(options.get(DART_DEBUG));
+    isDebugEnabled = options.containsKey(OPTION_DART_DEBUG)
+        && Boolean.parseBoolean(options.get(OPTION_DART_DEBUG));
   }
 
   @Override public Set<String> getSupportedAnnotationTypes() {
@@ -84,7 +85,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
 
   @Override public Set<String> getSupportedOptions() {
     Set<String> supportedOptions = new LinkedHashSet<String>();
-    supportedOptions.add(DART_DEBUG);
+    supportedOptions.add(OPTION_DART_DEBUG);
     return supportedOptions;
   }
 
