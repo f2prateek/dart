@@ -14,6 +14,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.lang.model.element.Modifier;
@@ -25,7 +26,7 @@ import javax.lang.model.type.TypeMirror;
  * a given activity.
  * The intent builders are invoked by Henson, which is
  * created by {@link HensonNavigatorGenerator}.
-
+ *
  * @see {@link com.f2prateek.dart.henson.Henson} to use this code at runtime.
  */
 public class IntentBuilderGenerator extends BaseGenerator {
@@ -89,8 +90,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
     }
 
     final ExtraInjectionComparator extraInjectionComparator = new ExtraInjectionComparator();
-    requiredInjections.sort(extraInjectionComparator);
-    optionalInjections.sort(extraInjectionComparator);
+    Collections.sort(requiredInjections, extraInjectionComparator);
+    Collections.sort(optionalInjections, extraInjectionComparator);
 
     //getters and setters
     emitSetters(intentBuilderTypeBuilder, requiredInjections, false, false);
@@ -134,8 +135,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
       final boolean isLastMandatorySetter = indexInjection == injectionList.size() - 1;
 
       String nextStateClassName =
-          emitSetter(builderStateClass, injection, isLastMandatorySetter,
-              isOptional, areAllExtrasOptional);
+          emitSetter(builderStateClass, injection, isLastMandatorySetter, isOptional,
+              areAllExtrasOptional);
 
       //optional fields do not rotate
       //they all return the intent builder itself
@@ -151,14 +152,11 @@ public class IntentBuilderGenerator extends BaseGenerator {
       builder.addType(builderStateClass.build());
     }
     //prepare next state class
-    builderStateClass = TypeSpec.classBuilder(nextStateClassName)
-        .addModifiers(Modifier.PUBLIC);
+    builderStateClass = TypeSpec.classBuilder(nextStateClassName).addModifiers(Modifier.PUBLIC);
     return builderStateClass;
   }
 
-
   /**
-   *
    * @param builder the intent builder in which to emit.
    * @param injection the injection to emit.
    * @param isLastMandatorySetter whether or not the injection is the last mandatory one.
