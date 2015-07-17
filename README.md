@@ -95,6 +95,11 @@ If Proguard is enabled be sure to add these rules on your configuration:
 -keep class **$$IntentBuilder { *; }
 ```
 
+Bonus
+-----
+
+As you can see from the examples above, using both Dart & Henson not only provided a very structured generated navigation layer and conveninent DSLs, it also completely transparently allows to wrap/unwrap parcelables. 
+
 
 Download
 --------
