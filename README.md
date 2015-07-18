@@ -63,7 +63,7 @@ The new module is called Henson (after [Matthew Henson](https://en.wikipedia.org
 For the sample activity mentionned above, Henson would offer a DSL to navigate to it easily : 
 ```java
 Intent intent = Henson.with(this)
-        .getoExampleActivity()
+        .gotoExampleActivity()
         .key_1("defaultKeyExtra")
         .key_2(2)
         .key_3(new User())
