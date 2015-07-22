@@ -1,7 +1,5 @@
 package com.f2prateek.dart.henson.processor;
 
-import android.content.Context;
-import android.content.Intent;
 import com.f2prateek.dart.common.BaseGenerator;
 import com.f2prateek.dart.common.ExtraInjection;
 import com.f2prateek.dart.common.FieldBinding;
@@ -28,6 +26,13 @@ import javax.lang.model.type.TypeMirror;
  * created by {@link HensonNavigatorGenerator}.
  *
  * @see {@link com.f2prateek.dart.henson.Henson} to use this code at runtime.
+ * Note: Due to the fact that gradle uses a different classpath to invoke
+ * an annotation processor (it doesn't use the same classpath as the one that is used
+ * to compile the classes to be compiled), this we can't use android classes in a generator.
+ * We should always reference them indirectly via string, not using direct references to types
+ * (i.e. not Intent.class but ClassName.get("android.content", "Intent"))
+ * See https://github.com/johncarl81/parceler/issues/11
+
  */
 public class IntentBuilderGenerator extends BaseGenerator {
   public static final String BUNDLE_BUILDER_SUFFIX = "$$IntentBuilder";
@@ -61,7 +66,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
   private void emitFields(TypeSpec.Builder intentBuilderTypeBuilder) {
     FieldSpec.Builder intentFieldBuilder =
-        FieldSpec.builder(Intent.class, "intent", Modifier.PRIVATE);
+        FieldSpec.builder(ClassName.get("android.content", "Intent"), "intent", Modifier.PRIVATE);
     intentBuilderTypeBuilder.addField(intentFieldBuilder.build());
     FieldSpec.Builder bundlerFieldBuilder =
         FieldSpec.builder(Bundler.class, "bundler", Modifier.PRIVATE);
@@ -72,7 +77,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
   private void emitConstructor(TypeSpec.Builder intentBuilderTypeBuilder) {
     MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder()
         .addModifiers(Modifier.PUBLIC)
-        .addParameter(Context.class, "context")
+        .addParameter(ClassName.get("android.content", "Context"), "context")
         .addStatement("intent = new Intent(context, $L)", target.className + ".class");
     intentBuilderTypeBuilder.addMethod(constructorBuilder.build());
   }
@@ -118,7 +123,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
   private void emitBuildMethod(TypeSpec.Builder builder) {
     MethodSpec.Builder getBuilder = MethodSpec.methodBuilder("build")
         .addModifiers(Modifier.PUBLIC)
-        .returns(Intent.class)
+        .returns(ClassName.get("android.content", "Intent"))
         .addStatement("intent.putExtras(bundler.get())")
         .addStatement("return intent");
     builder.addMethod(getBuilder.build());
