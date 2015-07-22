@@ -48,6 +48,8 @@
     <fest.android.version>1.0.7</fest.android.version>
     <compile-test.version>0.4</compile-test.version>
     <parceler.version>0.2.6</parceler.version>
+
+    <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
 
   <scm>
