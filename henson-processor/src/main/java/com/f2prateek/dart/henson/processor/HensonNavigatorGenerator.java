@@ -1,6 +1,5 @@
 package com.f2prateek.dart.henson.processor;
 
-import android.content.Context;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.common.BaseGenerator;
 import com.f2prateek.dart.common.InjectionTarget;
@@ -20,6 +19,12 @@ import javax.lang.model.element.Modifier;
  * This generator creates the Henson class.
  * The intent builders are created by {@link IntentBuilderGenerator}.
  * @see {@link com.f2prateek.dart.henson.Henson} to use this code at runtime.
+ * Note: Due to the fact that gradle uses a different classpath to invoke
+ * an annotation processor (it doesn't use the same classpath as the one that is used
+ * to compile the classes to be compiled), this we can't use android classes in a generator.
+ * We should always reference them indirectly via string, not using direct references to types
+ * (i.e. not Intent.class but ClassName.get("android.content", "Intent"))
+ * See https://github.com/johncarl81/parceler/issues/11
  */
 public class HensonNavigatorGenerator extends BaseGenerator {
   public static final String HENSON_NAVIGATOR_CLASS_NAME = "Henson";
@@ -67,10 +72,11 @@ public class HensonNavigatorGenerator extends BaseGenerator {
         TypeSpec.classBuilder(WITH_CONTEXT_SET_STATE_CLASS_NAME)
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
     withContextSetStateBuilder.addField(
-        FieldSpec.builder(Context.class, "context", Modifier.PRIVATE).build());
+        FieldSpec.builder(ClassName.get("android.content", "Context"),
+            "context", Modifier.PRIVATE).build());
     withContextSetStateBuilder.addMethod(MethodSpec.constructorBuilder()
         .addModifiers(Modifier.PRIVATE)
-        .addParameter(Context.class, "context")
+        .addParameter(ClassName.get("android.content", "Context"), "context")
         .addStatement("this.context = context")
         .build());
     //separate required extras from optional extras and sort both sublists.
@@ -89,7 +95,7 @@ public class HensonNavigatorGenerator extends BaseGenerator {
         ClassName.get(packageName, HENSON_NAVIGATOR_CLASS_NAME, WITH_CONTEXT_SET_STATE_CLASS_NAME);
     MethodSpec.Builder gotoMethodBuilder = MethodSpec.methodBuilder("with")
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-        .addParameter(Context.class, "context")
+        .addParameter(ClassName.get("android.content", "Context"), "context")
         .returns(withContextSetStateClassName)
         .addStatement("return new $L(context)", withContextSetStateClassName);
     builder.addMethod(gotoMethodBuilder.build());
