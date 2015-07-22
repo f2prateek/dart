@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 /**
@@ -33,7 +35,6 @@ import javax.lang.model.type.TypeMirror;
  * We should always reference them indirectly via string, not using direct references to types
  * (i.e. not Intent.class but ClassName.get("android.content", "Intent"))
  * See https://github.com/johncarl81/parceler/issues/11
-
  */
 public class IntentBuilderGenerator extends BaseGenerator {
   public static final String BUNDLE_BUILDER_SUFFIX = "$$IntentBuilder";
@@ -213,11 +214,13 @@ public class IntentBuilderGenerator extends BaseGenerator {
       nextStateClassName += "." + nextStateSimpleClassName;
     }
 
+    String castToParcelableIfNecessary = doCreateParcelableCastIfExtraIsParcelable(extraType);
     MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder(injection.getKey())
         .addModifiers(Modifier.PUBLIC)
         .returns(ClassName.bestGuess(nextStateClassName))
         .addParameter(TypeName.get(extraType), injection.getKey())
-        .addStatement("bundler.put($S,$L)", injection.getKey(), value);
+        .addStatement("bundler.put($S," + castToParcelableIfNecessary + " $L)", injection.getKey(),
+            value);
 
     if (isOptional) {
       setterBuilder.addStatement("return this");
@@ -227,6 +230,34 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
     builder.addMethod(setterBuilder.build());
     return nextStateSimpleClassName;
+  }
+
+  /**
+   * This method returns either an empty String or {@code "(Parcelable)"} if
+   * the extra type is Parcelable. We need this explicit conversion in cases
+   * where the extra type is both Parcelable and Serializable. In that
+   * case we will prefer Parcelable. Not that the extra type has to directly
+   * implement Parcelable, not via a super class.
+   * @param extraType the type that might be parcelable.
+   * @return either an empty String or {@code "(Parcelable)"} if
+   * the extra type is Parcelable
+   */
+  private String doCreateParcelableCastIfExtraIsParcelable(TypeMirror extraType) {
+    String castToParcelableIfNecessary = "";
+    if (extraType instanceof DeclaredType) {
+      boolean isParcelable = false;
+      final TypeElement typeElement = (TypeElement) ((DeclaredType) extraType).asElement();
+      for (TypeMirror interfaceType : typeElement.getInterfaces()) {
+        if ("android.os.Parcelable".equals(interfaceType.toString())) {
+          isParcelable = true;
+        }
+      }
+
+      if (isParcelable) {
+        castToParcelableIfNecessary = "(android.os.Parcelable)";
+      }
+    }
+    return castToParcelableIfNecessary;
   }
 
   private String extractValue(ExtraInjection injection, FieldBinding firstFieldBinding) {

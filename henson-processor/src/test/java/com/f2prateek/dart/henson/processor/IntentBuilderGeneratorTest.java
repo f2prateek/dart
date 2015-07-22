@@ -555,4 +555,57 @@ public class IntentBuilderGeneratorTest {
         .and()
         .generatesSources(builderSource);
   }
+
+  @Test public void injectingBothSerializableAndParcelableExtra() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import android.os.Parcelable;", //
+        "import java.io.Serializable;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "import com.f2prateek.dart.Nullable;", //
+        "class Extra implements Serializable, Parcelable {", //
+        "  public void writeToParcel(android.os.Parcel out, int flags) {", //
+        "  }", //
+        "  public int describeContents() {", //
+        "    return 0;", //
+        "  }", //
+        "}", //
+        "public class Test extends Activity {", //
+        "    @InjectExtra(\"key\") Extra extra;", //
+        "}" //
+    ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+                "import android.content.Context;", //
+                "import android.content.Intent;", //
+                "import com.f2prateek.dart.henson.Bundler;", //
+                "public class Test$$IntentBuilder {", //
+                "  private Intent intent;", //
+                "  private Bundler bundler = Bundler.create();", //
+                "  public Test$$IntentBuilder(Context context) {", //
+                "    intent = new Intent(context, Test.class);", //
+                "  }", //
+                "  public Test$$IntentBuilder.AllSet key(Extra key) {", //
+                "    bundler.put(\"key\",(android.os.Parcelable) key);", //
+                "    return new Test$$IntentBuilder.AllSet();", //
+                "  }", //
+                "  public class AllSet {", //
+                "    public Intent build() {", //
+                "      intent.putExtras(bundler.get());", //
+                "      return intent;", //
+                "    }", //
+                "  }", //
+                "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
 }
