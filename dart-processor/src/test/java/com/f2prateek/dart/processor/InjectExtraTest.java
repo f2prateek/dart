@@ -84,69 +84,53 @@ public class InjectExtraTest {
     JavaFileObject injectorSource =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-            "import com.f2prateek.dart.Dart;", //
-            "import java.lang.Boolean;", //
-            "import java.lang.Byte;", //
-            "import java.lang.Character;", //
-            "import java.lang.Double;", //
-            "import java.lang.Float;", //
-            "import java.lang.Integer;", //
-            "import java.lang.Long;", //
-            "import java.lang.Object;", //
-            "import java.lang.Short;", //
-            "public class Test$$ExtraInjector {", //
-            "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
-            "    Object object;", //
-            "    object = finder.getExtra(source, \"key_bool\");", //
-            "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_bool' for field 'aBool' was not found. If this extra is optional add '@Nullable' annotation.\");",
-            //
-            "    }", //
-            "    target.aBool = (Boolean) object;", //
-            "    object = finder.getExtra(source, \"key_byte\");", //
-            "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_byte' for field 'aByte' was not found. If this extra is optional add '@Nullable' annotation.\");",
-            //
-            "    }", //
-            "    target.aByte = (Byte) object;", //
-            "    object = finder.getExtra(source, \"key_short\");", //
-            "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_short' for field 'aShort' was not found. If this extra is optional add '@Nullable' annotation.\");",
-            //
-            "    }", //
-            "    target.aShort = (Short) object;", //
-            "    object = finder.getExtra(source, \"key_int\");", //
-            "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_int' for field 'anInt' was not found. If this extra is optional add '@Nullable' annotation.\");",
-            //
-            "    }", //
-            "    target.anInt = (Integer) object;", //
-            "    object = finder.getExtra(source, \"key_long\");", //
-            "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_long' for field 'aLong' was not found. If this extra is optional add '@Nullable' annotation.\");",
-            //
-            "    }", //
-            "    target.aLong = (Long) object;", //
-            "    object = finder.getExtra(source, \"key_char\");", //
-            "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_char' for field 'aChar' was not found. If this extra is optional add '@Nullable' annotation.\");",
-            //
-            "    }", //
-            "    target.aChar = (Character) object;", //
-            "    object = finder.getExtra(source, \"key_float\");", //
-            "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_float' for field 'aFloat' was not found. If this extra is optional add '@Nullable' annotation.\");",
-            //
-            "    }", //
-            "    target.aFloat = (Float) object;", //
-            "    object = finder.getExtra(source, \"key_double\");", //
-            "    if (object == null) {", //
-            "      throw new IllegalStateException(\"Required extra with key 'key_double' for field 'aDouble' was not found. If this extra is optional add '@Nullable' annotation.\");",
-            //
-            "    }", //
-            "    target.aDouble = (Double) object;", //
-            "  }", //
-            "}" //
+                "import com.f2prateek.dart.Dart;", //
+                "import java.lang.Object;", //
+                "public class Test$$ExtraInjector {", //
+                "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+                "    Object object;", //
+                "    object = finder.getExtra(source, \"key_bool\");", //
+                "    if (object == null) {", //
+                "      throw new IllegalStateException(\"Required extra with key 'key_bool' for field 'aBool' was not found. If this extra is optional add '@Nullable' annotation.\");", //
+                "    }", //
+                "    target.aBool = (boolean) object;", //
+                "    object = finder.getExtra(source, \"key_byte\");", //
+                "    if (object == null) {", //
+                "      throw new IllegalStateException(\"Required extra with key 'key_byte' for field 'aByte' was not found. If this extra is optional add '@Nullable' annotation.\");", //
+                "    }", //
+                "    target.aByte = (byte) object;", //
+                "    object = finder.getExtra(source, \"key_short\");", //
+                "    if (object == null) {", //
+                "      throw new IllegalStateException(\"Required extra with key 'key_short' for field 'aShort' was not found. If this extra is optional add '@Nullable' annotation.\");", //
+                "    }", //
+                "    target.aShort = (short) object;", //
+                "    object = finder.getExtra(source, \"key_int\");", //
+                "    if (object == null) {", //
+                "      throw new IllegalStateException(\"Required extra with key 'key_int' for field 'anInt' was not found. If this extra is optional add '@Nullable' annotation.\");", //
+                "    }", //
+                "    target.anInt = (int) object;", //
+                "    object = finder.getExtra(source, \"key_long\");", //
+                "    if (object == null) {", //
+                "      throw new IllegalStateException(\"Required extra with key 'key_long' for field 'aLong' was not found. If this extra is optional add '@Nullable' annotation.\");", //
+                "    }", //
+                "    target.aLong = (long) object;", //
+                "    object = finder.getExtra(source, \"key_char\");", //
+                "    if (object == null) {", //
+                "      throw new IllegalStateException(\"Required extra with key 'key_char' for field 'aChar' was not found. If this extra is optional add '@Nullable' annotation.\");", //
+                "    }", //
+                "    target.aChar = (char) object;", //
+                "    object = finder.getExtra(source, \"key_float\");", //
+                "    if (object == null) {", //
+                "      throw new IllegalStateException(\"Required extra with key 'key_float' for field 'aFloat' was not found. If this extra is optional add '@Nullable' annotation.\");", //
+                "    }", //
+                "    target.aFloat = (float) object;", //
+                "    object = finder.getExtra(source, \"key_double\");", //
+                "    if (object == null) {", //
+                "      throw new IllegalStateException(\"Required extra with key 'key_double' for field 'aDouble' was not found. If this extra is optional add '@Nullable' annotation.\");", //
+                "    }", //
+                "    target.aDouble = (double) object;", //
+                "  }", //
+                "}" //
         ));
 
     ASSERT.about(javaSource())

@@ -17,7 +17,6 @@
 
 package com.f2prateek.dart.processor;
 
-import com.f2prateek.dart.processor.InjectExtraProcessor;
 import java.util.Arrays;
 import javax.annotation.processing.Processor;
 

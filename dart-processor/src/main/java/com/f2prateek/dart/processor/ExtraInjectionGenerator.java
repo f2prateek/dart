@@ -26,6 +26,7 @@ import com.f2prateek.dart.common.InjectionTarget;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.Collection;
 import java.util.List;
@@ -124,7 +125,7 @@ public class ExtraInjectionGenerator extends BaseGenerator {
   }
 
   private void emitCast(MethodSpec.Builder builder, TypeMirror fieldType) {
-    builder.addCode("($T) ", ClassName.bestGuess(getType(fieldType)));
+    builder.addCode("($T) ", TypeName.get(fieldType));
   }
 
   //TODO add android annotations dependency to get that annotation plus others.
