@@ -9,6 +9,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -215,7 +216,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
     MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder(injection.getKey())
         .addModifiers(Modifier.PUBLIC)
         .returns(ClassName.bestGuess(nextStateClassName))
-        .addParameter(ClassName.bestGuess(getType(extraType)), injection.getKey())
+        .addParameter(TypeName.get(extraType), injection.getKey())
         .addStatement("bundler.put($S,$L)", injection.getKey(), value);
 
     if (isOptional) {
