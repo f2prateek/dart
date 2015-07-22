@@ -49,7 +49,7 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 /**
  * Base class of the annotation processors of Dart.
  * It collects all information about extra injections to be performed
- * when scanning the {@link @InjectExtra} annotations of given source files.
+ * when scanning the {@link com.f2prateek.dart.InjectExtra} annotations of given source files.
  * The collected information is stored in a collection of {@code InjectionTarget}.
  * All annotations processors in Dart support the option {@code #OPTION_DART_DEBUG}
  * that will log information about annotation processor and generated code.
