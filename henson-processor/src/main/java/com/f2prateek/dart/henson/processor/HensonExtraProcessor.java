@@ -40,6 +40,7 @@ import javax.tools.JavaFileObject;
  * will be generated.
  * If this option is not present, then the annotation processor tries to find a common
  * package between all classes that contain the {@link InjectExtra} annotation.
+ *
  * @see HensonNavigatorGenerator#findCommonPackage(java.util.Collection)
  */
 public final class HensonExtraProcessor extends AbstractDartProcessor {
@@ -66,6 +67,8 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
     for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
       TypeElement typeElement = entry.getKey();
       InjectionTarget injectionTarget = entry.getValue();
+
+      enhanceInjectionTargetWithInheritedInjectionExtras(targetClassMap, injectionTarget);
 
       // Now write the IntentBuilder
       Writer writer = null;
@@ -133,5 +136,36 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
 
     //return false here to let dart process the annotations too
     return false;
+  }
+
+  private void enhanceInjectionTargetWithInheritedInjectionExtras(
+      Map<TypeElement, InjectionTarget> targetClassMap, InjectionTarget injectionTarget) {
+    InjectionTarget currentTarget = injectionTarget;
+    InjectionTarget parentTarget;
+    while (currentTarget != null) {
+      parentTarget = findParentTarget(currentTarget.parentTarget, targetClassMap);
+      if (parentTarget != null) {
+        currentTarget.injectionMap.putAll(parentTarget.injectionMap);
+      }
+      currentTarget = parentTarget;
+    }
+  }
+
+  private InjectionTarget findParentTarget(String parentClassName,
+      Map<TypeElement, InjectionTarget> targetClassMap) {
+    InjectionTarget parentTarget = null;
+
+    final Set<Map.Entry<TypeElement, InjectionTarget>> entrySet = targetClassMap.entrySet();
+    for (Map.Entry<TypeElement, InjectionTarget> entryTypeToInjectionTarget : entrySet) {
+      if (entryTypeToInjectionTarget.getKey()
+          .getQualifiedName()
+          .toString()
+          .equals(parentClassName)) {
+        parentTarget = entryTypeToInjectionTarget.getValue();
+        break;
+      }
+    }
+
+    return parentTarget;
   }
 }
