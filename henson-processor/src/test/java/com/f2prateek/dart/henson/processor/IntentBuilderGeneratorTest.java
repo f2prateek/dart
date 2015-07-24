@@ -19,6 +19,7 @@ package com.f2prateek.dart.henson.processor;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
+import javax.annotation.processing.Processor;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
@@ -69,6 +70,60 @@ public class IntentBuilderGeneratorTest {
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
+  }
+
+  @Test public void henson() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.Henson;", //
+        "@Henson public class Test extends Activity {", //
+        "}" //
+    ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "public class Test$$IntentBuilder {", //
+            "  private Intent intent;", //
+            "  private Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Intent build() {", //
+            "    intent.putExtras(bundler.get());", //
+            "    return intent;", //
+            "  }", //
+            "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test public void henson_with_extras() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "import com.f2prateek.dart.Henson;", //
+        "@Henson public class Test extends Activity {", //
+        "    @InjectExtra(\"key\") String extra;", //
+        "}" //
+    ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .failsToCompile()
+        .withErrorContaining("@Henson class Test must not contain any @InjectExtra annotation");
   }
 
   @Test public void injectingAllPrimitives() {
