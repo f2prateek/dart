@@ -17,6 +17,7 @@
 
 package com.f2prateek.dart.common;
 
+import com.f2prateek.dart.Henson;
 import com.f2prateek.dart.InjectExtra;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -42,6 +43,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import static javax.lang.model.element.ElementKind.CLASS;
+import static javax.lang.model.element.ElementKind.PACKAGE;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 import static javax.tools.Diagnostic.Kind.ERROR;
@@ -53,6 +55,7 @@ import static javax.tools.Diagnostic.Kind.ERROR;
  * The collected information is stored in a collection of {@code InjectionTarget}.
  * All annotations processors in Dart support the option {@code #OPTION_DART_DEBUG}
  * that will log information about annotation processor and generated code.
+ *
  * @see #findAndParseTargets(RoundEnvironment)
  */
 public abstract class AbstractDartProcessor extends AbstractProcessor {
@@ -71,8 +74,8 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     filer = env.getFiler();
 
     final Map<String, String> options = env.getOptions();
-    isDebugEnabled |= options.containsKey(OPTION_DART_DEBUG)
-        && Boolean.parseBoolean(options.get(OPTION_DART_DEBUG));
+    isDebugEnabled |= options.containsKey(OPTION_DART_DEBUG) && Boolean.parseBoolean(
+        options.get(OPTION_DART_DEBUG));
   }
 
   @Override public Set<String> getSupportedAnnotationTypes() {
@@ -102,17 +105,8 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     Set<TypeMirror> erasedTargetTypes = new LinkedHashSet<TypeMirror>();
 
     // Process each @InjectExtra elements.
-    for (Element element : env.getElementsAnnotatedWith(InjectExtra.class)) {
-      try {
-        parseInjectExtra(element, targetClassMap, erasedTargetTypes);
-      } catch (Exception e) {
-        StringWriter stackTrace = new StringWriter();
-        e.printStackTrace(new PrintWriter(stackTrace));
-
-        error(element, "Unable to generate extra injector for @InjectExtra.\n\n%s",
-            stackTrace.toString());
-      }
-    }
+    parseInjectExtraAnnotatedElements(env, targetClassMap, erasedTargetTypes);
+    parseHensonAnnotatedElements(env, targetClassMap, erasedTargetTypes);
 
     // Try to find a parent injector for each injector.
     for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
@@ -125,32 +119,94 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     return targetClassMap;
   }
 
-  private boolean isValidForGeneratedCode(Class<? extends Annotation> annotationClass,
-      String targetThing, Element element) {
+  private void parseInjectExtraAnnotatedElements(RoundEnvironment env,
+      Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes) {
+    for (Element element : env.getElementsAnnotatedWith(InjectExtra.class)) {
+      try {
+        parseInjectExtra(element, targetClassMap, erasedTargetTypes);
+      } catch (Exception e) {
+        StringWriter stackTrace = new StringWriter();
+        e.printStackTrace(new PrintWriter(stackTrace));
+
+        error(element, "Unable to generate extra injector when parsing @InjectExtra.\n\n%s",
+            stackTrace.toString());
+      }
+    }
+  }
+
+  private void parseHensonAnnotatedElements(RoundEnvironment env,
+      Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes) {
+    for (Element element : env.getElementsAnnotatedWith(Henson.class)) {
+      try {
+        parseHenson((TypeElement) element, targetClassMap, erasedTargetTypes);
+      } catch (Exception e) {
+        StringWriter stackTrace = new StringWriter();
+        e.printStackTrace(new PrintWriter(stackTrace));
+
+        error(element, "Unable to generate extra injector when parsing @Henson.\n\n%s",
+            stackTrace.toString());
+      }
+    }
+  }
+
+  private boolean isValidUsageOfHenson(Class<? extends Annotation> annotationClass,
+      Element element) {
+    boolean valid = true;
+
+    // Verify modifiers.
+    Set<Modifier> modifiers = element.getModifiers();
+    if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC)) {
+      error(element, "@%s class %s must not be private or static.", annotationClass.getSimpleName(),
+          element.getSimpleName());
+      valid = false;
+    }
+
+    // Verify containing type.
+    if (element.getEnclosingElement() == null
+        || element.getEnclosingElement().getKind() != PACKAGE) {
+      error(element, "@%s class %s must be a top level class", annotationClass.getSimpleName(),
+          element.getSimpleName());
+      valid = false;
+    }
+
+    //verify there are no @InjectExtra annotated fields
+    for (Element enclosedElement : element.getEnclosedElements()) {
+      if (enclosedElement.getAnnotation(InjectExtra.class) != null) {
+        error(element, "@%s class %s must not contain any @InjectExtra annotation",
+            annotationClass.getSimpleName(), element.getSimpleName());
+        valid = false;
+      }
+    }
+
+    return valid;
+  }
+
+  private boolean isValidUsageOfInjectExtra(Class<? extends Annotation> annotationClass,
+      Element element) {
     boolean valid = true;
     TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
 
-    // Verify method modifiers.
+    // Verify modifiers.
     Set<Modifier> modifiers = element.getModifiers();
     if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC)) {
-      error(element, "@%s %s must not be private or static. (%s.%s)",
-          annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(),
+      error(element, "@%s fields must not be private or static. (%s.%s)",
+          annotationClass.getSimpleName(), enclosingElement.getQualifiedName(),
           element.getSimpleName());
       valid = false;
     }
 
     // Verify containing type.
     if (enclosingElement.getKind() != CLASS) {
-      error(enclosingElement, "@%s %s may only be contained in classes. (%s.%s)",
-          annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(),
+      error(enclosingElement, "@%s fields may only be contained in classes. (%s.%s)",
+          annotationClass.getSimpleName(), enclosingElement.getQualifiedName(),
           element.getSimpleName());
       valid = false;
     }
 
     // Verify containing class visibility is not private.
     if (enclosingElement.getModifiers().contains(PRIVATE)) {
-      error(enclosingElement, "@%s %s may not be contained in private classes. (%s.%s)",
-          annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(),
+      error(enclosingElement, "@%s fields may not be contained in private classes. (%s.%s)",
+          annotationClass.getSimpleName(), enclosingElement.getQualifiedName(),
           element.getSimpleName());
       valid = false;
     }
@@ -158,12 +214,28 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     return valid;
   }
 
+  private void parseHenson(TypeElement element, Map<TypeElement, InjectionTarget> targetClassMap,
+      Set<TypeMirror> erasedTargetTypes) {
+
+    // Verify common generated code restrictions.
+    if (!isValidUsageOfHenson(Henson.class, element)) {
+      return;
+    }
+
+    // Assemble information on the injection point.
+    getOrCreateTargetClass(targetClassMap, element);
+
+    // Add the type-erased version to the valid injection targets set.
+    TypeMirror erasedTargetType = typeUtils.erasure(element.asType());
+    erasedTargetTypes.add(erasedTargetType);
+  }
+
   private void parseInjectExtra(Element element, Map<TypeElement, InjectionTarget> targetClassMap,
       Set<TypeMirror> erasedTargetTypes) {
     TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
 
     // Verify common generated code restrictions.
-    if (!isValidForGeneratedCode(InjectExtra.class, "fields", element)) {
+    if (!isValidUsageOfInjectExtra(InjectExtra.class, element)) {
       return;
     }
 

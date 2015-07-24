@@ -17,6 +17,7 @@
 
 package com.f2prateek.dart.henson.processor;
 
+import com.f2prateek.dart.Henson;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.common.AbstractDartProcessor;
 import com.f2prateek.dart.common.InjectionTarget;
@@ -47,6 +48,12 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
 
   public static final String OPTION_HENSON_PACKAGE = "dart.henson.package";
   private String hensonPackage;
+
+  @Override public Set<String> getSupportedAnnotationTypes() {
+    Set<String> supportTypes = new LinkedHashSet<String>(super.getSupportedAnnotationTypes());
+    supportTypes.add(Henson.class.getCanonicalName());
+    return supportTypes;
+  }
 
   @Override public Set<String> getSupportedOptions() {
     Set<String> supportedOptions = new LinkedHashSet<String>();
