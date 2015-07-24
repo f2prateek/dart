@@ -75,31 +75,34 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
       TypeElement typeElement = entry.getKey();
       InjectionTarget injectionTarget = entry.getValue();
 
-      enhanceInjectionTargetWithInheritedInjectionExtras(targetClassMap, injectionTarget);
+      //we unfortunately can't test that nothing is generated in a TRUTH based test
+      if (!injectionTarget.isAbstractTargetClass) {
+        enhanceInjectionTargetWithInheritedInjectionExtras(targetClassMap, injectionTarget);
 
-      // Now write the IntentBuilder
-      Writer writer = null;
-
-      // Generate the IntentBuilder
-      try {
-        IntentBuilderGenerator intentBuilderGenerator = new IntentBuilderGenerator(injectionTarget);
-        JavaFileObject jfo = filer.createSourceFile(intentBuilderGenerator.getFqcn(), typeElement);
-        writer = jfo.openWriter();
-        if (isDebugEnabled) {
-          System.out.println(
-              "IntentBuilder generated:\n" + intentBuilderGenerator.brewJava() + "---");
-        }
-        writer.write(intentBuilderGenerator.brewJava());
-      } catch (IOException e) {
-        error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,
-            e.getMessage());
-      } finally {
-        if (writer != null) {
-          try {
-            writer.close();
-          } catch (IOException e) {
-            error(typeElement, "Unable to close intent builder source file for type %s: %s",
-                typeElement, e.getMessage());
+        // Now write the IntentBuilder
+        Writer writer = null;
+        try {
+          IntentBuilderGenerator intentBuilderGenerator =
+              new IntentBuilderGenerator(injectionTarget);
+          JavaFileObject jfo =
+              filer.createSourceFile(intentBuilderGenerator.getFqcn(), typeElement);
+          writer = jfo.openWriter();
+          if (isDebugEnabled) {
+            System.out.println(
+                "IntentBuilder generated:\n" + intentBuilderGenerator.brewJava() + "---");
+          }
+          writer.write(intentBuilderGenerator.brewJava());
+        } catch (IOException e) {
+          error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,
+              e.getMessage());
+        } finally {
+          if (writer != null) {
+            try {
+              writer.close();
+            } catch (IOException e) {
+              error(typeElement, "Unable to close intent builder source file for type %s: %s",
+                  typeElement, e.getMessage());
+            }
           }
         }
       }

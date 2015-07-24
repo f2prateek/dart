@@ -298,15 +298,16 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   }
 
   private InjectionTarget getOrCreateTargetClass(Map<TypeElement, InjectionTarget> targetClassMap,
-      TypeElement enclosingElement) {
-    InjectionTarget injectionTarget = targetClassMap.get(enclosingElement);
+      TypeElement typeElement) {
+    InjectionTarget injectionTarget = targetClassMap.get(typeElement);
     if (injectionTarget == null) {
-      String targetType = enclosingElement.getQualifiedName().toString();
-      String classPackage = getPackageName(enclosingElement);
-      String className = getClassName(enclosingElement, classPackage);
+      final String targetType = typeElement.getQualifiedName().toString();
+      final String classPackage = getPackageName(typeElement);
+      final String className = getClassName(typeElement, classPackage);
+      final boolean isAbstractType = typeElement.getModifiers().contains(Modifier.ABSTRACT);
 
-      injectionTarget = new InjectionTarget(classPackage, className, targetType);
-      targetClassMap.put(enclosingElement, injectionTarget);
+      injectionTarget = new InjectionTarget(classPackage, className, targetType, isAbstractType);
+      targetClassMap.put(typeElement, injectionTarget);
     }
     return injectionTarget;
   }

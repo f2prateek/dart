@@ -31,7 +31,8 @@ public class ExtraInjectionGeneratorTest {
 
   @Before
   public void setup() {
-    extraInjectionGenerator = new ExtraInjectionGenerator(new InjectionTarget("foo", "bar","qurtz"));
+    final InjectionTarget injectionTarget = new InjectionTarget("foo", "bar", "qurtz", false);
+    extraInjectionGenerator = new ExtraInjectionGenerator(injectionTarget);
   }
 
   @Test public void humanDescriptionJoinWorks() {
