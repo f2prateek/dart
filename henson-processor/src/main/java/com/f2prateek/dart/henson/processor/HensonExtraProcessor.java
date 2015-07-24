@@ -17,6 +17,7 @@
 
 package com.f2prateek.dart.henson.processor;
 
+import com.f2prateek.dart.Henson;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.common.AbstractDartProcessor;
 import com.f2prateek.dart.common.InjectionTarget;
@@ -40,12 +41,19 @@ import javax.tools.JavaFileObject;
  * will be generated.
  * If this option is not present, then the annotation processor tries to find a common
  * package between all classes that contain the {@link InjectExtra} annotation.
+ *
  * @see HensonNavigatorGenerator#findCommonPackage(java.util.Collection)
  */
 public final class HensonExtraProcessor extends AbstractDartProcessor {
 
   public static final String OPTION_HENSON_PACKAGE = "dart.henson.package";
   private String hensonPackage;
+
+  @Override public Set<String> getSupportedAnnotationTypes() {
+    Set<String> supportTypes = new LinkedHashSet<String>(super.getSupportedAnnotationTypes());
+    supportTypes.add(Henson.class.getCanonicalName());
+    return supportTypes;
+  }
 
   @Override public Set<String> getSupportedOptions() {
     Set<String> supportedOptions = new LinkedHashSet<String>();
@@ -67,29 +75,34 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
       TypeElement typeElement = entry.getKey();
       InjectionTarget injectionTarget = entry.getValue();
 
-      // Now write the IntentBuilder
-      Writer writer = null;
+      //we unfortunately can't test that nothing is generated in a TRUTH based test
+      if (!injectionTarget.isAbstractTargetClass) {
+        enhanceInjectionTargetWithInheritedInjectionExtras(targetClassMap, injectionTarget);
 
-      // Generate the IntentBuilder
-      try {
-        IntentBuilderGenerator intentBuilderGenerator = new IntentBuilderGenerator(injectionTarget);
-        JavaFileObject jfo = filer.createSourceFile(intentBuilderGenerator.getFqcn(), typeElement);
-        writer = jfo.openWriter();
-        if (isDebugEnabled) {
-          System.out.println(
-              "IntentBuilder generated:\n" + intentBuilderGenerator.brewJava() + "---");
-        }
-        writer.write(intentBuilderGenerator.brewJava());
-      } catch (IOException e) {
-        error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,
-            e.getMessage());
-      } finally {
-        if (writer != null) {
-          try {
-            writer.close();
-          } catch (IOException e) {
-            error(typeElement, "Unable to close intent builder source file for type %s: %s",
-                typeElement, e.getMessage());
+        // Now write the IntentBuilder
+        Writer writer = null;
+        try {
+          IntentBuilderGenerator intentBuilderGenerator =
+              new IntentBuilderGenerator(injectionTarget);
+          JavaFileObject jfo =
+              filer.createSourceFile(intentBuilderGenerator.getFqcn(), typeElement);
+          writer = jfo.openWriter();
+          if (isDebugEnabled) {
+            System.out.println(
+                "IntentBuilder generated:\n" + intentBuilderGenerator.brewJava() + "---");
+          }
+          writer.write(intentBuilderGenerator.brewJava());
+        } catch (IOException e) {
+          error(typeElement, "Unable to write intent builder for type %s: %s", typeElement,
+              e.getMessage());
+        } finally {
+          if (writer != null) {
+            try {
+              writer.close();
+            } catch (IOException e) {
+              error(typeElement, "Unable to close intent builder source file for type %s: %s",
+                  typeElement, e.getMessage());
+            }
           }
         }
       }
@@ -133,5 +146,36 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
 
     //return false here to let dart process the annotations too
     return false;
+  }
+
+  private void enhanceInjectionTargetWithInheritedInjectionExtras(
+      Map<TypeElement, InjectionTarget> targetClassMap, InjectionTarget injectionTarget) {
+    InjectionTarget currentTarget = injectionTarget;
+    InjectionTarget parentTarget;
+    while (currentTarget != null) {
+      parentTarget = findParentTarget(currentTarget.parentTarget, targetClassMap);
+      if (parentTarget != null) {
+        currentTarget.injectionMap.putAll(parentTarget.injectionMap);
+      }
+      currentTarget = parentTarget;
+    }
+  }
+
+  private InjectionTarget findParentTarget(String parentClassName,
+      Map<TypeElement, InjectionTarget> targetClassMap) {
+    InjectionTarget parentTarget = null;
+
+    final Set<Map.Entry<TypeElement, InjectionTarget>> entrySet = targetClassMap.entrySet();
+    for (Map.Entry<TypeElement, InjectionTarget> entryTypeToInjectionTarget : entrySet) {
+      if (entryTypeToInjectionTarget.getKey()
+          .getQualifiedName()
+          .toString()
+          .equals(parentClassName)) {
+        parentTarget = entryTypeToInjectionTarget.getValue();
+        break;
+      }
+    }
+
+    return parentTarget;
   }
 }

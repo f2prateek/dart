@@ -19,6 +19,7 @@ package com.f2prateek.dart.henson.processor;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
+import javax.annotation.processing.Processor;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
@@ -57,6 +58,81 @@ public class HensonNavigatorGeneratorTest {
                 "    }", //
                 "  }", //
                 "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test public void henson() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.Henson;", //
+        "@Henson public class Test extends Activity {", //
+        "}" //
+    ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
+            "package test;", //
+                "import android.content.Context;", //
+                "public class Henson {", //
+                "  private Henson() {", //
+                "  }", //
+                "  public static WithContextSetState with(Context context) {", //
+                "    return new test.Henson.WithContextSetState(context);", //
+                "  }", //
+                "  public static class WithContextSetState {", //
+                "    private Context context;", //
+                "    private WithContextSetState(Context context) {", //
+                "      this.context = context;", //
+                "    }", //
+                "    public Test$$IntentBuilder gotoTest() {", //
+                "      return new test.Test$$IntentBuilder(context);", //
+                "    }", //
+                "  }", //
+                "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test public void henson_doesntGotoAbstractClasses() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.Henson;", //
+        "@Henson public abstract class Test extends Activity {", //
+        "}" //
+    ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "public class Henson {", //
+            "  private Henson() {", //
+            "  }", //
+            "  public static WithContextSetState with(Context context) {", //
+            "    return new test.Henson.WithContextSetState(context);", //
+            "  }", //
+            "  public static class WithContextSetState {", //
+            "    private Context context;", //
+            "    private WithContextSetState(Context context) {", //
+            "      this.context = context;", //
+            "    }", //
+            "  }", //
+            "}" //
         ));
 
     ASSERT.about(javaSource())

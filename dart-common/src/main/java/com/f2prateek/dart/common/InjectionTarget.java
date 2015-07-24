@@ -27,11 +27,14 @@ public final class InjectionTarget {
   public final String className;
   public final String targetClass;
   public String parentTarget;
+  public boolean isAbstractTargetClass;
 
-  public InjectionTarget(String classPackage, String className, String targetClass) {
+  public InjectionTarget(String classPackage, String className, String targetClass,
+      boolean isAbstractTargetClass) {
     this.classPackage = classPackage;
     this.className = className;
     this.targetClass = targetClass;
+    this.isAbstractTargetClass = isAbstractTargetClass;
   }
 
   void addField(String key, String name, TypeMirror type, boolean required, boolean parcel) {

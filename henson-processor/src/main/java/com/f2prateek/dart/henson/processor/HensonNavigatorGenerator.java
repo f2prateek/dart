@@ -18,7 +18,6 @@ import javax.lang.model.element.Modifier;
  * without having to know them explicitly.
  * This generator creates the Henson class.
  * The intent builders are created by {@link IntentBuilderGenerator}.
- * @see {@link com.f2prateek.dart.henson.Henson} to use this code at runtime.
  * Note: Due to the fact that gradle uses a different classpath to invoke
  * an annotation processor (it doesn't use the same classpath as the one that is used
  * to compile the classes to be compiled), this we can't use android classes in a generator.
@@ -39,7 +38,7 @@ public class HensonNavigatorGenerator extends BaseGenerator {
       this.packageName = findCommonPackage(targets);
     }
 
-    this.targetClassNames = getAllClassNames(targets);
+    this.targetClassNames = getClassNamesWhereHensonCanGoto(targets);
   }
 
   private String hensonNavigatorClassName() {
@@ -79,7 +78,6 @@ public class HensonNavigatorGenerator extends BaseGenerator {
         .addParameter(ClassName.get("android.content", "Context"), "context")
         .addStatement("this.context = context")
         .build());
-    //separate required extras from optional extras and sort both sublists.
     for (String targetClassName : targetClassNames) {
       emitNavigationMethod(withContextSetStateBuilder, targetClassName);
     }
@@ -153,10 +151,12 @@ public class HensonNavigatorGenerator extends BaseGenerator {
     return commonRoot;
   }
 
-  private Collection<String> getAllClassNames(Collection<InjectionTarget> targets) {
+  private Collection<String> getClassNamesWhereHensonCanGoto(Collection<InjectionTarget> targets) {
     Collection<String> classNames = new HashSet<>();
     for (InjectionTarget injectionTarget : targets) {
-      classNames.add(injectionTarget.targetClass);
+      if (!injectionTarget.isAbstractTargetClass) {
+        classNames.add(injectionTarget.targetClass);
+      }
     }
     return classNames;
   }

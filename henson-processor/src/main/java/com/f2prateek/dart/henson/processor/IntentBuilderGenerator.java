@@ -57,7 +57,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
     emitFields(intentBuilderTypeBuilder);
     emitConstructor(intentBuilderTypeBuilder);
-    emitGettersAndSetters(intentBuilderTypeBuilder);
+    emitExtraDSLStateMachine(intentBuilderTypeBuilder);
 
     //build
     JavaFile javaFile = JavaFile.builder(target.classPackage, intentBuilderTypeBuilder.build())
@@ -84,7 +84,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
     intentBuilderTypeBuilder.addMethod(constructorBuilder.build());
   }
 
-  private void emitGettersAndSetters(TypeSpec.Builder intentBuilderTypeBuilder) {
+  private void emitExtraDSLStateMachine(TypeSpec.Builder intentBuilderTypeBuilder) {
     //separate required extras from optional extras and sort both sublists.
     List<ExtraInjection> requiredInjections = new ArrayList<>();
     List<ExtraInjection> optionalInjections = new ArrayList<>();
