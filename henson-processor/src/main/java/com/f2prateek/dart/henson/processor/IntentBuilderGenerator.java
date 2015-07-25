@@ -238,12 +238,11 @@ public class IntentBuilderGenerator extends BaseGenerator {
   //and enforce a java compliant name. There might be some cases where this
   //can't be derived from a pathological key though (in that we should throw an error)
   private String sanitizeForMethodName(String key) {
-    String s = key.toLowerCase();
-    final int lastDotIndex = s.lastIndexOf('.');
+    final int lastDotIndex = key.lastIndexOf('.');
     if (lastDotIndex != -1) {
-      s = s.substring(lastDotIndex + 1);
+      key = key.substring(lastDotIndex + 1);
     }
-    return s;
+    return key;
   }
 
   /**
