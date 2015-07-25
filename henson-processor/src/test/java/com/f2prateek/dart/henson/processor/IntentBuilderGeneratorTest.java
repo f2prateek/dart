@@ -51,8 +51,8 @@ public class IntentBuilderGeneratorTest {
                 "  public Test$$IntentBuilder(Context context) {", //
                 "    intent = new Intent(context, Test.class);", //
                 "  }", //
-                "  public Test$$IntentBuilder.AllSet key(String key) {", //
-                "    bundler.put(\"key\",key);", //
+                "  public Test$$IntentBuilder.AllSet key(String extra) {", //
+                "    bundler.put(\"key\",extra);", //
                 "    return new Test$$IntentBuilder.AllSet();", //
                 "  }", //
                 "  public class AllSet {", //
@@ -155,49 +155,49 @@ public class IntentBuilderGeneratorTest {
                 "  public Test$$IntentBuilder(Context context) {", //
                 "    intent = new Intent(context, Test.class);", //
                 "  }", //
-                "  public Test$$IntentBuilder.AfterSettingKey_bool key_bool(boolean key_bool) {", //
-                "    bundler.put(\"key_bool\",key_bool);", //
+                "  public Test$$IntentBuilder.AfterSettingKey_bool key_bool(boolean aBool) {", //
+                "    bundler.put(\"key_bool\",aBool);", //
                 "    return new Test$$IntentBuilder.AfterSettingKey_bool();", //
                 "  }", //
                 "  public class AfterSettingKey_bool {", //
-                "    public Test$$IntentBuilder.AfterSettingKey_byte key_byte(byte key_byte) {", //
-                "      bundler.put(\"key_byte\",key_byte);", //
+                "    public Test$$IntentBuilder.AfterSettingKey_byte key_byte(byte aByte) {", //
+                "      bundler.put(\"key_byte\",aByte);", //
                 "      return new Test$$IntentBuilder.AfterSettingKey_byte();", //
                 "    }", //
                 "  }", //
                 "  public class AfterSettingKey_byte {", //
-                "    public Test$$IntentBuilder.AfterSettingKey_char key_char(char key_char) {", //
-                "      bundler.put(\"key_char\",key_char);", //
+                "    public Test$$IntentBuilder.AfterSettingKey_char key_char(char aChar) {", //
+                "      bundler.put(\"key_char\",aChar);", //
                 "      return new Test$$IntentBuilder.AfterSettingKey_char();", //
                 "    }", //
                 "  }", //
                 "  public class AfterSettingKey_char {", //
-                "    public Test$$IntentBuilder.AfterSettingKey_double key_double(double key_double) {", //
-                "      bundler.put(\"key_double\",key_double);", //
+                "    public Test$$IntentBuilder.AfterSettingKey_double key_double(double aDouble) {", //
+                "      bundler.put(\"key_double\",aDouble);", //
                 "      return new Test$$IntentBuilder.AfterSettingKey_double();", //
                 "    }", //
                 "  }", //
                 "  public class AfterSettingKey_double {", //
-                "    public Test$$IntentBuilder.AfterSettingKey_float key_float(float key_float) {", //
-                "      bundler.put(\"key_float\",key_float);", //
+                "    public Test$$IntentBuilder.AfterSettingKey_float key_float(float aFloat) {", //
+                "      bundler.put(\"key_float\",aFloat);", //
                 "      return new Test$$IntentBuilder.AfterSettingKey_float();", //
                 "    }", //
                 "  }", //
                 "  public class AfterSettingKey_float {", //
-                "    public Test$$IntentBuilder.AfterSettingKey_int key_int(int key_int) {", //
-                "      bundler.put(\"key_int\",key_int);", //
+                "    public Test$$IntentBuilder.AfterSettingKey_int key_int(int anInt) {", //
+                "      bundler.put(\"key_int\",anInt);", //
                 "      return new Test$$IntentBuilder.AfterSettingKey_int();", //
                 "    }", //
                 "  }", //
                 "  public class AfterSettingKey_int {", //
-                "    public Test$$IntentBuilder.AfterSettingKey_long key_long(long key_long) {", //
-                "      bundler.put(\"key_long\",key_long);", //
+                "    public Test$$IntentBuilder.AfterSettingKey_long key_long(long aLong) {", //
+                "      bundler.put(\"key_long\",aLong);", //
                 "      return new Test$$IntentBuilder.AfterSettingKey_long();", //
                 "    }", //
                 "  }", //
                 "  public class AfterSettingKey_long {", //
-                "    public Test$$IntentBuilder.AllSet key_short(short key_short) {", //
-                "      bundler.put(\"key_short\",key_short);", //
+                "    public Test$$IntentBuilder.AllSet key_short(short aShort) {", //
+                "      bundler.put(\"key_short\",aShort);", //
                 "      return new Test$$IntentBuilder.AllSet();", //
                 "    }", //
                 "  }", //
@@ -243,8 +243,8 @@ public class IntentBuilderGeneratorTest {
                 "  public Test$$IntentBuilder(Context context) {", //
                 "    intent = new Intent(context, Test.class);", //
                 "  }", //
-                "  public Test$$IntentBuilder.AllSet key(String key) {", //
-                "    bundler.put(\"key\",key);", //
+                "  public Test$$IntentBuilder.AllSet key(String extra1) {", //
+                "    bundler.put(\"key\",extra1);", //
                 "    return new Test$$IntentBuilder.AllSet();", //
                 "  }", //
                 "  public class AllSet {", //
@@ -336,8 +336,8 @@ public class IntentBuilderGeneratorTest {
                 "  public Test$$IntentBuilder(Context context) {", //
                 "    intent = new Intent(context, Test.class);", //
                 "  }", //
-                "  public Test$$IntentBuilder.AllSet key(String key) {", //
-                "    bundler.put(\"key\",key);", //
+                "  public Test$$IntentBuilder.AllSet key(String extra) {", //
+                "    bundler.put(\"key\",extra);", //
                 "    return new Test$$IntentBuilder.AllSet();", //
                 "  }", //
                 "  public class AllSet {", //
@@ -362,8 +362,8 @@ public class IntentBuilderGeneratorTest {
                 "  public TestOne$$IntentBuilder(Context context) {", //
                 "    intent = new Intent(context, TestOne.class);", //
                 "  }", //
-                "  public TestOne$$IntentBuilder.AllSet key(String key) {", //
-                "    bundler.put(\"key\",key);", //
+                "  public TestOne$$IntentBuilder.AllSet key(String extra) {", //
+                "    bundler.put(\"key\",extra);", //
                 "    return new TestOne$$IntentBuilder.AllSet();", //
                 "  }", //
                 "  public class AllSet {", //
@@ -411,8 +411,8 @@ public class IntentBuilderGeneratorTest {
             "  public Test$$IntentBuilder(Context context) {", //
             "    intent = new Intent(context, Test.class);", //
             "  }", //
-            "  public Test$$IntentBuilder.AllSet key(String key) {", //
-            "    bundler.put(\"key\",key);", //
+            "  public Test$$IntentBuilder.AllSet key(String extra) {", //
+            "    bundler.put(\"key\",extra);", //
             "    return new Test$$IntentBuilder.AllSet();", //
             "  }", //
             "  public class AllSet {", //
@@ -437,13 +437,13 @@ public class IntentBuilderGeneratorTest {
             "  public TestOne$$IntentBuilder(Context context) {", //
             "    intent = new Intent(context, TestOne.class);", //
             "  }", //
-            "  public TestOne$$IntentBuilder.AfterSettingKey key(String key) {", //
-            "    bundler.put(\"key\", key);", //
+            "  public TestOne$$IntentBuilder.AfterSettingKey key(String extra) {", //
+            "    bundler.put(\"key\", extra);", //
             "    return new TestOne$$IntentBuilder.AfterSettingKey();", //
             "  }", //
             "  public class AfterSettingKey {", //
-            "    public TestOne$$IntentBuilder.AllSet key1(String key1) {", //
-            "      bundler.put(\"key1\", key1);", //
+            "    public TestOne$$IntentBuilder.AllSet key1(String extra1) {", //
+            "      bundler.put(\"key1\", extra1);", //
             "      return new TestOne$$IntentBuilder.AllSet();", //
             "    }", //
             "  }", //
@@ -492,8 +492,8 @@ public class IntentBuilderGeneratorTest {
             "  public Test$$IntentBuilder(Context context) {", //
             "    intent = new Intent(context, Test.class);", //
             "  }", //
-            "  public Test$$IntentBuilder.AllSet key(String key) {", //
-            "    bundler.put(\"key\",key);", //
+            "  public Test$$IntentBuilder.AllSet key(String extra) {", //
+            "    bundler.put(\"key\",extra);", //
             "    return new Test$$IntentBuilder.AllSet();", //
             "  }", //
             "  public class AllSet {", //
@@ -519,8 +519,8 @@ public class IntentBuilderGeneratorTest {
             "  public TestOne$$IntentBuilder(Context context) {", //
             "    intent = new Intent(context, TestOne.class);", //
             "  }", //
-            "  public TestOne$$IntentBuilder.AllSet key(String key) {", //
-            "    bundler.put(\"key\",key);", //
+            "  public TestOne$$IntentBuilder.AllSet key(String extra) {", //
+            "    bundler.put(\"key\",extra);", //
             "    return new TestOne$$IntentBuilder.AllSet();", //
             "  }", //
             "  public class AllSet {", //
@@ -578,8 +578,8 @@ public class IntentBuilderGeneratorTest {
             "  public Test$$IntentBuilder(Context context) {", //
             "    intent = new Intent(context, Test.class);", //
             "  }", //
-            "  public Test$$IntentBuilder.AllSet key(ExampleParcel key) {", //
-            "    bundler.put(\"key\",org.parceler.Parcels.wrap(key));", //
+            "  public Test$$IntentBuilder.AllSet key(ExampleParcel extra) {", //
+            "    bundler.put(\"key\",org.parceler.Parcels.wrap(extra));", //
             "    return new Test$$IntentBuilder.AllSet();", //
             "  }", //
             "  public class AllSet {", //
@@ -624,13 +624,13 @@ public class IntentBuilderGeneratorTest {
             "  public Test$$IntentBuilder(Context context) {", //
             "    intent = new Intent(context, Test.class);", //
             "  }", //
-            "  public Test$$IntentBuilder.AllSet key(String key) {", //
-            "    bundler.put(\"key\",key);", //
+            "  public Test$$IntentBuilder.AllSet key(String extra) {", //
+            "    bundler.put(\"key\",extra);", //
             "    return new Test$$IntentBuilder.AllSet();", //
             "  }", //
             "  public class AllSet {", //
-            "    public Test$$IntentBuilder.AllSet key2(String key2) {", //
-            "      bundler.put(\"key2\",key2);", //
+            "    public Test$$IntentBuilder.AllSet key2(String extra2) {", //
+            "      bundler.put(\"key2\",extra2);", //
             "      return this;", //
             "    }", //
             "    public Intent build() {", //
@@ -673,8 +673,8 @@ public class IntentBuilderGeneratorTest {
             "  public Test$$IntentBuilder(Context context) {", //
             "    intent = new Intent(context, Test.class);", //
             "  }", //
-            "  public Test$$IntentBuilder key(String key) {", //
-            "    bundler.put(\"key\",key);", //
+            "  public Test$$IntentBuilder key(String extra) {", //
+            "    bundler.put(\"key\",extra);", //
             "    return this;", //
             "  }", //
             "  public Intent build() {", //
@@ -724,8 +724,8 @@ public class IntentBuilderGeneratorTest {
                 "  public Test$$IntentBuilder(Context context) {", //
                 "    intent = new Intent(context, Test.class);", //
                 "  }", //
-                "  public Test$$IntentBuilder.AllSet key(Extra key) {", //
-                "    bundler.put(\"key\",(android.os.Parcelable) key);", //
+                "  public Test$$IntentBuilder.AllSet key(Extra extra) {", //
+                "    bundler.put(\"key\",(android.os.Parcelable) extra);", //
                 "    return new Test$$IntentBuilder.AllSet();", //
                 "  }", //
                 "  public class AllSet {", //
@@ -735,6 +735,51 @@ public class IntentBuilderGeneratorTest {
                 "    }", //
                 "  }", //
                 "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  //TDD https://github.com/f2prateek/dart/issues/59
+  @Test public void injectingExtra_keysAreSanitized() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "public class Test extends Activity {", //
+        "    @InjectExtra(\"a.b\") String extra;", //
+        "}" //
+    ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import java.lang.String;", //
+            "public class Test$$IntentBuilder {", //
+            "  private Intent intent;", //
+            "  private Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Test$$IntentBuilder.AllSet b(String extra) {", //
+            "    bundler.put(\"a.b\",extra);", //
+            "    return new Test$$IntentBuilder.AllSet();", //
+            "  }", //
+            "  public class AllSet {", //
+            "    public Intent build() {", //
+            "      intent.putExtras(bundler.get());", //
+            "      return intent;", //
+            "    }", //
+            "  }", //
+            "}" //
         ));
 
     ASSERT.about(javaSource())
