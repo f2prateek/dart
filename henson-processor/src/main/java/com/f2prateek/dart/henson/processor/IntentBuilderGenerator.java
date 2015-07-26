@@ -28,7 +28,6 @@ import javax.lang.model.type.TypeMirror;
  * The intent builders are invoked by Henson, which is
  * created by {@link HensonNavigatorGenerator}.
  *
- * @see {@link com.f2prateek.dart.henson.Henson} to use this code at runtime.
  * Note: Due to the fact that gradle uses a different classpath to invoke
  * an annotation processor (it doesn't use the same classpath as the one that is used
  * to compile the classes to be compiled), this we can't use android classes in a generator.
@@ -187,8 +186,6 @@ public class IntentBuilderGenerator extends BaseGenerator {
     FieldBinding firstFieldBinding = fieldBindings.iterator().next();
     TypeMirror extraType = firstFieldBinding.getType();
 
-    final String value = extractValue(injection, firstFieldBinding);
-
     final String nextStateSimpleClassName;
     final boolean isInnerClass;
 
@@ -215,10 +212,14 @@ public class IntentBuilderGenerator extends BaseGenerator {
     }
 
     String castToParcelableIfNecessary = doCreateParcelableCastIfExtraIsParcelable(extraType);
-    MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder(injection.getKey())
+    final String firstInjectedFieldName = firstFieldBinding.getName();
+    final String value = extractValue(firstFieldBinding);
+
+    final String sanitizedKey = sanitizeForMethodName(injection.getKey());
+    MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder(sanitizedKey)
         .addModifiers(Modifier.PUBLIC)
         .returns(ClassName.bestGuess(nextStateClassName))
-        .addParameter(TypeName.get(extraType), injection.getKey())
+        .addParameter(TypeName.get(extraType), firstInjectedFieldName)
         .addStatement("bundler.put($S," + castToParcelableIfNecessary + " $L)", injection.getKey(),
             value);
 
@@ -232,12 +233,25 @@ public class IntentBuilderGenerator extends BaseGenerator {
     return nextStateSimpleClassName;
   }
 
+  //TODO this method of sanitation is not good enough
+  //next time there is a bug reported here, do it well
+  //and enforce a java compliant name. There might be some cases where this
+  //can't be derived from a pathological key though (in that we should throw an error)
+  private String sanitizeForMethodName(String key) {
+    final int lastDotIndex = key.lastIndexOf('.');
+    if (lastDotIndex != -1) {
+      key = key.substring(lastDotIndex + 1);
+    }
+    return key;
+  }
+
   /**
    * This method returns either an empty String or {@code "(Parcelable)"} if
    * the extra type is Parcelable. We need this explicit conversion in cases
    * where the extra type is both Parcelable and Serializable. In that
    * case we will prefer Parcelable. Not that the extra type has to directly
    * implement Parcelable, not via a super class.
+   *
    * @param extraType the type that might be parcelable.
    * @return either an empty String or {@code "(Parcelable)"} if
    * the extra type is Parcelable
@@ -260,12 +274,12 @@ public class IntentBuilderGenerator extends BaseGenerator {
     return castToParcelableIfNecessary;
   }
 
-  private String extractValue(ExtraInjection injection, FieldBinding firstFieldBinding) {
+  private String extractValue(FieldBinding firstFieldBinding) {
     final String value;
     if (firstFieldBinding.isParcel()) {
-      value = "org.parceler.Parcels.wrap(" + injection.getKey() + ')';
+      value = "org.parceler.Parcels.wrap(" + firstFieldBinding.getName() + ')';
     } else {
-      value = injection.getKey();
+      value = firstFieldBinding.getName();
     }
     return value;
   }
