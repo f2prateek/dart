@@ -157,6 +157,11 @@ or Gradle:
 compile 'com.f2prateek.dart:henson:(insert latest version)'
 provided 'com.f2prateek.dart:henson-processor:(insert latest version)'
 ```
+
+When using Henson, as Android Studio doesn't call live annotation processors when editing a file, you might prefer using the [apt Android Studio plugin](https://bitbucket.org/hvisser/android-apt). It will allow to use Henson generated DSL right away when you edit your code. 
+
+The Henson annotation processor dependency would then have to be declared within the apt scope instead of provided.
+
 License
 -------
 
