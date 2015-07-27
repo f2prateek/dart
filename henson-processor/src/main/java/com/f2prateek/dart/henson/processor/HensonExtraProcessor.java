@@ -155,7 +155,7 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
     while (currentTarget != null) {
       parentTarget = findParentTarget(currentTarget.parentTarget, targetClassMap);
       if (parentTarget != null) {
-        currentTarget.injectionMap.putAll(parentTarget.injectionMap);
+        injectionTarget.injectionMap.putAll(parentTarget.injectionMap);
       }
       currentTarget = parentTarget;
     }
