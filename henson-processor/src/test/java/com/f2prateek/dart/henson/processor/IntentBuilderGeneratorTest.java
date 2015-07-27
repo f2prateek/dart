@@ -464,6 +464,55 @@ public class IntentBuilderGeneratorTest {
         .generatesSources(expectedSource1, expectedSource2);
   }
 
+  //Test for https://github.com/f2prateek/dart/issues/64
+  @Test public void superclassDifferentKeys_issue64() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "import com.f2prateek.dart.Henson;", //
+        "public abstract class Test extends Activity {", //
+        "    @InjectExtra(\"key\") String extra;", //
+        "}", //
+        "@Henson class TestAwo extends TestOne {", //
+        "}", //
+        "@Henson class TestOne extends Test {", //
+        "}" //
+    ));
+
+    JavaFileObject expectedSource =
+        JavaFileObjects.forSourceString("test/TestTwo_Bundler", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import java.lang.String;", //
+            "public class TestAwo$$IntentBuilder {", //
+            "  private Intent intent;", //
+            "  private Bundler bundler = Bundler.create();", //
+            "  public TestAwo$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, TestAwo.class);", //
+            "  }", //
+            "  public TestAwo$$IntentBuilder.AllSet key(String extra) {", //
+            "    bundler.put(\"key\", extra);", //
+            "    return new TestAwo$$IntentBuilder.AllSet();", //
+            "  }", //
+            "  public class AllSet {", //
+            "    public Intent build() {", //
+            "      intent.putExtras(bundler.get());", //
+            "      return intent;", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(expectedSource);
+  }
+
   @Test public void genericSuperclass() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
