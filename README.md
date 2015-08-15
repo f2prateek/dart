@@ -60,7 +60,7 @@ Henson
 In Dart 2.0, we added an anotation processor that helps you navigate between activities. 
 The new module is called Henson (after [Matthew Henson](https://en.wikipedia.org/wiki/Matthew_Henson), the african american artic explorer that first reached the North Pole) :
 
-For the sample activity mentionned above, Henson would offer a DSL to navigate to it easily : 
+For the sample activity mentioned above, Henson would offer a DSL to navigate to it easily : 
 ```java
 Intent intent = Henson.with(this)
         .gotoExampleActivity()
