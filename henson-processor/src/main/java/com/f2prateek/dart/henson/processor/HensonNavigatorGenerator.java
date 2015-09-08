@@ -144,10 +144,6 @@ public class HensonNavigatorGenerator extends BaseGenerator {
       }
     }
     String commonRoot = packageName.substring(0, indexCommon);
-    final int lastDotIndex = commonRoot.lastIndexOf('.');
-    if (lastDotIndex != -1) {
-      commonRoot = commonRoot.substring(lastDotIndex);
-    }
     return commonRoot;
   }
 
