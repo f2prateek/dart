@@ -40,12 +40,6 @@
     </dependency>
 
     <dependency>
-        <groupId>com.squareup</groupId>
-        <artifactId>javapoet</artifactId>
-        <version>1.0.0</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.google.android</groupId>
       <artifactId>android</artifactId>
       <scope>provided</scope>
