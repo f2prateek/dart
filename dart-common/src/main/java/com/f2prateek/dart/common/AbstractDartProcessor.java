@@ -22,6 +22,7 @@ import com.f2prateek.dart.InjectExtra;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.WildcardType;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -244,8 +245,21 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     String key = element.getAnnotation(InjectExtra.class).value();
     TypeMirror type = element.asType();
     boolean required = isRequiredInjection(element);
-    boolean parcel =
-        hasAnnotationWithFqcn(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
+
+    boolean parcel = false;
+
+    TypeElement collectionTypeElement = elementUtils.getTypeElement(Collection.class.getName());
+    TypeMirror[] wildcardType = {typeUtils.getWildcardType(null, null)};
+    DeclaredType collectionType = typeUtils.getDeclaredType(collectionTypeElement, wildcardType);
+    if (typeUtils.isAssignable(element.asType(), collectionType) && type instanceof DeclaredType) {
+      for (TypeMirror generic : ((DeclaredType) type).getTypeArguments()) {
+        if (hasAnnotationWithFqcn(typeUtils.asElement(generic), "org.parceler.Parcel")) {
+          parcel = true;
+        }
+      }
+    } else {
+      parcel = hasAnnotationWithFqcn(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
+    }
 
     InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, enclosingElement);
     injectionTarget.addField(isNullOrEmpty(key) ? name : key, name, type, required, parcel);
