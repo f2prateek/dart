@@ -8,9 +8,9 @@ Dart is inspired by [ButterKnife][1].
 
 ```java
 class ExampleActivity extends Activity {
-  @InjectExtra("key_1") String extra1;
-  @InjectExtra("key_2") int extra2;
-  @InjectExtra("key_3") User extra3; // User implements Parcelable
+  @InjectExtra String extra1;
+  @InjectExtra int extra2;
+  @InjectExtra User extra3; // User implements Parcelable
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -25,6 +25,8 @@ Simply call one of the `inject()` methods, which will delegate to generated code
 You can inject from an Activity (which uses it's intent extras), Fragment (which use it's arguments)
 or directly from a Bundle.
 
+The key used for the extra will be by default the variable name. However, it can be set manually as a parameter in the annotation: `@InjectExtra("key")`
+
 Optional Injection
 ------------------
 By default all `@InjectExtra` fields are required. An exception will be thrown if the target extra cannot be found.
@@ -33,7 +35,7 @@ To suppress this behavior and create an optional injection, add the `@Nullable` 
 Any annotation with the class name `Nullable` is respected, including ones from the support library annotations and ButterKnife.
 
 ```java
-@Nullable @InjectExtra("key") String title;
+@Nullable @InjectExtra String title;
 ```
 
 Default Values
