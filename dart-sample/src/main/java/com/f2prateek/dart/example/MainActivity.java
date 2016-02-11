@@ -23,6 +23,8 @@ import android.os.Bundle;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.f2prateek.dart.example.SampleActivity.UNEXISTING;
+
 public class MainActivity extends Activity {
 
   @Override protected void onCreate(Bundle savedInstanceState) {
