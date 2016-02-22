@@ -68,7 +68,7 @@ public class HensonNavigatorGeneratorTest {
         .generatesSources(builderSource);
   }
 
-  @Test public void henson() {
+  @Test public void hensonNavigable() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
         "import android.app.Activity;", //
@@ -107,7 +107,49 @@ public class HensonNavigatorGeneratorTest {
         .generatesSources(builderSource);
   }
 
-  @Test public void henson_doesntGotoAbstractClasses() {
+  @Test public void hensonNavigable_withModel() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.TestModel", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "import com.f2prateek.dart.HensonNavigable;", //
+        "@HensonNavigable(model = Foo.class) public class TestModel extends Activity {", //
+        "}", //
+        "class Foo {", //
+        "  @InjectExtra String extra;", //
+        "}" //
+    ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "public class Henson {", //
+            "  private Henson() {", //
+            "  }", //
+            "  public static WithContextSetState with(Context context) {", //
+            "    return new test.Henson.WithContextSetState(context);", //
+            "  }", //
+            "  public static class WithContextSetState {", //
+            "    private Context context;", //
+            "    private WithContextSetState(Context context) {", //
+            "      this.context = context;", //
+            "    }", //
+            "    public TestModel$$IntentBuilder gotoTestModel() {", //
+            "      return new test.TestModel$$IntentBuilder(context);", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError().and()
+        .generatesSources(builderSource);
+  }
+
+  @Test public void hensonNavigable_doesntGotoAbstractClasses() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
         "import android.app.Activity;", //

@@ -41,7 +41,7 @@ public final class InjectionTarget {
     getOrCreateExtraBinding(key).addFieldBinding(new FieldBinding(name, type, required, parcel));
   }
 
-  void setParentTarget(String parentTarget) {
+  public void setParentTarget(String parentTarget) {
     this.parentTarget = parentTarget;
   }
 

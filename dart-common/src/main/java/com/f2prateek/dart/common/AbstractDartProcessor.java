@@ -22,9 +22,10 @@ import com.f2prateek.dart.InjectExtra;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
@@ -33,7 +34,9 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
@@ -99,27 +102,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     this.isDebugEnabled = isDebugEnabled;
   }
 
-  protected Map<TypeElement, InjectionTarget> findAndParseTargets(RoundEnvironment env) {
-    Map<TypeElement, InjectionTarget> targetClassMap =
-        new LinkedHashMap<TypeElement, InjectionTarget>();
-    Set<TypeMirror> erasedTargetTypes = new LinkedHashSet<TypeMirror>();
-
-    // Process each @InjectExtra elements.
-    parseInjectExtraAnnotatedElements(env, targetClassMap, erasedTargetTypes);
-    parseHensonAnnotatedElements(env, targetClassMap, erasedTargetTypes);
-
-    // Try to find a parent injector for each injector.
-    for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
-      String parentClassFqcn = findParentFqcn(entry.getKey(), erasedTargetTypes);
-      if (parentClassFqcn != null) {
-        entry.getValue().setParentTarget(parentClassFqcn);
-      }
-    }
-
-    return targetClassMap;
-  }
-
-  private void parseInjectExtraAnnotatedElements(RoundEnvironment env,
+  protected void parseInjectExtraAnnotatedElements(RoundEnvironment env,
       Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes) {
     for (Element element : env.getElementsAnnotatedWith(InjectExtra.class)) {
       try {
@@ -134,11 +117,12 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     }
   }
 
-  private void parseHensonAnnotatedElements(RoundEnvironment env,
+  protected void parseHensonNavigableAnnotatedElements(RoundEnvironment env,
       Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes) {
+    List<TypeElement> modelTypeElements = new ArrayList<>();
     for (Element element : env.getElementsAnnotatedWith(HensonNavigable.class)) {
       try {
-        parseHenson((TypeElement) element, targetClassMap, erasedTargetTypes);
+        parseHenson((TypeElement) element, targetClassMap, erasedTargetTypes, modelTypeElements);
       } catch (Exception e) {
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
@@ -146,6 +130,9 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
         error(element, "Unable to generate extra injector when parsing @HensonNavigable.\n\n%s",
             stackTrace.toString());
       }
+    }
+    for (TypeElement modelTypeElement : modelTypeElements) {
+      targetClassMap.remove(modelTypeElement);
     }
   }
 
@@ -215,7 +202,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   }
 
   private void parseHenson(TypeElement element, Map<TypeElement, InjectionTarget> targetClassMap,
-      Set<TypeMirror> erasedTargetTypes) {
+      Set<TypeMirror> erasedTargetTypes, List<TypeElement> modelInjectTargets) {
 
     // Verify common generated code restrictions.
     if (!isValidUsageOfHenson(HensonNavigable.class, element)) {
@@ -223,7 +210,23 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     }
 
     // Assemble information on the injection point.
-    getOrCreateTargetClass(targetClassMap, element);
+    InjectionTarget hensonNavigableTarget = getOrCreateTargetClass(targetClassMap, element);
+    //get the model class of Henson annotation
+    AnnotationMirror hensonAnnotationMirror = getAnnotationMirror(element, HensonNavigable.class);
+    TypeMirror modelTypeMirror = getHensonModelMirror(hensonAnnotationMirror);
+    if (modelTypeMirror != null) {
+      TypeElement modelElement = (TypeElement) typeUtils.asElement(modelTypeMirror);
+      if (!"Void".equals(modelElement.getSimpleName())) {
+        if (isDebugEnabled) {
+          System.out.println(String.format("HensonNavigable class %s uses model class %s\n",
+              element.getSimpleName(), modelElement.getSimpleName()));
+        }
+      }
+      //we simply copy all extra injections from the model and add them to the target
+      InjectionTarget modelInjectionTarget = getOrCreateTargetClass(targetClassMap, modelElement);
+      modelInjectTargets.add(modelElement);
+      hensonNavigableTarget.injectionMap.putAll(modelInjectionTarget.injectionMap);
+    }
 
     // Add the type-erased version to the valid injection targets set.
     TypeMirror erasedTargetType = typeUtils.erasure(element.asType());
@@ -233,6 +236,11 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   private void parseInjectExtra(Element element, Map<TypeElement, InjectionTarget> targetClassMap,
       Set<TypeMirror> erasedTargetTypes) {
     TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
+    parseInjectExtra(element, targetClassMap, erasedTargetTypes, enclosingElement);
+  }
+
+  private void parseInjectExtra(Element element, Map<TypeElement, InjectionTarget> targetClassMap,
+      Set<TypeMirror> erasedTargetTypes, TypeElement targetElement) {
 
     // Verify common generated code restrictions.
     if (!isValidUsageOfInjectExtra(InjectExtra.class, element)) {
@@ -247,11 +255,11 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     boolean parcel =
         hasAnnotationWithFqcn(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
 
-    InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, enclosingElement);
+    InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, targetElement);
     injectionTarget.addField(isNullOrEmpty(key) ? name : key, name, type, required, parcel);
 
     // Add the type-erased version to the valid injection targets set.
-    TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
+    TypeMirror erasedTargetType = typeUtils.erasure(targetElement.asType());
     erasedTargetTypes.add(erasedTargetType);
   }
 
@@ -268,6 +276,31 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
       }
     }
     return false;
+  }
+
+  private static AnnotationMirror getAnnotationMirror(TypeElement typeElement, Class<?> clazz) {
+    String clazzName = clazz.getName();
+    for (AnnotationMirror m : typeElement.getAnnotationMirrors()) {
+      if (m.getAnnotationType().toString().equals(clazzName)) {
+        return m;
+      }
+    }
+    return null;
+  }
+
+  private static TypeMirror getHensonModelMirror(AnnotationMirror annotationMirror) {
+    return getAnnotationValue(annotationMirror, "model");
+  }
+
+  private static TypeMirror getAnnotationValue(AnnotationMirror annotationMirror, String key) {
+    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror
+        .getElementValues()
+        .entrySet()) {
+      if (entry.getKey().getSimpleName().toString().equals(key)) {
+        return (TypeMirror) entry.getValue().getValue();
+      }
+    }
+    return null;
   }
 
   /**
@@ -318,7 +351,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   }
 
   /** Finds the parent injector type in the supplied set, if any. */
-  private String findParentFqcn(TypeElement typeElement, Set<TypeMirror> parents) {
+  protected String findParentFqcn(TypeElement typeElement, Set<TypeMirror> parents) {
     TypeMirror type;
     while (true) {
       type = typeElement.getSuperclass();
