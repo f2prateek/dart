@@ -102,6 +102,8 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     this.isDebugEnabled = isDebugEnabled;
   }
 
+  protected abstract Map<TypeElement, InjectionTarget> findAndParseTargets(RoundEnvironment env);
+
   protected void parseInjectExtraAnnotatedElements(RoundEnvironment env,
       Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes) {
     for (Element element : env.getElementsAnnotatedWith(InjectExtra.class)) {
@@ -236,11 +238,6 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   private void parseInjectExtra(Element element, Map<TypeElement, InjectionTarget> targetClassMap,
       Set<TypeMirror> erasedTargetTypes) {
     TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-    parseInjectExtra(element, targetClassMap, erasedTargetTypes, enclosingElement);
-  }
-
-  private void parseInjectExtra(Element element, Map<TypeElement, InjectionTarget> targetClassMap,
-      Set<TypeMirror> erasedTargetTypes, TypeElement targetElement) {
 
     // Verify common generated code restrictions.
     if (!isValidUsageOfInjectExtra(InjectExtra.class, element)) {
@@ -255,11 +252,11 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     boolean parcel =
         hasAnnotationWithFqcn(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
 
-    InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, targetElement);
+    InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, enclosingElement);
     injectionTarget.addField(isNullOrEmpty(key) ? name : key, name, type, required, parcel);
 
     // Add the type-erased version to the valid injection targets set.
-    TypeMirror erasedTargetType = typeUtils.erasure(targetElement.asType());
+    TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
     erasedTargetTypes.add(erasedTargetType);
   }
 
@@ -294,8 +291,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
 
   private static TypeMirror getAnnotationValue(AnnotationMirror annotationMirror, String key) {
     for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror
-        .getElementValues()
-        .entrySet()) {
+        .getElementValues().entrySet()) {
       if (entry.getKey().getSimpleName().toString().equals(key)) {
         return (TypeMirror) entry.getValue().getValue();
       }
