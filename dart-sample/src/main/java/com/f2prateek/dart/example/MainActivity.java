@@ -57,6 +57,12 @@ public class MainActivity extends Activity {
         .build();
 
     startActivity(intent);
+
+    Intent intentService = Henson.with(this)
+        .gotoSampleService()
+        .stringExtra("foo")
+        .build();
+    startService(intentService);
   }
 
 }
