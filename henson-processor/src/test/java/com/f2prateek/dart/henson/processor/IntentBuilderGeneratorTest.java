@@ -76,8 +76,8 @@ public class IntentBuilderGeneratorTest {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
         "import android.app.Activity;", //
-        "import com.f2prateek.dart.Henson;", //
-        "@Henson public class Test extends Activity {", //
+        "import com.f2prateek.dart.HensonNavigable;", //
+        "@HensonNavigable public class Test extends Activity {", //
         "}" //
     ));
 
@@ -113,8 +113,8 @@ public class IntentBuilderGeneratorTest {
         "package test;", //
         "import android.app.Activity;", //
         "import com.f2prateek.dart.InjectExtra;", //
-        "import com.f2prateek.dart.Henson;", //
-        "@Henson public class Test extends Activity {", //
+        "import com.f2prateek.dart.HensonNavigable;", //
+        "@HensonNavigable public class Test extends Activity {", //
         "    @InjectExtra(\"key\") String extra;", //
         "}" //
     ));
@@ -123,7 +123,7 @@ public class IntentBuilderGeneratorTest {
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessors())
         .failsToCompile()
-        .withErrorContaining("@Henson class Test must not contain any @InjectExtra annotation");
+        .withErrorContaining("@HensonNavigable class Test must not contain any @InjectExtra annotation");
   }
 
   @Test public void injectingAllPrimitives() {
@@ -470,13 +470,13 @@ public class IntentBuilderGeneratorTest {
         "package test;", //
         "import android.app.Activity;", //
         "import com.f2prateek.dart.InjectExtra;", //
-        "import com.f2prateek.dart.Henson;", //
+        "import com.f2prateek.dart.HensonNavigable;", //
         "public abstract class Test extends Activity {", //
         "    @InjectExtra(\"key\") String extra;", //
         "}", //
-        "@Henson class TestAwo extends TestOne {", //
+        "@HensonNavigable class TestAwo extends TestOne {", //
         "}", //
-        "@Henson class TestOne extends Test {", //
+        "@HensonNavigable class TestOne extends Test {", //
         "}" //
     ));
 

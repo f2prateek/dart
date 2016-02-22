@@ -17,7 +17,7 @@
 
 package com.f2prateek.dart.common;
 
-import com.f2prateek.dart.Henson;
+import com.f2prateek.dart.HensonNavigable;
 import com.f2prateek.dart.InjectExtra;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -136,14 +136,14 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
 
   private void parseHensonAnnotatedElements(RoundEnvironment env,
       Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes) {
-    for (Element element : env.getElementsAnnotatedWith(Henson.class)) {
+    for (Element element : env.getElementsAnnotatedWith(HensonNavigable.class)) {
       try {
         parseHenson((TypeElement) element, targetClassMap, erasedTargetTypes);
       } catch (Exception e) {
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
 
-        error(element, "Unable to generate extra injector when parsing @Henson.\n\n%s",
+        error(element, "Unable to generate extra injector when parsing @HensonNavigable.\n\n%s",
             stackTrace.toString());
       }
     }
@@ -218,7 +218,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
       Set<TypeMirror> erasedTargetTypes) {
 
     // Verify common generated code restrictions.
-    if (!isValidUsageOfHenson(Henson.class, element)) {
+    if (!isValidUsageOfHenson(HensonNavigable.class, element)) {
       return;
     }
 

@@ -6,5 +6,5 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
-@Retention(SOURCE) @Target(TYPE) public @interface Henson {
+@Retention(SOURCE) @Target(TYPE) public @interface HensonNavigable {
 }

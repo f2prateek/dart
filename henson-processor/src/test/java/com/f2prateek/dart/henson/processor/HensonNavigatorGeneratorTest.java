@@ -72,8 +72,8 @@ public class HensonNavigatorGeneratorTest {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
         "import android.app.Activity;", //
-        "import com.f2prateek.dart.Henson;", //
-        "@Henson public class Test extends Activity {", //
+        "import com.f2prateek.dart.HensonNavigable;", //
+        "@HensonNavigable public class Test extends Activity {", //
         "}" //
     ));
 
@@ -111,8 +111,8 @@ public class HensonNavigatorGeneratorTest {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
         "import android.app.Activity;", //
-        "import com.f2prateek.dart.Henson;", //
-        "@Henson public abstract class Test extends Activity {", //
+        "import com.f2prateek.dart.HensonNavigable;", //
+        "@HensonNavigable public abstract class Test extends Activity {", //
         "}" //
     ));
 
