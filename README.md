@@ -74,7 +74,7 @@ Intent intent = Henson.with(this)
 startActivty(intent);
 ```
 
-Off course, you can add any additional extra to the intent before using it.
+Of course, you can add any additional extra to the intent before using it.
 
 The Henson annotation processor will generate the Henson navigator class (used above) in a package that is : 
 * either the package specified by the `dart.henson.package` annotation processor option
