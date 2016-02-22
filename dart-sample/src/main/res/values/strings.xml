@@ -19,5 +19,6 @@
 
 <resources>
   <string name="app_name">Dart</string>
-  <string name="launch">Launch</string>
+  <string name="launch">Launch first activity</string>
+  <string name="launch2">Launch second activity</string>
 </resources>
