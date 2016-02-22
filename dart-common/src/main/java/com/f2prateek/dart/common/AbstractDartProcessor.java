@@ -223,11 +223,11 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
           System.out.println(String.format("HensonNavigable class %s uses model class %s\n",
               element.getSimpleName(), modelElement.getSimpleName()));
         }
+        //we simply copy all extra injections from the model and add them to the target
+        InjectionTarget modelInjectionTarget = getOrCreateTargetClass(targetClassMap, modelElement);
+        modelInjectTargets.add(modelElement);
+        hensonNavigableTarget.injectionMap.putAll(modelInjectionTarget.injectionMap);
       }
-      //we simply copy all extra injections from the model and add them to the target
-      InjectionTarget modelInjectionTarget = getOrCreateTargetClass(targetClassMap, modelElement);
-      modelInjectTargets.add(modelElement);
-      hensonNavigableTarget.injectionMap.putAll(modelInjectionTarget.injectionMap);
     }
 
     // Add the type-erased version to the valid injection targets set.
