@@ -25,7 +25,7 @@ Simply call one of the `inject()` methods, which will delegate to generated code
 You can inject from an Activity (which uses it's intent extras), Fragment (which use it's arguments)
 or directly from a Bundle.
 
-The key used for the extra will be by default the variable name. However, it can be set manually as a parameter in the annotation: `@InjectExtra("key")`
+The key used for the extra will be the field name by default. However, it can be set manually as a parameter in the annotation: `@InjectExtra("key")`
 
 Optional Injection
 ------------------
