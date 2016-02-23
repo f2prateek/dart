@@ -45,4 +45,31 @@ public class MainActivity extends Activity {
 
       startActivity(intent);
   }
+
+  @OnClick(R.id.button2) public void onLaunchButton2Click() {
+    Intent intent = Henson.with(this)
+        .gotoSampleModelActivity()
+        .defaultKeyExtra("defaultKeyExtra")
+        .extraInt(4)
+        .extraParcel(new ExampleParcel("Andy"))
+        .extraParcelable(ComplexParcelable.random())
+        .extraString("a string")
+        .build();
+
+    Intent intentSampleFragment = Henson.with(this)
+        .gotoSampleFragment()
+        .foo("bar")
+        .build();
+
+    intent.putExtras(intentSampleFragment);
+    startActivity(intent);
+
+
+    Intent intentService = Henson.with(this)
+        .gotoSampleService()
+        .stringExtra("foo")
+        .build();
+    startService(intentService);
+  }
+
 }
