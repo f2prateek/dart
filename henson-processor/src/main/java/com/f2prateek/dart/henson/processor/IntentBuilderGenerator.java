@@ -215,8 +215,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
     final String firstInjectedFieldName = firstFieldBinding.getName();
     final String value = extractValue(firstFieldBinding);
 
-    final String sanitizedKey = sanitizeForMethodName(injection.getKey());
-    MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder(sanitizedKey)
+    MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder(injection.getKey())
         .addModifiers(Modifier.PUBLIC)
         .returns(ClassName.bestGuess(nextStateClassName))
         .addParameter(TypeName.get(extraType), firstInjectedFieldName)

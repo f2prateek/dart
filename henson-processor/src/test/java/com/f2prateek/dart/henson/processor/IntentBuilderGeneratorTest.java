@@ -843,7 +843,6 @@ public class IntentBuilderGeneratorTest {
         .generatesSources(builderSource);
   }
 
-  //TDD https://github.com/f2prateek/dart/issues/59
   @Test public void injectingExtra_keysAreSanitized() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
@@ -854,37 +853,12 @@ public class IntentBuilderGeneratorTest {
         "}" //
     ));
 
-    JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
-            "package test;", //
-            "import android.content.Context;", //
-            "import android.content.Intent;", //
-            "import com.f2prateek.dart.henson.Bundler;", //
-            "import java.lang.String;", //
-            "public class Test$$IntentBuilder {", //
-            "  private Intent intent;", //
-            "  private Bundler bundler = Bundler.create();", //
-            "  public Test$$IntentBuilder(Context context) {", //
-            "    intent = new Intent(context, Test.class);", //
-            "  }", //
-            "  public Test$$IntentBuilder.AllSet b(String extra) {", //
-            "    bundler.put(\"a.b\",extra);", //
-            "    return new Test$$IntentBuilder.AllSet();", //
-            "  }", //
-            "  public class AllSet {", //
-            "    public Intent build() {", //
-            "      intent.putExtras(bundler.get());", //
-            "      return intent;", //
-            "    }", //
-            "  }", //
-            "}" //
-        ));
-
     ASSERT.about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+        .failsToCompile()
+        .withErrorContaining("Keys have to be valid java variable identifiers.")
+        .in(source)
+        .onLine(5);
   }
 }
