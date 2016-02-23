@@ -18,6 +18,7 @@
 package com.f2prateek.dart.example;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.widget.TextView;
 import butterknife.ButterKnife;
@@ -27,9 +28,10 @@ import com.f2prateek.dart.HensonNavigable;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.Nullable;
 
-@HensonNavigable(model = SampleModelActivity.Model.class)
-public class SampleModelActivity extends Activity {
+@HensonNavigable(model = SampleModelActivity.Model.class) public class SampleModelActivity
+    extends Activity {
 
+  public static final String TAG_SAMPLE_FRAGMENT = "SampleFragment";
   @InjectView(R.id.default_key_extra) TextView defaultKeyExtraTextView;
   @InjectView(R.id.string_extra) TextView stringExtraTextView;
   @InjectView(R.id.int_extra) TextView intExtraTextView;
@@ -40,7 +42,8 @@ public class SampleModelActivity extends Activity {
 
   private Model model = new Model();
 
-  @Override protected void onCreate(Bundle savedInstanceState) {
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_sample);
 
@@ -55,6 +58,17 @@ public class SampleModelActivity extends Activity {
     parcelExtraTextView.setText(String.valueOf(model.parcelExtra.getName()));
     defaultExtraTextView.setText(String.valueOf(model.defaultExtra));
     defaultKeyExtraTextView.setText(model.defaultKeyExtra);
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    Fragment sampleFragment = getFragmentManager().findFragmentByTag(TAG_SAMPLE_FRAGMENT);
+    if (sampleFragment == null) {
+      getFragmentManager().beginTransaction()
+          .add(new SampleFragment(), TAG_SAMPLE_FRAGMENT)
+          .commit();
+    }
   }
 
   public static class Model {
@@ -74,6 +88,5 @@ public class SampleModelActivity extends Activity {
     @Nullable @InjectExtra(EXTRA_OPTIONAL) String optionalExtra;
     @Nullable @InjectExtra(EXTRA_WITH_DEFAULT) String defaultExtra = DEFAULT_EXTRA_VALUE;
     @InjectExtra String defaultKeyExtra;
-
   }
 }

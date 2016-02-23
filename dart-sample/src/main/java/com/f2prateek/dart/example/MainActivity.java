@@ -56,7 +56,14 @@ public class MainActivity extends Activity {
         .extraString("a string")
         .build();
 
+    Intent intentSampleFragment = Henson.with(this)
+        .gotoSampleFragment()
+        .foo("bar")
+        .build();
+
+    intent.putExtras(intentSampleFragment);
     startActivity(intent);
+
 
     Intent intentService = Henson.with(this)
         .gotoSampleService()
