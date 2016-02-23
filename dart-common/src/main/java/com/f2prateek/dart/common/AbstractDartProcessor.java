@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,6 +72,21 @@ import static javax.tools.Diagnostic.Kind.ERROR;
  */
 public abstract class AbstractDartProcessor extends AbstractProcessor {
   public static final String OPTION_DART_DEBUG = "dart.debug";
+
+  private static final Set<String> JAVA_KEYWORDS = new HashSet<>(Arrays.asList(
+      "abstract",  "assert",       "boolean",    "break",      "byte",      "case",
+      "catch",     "char",         "class",      "const",     "continue",   "enum",
+      "default",   "do",           "double",     "else",      "extends",    "while",
+      "false",     "final",        "finally",    "float",     "for",
+      "goto",      "if",           "implements", "import",    "instanceof",
+      "int",       "interface",    "long",       "native",    "new",
+      "null",      "package",      "private",    "protected", "public",
+      "return",    "short",        "static",     "strictfp",  "super",
+      "switch",    "synchronized", "this",       "throw",     "throws",
+      "transient", "true",         "try",        "void",      "volatile"
+    ));
+
+
 
   private Elements elementUtils;
   private Types typeUtils;
@@ -252,15 +268,21 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
       return;
     }
 
+    String annotationValue = element.getAnnotation(InjectExtra.class).value();
+    if (!isNullOrEmpty(annotationValue) && !isValidJavaIdentifier(annotationValue)) {
+      throw new IllegalArgumentException("Keys have to be valid java variable identifiers. "
+          + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html");
+    }
+
     // Assemble information on the injection point.
     String name = element.getSimpleName().toString();
-    String key = element.getAnnotation(InjectExtra.class).value();
+    String key = isNullOrEmpty(annotationValue) ? name : annotationValue;
     TypeMirror type = element.asType();
     boolean required = isRequiredInjection(element);
     boolean parcel = isParcel(type);
 
     InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, enclosingElement);
-    injectionTarget.addField(isNullOrEmpty(key) ? name : key, name, type, required, parcel);
+    injectionTarget.addField(key, name, type, required, parcel);
 
     // Add the type-erased version to the valid injection targets set.
     TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
@@ -463,5 +485,30 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
 
   private String getPackageName(TypeElement type) {
     return elementUtils.getPackageOf(type).getQualifiedName().toString();
+  }
+
+  /**
+   * Returns true if the string is a valid Java identifier.
+   * See <a href="https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html">Identifiers</a>
+   *
+   * @param str the string to be examined
+   * @return true if str is a valid Java identifier
+   */
+  static boolean isValidJavaIdentifier(String str) {
+    if (isNullOrEmpty(str)) {
+      return false;
+    }
+    if (JAVA_KEYWORDS.contains(str)) {
+      return false;
+    }
+    if (!Character.isJavaIdentifierStart(str.charAt(0))) {
+      return false;
+    }
+    for (int i = 1; i < str.length(); i++) {
+      if (!Character.isJavaIdentifierPart(str.charAt(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 }
