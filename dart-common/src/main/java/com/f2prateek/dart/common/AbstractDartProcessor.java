@@ -22,11 +22,20 @@ import com.f2prateek.dart.InjectExtra;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -244,21 +253,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     String key = element.getAnnotation(InjectExtra.class).value();
     TypeMirror type = element.asType();
     boolean required = isRequiredInjection(element);
-
-    boolean parcel = false;
-
-    TypeElement collectionTypeElement = elementUtils.getTypeElement(Collection.class.getName());
-    TypeMirror[] wildcardType = {typeUtils.getWildcardType(null, null)};
-    DeclaredType collectionType = typeUtils.getDeclaredType(collectionTypeElement, wildcardType);
-    if (typeUtils.isAssignable(element.asType(), collectionType) && type instanceof DeclaredType) {
-      for (TypeMirror generic : ((DeclaredType) type).getTypeArguments()) {
-        if (hasAnnotationWithFqcn(typeUtils.asElement(generic), "org.parceler.Parcel")) {
-          parcel = true;
-        }
-      }
-    } else {
-      parcel = hasAnnotationWithFqcn(typeUtils.asElement(element.asType()), "org.parceler.Parcel");
-    }
+    boolean parcel = isParcel(type);
 
     InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, enclosingElement);
     injectionTarget.addField(isNullOrEmpty(key) ? name : key, name, type, required, parcel);
@@ -266,6 +261,72 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     // Add the type-erased version to the valid injection targets set.
     TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
     erasedTargetTypes.add(erasedTargetType);
+  }
+
+  private boolean isParcel(TypeMirror type) {
+    List<Element> supportedTypes = getTypeElements(
+            new Class[]{Byte.class, Double.class, Float.class, Integer.class,
+                        Long.class, Character.class, Boolean.class, String.class});
+
+    List<Element> singleGenericCollections = getTypeElements(
+            new Class[]{List.class, ArrayList.class, LinkedList.class,
+                        Set.class, HashSet.class, SortedSet.class, TreeSet.class,
+                        LinkedHashSet.class});
+
+    List<Element> doubleGenericCollections = getTypeElements(
+            new Class[]{Map.class, HashMap.class, LinkedHashMap.class,
+                        SortedMap.class, TreeMap.class});
+
+    return isParcelRecursive(
+            type,
+            supportedTypes,
+            singleGenericCollections,
+            doubleGenericCollections,
+            false);
+  }
+
+  private boolean isParcelRecursive(TypeMirror type,
+                                    List<Element> supportedTypes,
+                                    List<Element> singleGenericCollections,
+                                    List<Element> doubleGenericCollections,
+                                    boolean subCollection) {
+    if (subCollection && existsWithin(type, supportedTypes)) {
+      return true;
+    }
+    if (hasAnnotationWithFqcn(typeUtils.asElement(type), "org.parceler.Parcel")) {
+      return true;
+    }
+    if (type instanceof DeclaredType) {
+      DeclaredType declaredType = (DeclaredType) type;
+      if (existsWithin(type, singleGenericCollections)) {
+        return isParcelRecursive(declaredType.getTypeArguments().get(0),
+                supportedTypes, singleGenericCollections, doubleGenericCollections, true);
+      }
+      if (existsWithin(type, doubleGenericCollections)) {
+        return isParcelRecursive(declaredType.getTypeArguments().get(0),
+                supportedTypes, singleGenericCollections, doubleGenericCollections, true)
+                && isParcelRecursive(declaredType.getTypeArguments().get(1),
+                        supportedTypes, singleGenericCollections, doubleGenericCollections, true);
+      }
+    }
+    return false;
+  }
+
+  private boolean existsWithin(TypeMirror type, List<Element> supportedTypes) {
+    for (Element supportedType : supportedTypes) {
+      if (typeUtils.erasure(type).equals(typeUtils.erasure(supportedType.asType()))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private List<Element> getTypeElements(Class[] input) {
+    List<Element> elements = new ArrayList<>();
+    for (Class clazz : input) {
+      elements.add(elementUtils.getTypeElement(clazz.getName()));
+    }
+    return elements;
   }
 
   /**

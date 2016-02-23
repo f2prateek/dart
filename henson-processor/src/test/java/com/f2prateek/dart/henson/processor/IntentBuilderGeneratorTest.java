@@ -592,6 +592,8 @@ public class IntentBuilderGeneratorTest {
   @Test public void injectingParcelExtra() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
+        "import java.util.List;", //
+        "import java.util.Map;", //
         "import android.app.Activity;", //
         "import com.f2prateek.dart.InjectExtra;", //
         "import org.parceler.Parcel;", //
@@ -612,6 +614,8 @@ public class IntentBuilderGeneratorTest {
         "}", //
         "public class Test extends Activity {", //
         "    @InjectExtra(\"key\") ExampleParcel extra;", //
+        "    @InjectExtra(\"list\") List<ExampleParcel> listExtra;", //
+        "    @InjectExtra(\"mapNestedExtra\") Map<List<String>, List<ExampleParcel>> mapNestedExtra;", //
         "}" //
     ));
 
@@ -621,15 +625,31 @@ public class IntentBuilderGeneratorTest {
             "import android.content.Context;", //
             "import android.content.Intent;", //
             "import com.f2prateek.dart.henson.Bundler;", //
+            "import java.lang.String;", //
+            "import java.util.List;", //
+            "import java.util.Map;", //
             "public class Test$$IntentBuilder {", //
             "  private Intent intent;", //
             "  private Bundler bundler = Bundler.create();", //
             "  public Test$$IntentBuilder(Context context) {", //
             "    intent = new Intent(context, Test.class);", //
             "  }", //
-            "  public Test$$IntentBuilder.AllSet key(ExampleParcel extra) {", //
-            "    bundler.put(\"key\",org.parceler.Parcels.wrap(extra));", //
-            "    return new Test$$IntentBuilder.AllSet();", //
+            "  public Test$$IntentBuilder.AfterSettingKey key(ExampleParcel extra) {", //
+            "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
+            "    return new Test$$IntentBuilder.AfterSettingKey();", //
+            "  }", //
+            "  public class AfterSettingKey {", //
+            "    public Test$$IntentBuilder.AfterSettingList list(List<ExampleParcel> listExtra) {", //
+            "      bundler.put(\"list\", org.parceler.Parcels.wrap(listExtra));", //
+            "      return new Test$$IntentBuilder.AfterSettingList();", //
+            "    }", //
+            "  }", //
+            "", //
+            "  public class AfterSettingList {", //
+            "    public Test$$IntentBuilder.AllSet mapNestedExtra(Map<List<String>, List<ExampleParcel>> mapNestedExtra) {", //
+            "      bundler.put(\"mapNestedExtra\", org.parceler.Parcels.wrap(mapNestedExtra));", //
+            "      return new Test$$IntentBuilder.AllSet();", //
+            "    }", //
             "  }", //
             "  public class AllSet {", //
             "    public Intent build() {", //
