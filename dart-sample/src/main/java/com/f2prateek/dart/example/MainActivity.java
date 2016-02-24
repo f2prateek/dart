@@ -20,8 +20,11 @@ package com.f2prateek.dart.example;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.SparseArray;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity {
 
@@ -34,12 +37,25 @@ public class MainActivity extends Activity {
   }
 
   @OnClick(R.id.button) public void onLaunchButtonClick() {
+    ExampleParcel parcel1 = new ExampleParcel("Andy");
+    ExampleParcel parcel2 = new ExampleParcel("Tony");
+
+    List<ExampleParcel> parcelList = new ArrayList<>();
+    parcelList.add(parcel1);
+    parcelList.add(parcel2);
+
+    SparseArray<ExampleParcel> parcelSparseArray = new SparseArray<>();
+    parcelSparseArray.put(0, parcel1);
+    parcelSparseArray.put(2, parcel2);
+
     Intent intent = Henson.with(this)
         .gotoSampleActivity()
         .defaultKeyExtra("defaultKeyExtra")
         .extraInt(4)
-        .extraParcel(new ExampleParcel("Andy"))
+        .extraListParcelable(parcelList)
+        .extraParcel(parcel1)
         .extraParcelable(ComplexParcelable.random())
+        .extraSparseArrayParcelable(parcelSparseArray)
         .extraString("a string")
         .build();
 
@@ -47,6 +63,7 @@ public class MainActivity extends Activity {
   }
 
   @OnClick(R.id.button2) public void onLaunchButton2Click() {
+    // Include fragment extras
     Intent intent = Henson.with(this)
         .gotoSampleModelActivity()
         .defaultKeyExtra("defaultKeyExtra")
@@ -64,7 +81,7 @@ public class MainActivity extends Activity {
     intent.putExtras(intentSampleFragment);
     startActivity(intent);
 
-
+    // Service
     Intent intentService = Henson.with(this)
         .gotoSampleService()
         .stringExtra("foo")

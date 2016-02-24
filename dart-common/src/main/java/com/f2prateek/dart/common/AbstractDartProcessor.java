@@ -17,6 +17,7 @@
 
 package com.f2prateek.dart.common;
 
+import android.util.SparseArray;
 import com.f2prateek.dart.HensonNavigable;
 import com.f2prateek.dart.InjectExtra;
 import java.io.PrintWriter;
@@ -73,6 +74,9 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 public abstract class AbstractDartProcessor extends AbstractProcessor {
   public static final String OPTION_DART_DEBUG = "dart.debug";
 
+  // @formatter:off
+  //You must go to Preferences->Code Style->General->Formatter Control
+  // and check Enable formatter markers in comments for this to work.
   private static final Set<String> JAVA_KEYWORDS = new HashSet<>(Arrays.asList(
       "abstract",  "assert",       "boolean",    "break",      "byte",      "case",
       "catch",     "char",         "class",      "const",     "continue",   "enum",
@@ -84,14 +88,16 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
       "return",    "short",        "static",     "strictfp",  "super",
       "switch",    "synchronized", "this",       "throw",     "throws",
       "transient", "true",         "try",        "void",      "volatile"
-    ));
+  ));
+  // @formatter:on
 
-
-
+  private List<Element> singleCollections;
+  private List<Element> doubleCollections;
   private Elements elementUtils;
   private Types typeUtils;
   protected Filer filer;
   protected boolean isDebugEnabled;
+  protected boolean usesParcelerOption = true;
 
   @Override public synchronized void init(ProcessingEnvironment env) {
     super.init(env);
@@ -100,9 +106,15 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     typeUtils = env.getTypeUtils();
     filer = env.getFiler();
 
+    initGenericCollectionLists();
+
     final Map<String, String> options = env.getOptions();
     isDebugEnabled |= options.containsKey(OPTION_DART_DEBUG) && Boolean.parseBoolean(
         options.get(OPTION_DART_DEBUG));
+  }
+
+  public void setUsesParcelerOption(boolean usesParcelerOption) {
+    this.usesParcelerOption = usesParcelerOption;
   }
 
   @Override public Set<String> getSupportedAnnotationTypes() {
@@ -127,6 +139,16 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   }
 
   protected abstract Map<TypeElement, InjectionTarget> findAndParseTargets(RoundEnvironment env);
+
+  private void initGenericCollectionLists() {
+    singleCollections = getTypeElements(new Class[] {
+        List.class, ArrayList.class, LinkedList.class, Set.class, HashSet.class, SortedSet.class,
+        TreeSet.class, LinkedHashSet.class, SparseArray.class
+    });
+    doubleCollections = getTypeElements(new Class[] {
+        Map.class, HashMap.class, LinkedHashMap.class, SortedMap.class, TreeMap.class
+    });
+  }
 
   protected void parseInjectExtraAnnotatedElements(RoundEnvironment env,
       Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes) {
@@ -208,6 +230,17 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
       valid = false;
     }
 
+    //Verify that the type is primitive or serializable or parcelable
+    TypeMirror typeElement = element.asType();
+    if (!isValidExtraType(typeElement)
+        && !(isParcelerAvailable() && isValidExtraTypeForParceler(typeElement))) {
+      error(element, "@%s field must be a primitive or Serializable or Parcelable (%s.%s). "
+          + "If you use Parceler, all types supported by Parceler are allowed.",
+          annotationClass.getSimpleName(), enclosingElement.getQualifiedName(),
+          element.getSimpleName());
+      valid = false;
+    }
+
     // Verify containing type.
     if (enclosingElement.getKind() != CLASS) {
       error(enclosingElement, "@%s fields may only be contained in classes. (%s.%s)",
@@ -225,6 +258,59 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     }
 
     return valid;
+  }
+
+  private boolean isValidExtraType(TypeMirror type) {
+    return isSerializable(type) || isParcelable(type) || isCharSequence(type);
+  }
+
+  private boolean isValidExtraTypeForParceler(TypeMirror type) {
+    return isValidForParceler(type, false);
+  }
+
+  private boolean isValidForParceler(TypeMirror type, boolean subCollection) {
+    if (subCollection && (isSerializable(type) || isParcelable(type))) {
+      return true;
+    }
+    if (isAnnotatedWithParcel(type)) {
+      return true;
+    }
+    if (type instanceof DeclaredType) {
+      DeclaredType declaredType = (DeclaredType) type;
+      if (existsWithin(type, singleCollections)) {
+        return isValidForParceler(declaredType.getTypeArguments().get(0), true);
+      }
+      if (existsWithin(type, doubleCollections)) {
+        return isValidForParceler(declaredType.getTypeArguments().get(0), true)
+            && isValidForParceler(declaredType.getTypeArguments().get(1), true);
+      }
+    }
+    return false;
+  }
+
+  private boolean isSerializable(TypeMirror type) {
+    TypeMirror serializableTypeMirror =
+        elementUtils.getTypeElement("java.io.Serializable").asType();
+    return typeUtils.isAssignable(type, serializableTypeMirror);
+  }
+
+  private boolean isParcelable(TypeMirror type) {
+    TypeMirror parcelableTypeMirror = elementUtils.getTypeElement("android.os.Parcelable").asType();
+    return typeUtils.isAssignable(type, parcelableTypeMirror);
+  }
+
+  private boolean isCharSequence(TypeMirror type) {
+    TypeMirror charSequenceTypeMirror =
+        elementUtils.getTypeElement("java.lang.CharSequence").asType();
+    return typeUtils.isAssignable(type, charSequenceTypeMirror);
+  }
+
+  private boolean isParcelerAvailable() {
+    return usesParcelerOption && elementUtils.getTypeElement("org.parceler.Parcel") != null;
+  }
+
+  private boolean isAnnotatedWithParcel(TypeMirror type) {
+    return hasAnnotationWithFqcn(typeUtils.asElement(type), "org.parceler.Parcel");
   }
 
   private void parseHenson(TypeElement element, Map<TypeElement, InjectionTarget> targetClassMap,
@@ -279,7 +365,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     String key = isNullOrEmpty(annotationValue) ? name : annotationValue;
     TypeMirror type = element.asType();
     boolean required = isRequiredInjection(element);
-    boolean parcel = isParcel(type);
+    boolean parcel = isParcelerAvailable() && isValidExtraTypeForParceler(type);
 
     InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, enclosingElement);
     injectionTarget.addField(key, name, type, required, parcel);
@@ -287,55 +373,6 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     // Add the type-erased version to the valid injection targets set.
     TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
     erasedTargetTypes.add(erasedTargetType);
-  }
-
-  private boolean isParcel(TypeMirror type) {
-    List<Element> supportedTypes = getTypeElements(
-            new Class[]{Byte.class, Double.class, Float.class, Integer.class,
-                        Long.class, Character.class, Boolean.class, String.class});
-
-    List<Element> singleGenericCollections = getTypeElements(
-            new Class[]{List.class, ArrayList.class, LinkedList.class,
-                        Set.class, HashSet.class, SortedSet.class, TreeSet.class,
-                        LinkedHashSet.class});
-
-    List<Element> doubleGenericCollections = getTypeElements(
-            new Class[]{Map.class, HashMap.class, LinkedHashMap.class,
-                        SortedMap.class, TreeMap.class});
-
-    return isParcelRecursive(
-            type,
-            supportedTypes,
-            singleGenericCollections,
-            doubleGenericCollections,
-            false);
-  }
-
-  private boolean isParcelRecursive(TypeMirror type,
-                                    List<Element> supportedTypes,
-                                    List<Element> singleGenericCollections,
-                                    List<Element> doubleGenericCollections,
-                                    boolean subCollection) {
-    if (subCollection && existsWithin(type, supportedTypes)) {
-      return true;
-    }
-    if (hasAnnotationWithFqcn(typeUtils.asElement(type), "org.parceler.Parcel")) {
-      return true;
-    }
-    if (type instanceof DeclaredType) {
-      DeclaredType declaredType = (DeclaredType) type;
-      if (existsWithin(type, singleGenericCollections)) {
-        return isParcelRecursive(declaredType.getTypeArguments().get(0),
-                supportedTypes, singleGenericCollections, doubleGenericCollections, true);
-      }
-      if (existsWithin(type, doubleGenericCollections)) {
-        return isParcelRecursive(declaredType.getTypeArguments().get(0),
-                supportedTypes, singleGenericCollections, doubleGenericCollections, true)
-                && isParcelRecursive(declaredType.getTypeArguments().get(1),
-                        supportedTypes, singleGenericCollections, doubleGenericCollections, true);
-      }
-    }
-    return false;
   }
 
   private boolean existsWithin(TypeMirror type, List<Element> supportedTypes) {
@@ -395,7 +432,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   }
 
   /**
-   * Returns {@code true} if an injection is deemed to be not required. This happens if it is
+   * Returns {@code true} if an injection is deemed to be required. Returns false when a field is
    * annotated with any annotation named {@code Optional} or {@code Nullable}.
    */
   private static boolean isRequiredInjection(Element element) {

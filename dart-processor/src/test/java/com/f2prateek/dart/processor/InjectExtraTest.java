@@ -58,7 +58,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(injectorSource);
@@ -84,58 +84,66 @@ public class InjectExtraTest {
     JavaFileObject injectorSource =
         JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
-                "import com.f2prateek.dart.Dart;", //
-                "import java.lang.Object;", //
-                "public class Test$$ExtraInjector {", //
-                "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
-                "    Object object;", //
-                "    object = finder.getExtra(source, \"key_bool\");", //
-                "    if (object == null) {", //
-                "      throw new IllegalStateException(\"Required extra with key 'key_bool' for field 'aBool' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                "    }", //
-                "    target.aBool = (boolean) object;", //
-                "    object = finder.getExtra(source, \"key_byte\");", //
-                "    if (object == null) {", //
-                "      throw new IllegalStateException(\"Required extra with key 'key_byte' for field 'aByte' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                "    }", //
-                "    target.aByte = (byte) object;", //
-                "    object = finder.getExtra(source, \"key_short\");", //
-                "    if (object == null) {", //
-                "      throw new IllegalStateException(\"Required extra with key 'key_short' for field 'aShort' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                "    }", //
-                "    target.aShort = (short) object;", //
-                "    object = finder.getExtra(source, \"key_int\");", //
-                "    if (object == null) {", //
-                "      throw new IllegalStateException(\"Required extra with key 'key_int' for field 'anInt' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                "    }", //
-                "    target.anInt = (int) object;", //
-                "    object = finder.getExtra(source, \"key_long\");", //
-                "    if (object == null) {", //
-                "      throw new IllegalStateException(\"Required extra with key 'key_long' for field 'aLong' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                "    }", //
-                "    target.aLong = (long) object;", //
-                "    object = finder.getExtra(source, \"key_char\");", //
-                "    if (object == null) {", //
-                "      throw new IllegalStateException(\"Required extra with key 'key_char' for field 'aChar' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                "    }", //
-                "    target.aChar = (char) object;", //
-                "    object = finder.getExtra(source, \"key_float\");", //
-                "    if (object == null) {", //
-                "      throw new IllegalStateException(\"Required extra with key 'key_float' for field 'aFloat' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                "    }", //
-                "    target.aFloat = (float) object;", //
-                "    object = finder.getExtra(source, \"key_double\");", //
-                "    if (object == null) {", //
-                "      throw new IllegalStateException(\"Required extra with key 'key_double' for field 'aDouble' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                "    }", //
-                "    target.aDouble = (double) object;", //
-                "  }", //
-                "}" //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "public class Test$$ExtraInjector {", //
+            "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+            "    Object object;", //
+            "    object = finder.getExtra(source, \"key_bool\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_bool' for field 'aBool' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
+            "    }", //
+            "    target.aBool = (boolean) object;", //
+            "    object = finder.getExtra(source, \"key_byte\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_byte' for field 'aByte' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
+            "    }", //
+            "    target.aByte = (byte) object;", //
+            "    object = finder.getExtra(source, \"key_short\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_short' for field 'aShort' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
+            "    }", //
+            "    target.aShort = (short) object;", //
+            "    object = finder.getExtra(source, \"key_int\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_int' for field 'anInt' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
+            "    }", //
+            "    target.anInt = (int) object;", //
+            "    object = finder.getExtra(source, \"key_long\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_long' for field 'aLong' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
+            "    }", //
+            "    target.aLong = (long) object;", //
+            "    object = finder.getExtra(source, \"key_char\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_char' for field 'aChar' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
+            "    }", //
+            "    target.aChar = (char) object;", //
+            "    object = finder.getExtra(source, \"key_float\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_float' for field 'aFloat' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
+            "    }", //
+            "    target.aFloat = (float) object;", //
+            "    object = finder.getExtra(source, \"key_double\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key_double' for field 'aDouble' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            //
+            "    }", //
+            "    target.aDouble = (double) object;", //
+            "  }", //
+            "}" //
         ));
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(injectorSource);
@@ -176,7 +184,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource);
@@ -215,7 +223,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource);
@@ -237,7 +245,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError();
   }
 
@@ -271,7 +279,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource);
@@ -309,7 +317,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource);
@@ -329,7 +337,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .failsToCompile()
         .withErrorContaining(
             String.format("@InjectExtra fields may not be contained in private classes. (%s)",
@@ -350,7 +358,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .failsToCompile()
         .withErrorContaining(
             String.format("@InjectExtra fields must not be private or static. (%s)",
@@ -371,7 +379,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .failsToCompile()
         .withErrorContaining(
             String.format("@InjectExtra fields must not be private or static. (%s)",
@@ -392,7 +400,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .failsToCompile()
         .withErrorContaining(
             String.format("@InjectExtra fields may only be contained in classes. (%s)",
@@ -457,7 +465,7 @@ public class InjectExtraTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);
@@ -499,28 +507,26 @@ public class InjectExtraTest {
 
     JavaFileObject expectedSource2 =
         JavaFileObjects.forSourceString("test/TestOne$$ExtraInjector", Joiner.on('\n').join( //
-                "package test;", //
-                "import com.f2prateek.dart.Dart;", //
-                "import java.lang.Object;", //
-                "import java.lang.String;", //
-                "public class TestOne$$ExtraInjector {", //
-                "  public static void inject(Dart.Finder finder, TestOne target, Object source) {",
-                //
-                "    Test$$ExtraInjector.inject(finder, target, source);", //
-                "    Object object;", //
-                "    object = finder.getExtra(source, \"key\");", //
-                "    if (object == null) {", //
-                "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1' was not found. If this extra is optional add '@Nullable' annotation.\");",
-                //
-                "    }", //
-                "    target.extra1 = (String) object;", //
-                "  }", //
-                "}" //
-            ));
+            "package test;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "import java.lang.String;", //
+            "public class TestOne$$ExtraInjector {", //
+            "  public static void inject(Dart.Finder finder, TestOne target, Object source) {",
+            "    Test$$ExtraInjector.inject(finder, target, source);", //
+            "    Object object;", //
+            "    object = finder.getExtra(source, \"key\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1' was not found. If this extra is optional add '@Nullable' annotation.\");",
+            "    }", //
+            "    target.extra1 = (String) object;", //
+            "  }", //
+            "}" //
+        ));
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);

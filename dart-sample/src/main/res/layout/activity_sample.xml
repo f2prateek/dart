@@ -65,6 +65,20 @@
       style="@android:style/TextAppearance.Large"
       />
   <TextView
+      android:id="@+id/list_parcel_extra"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      style="@android:style/TextAppearance.Large"
+      />
+  <TextView
+      android:id="@+id/sparse_array_parcel_extra"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      style="@android:style/TextAppearance.Large"
+      />
+  <TextView
       android:id="@+id/default_extra"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"

@@ -24,4 +24,11 @@ final class ProcessorTestUtilities {
   static Iterable<? extends Processor> hensonProcessors() {
     return Arrays.asList(new HensonExtraProcessor());
   }
+
+  static Iterable<? extends Processor> hensonProcessorsWithoutParceler() {
+    HensonExtraProcessor hensonExtraProcessor = new HensonExtraProcessor();
+    hensonExtraProcessor.setUsesParcelerOption(false);
+    return Arrays.asList(hensonExtraProcessor);
+  }
+
 }
