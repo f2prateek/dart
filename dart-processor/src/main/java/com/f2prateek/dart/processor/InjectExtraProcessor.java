@@ -69,10 +69,9 @@ public final class InjectExtraProcessor extends AbstractDartProcessor {
     return false;
   }
 
-  protected Map<TypeElement, InjectionTarget> findAndParseTargets(RoundEnvironment env) {
-    Map<TypeElement, InjectionTarget> targetClassMap =
-        new LinkedHashMap<TypeElement, InjectionTarget>();
-    Set<TypeMirror> erasedTargetTypes = new LinkedHashSet<TypeMirror>();
+  @Override protected Map<TypeElement, InjectionTarget> findAndParseTargets(RoundEnvironment env) {
+    Map<TypeElement, InjectionTarget> targetClassMap = new LinkedHashMap<>();
+    Set<TypeMirror> erasedTargetTypes = new LinkedHashSet<>();
 
     // Process each @InjectExtra elements.
     parseInjectExtraAnnotatedElements(env, targetClassMap, erasedTargetTypes);

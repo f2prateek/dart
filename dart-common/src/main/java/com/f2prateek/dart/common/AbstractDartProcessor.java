@@ -18,7 +18,6 @@
 package com.f2prateek.dart.common;
 
 import android.util.SparseArray;
-import com.f2prateek.dart.HensonNavigable;
 import com.f2prateek.dart.InjectExtra;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -44,9 +43,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
@@ -56,7 +53,6 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import static javax.lang.model.element.ElementKind.CLASS;
-import static javax.lang.model.element.ElementKind.PACKAGE;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 import static javax.tools.Diagnostic.Kind.ERROR;
@@ -72,6 +68,7 @@ import static javax.tools.Diagnostic.Kind.ERROR;
  * @see #findAndParseTargets(RoundEnvironment)
  */
 public abstract class AbstractDartProcessor extends AbstractProcessor {
+
   public static final String OPTION_DART_DEBUG = "dart.debug";
 
   // @formatter:off
@@ -94,10 +91,12 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   private List<Element> singleCollections;
   private List<Element> doubleCollections;
   private Elements elementUtils;
-  private Types typeUtils;
+  protected Types typeUtils;
   protected Filer filer;
   protected boolean isDebugEnabled;
   protected boolean usesParcelerOption = true;
+
+  protected abstract Map<TypeElement, InjectionTarget> findAndParseTargets(RoundEnvironment env);
 
   @Override public synchronized void init(ProcessingEnvironment env) {
     super.init(env);
@@ -113,12 +112,8 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
         options.get(OPTION_DART_DEBUG));
   }
 
-  public void setUsesParcelerOption(boolean usesParcelerOption) {
-    this.usesParcelerOption = usesParcelerOption;
-  }
-
   @Override public Set<String> getSupportedAnnotationTypes() {
-    Set<String> supportTypes = new LinkedHashSet<String>();
+    Set<String> supportTypes = new LinkedHashSet<>();
     supportTypes.add(InjectExtra.class.getCanonicalName());
     return supportTypes;
   }
@@ -128,7 +123,7 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   }
 
   @Override public Set<String> getSupportedOptions() {
-    Set<String> supportedOptions = new LinkedHashSet<String>();
+    Set<String> supportedOptions = new LinkedHashSet<>();
     supportedOptions.add(OPTION_DART_DEBUG);
     return supportedOptions;
   }
@@ -138,16 +133,43 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     this.isDebugEnabled = isDebugEnabled;
   }
 
-  protected abstract Map<TypeElement, InjectionTarget> findAndParseTargets(RoundEnvironment env);
+  public void setUsesParcelerOption(boolean usesParcelerOption) {
+    this.usesParcelerOption = usesParcelerOption;
+  }
 
-  private void initGenericCollectionLists() {
-    singleCollections = getTypeElements(new Class[] {
-        List.class, ArrayList.class, LinkedList.class, Set.class, HashSet.class, SortedSet.class,
-        TreeSet.class, LinkedHashSet.class, SparseArray.class
-    });
-    doubleCollections = getTypeElements(new Class[] {
-        Map.class, HashMap.class, LinkedHashMap.class, SortedMap.class, TreeMap.class
-    });
+  protected InjectionTarget getOrCreateTargetClass(Map<TypeElement, InjectionTarget> targetClassMap,
+      TypeElement typeElement) {
+    InjectionTarget injectionTarget = targetClassMap.get(typeElement);
+    if (injectionTarget == null) {
+      final String targetType = typeElement.getQualifiedName().toString();
+      final String classPackage = getPackageName(typeElement);
+      final String className = getClassName(typeElement, classPackage);
+      final boolean isAbstractType = typeElement.getModifiers().contains(Modifier.ABSTRACT);
+
+      injectionTarget = new InjectionTarget(classPackage, className, targetType, isAbstractType);
+      targetClassMap.put(typeElement, injectionTarget);
+    }
+    return injectionTarget;
+  }
+
+  /** Finds the parent injector type in the supplied set, if any. */
+  protected String findParentFqcn(TypeElement typeElement, Set<TypeMirror> parents) {
+    TypeMirror type;
+    while (true) {
+      type = typeElement.getSuperclass();
+      if (type.getKind() == TypeKind.NONE) {
+        return null;
+      }
+      typeElement = (TypeElement) ((DeclaredType) type).asElement();
+      if (containsTypeMirror(parents, type)) {
+        String packageName = getPackageName(typeElement);
+        return packageName + "." + getClassName(typeElement, packageName);
+      }
+    }
+  }
+
+  protected void error(Element element, String message, Object... args) {
+    processingEnv.getMessager().printMessage(ERROR, String.format(message, args), element);
   }
 
   protected void parseInjectExtraAnnotatedElements(RoundEnvironment env,
@@ -165,55 +187,34 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     }
   }
 
-  protected void parseHensonNavigableAnnotatedElements(RoundEnvironment env,
-      Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes) {
-    List<TypeElement> modelTypeElements = new ArrayList<>();
-    for (Element element : env.getElementsAnnotatedWith(HensonNavigable.class)) {
-      try {
-        parseHenson((TypeElement) element, targetClassMap, erasedTargetTypes, modelTypeElements);
-      } catch (Exception e) {
-        StringWriter stackTrace = new StringWriter();
-        e.printStackTrace(new PrintWriter(stackTrace));
+  private void parseInjectExtra(Element element, Map<TypeElement, InjectionTarget> targetClassMap,
+      Set<TypeMirror> erasedTargetTypes) {
+    TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
 
-        error(element, "Unable to generate extra injector when parsing @HensonNavigable.\n\n%s",
-            stackTrace.toString());
-      }
-    }
-    for (TypeElement modelTypeElement : modelTypeElements) {
-      targetClassMap.remove(modelTypeElement);
-    }
-  }
-
-  private boolean isValidUsageOfHenson(Class<? extends Annotation> annotationClass,
-      Element element) {
-    boolean valid = true;
-
-    // Verify modifiers.
-    Set<Modifier> modifiers = element.getModifiers();
-    if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC)) {
-      error(element, "@%s class %s must not be private or static.", annotationClass.getSimpleName(),
-          element.getSimpleName());
-      valid = false;
+    // Verify common generated code restrictions.
+    if (!isValidUsageOfInjectExtra(InjectExtra.class, element)) {
+      return;
     }
 
-    // Verify containing type.
-    if (element.getEnclosingElement() == null
-        || element.getEnclosingElement().getKind() != PACKAGE) {
-      error(element, "@%s class %s must be a top level class", annotationClass.getSimpleName(),
-          element.getSimpleName());
-      valid = false;
+    String annotationValue = element.getAnnotation(InjectExtra.class).value();
+    if (!isNullOrEmpty(annotationValue) && !isValidJavaIdentifier(annotationValue)) {
+      throw new IllegalArgumentException("Keys have to be valid java variable identifiers. "
+          + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html");
     }
 
-    //verify there are no @InjectExtra annotated fields
-    for (Element enclosedElement : element.getEnclosedElements()) {
-      if (enclosedElement.getAnnotation(InjectExtra.class) != null) {
-        error(element, "@%s class %s must not contain any @InjectExtra annotation",
-            annotationClass.getSimpleName(), element.getSimpleName());
-        valid = false;
-      }
-    }
+    // Assemble information on the injection point.
+    String name = element.getSimpleName().toString();
+    String key = isNullOrEmpty(annotationValue) ? name : annotationValue;
+    TypeMirror type = element.asType();
+    boolean required = isRequiredInjection(element);
+    boolean parcel = isParcelerAvailable() && isValidExtraTypeForParceler(type);
 
-    return valid;
+    InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, enclosingElement);
+    injectionTarget.addField(key, name, type, required, parcel);
+
+    // Add the type-erased version to the valid injection targets set.
+    TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
+    erasedTargetTypes.add(erasedTargetType);
   }
 
   private boolean isValidUsageOfInjectExtra(Class<? extends Annotation> annotationClass,
@@ -313,68 +314,6 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     return hasAnnotationWithFqcn(typeUtils.asElement(type), "org.parceler.Parcel");
   }
 
-  private void parseHenson(TypeElement element, Map<TypeElement, InjectionTarget> targetClassMap,
-      Set<TypeMirror> erasedTargetTypes, List<TypeElement> modelInjectTargets) {
-
-    // Verify common generated code restrictions.
-    if (!isValidUsageOfHenson(HensonNavigable.class, element)) {
-      return;
-    }
-
-    // Assemble information on the injection point.
-    InjectionTarget hensonNavigableTarget = getOrCreateTargetClass(targetClassMap, element);
-    //get the model class of Henson annotation
-    AnnotationMirror hensonAnnotationMirror = getAnnotationMirror(element, HensonNavigable.class);
-    TypeMirror modelTypeMirror = getHensonModelMirror(hensonAnnotationMirror);
-    if (modelTypeMirror != null) {
-      TypeElement modelElement = (TypeElement) typeUtils.asElement(modelTypeMirror);
-      if (!"Void".equals(modelElement.getSimpleName())) {
-        if (isDebugEnabled) {
-          System.out.println(String.format("HensonNavigable class %s uses model class %s\n",
-              element.getSimpleName(), modelElement.getSimpleName()));
-        }
-        //we simply copy all extra injections from the model and add them to the target
-        InjectionTarget modelInjectionTarget = getOrCreateTargetClass(targetClassMap, modelElement);
-        modelInjectTargets.add(modelElement);
-        hensonNavigableTarget.injectionMap.putAll(modelInjectionTarget.injectionMap);
-      }
-    }
-
-    // Add the type-erased version to the valid injection targets set.
-    TypeMirror erasedTargetType = typeUtils.erasure(element.asType());
-    erasedTargetTypes.add(erasedTargetType);
-  }
-
-  private void parseInjectExtra(Element element, Map<TypeElement, InjectionTarget> targetClassMap,
-      Set<TypeMirror> erasedTargetTypes) {
-    TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-
-    // Verify common generated code restrictions.
-    if (!isValidUsageOfInjectExtra(InjectExtra.class, element)) {
-      return;
-    }
-
-    String annotationValue = element.getAnnotation(InjectExtra.class).value();
-    if (!isNullOrEmpty(annotationValue) && !isValidJavaIdentifier(annotationValue)) {
-      throw new IllegalArgumentException("Keys have to be valid java variable identifiers. "
-          + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html");
-    }
-
-    // Assemble information on the injection point.
-    String name = element.getSimpleName().toString();
-    String key = isNullOrEmpty(annotationValue) ? name : annotationValue;
-    TypeMirror type = element.asType();
-    boolean required = isRequiredInjection(element);
-    boolean parcel = isParcelerAvailable() && isValidExtraTypeForParceler(type);
-
-    InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, enclosingElement);
-    injectionTarget.addField(key, name, type, required, parcel);
-
-    // Add the type-erased version to the valid injection targets set.
-    TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
-    erasedTargetTypes.add(erasedTargetType);
-  }
-
   private boolean existsWithin(TypeMirror type, List<Element> supportedTypes) {
     for (Element supportedType : supportedTypes) {
       if (typeUtils.erasure(type).equals(typeUtils.erasure(supportedType.asType()))) {
@@ -382,6 +321,16 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
       }
     }
     return false;
+  }
+
+  private void initGenericCollectionLists() {
+    singleCollections = getTypeElements(new Class[] {
+        List.class, ArrayList.class, LinkedList.class, Set.class, HashSet.class, SortedSet.class,
+        TreeSet.class, LinkedHashSet.class, SparseArray.class
+    });
+    doubleCollections = getTypeElements(new Class[] {
+        Map.class, HashMap.class, LinkedHashMap.class, SortedMap.class, TreeMap.class
+    });
   }
 
   private List<Element> getTypeElements(Class[] input) {
@@ -405,30 +354,6 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
       }
     }
     return false;
-  }
-
-  private static AnnotationMirror getAnnotationMirror(TypeElement typeElement, Class<?> clazz) {
-    String clazzName = clazz.getName();
-    for (AnnotationMirror m : typeElement.getAnnotationMirrors()) {
-      if (m.getAnnotationType().toString().equals(clazzName)) {
-        return m;
-      }
-    }
-    return null;
-  }
-
-  private static TypeMirror getHensonModelMirror(AnnotationMirror annotationMirror) {
-    return getAnnotationValue(annotationMirror, "model");
-  }
-
-  private static TypeMirror getAnnotationValue(AnnotationMirror annotationMirror, String key) {
-    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror
-        .getElementValues().entrySet()) {
-      if (entry.getKey().getSimpleName().toString().equals(key)) {
-        return (TypeMirror) entry.getValue().getValue();
-      }
-    }
-    return null;
   }
 
   /**
@@ -458,40 +383,9 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     return false;
   }
 
-  private InjectionTarget getOrCreateTargetClass(Map<TypeElement, InjectionTarget> targetClassMap,
-      TypeElement typeElement) {
-    InjectionTarget injectionTarget = targetClassMap.get(typeElement);
-    if (injectionTarget == null) {
-      final String targetType = typeElement.getQualifiedName().toString();
-      final String classPackage = getPackageName(typeElement);
-      final String className = getClassName(typeElement, classPackage);
-      final boolean isAbstractType = typeElement.getModifiers().contains(Modifier.ABSTRACT);
-
-      injectionTarget = new InjectionTarget(classPackage, className, targetType, isAbstractType);
-      targetClassMap.put(typeElement, injectionTarget);
-    }
-    return injectionTarget;
-  }
-
   private static String getClassName(TypeElement type, String packageName) {
     int packageLen = packageName.length() + 1;
     return type.getQualifiedName().toString().substring(packageLen).replace('.', '$');
-  }
-
-  /** Finds the parent injector type in the supplied set, if any. */
-  protected String findParentFqcn(TypeElement typeElement, Set<TypeMirror> parents) {
-    TypeMirror type;
-    while (true) {
-      type = typeElement.getSuperclass();
-      if (type.getKind() == TypeKind.NONE) {
-        return null;
-      }
-      typeElement = (TypeElement) ((DeclaredType) type).asElement();
-      if (containsTypeMirror(parents, type)) {
-        String packageName = getPackageName(typeElement);
-        return packageName + "." + getClassName(typeElement, packageName);
-      }
-    }
   }
 
   /**
@@ -514,10 +408,6 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
       }
     }
     return false;
-  }
-
-  protected void error(Element element, String message, Object... args) {
-    processingEnv.getMessager().printMessage(ERROR, String.format(message, args), element);
   }
 
   private String getPackageName(TypeElement type) {
