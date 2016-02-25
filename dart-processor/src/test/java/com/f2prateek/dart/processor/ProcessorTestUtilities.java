@@ -24,4 +24,11 @@ final class ProcessorTestUtilities {
   static Iterable<? extends Processor> dartProcessors() {
     return Arrays.asList(new InjectExtraProcessor());
   }
+
+  static Iterable<? extends Processor> dartProcessorsWithoutParceler() {
+    InjectExtraProcessor injectExtraProcessor = new InjectExtraProcessor();
+    injectExtraProcessor.setUsesParcelerOption(false);
+    return Arrays.asList(injectExtraProcessor);
+  }
+
 }
