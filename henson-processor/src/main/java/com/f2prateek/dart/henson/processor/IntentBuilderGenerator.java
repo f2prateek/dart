@@ -232,18 +232,6 @@ public class IntentBuilderGenerator extends BaseGenerator {
     return nextStateSimpleClassName;
   }
 
-  //TODO this method of sanitation is not good enough
-  //next time there is a bug reported here, do it well
-  //and enforce a java compliant name. There might be some cases where this
-  //can't be derived from a pathological key though (in that we should throw an error)
-  private String sanitizeForMethodName(String key) {
-    final int lastDotIndex = key.lastIndexOf('.');
-    if (lastDotIndex != -1) {
-      key = key.substring(lastDotIndex + 1);
-    }
-    return key;
-  }
-
   /**
    * This method returns either an empty String or {@code "(Parcelable)"} if
    * the extra type is Parcelable. We need this explicit conversion in cases
