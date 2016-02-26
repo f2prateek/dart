@@ -34,9 +34,9 @@ public class InjectExtraWithParcelerTest {
         "import com.f2prateek.dart.InjectExtra;", //
         "import java.lang.Object;", //
         "import java.lang.String;", //
-        "import java.util.ArrayList;", //
+        "import android.util.SparseArray;", //
         "public class TestSerializableCollection extends Activity {", //
-        "  @InjectExtra(\"key\") ArrayList<String> extra;", //
+        "  @InjectExtra(\"key\") SparseArray<String> extra;", //
         "}" //
     ));
 

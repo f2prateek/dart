@@ -17,7 +17,6 @@
 
 package com.f2prateek.dart.common;
 
-import android.util.SparseArray;
 import com.f2prateek.dart.InjectExtra;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -25,18 +24,11 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -105,7 +97,21 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     typeUtils = env.getTypeUtils();
     filer = env.getFiler();
 
-    initGenericCollectionLists();
+    //note for maintenance : here we use class names directly
+    //as a general rule of thumb, we should not use classes in an annotation processor
+    //as those classes are different from classes seen at runtime.
+    //Using class created a bug in apps built by gradle as SparseArray was not found during
+    //annotation processing time.
+    singleCollections = getTypeElements(new String[] {
+        "java.util.List", "java.util.ArrayList", "java.util.LinkedList", "java.util.Set",
+        "java.util.HashSet", "java.util.SortedSet", "java.util.TreeSet", "java.util.LinkedHashSet",
+        "android.util.SparseArray"
+    });
+
+    doubleCollections = getTypeElements(new String[] {
+        "java.util.Map", "java.util.HashMap", "java.util.LinkedHashMap", "java.util.SortedMap",
+        "java.util.TreeMap"
+    });
 
     final Map<String, String> options = env.getOptions();
     isDebugEnabled |= options.containsKey(OPTION_DART_DEBUG) && Boolean.parseBoolean(
@@ -233,10 +239,10 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
 
     //Verify that the type is primitive or serializable or parcelable
     TypeMirror typeElement = element.asType();
-    if (!isValidExtraType(typeElement)
-        && !(isParcelerAvailable() && isValidExtraTypeForParceler(typeElement))) {
+    if (!isValidExtraType(typeElement) && !(isParcelerAvailable() && isValidExtraTypeForParceler(
+        typeElement))) {
       error(element, "@%s field must be a primitive or Serializable or Parcelable (%s.%s). "
-          + "If you use Parceler, all types supported by Parceler are allowed.",
+              + "If you use Parceler, all types supported by Parceler are allowed.",
           annotationClass.getSimpleName(), enclosingElement.getQualifiedName(),
           element.getSimpleName());
       valid = false;
@@ -323,20 +329,10 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     return false;
   }
 
-  private void initGenericCollectionLists() {
-    singleCollections = getTypeElements(new Class[] {
-        List.class, ArrayList.class, LinkedList.class, Set.class, HashSet.class, SortedSet.class,
-        TreeSet.class, LinkedHashSet.class, SparseArray.class
-    });
-    doubleCollections = getTypeElements(new Class[] {
-        Map.class, HashMap.class, LinkedHashMap.class, SortedMap.class, TreeMap.class
-    });
-  }
-
-  private List<Element> getTypeElements(Class[] input) {
+  private List<Element> getTypeElements(String[] classNames) {
     List<Element> elements = new ArrayList<>();
-    for (Class clazz : input) {
-      elements.add(elementUtils.getTypeElement(clazz.getName()));
+    for (String className : classNames) {
+      elements.add(elementUtils.getTypeElement(className));
     }
     return elements;
   }
