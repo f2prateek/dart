@@ -58,28 +58,81 @@ User user = Dart.get(bundle, "key"); // User implements Parcelable
 ```
 
 Henson
------
-In Dart 2.0, we added an anotation processor that helps you navigate between activities. 
+------
+In Dart 2.0, we added an anotation processor that helps you to navigate between activities.
 The new module is called Henson (after [Matthew Henson](https://en.wikipedia.org/wiki/Matthew_Henson), the african american artic explorer that first reached the North Pole) :
 
-For the sample activity mentioned above, Henson would offer a DSL to navigate to it easily : 
+For the sample activity mentioned above, Henson will offer a DSL to navigate to it easily :
 ```java
 Intent intent = Henson.with(this)
         .gotoExampleActivity()
-        .key_1("defaultKeyExtra")
-        .key_2(2)
-        .key_3(new User())
+        .extra1("defaultKeyExtra")
+        .extra2(2)
+        .extra3(new User())
         .build();
         
-startActivty(intent);
+startActivity(intent);
 ```
 
 Of course, you can add any additional extra to the intent before using it.
+
+The DSL will be generated for all classes which contain `@InjectExtra` fields. If you want to extend it to other classes, use the `@HensonNavigable` annotation.
+
+```java
+@HensonNavigable
+class AnotherActivity extends Activity {
+  @Override public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    ...
+  }
+}
+```
 
 The Henson annotation processor will generate the Henson navigator class (used above) in a package that is : 
 * either the package specified by the `dart.henson.package` annotation processor option
 * or if no such option is used, in the common package of all annotated activities. See the Javadoc of HensonExtraProcessor for more details.
 
+Bonus
+-----
+As you can see from the examples above, using both Dart & Henson not only provided a very structured generated navigation layer and conveninent DSLs, it also completely transparently allows to wrap/unwrap parcelables.
+
+Parceler
+-------------------------
+Dart 2.0 offers a built-in support for [Parceler](https://github.com/johncarl81/parceler). Using Parceler with Dart 2 is optional.
+
+If you use Parceler, Dart will automatically detect @Parcel annotated beans, or collections of them, and wrap them using the Henson DSL and unwrap them when they are injected.
+
+```java
+@Parcel
+public class ParcelExample {
+    ...
+}
+```
+
+```java
+class OneMoreActivityActivity extends Activity {
+  @InjectExtra ParcelExample extra;
+
+  @Override public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.simple_activity);
+    Dart.inject(this);
+    // TODO Use "injected" extras...
+  }
+}
+```
+
+```java
+Intent intent = Henson.with(this)
+        .gotoOneMoreActivityActivity()
+        .extra(new ParcelExample())
+        .build();
+
+startActivity(intent);
+```
+Parceler usage is optional and will take place only when Parceler is present in the classpath.
+
+When possible, it will be used to parcelize collections instead of serializing them to gain speed.
 
 Proguard
 --------
@@ -96,12 +149,6 @@ If Proguard is enabled be sure to add these rules on your configuration:
 -keep class **Henson { *; }
 -keep class **$$IntentBuilder { *; }
 ```
-
-Bonus
------
-
-As you can see from the examples above, using both Dart & Henson not only provided a very structured generated navigation layer and conveninent DSLs, it also completely transparently allows to wrap/unwrap parcelables. 
-
 
 Download
 --------
