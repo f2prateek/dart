@@ -94,13 +94,13 @@ The Henson annotation processor will generate the Henson navigator class (used a
 
 Bonus
 -----
-As you can see from the examples above, using both Dart & Henson not only provided a very structured generated navigation layer and conveninent DSLs, it also completely transparently allows to wrap/unwrap parcelables.
+As you can see from the examples above, using both Dart & Henson not only provides a very structured generated navigation layer and conveninent DSLs; it also allowsto wrap/unwrap parcelables automatically.
 
 Parceler
 -------------------------
 Dart 2.0 offers a built-in support for [Parceler](https://github.com/johncarl81/parceler). Using Parceler with Dart 2 is optional.
 
-If you use Parceler, Dart will automatically detect @Parcel annotated beans, or collections of them, and wrap them using the Henson DSL and unwrap them when they are injected.
+If you use Parceler, Dart will automatically detect @Parcel annotated beans (pojos), or collections of them, and wrap them using the Henson DSL and unwrap them when they are injected via Dart.
 
 ```java
 @Parcel
@@ -132,7 +132,7 @@ startActivity(intent);
 ```
 Parceler usage is optional and will take place only when Parceler is present in the classpath.
 
-When possible, it will be used to parcelize collections instead of serializing them to gain speed.
+When available, Parceler will be used to parcelize collections instead of serializing them, in order to gain speed.
 
 Proguard
 --------
@@ -148,26 +148,23 @@ If Proguard is enabled be sure to add these rules on your configuration:
 #for dart 2.0 only
 -keep class **Henson { *; }
 -keep class **$$IntentBuilder { *; }
+
+
+#if you use it
+#see Parceler's github page
+#for specific proguard instructions
 ```
 
 Download
 --------
 
-For Dart 1.x :
-Download [the latest JAR][2] or grab via Maven:
-```xml
-<dependency>
-  <groupId>com.f2prateek.dart</groupId>
-  <artifactId>dart</artifactId>
-  <version>(insert latest version)</version>
-</dependency>
-```
-or Gradle:
+For Dart 2.x :
+Gradle:
 ```groovy
 compile 'com.f2prateek.dart:dart:(insert latest version)'
+provided 'com.f2prateek.dart:dart-processor:(insert latest version)'
 ```
-
-For Dart 2.x :
+or maven
 ```xml
 <dependency>
   <groupId>com.f2prateek.dart</groupId>
@@ -181,13 +178,18 @@ For Dart 2.x :
   <scope>provided</scope>
 </dependency>
 ```
-or Gradle:
-```groovy
-compile 'com.f2prateek.dart:dart:(insert latest version)'
-provided 'com.f2prateek.dart:dart-processor:(insert latest version)'
-```
 
 And for using Henson : 
+Gradle:
+```groovy
+compile 'com.f2prateek.dart:henson:(insert latest version)'
+provided 'com.f2prateek.dart:henson-processor:(insert latest version)'
+```
+When using Henson, as Android Studio doesn't call live annotation processors when editing a file, you might prefer using the [apt Android Studio plugin](https://bitbucket.org/hvisser/android-apt). It will allow to use Henson generated DSL right away when you edit your code. 
+
+The Henson annotation processor dependency would then have to be declared within the apt scope instead of provided.
+
+or maven
 ```xml
 <dependency>
   <groupId>com.f2prateek.dart</groupId>
@@ -201,15 +203,19 @@ And for using Henson :
   <scope>provided</scope>
 </dependency>
 ```
-or Gradle:
+For Dart 1.x :
+Gradle:
 ```groovy
-compile 'com.f2prateek.dart:henson:(insert latest version)'
-provided 'com.f2prateek.dart:henson-processor:(insert latest version)'
+compile 'com.f2prateek.dart:dart:(insert latest version)'
 ```
-
-When using Henson, as Android Studio doesn't call live annotation processors when editing a file, you might prefer using the [apt Android Studio plugin](https://bitbucket.org/hvisser/android-apt). It will allow to use Henson generated DSL right away when you edit your code. 
-
-The Henson annotation processor dependency would then have to be declared within the apt scope instead of provided.
+Maven:
+```xml
+<dependency>
+  <groupId>com.f2prateek.dart</groupId>
+  <artifactId>dart</artifactId>
+  <version>(insert latest version)</version>
+</dependency>
+```
 
 License
 -------
