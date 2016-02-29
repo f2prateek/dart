@@ -94,7 +94,7 @@ The Henson annotation processor will generate the Henson navigator class (used a
 
 Bonus
 -----
-As you can see from the examples above, using both Dart & Henson not only provides a very structured generated navigation layer and conveninent DSLs; it also allowsto wrap/unwrap parcelables automatically.
+As you can see from the examples above, using both Dart & Henson not only provides a very structured generated navigation layer and conveninent DSLs; it also allows to wrap/unwrap parcelables automatically.
 
 Parceler
 -------------------------
