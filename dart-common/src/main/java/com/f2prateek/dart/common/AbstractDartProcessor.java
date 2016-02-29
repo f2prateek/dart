@@ -139,6 +139,11 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     this.isDebugEnabled = isDebugEnabled;
   }
 
+  @SuppressWarnings("This method is only used for testing.")
+  public boolean isDebugEnabled() {
+    return isDebugEnabled;
+  }
+
   public void setUsesParcelerOption(boolean usesParcelerOption) {
     this.usesParcelerOption = usesParcelerOption;
   }

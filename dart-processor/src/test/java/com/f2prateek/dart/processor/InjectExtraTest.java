@@ -22,6 +22,7 @@ import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
@@ -30,6 +31,11 @@ import static org.truth0.Truth.ASSERT;
  * For tests not related to Parceler.
  */
 public class InjectExtraTest {
+
+  @Test public void testIsDebugDisabled() {
+    boolean isDebugEnabled = new InjectExtraProcessor().isDebugEnabled();
+    assertThat(isDebugEnabled).isFalse();
+  }
 
   @Test public void injectingExtra() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
