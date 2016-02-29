@@ -26,6 +26,10 @@ import org.junit.Test;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
+/**
+ * Tests {@link com.f2prateek.dart.henson.processor.HensonExtraProcessor}.
+ * For tests not related to Parceler.
+ */
 public class IntentBuilderGeneratorTest {
 
   @Test public void injectingExtra() {
@@ -66,7 +70,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -102,7 +106,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -150,7 +154,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -169,7 +173,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .failsToCompile()
         .withErrorContaining(
             "@HensonNavigable class Test must not contain any @InjectExtra annotation");
@@ -261,7 +265,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -307,7 +311,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -351,7 +355,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -426,7 +430,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);
@@ -507,7 +511,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);
@@ -556,7 +560,7 @@ public class IntentBuilderGeneratorTest {
         ));
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource);
@@ -632,89 +636,10 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1, expectedSource2);
-  }
-
-  @Test public void injectingParcelExtra() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
-        "package test;", //
-        "import java.util.List;", //
-        "import java.util.Map;", //
-        "import android.app.Activity;", //
-        "import com.f2prateek.dart.InjectExtra;", //
-        "import org.parceler.Parcel;", //
-        "import org.parceler.ParcelConstructor;", //
-        "@Parcel", //
-        "class ExampleParcel {", //
-        "", //
-        "  String name;", //
-        "", //
-        "  @ParcelConstructor", //
-        "  public ExampleParcel(String name) {", //
-        "    this.name = name;", //
-        "  }", //
-        "", //
-        "  public String getName() {", //
-        "    return name;", //
-        "  }", //
-        "}", //
-        "public class Test extends Activity {", //
-        "    @InjectExtra(\"key\") ExampleParcel extra;", //
-        "    @InjectExtra(\"list\") List<ExampleParcel> listExtra;", //
-        "    @InjectExtra(\"mapNestedExtra\") Map<List<String>, List<ExampleParcel>> mapNestedExtra;", //
-        "}" //
-    ));
-
-    JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test/Test_Bundler", Joiner.on('\n').join( //
-            "package test;", //
-            "import android.content.Context;", //
-            "import android.content.Intent;", //
-            "import com.f2prateek.dart.henson.Bundler;", //
-            "import java.lang.String;", //
-            "import java.util.List;", //
-            "import java.util.Map;", //
-            "public class Test$$IntentBuilder {", //
-            "  private Intent intent;", //
-            "  private Bundler bundler = Bundler.create();", //
-            "  public Test$$IntentBuilder(Context context) {", //
-            "    intent = new Intent(context, Test.class);", //
-            "  }", //
-            "  public Test$$IntentBuilder.AfterSettingKey key(ExampleParcel extra) {", //
-            "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-            "    return new Test$$IntentBuilder.AfterSettingKey();", //
-            "  }", //
-            "  public class AfterSettingKey {", //
-            "    public Test$$IntentBuilder.AfterSettingList list(List<ExampleParcel> listExtra) {", //
-            "      bundler.put(\"list\", org.parceler.Parcels.wrap(listExtra));", //
-            "      return new Test$$IntentBuilder.AfterSettingList();", //
-            "    }", //
-            "  }", //
-            "", //
-            "  public class AfterSettingList {", //
-            "    public Test$$IntentBuilder.AllSet mapNestedExtra(Map<List<String>, List<ExampleParcel>> mapNestedExtra) {", //
-            "      bundler.put(\"mapNestedExtra\", org.parceler.Parcels.wrap(mapNestedExtra));", //
-            "      return new Test$$IntentBuilder.AllSet();", //
-            "    }", //
-            "  }", //
-            "  public class AllSet {", //
-            "    public Intent build() {", //
-            "      intent.putExtras(bundler.get());", //
-            "      return intent;", //
-            "    }", //
-            "  }", //
-            "}" //
-        ));
-
-    ASSERT.about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
   }
 
   @Test public void injectingOptionalExtra() {
@@ -761,7 +686,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -804,7 +729,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -817,7 +742,6 @@ public class IntentBuilderGeneratorTest {
         "import android.os.Parcelable;", //
         "import java.io.Serializable;", //
         "import com.f2prateek.dart.InjectExtra;", //
-        "import com.f2prateek.dart.Nullable;", //
         "class Extra implements Serializable, Parcelable {", //
         "  public void writeToParcel(android.os.Parcel out, int flags) {", //
         "  }", //
@@ -857,7 +781,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
         .generatesSources(builderSource);
@@ -875,7 +799,7 @@ public class IntentBuilderGeneratorTest {
 
     ASSERT.about(javaSource())
         .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .failsToCompile()
         .withErrorContaining("Keys have to be valid java variable identifiers.")
         .in(source)

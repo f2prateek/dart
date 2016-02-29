@@ -25,6 +25,10 @@ import org.junit.Test;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
+/**
+ * Tests {@link com.f2prateek.dart.henson.processor.HensonExtraProcessor}.
+ * For tests related to Parceler, but Parceler is not available.
+ */
 public class IntentBuilderGeneratorWithoutParcelerTest {
 
   @Test public void serializableCollection() {
@@ -139,5 +143,64 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
         .failsToCompile()
         .withErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable"
             + " (test.TestCollectionParcel.extra). If you use Parceler, all types supported by Parceler are allowed.");
+  }
+
+  @Test public void injectingParcelableThatExtendsParcelableExtra() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.TestParcelableExtendsParcelable",
+        Joiner.on('\n').join( //
+            "package test;", //
+            "import android.app.Activity;", //
+            "import android.os.Parcelable;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "class ExtraParent implements Parcelable {", //
+            "  public void writeToParcel(android.os.Parcel out, int flags) {", //
+            "  }", //
+            "  public int describeContents() {", //
+            "    return 0;", //
+            "  }", //
+            "}", //
+            "class Extra extends ExtraParent implements Parcelable {", //
+            "  public void writeToParcel(android.os.Parcel out, int flags) {", //
+            "  }", //
+            "  public int describeContents() {", //
+            "    return 0;", //
+            "  }", //
+            "}", //
+            "public class TestParcelableExtendsParcelable extends Activity {", //
+            "    @InjectExtra(\"key\") Extra extra;", //
+            "}" //
+        ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "public class TestParcelableExtendsParcelable$$IntentBuilder {", //
+            "  private Intent intent;", //
+            "  private Bundler bundler = Bundler.create();", //
+            "  public TestParcelableExtendsParcelable$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, TestParcelableExtendsParcelable.class);", //
+            "  }", //
+            "  public TestParcelableExtendsParcelable$$IntentBuilder.AllSet key(Extra extra) {", //
+            "    bundler.put(\"key\",(android.os.Parcelable) extra);", //
+            "    return new TestParcelableExtendsParcelable$$IntentBuilder.AllSet();", //
+            "  }", //
+            "  public class AllSet {", //
+            "    public Intent build() {", //
+            "      intent.putExtras(bundler.get());", //
+            "      return intent;", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
   }
 }

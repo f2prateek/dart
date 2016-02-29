@@ -25,6 +25,10 @@ import org.junit.Test;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
+/**
+ * Tests {@link com.f2prateek.dart.processor.InjectExtraProcessor}.
+ * For tests related to Parceler and Parceler is available.
+ */
 public class InjectExtraWithParcelerTest {
 
   @Test public void serializableCollection() {
@@ -180,5 +184,102 @@ public class InjectExtraWithParcelerTest {
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource);
+  }
+
+  @Test public void injectingParcelThatExtendsParcelableExtra() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.TestParcelExtendsParcelable",
+        Joiner.on('\n').join( //
+            "package test;", //
+            "import android.app.Activity;", //
+            "import android.os.Parcelable;", //
+            "import org.parceler.Parcel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "class ExtraParent implements Parcelable {", //
+            "  public void writeToParcel(android.os.Parcel out, int flags) {", //
+            "  }", //
+            "  public int describeContents() {", //
+            "    return 0;", //
+            "  }", //
+            "}", //
+            "@Parcel class Extra extends ExtraParent {}", //
+            "public class TestParcelExtendsParcelable extends Activity {", //
+            "    @InjectExtra(\"key\") Extra extra;", //
+            "}" //
+        ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
+            "package test;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "public class TestParcelExtendsParcelable$$ExtraInjector {", //
+            "  public static void inject(Dart.Finder finder, TestParcelExtendsParcelable target, Object source) {", //
+            "    Object object;", //
+            "    object = finder.getExtra(source, \"key\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");", //
+            "    }", //
+            "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);", //
+            "  }", //
+            "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test public void injectingParcelableThatExtendsParcelableExtra() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.TestParcelableExtendsParcelable",
+        Joiner.on('\n').join( //
+            "package test;", //
+            "import android.app.Activity;", //
+            "import android.os.Parcelable;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "class ExtraParent implements Parcelable {", //
+            "  public void writeToParcel(android.os.Parcel out, int flags) {", //
+            "  }", //
+            "  public int describeContents() {", //
+            "    return 0;", //
+            "  }", //
+            "}", //
+            "class Extra extends ExtraParent implements Parcelable {", //
+            "  public void writeToParcel(android.os.Parcel out, int flags) {", //
+            "  }", //
+            "  public int describeContents() {", //
+            "    return 0;", //
+            "  }", //
+            "}", //
+            "public class TestParcelableExtendsParcelable extends Activity {", //
+            "    @InjectExtra(\"key\") Extra extra;", //
+            "}" //
+        ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
+            "package test;", //
+            "import com.f2prateek.dart.Dart;", //
+            "import java.lang.Object;", //
+            "public class TestParcelableExtendsParcelable$$ExtraInjector {", //
+            "  public static void inject(Dart.Finder finder, TestParcelableExtendsParcelable target, Object source) {", //
+            "    Object object;", //
+            "    object = finder.getExtra(source, \"key\");", //
+            "    if (object == null) {", //
+            "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");", //
+            "    }", //
+            "    target.extra = (Extra) object;", //
+            "  }", //
+            "}" //
+        ));
+
+    ASSERT.about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.dartProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
   }
 }
