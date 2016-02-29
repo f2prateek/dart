@@ -25,6 +25,10 @@ import org.junit.Test;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
+/**
+ * Tests {@link com.f2prateek.dart.processor.InjectExtraProcessor}.
+ * For tests not related to Parceler.
+ */
 public class InjectExtraTest {
 
   @Test public void injectingExtra() {

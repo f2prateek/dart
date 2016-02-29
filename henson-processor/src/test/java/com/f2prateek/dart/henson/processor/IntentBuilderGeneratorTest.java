@@ -26,6 +26,10 @@ import org.junit.Test;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static org.truth0.Truth.ASSERT;
 
+/**
+ * Tests {@link com.f2prateek.dart.henson.processor.HensonExtraProcessor}.
+ * For tests not related to Parceler.
+ */
 public class IntentBuilderGeneratorTest {
 
   @Test public void injectingExtra() {
