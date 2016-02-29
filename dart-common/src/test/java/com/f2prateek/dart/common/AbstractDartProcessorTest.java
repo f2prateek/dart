@@ -4,9 +4,6 @@ import org.junit.Test;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-/**
- * Created by dmolinero on 2/23/16.
- */
 public class AbstractDartProcessorTest {
   @Test public void testIsValidJavaIdentifier_empty() {
     String empty = "";
