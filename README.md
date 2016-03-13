@@ -22,7 +22,7 @@ class ExampleActivity extends Activity {
 ```
 
 Simply call one of the `inject()` methods, which will delegate to generated code.
-You can inject from an Activity (which uses it's intent extras), Fragment (which use it's arguments)
+You can inject from an Activity (which uses its intent extras), Fragment (which uses its arguments)
 or directly from a Bundle.
 
 The key used for the extra will be the field name by default. However, it can be set manually as a parameter in the annotation: `@InjectExtra("key")`
@@ -44,7 +44,7 @@ You can assign any values to your fields to be used as default values, just as y
 ```java
 @InjectExtra String title = "Default Title";
 ```
-This value will be overriden after you call `inject()`. Remember to use the `@Nullable` annotation, if this injection is optional.
+This value will be overridden after you call `inject()`. Remember to use the `@Nullable` annotation, if this injection is optional.
 
 Bonus
 -----
@@ -59,8 +59,8 @@ User user = Dart.get(bundle, "key"); // User implements Parcelable
 
 Henson
 ------
-In Dart 2.0, we added an anotation processor that helps you to navigate between activities.
-The new module is called Henson (after [Matthew Henson](https://en.wikipedia.org/wiki/Matthew_Henson), the african american artic explorer that first reached the North Pole) :
+In Dart 2.0, we added an annotation processor that helps you to navigate between activities.
+The new module is called Henson (after [Matthew Henson](https://en.wikipedia.org/wiki/Matthew_Henson), the African-American Arctic explorer that first reached the North Pole) :
 
 For the sample activity mentioned above, Henson will offer a DSL to navigate to it easily :
 ```java
@@ -88,13 +88,13 @@ class AnotherActivity extends Activity {
 }
 ```
 
-The Henson annotation processor will generate the Henson navigator class (used above) in a package that is : 
+The Henson annotation processor will generate the `Henson` navigator class (used above) in a package that is : 
 * either the package specified by the `dart.henson.package` annotation processor option
-* or if no such option is used, in the common package of all annotated activities. See the Javadoc of HensonExtraProcessor for more details.
+* or if no such option is used, in the common package of all annotated activities. See the Javadoc of `HensonExtraProcessor` for more details.
 
 Bonus
 -----
-As you can see from the examples above, using both Dart & Henson not only provides a very structured generated navigation layer and conveninent DSLs; it also allows to wrap/unwrap parcelables automatically.
+As you can see from the examples above, using both Dart & Henson not only provides a very structured generated navigation layer and convenient DSLs; it also allows to wrap/unwrap parcelables automatically.
 
 Parceler
 -------------------------
@@ -134,10 +134,10 @@ Parceler usage is optional and will take place only when Parceler is present in 
 
 When available, Parceler will be used to parcelize collections instead of serializing them, in order to gain speed.
 
-Proguard
+ProGuard
 --------
 
-If Proguard is enabled be sure to add these rules on your configuration:
+If ProGuard is enabled be sure to add these rules to your configuration:
 
 ```
 -dontwarn com.f2prateek.dart.internal.**
@@ -185,7 +185,7 @@ Gradle:
 compile 'com.f2prateek.dart:henson:(insert latest version)'
 provided 'com.f2prateek.dart:henson-processor:(insert latest version)'
 ```
-When using Henson, as Android Studio doesn't call live annotation processors when editing a file, you might prefer using the [apt Android Studio plugin](https://bitbucket.org/hvisser/android-apt). It will allow to use Henson generated DSL right away when you edit your code. 
+When using Henson, as Android Studio doesn't call live annotation processors when editing a file, you might prefer using the [apt Android Studio plugin](https://bitbucket.org/hvisser/android-apt). It will allow you to use the Henson generated DSL right away when you edit your code. 
 
 The Henson annotation processor dependency would then have to be declared within the apt scope instead of provided.
 
