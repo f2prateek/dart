@@ -22,7 +22,6 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import com.f2prateek.dart.internal.InjectExtraProcessor;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -46,18 +45,20 @@ import java.util.Map;
  * {@link #inject(Object, Bundle) bundle into another object}.
  * <p>
  * Be default, extras are required to be present in the bundle for field injections.
- * If an extra is optional add the {@link Optional @Optional} annotation.
+ * If an extra is optional add the {@link Nullable @Nullable} annotation.
  * <pre><code>
- * {@literal @}Optional {@literal @}InjectExtra("key") String extra;
+ * {@literal @}Nullable {@literal @}InjectExtra("key") String extra;
  * </code></pre>
  * <p>
  * If you need to provide a default value for an extra, simply set an initial value
- * while declaring the field, combined with the {@link Optional @Optional} annotation.
+ * while declaring the field, combined with the {@link Nullable @Nullable} annotation.
  * <pre><code>
- * {@literal @}Optional {@literal @}InjectExtra("key") String extra = "default_value";
+ * {@literal @}Nullable {@literal @}InjectExtra("key") String extra = "default_value";
  * </code></pre>
  */
 public class Dart {
+  public static final String INJECTOR_SUFFIX = "$$ExtraInjector";
+
   static final Map<Class<?>, Method> INJECTORS = new LinkedHashMap<Class<?>, Method>();
   static final Method NO_OP = null;
   private static final String TAG = "Dart";
@@ -155,7 +156,7 @@ public class Dart {
       return NO_OP;
     }
     try {
-      Class<?> injector = Class.forName(clsName + InjectExtraProcessor.SUFFIX);
+      Class<?> injector = Class.forName(clsName + INJECTOR_SUFFIX);
       inject = injector.getMethod("inject", Finder.class, cls, Object.class);
       if (debug) Log.d(TAG, "HIT: Class loaded injection class.");
     } catch (ClassNotFoundException e) {
@@ -167,7 +168,8 @@ public class Dart {
   }
 
   /** Simpler version of {@link android.os.Bundle#get(String)} which infers the target type. */
-  @SuppressWarnings({ "unchecked", "UnusedDeclaration" }) // Checked by runtime cast. Public API.
+  @SuppressWarnings({ "unchecked", "UnusedDeclaration" })
+  // Checked by runtime cast. Public API.
   public static <T> T get(Bundle bundle, String key) {
     return (T) bundle.get(key);
   }

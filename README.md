@@ -1,4 +1,4 @@
-Dart
+Dart [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Dart-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1444)[![Build Status](https://travis-ci.org/f2prateek/dart.svg?branch=master)](https://travis-ci.org/f2prateek/dart)
 ============
 
 Extra "injection" library for Android which uses annotation processing to
@@ -8,9 +8,9 @@ Dart is inspired by [ButterKnife][1].
 
 ```java
 class ExampleActivity extends Activity {
-  @InjectExtra("key_1") String extra1;
-  @InjectExtra("key_2") int extra2;
-  @InjectExtra("key_3") User extra3; // User implements Parcelable
+  @InjectExtra String extra1;
+  @InjectExtra int extra2;
+  @InjectExtra User extra3; // User implements Parcelable
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -22,18 +22,29 @@ class ExampleActivity extends Activity {
 ```
 
 Simply call one of the `inject()` methods, which will delegate to generated code.
-You can inject from an Activity (which uses it's intent extras), Fragment (which use it's arguments)
+You can inject from an Activity (which uses its intent extras), Fragment (which uses its arguments)
 or directly from a Bundle.
+
+The key used for the extra will be the field name by default. However, it can be set manually as a parameter in the annotation: `@InjectExtra("key")`
 
 Optional Injection
 ------------------
-By default all @InjectExtra fields are required. An exception will be thrown if the target extra cannot be found.
+By default all `@InjectExtra` fields are required. An exception will be thrown if the target extra cannot be found.
 
-To suppress this behavior and create an optional injection, add the @Optional annotation to the field or method.
+To suppress this behavior and create an optional injection, add the `@Nullable` annotation to the field or method.
+Any annotation with the class name `Nullable` is respected, including ones from the support library annotations and ButterKnife.
 
 ```java
-@Optional InjectExtra("key") String title;
+@Nullable @InjectExtra String title;
 ```
+
+Default Values
+--------------
+You can assign any values to your fields to be used as default values, just as you would in regular "injection"-free code.
+```java
+@InjectExtra String title = "Default Title";
+```
+This value will be overridden after you call `inject()`. Remember to use the `@Nullable` annotation, if this injection is optional.
 
 Bonus
 -----
@@ -46,11 +57,158 @@ Bundle bundle = getIntent().getExtras(); // getArguments() for a Fragment
 User user = Dart.get(bundle, "key"); // User implements Parcelable
 ```
 
+Henson
+------
+In Dart 2.0, we added an annotation processor that helps you to navigate between activities.
+The new module is called Henson (after [Matthew Henson](https://en.wikipedia.org/wiki/Matthew_Henson), the African-American Arctic explorer that first reached the North Pole) :
+
+For the sample activity mentioned above, Henson will offer a DSL to navigate to it easily :
+```java
+Intent intent = Henson.with(this)
+        .gotoExampleActivity()
+        .extra1("defaultKeyExtra")
+        .extra2(2)
+        .extra3(new User())
+        .build();
+        
+startActivity(intent);
+```
+
+Of course, you can add any additional extra to the intent before using it.
+
+The DSL will be generated for all classes which contain `@InjectExtra` fields. If you want to extend it to other classes, use the `@HensonNavigable` annotation.
+
+```java
+@HensonNavigable
+class AnotherActivity extends Activity {
+  @Override public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    ...
+  }
+}
+```
+
+The Henson annotation processor will generate the `Henson` navigator class (used above) in a package that is : 
+* either the package specified by the `dart.henson.package` annotation processor option
+* or if no such option is used, in the common package of all annotated activities. See the Javadoc of `HensonExtraProcessor` for more details.
+
+Bonus
+-----
+As you can see from the examples above, using both Dart & Henson not only provides a very structured generated navigation layer and convenient DSLs; it also allows to wrap/unwrap parcelables automatically.
+
+Parceler
+-------------------------
+Dart 2.0 offers a built-in support for [Parceler](https://github.com/johncarl81/parceler). Using Parceler with Dart 2 is optional.
+
+If you use Parceler, Dart will automatically detect @Parcel annotated beans (pojos), or collections of them, and wrap them using the Henson DSL and unwrap them when they are injected via Dart.
+
+```java
+@Parcel
+public class ParcelExample {
+    ...
+}
+```
+
+```java
+class OneMoreActivityActivity extends Activity {
+  @InjectExtra ParcelExample extra;
+
+  @Override public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.simple_activity);
+    Dart.inject(this);
+    // TODO Use "injected" extras...
+  }
+}
+```
+
+```java
+Intent intent = Henson.with(this)
+        .gotoOneMoreActivityActivity()
+        .extra(new ParcelExample())
+        .build();
+
+startActivity(intent);
+```
+Parceler usage is optional and will take place only when Parceler is present in the classpath.
+
+When available, Parceler will be used to parcelize collections instead of serializing them, in order to gain speed.
+
+ProGuard
+--------
+
+If ProGuard is enabled be sure to add these rules to your configuration:
+
+```
+-dontwarn com.f2prateek.dart.internal.**
+-keep class **$$ExtraInjector { *; }
+-keepclasseswithmembernames class * {
+    @com.f2prateek.dart.* <fields>;
+}
+#for dart 2.0 only
+-keep class **Henson { *; }
+-keep class **$$IntentBuilder { *; }
+
+
+#if you use it
+#see Parceler's github page
+#for specific proguard instructions
+```
 
 Download
 --------
 
-Download [the latest JAR][2] or grab via Maven:
+For Dart 2.x :
+Gradle:
+```groovy
+compile 'com.f2prateek.dart:dart:(insert latest version)'
+provided 'com.f2prateek.dart:dart-processor:(insert latest version)'
+```
+or maven
+```xml
+<dependency>
+  <groupId>com.f2prateek.dart</groupId>
+  <artifactId>dart</artifactId>
+  <version>(insert latest version)</version>
+</dependency>
+<dependency>
+  <groupId>com.f2prateek.dart</groupId>
+  <artifactId>dart-processor</artifactId>
+  <version>(insert latest version)</version>
+  <scope>provided</scope>
+</dependency>
+```
+
+And for using Henson : 
+Gradle:
+```groovy
+compile 'com.f2prateek.dart:henson:(insert latest version)'
+provided 'com.f2prateek.dart:henson-processor:(insert latest version)'
+```
+When using Henson, as Android Studio doesn't call live annotation processors when editing a file, you might prefer using the [apt Android Studio plugin](https://bitbucket.org/hvisser/android-apt). It will allow you to use the Henson generated DSL right away when you edit your code. 
+
+The Henson annotation processor dependency would then have to be declared within the apt scope instead of provided.
+
+or maven
+```xml
+<dependency>
+  <groupId>com.f2prateek.dart</groupId>
+  <artifactId>henson</artifactId>
+  <version>(insert latest version)</version>
+</dependency>
+<dependency>
+  <groupId>com.f2prateek.dart</groupId>
+  <artifactId>henson-processor</artifactId>
+  <version>(insert latest version)</version>
+  <scope>provided</scope>
+</dependency>
+```
+For Dart 1.x :
+Gradle:
+```groovy
+compile 'com.f2prateek.dart:dart:(insert latest version)'
+```
+Maven:
 ```xml
 <dependency>
   <groupId>com.f2prateek.dart</groupId>
@@ -58,11 +216,6 @@ Download [the latest JAR][2] or grab via Maven:
   <version>(insert latest version)</version>
 </dependency>
 ```
-or Gradle:
-```groovy
-compile 'com.f2prateek.dart:dart:(insert latest version)'
-```
-
 
 License
 -------

@@ -20,10 +20,11 @@ package com.f2prateek.dart.example;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.SparseArray;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.f2prateek.dart.Dart;
-import org.parceler.Parcels;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity {
 
@@ -33,16 +34,59 @@ public class MainActivity extends Activity {
     setContentView(R.layout.activity_main);
 
     ButterKnife.inject(this);
-    Dart.inject(this);
   }
 
   @OnClick(R.id.button) public void onLaunchButtonClick() {
-    Intent intent = new Intent(MainActivity.this, SampleActivity.class);
-    intent.putExtra("defaultKey", "defaultKey");
-    intent.putExtra(SampleActivity.EXTRA_STRING, "String");
-    intent.putExtra(SampleActivity.EXTRA_INT, 4);
-    intent.putExtra(SampleActivity.EXTRA_PARCELABLE, ComplexParcelable.random());
-    intent.putExtra(SampleActivity.EXTRA_PARCEL, Parcels.wrap(new ExampleParcel("Andy")));
-    startActivity(intent);
+    ExampleParcel parcel1 = new ExampleParcel("Andy");
+    ExampleParcel parcel2 = new ExampleParcel("Tony");
+
+    List<ExampleParcel> parcelList = new ArrayList<>();
+    parcelList.add(parcel1);
+    parcelList.add(parcel2);
+
+    SparseArray<ExampleParcel> parcelSparseArray = new SparseArray<>();
+    parcelSparseArray.put(0, parcel1);
+    parcelSparseArray.put(2, parcel2);
+
+    Intent intent = Henson.with(this)
+        .gotoSampleActivity()
+        .defaultKeyExtra("defaultKeyExtra")
+        .extraInt(4)
+        .extraListParcelable(parcelList)
+        .extraParcel(parcel1)
+        .extraParcelable(ComplexParcelable.random())
+        .extraSparseArrayParcelable(parcelSparseArray)
+        .extraString("a string")
+        .build();
+
+      startActivity(intent);
   }
+
+  @OnClick(R.id.button2) public void onLaunchButton2Click() {
+    // Include fragment extras
+    Intent intent = Henson.with(this)
+        .gotoSampleModelActivity()
+        .defaultKeyExtra("defaultKeyExtra")
+        .extraInt(4)
+        .extraParcel(new ExampleParcel("Andy"))
+        .extraParcelable(ComplexParcelable.random())
+        .extraString("a string")
+        .build();
+
+    Intent intentSampleFragment = Henson.with(this)
+        .gotoSampleFragment()
+        .foo("bar")
+        .build();
+
+    intent.putExtras(intentSampleFragment);
+    startActivity(intent);
+
+    // Service
+    Intent intentService = Henson.with(this)
+        .gotoSampleService()
+        .stringExtra("foo")
+        .build();
+    startService(intentService);
+  }
+
 }

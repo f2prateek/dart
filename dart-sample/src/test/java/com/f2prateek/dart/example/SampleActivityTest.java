@@ -18,38 +18,58 @@
 package com.f2prateek.dart.example;
 
 import android.content.Intent;
-import android.os.Bundle;
+import android.util.SparseArray;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.parceler.Parcels;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
+@Config(emulateSdk = 18, manifest = "src/main/AndroidManifest.xml")
 public class SampleActivityTest {
   @Test public void verifyExtrasInjection() {
     ComplexParcelable parcelable = ComplexParcelable.random();
-    ExampleParcel parcel = new ExampleParcel("andy");
+    ExampleParcel parcel1 = new ExampleParcel("Andy");
+    ExampleParcel parcel2 = new ExampleParcel("Tony");
+    List<ExampleParcel> parcelList = new ArrayList<>();
+    parcelList.add(parcel1);
+    parcelList.add(parcel2);
+    SparseArray<ExampleParcel> parcelSparseArray = new SparseArray<>();
+    parcelSparseArray.put(0, parcel1);
+    parcelSparseArray.put(2, parcel2);
 
-    Intent intent = new Intent(Robolectric.application, SampleActivity.class);
-    Bundle bundle = new Bundle();
-    intent.putExtra("defaultKey", "defaultKey");
-    intent.putExtra(SampleActivity.EXTRA_STRING, "test");
-    intent.putExtra(SampleActivity.EXTRA_INT, 4);
-    intent.putExtra(SampleActivity.EXTRA_PARCELABLE, parcelable);
-    intent.putExtra(SampleActivity.EXTRA_PARCEL, Parcels.wrap(parcel));
-    intent.putExtras(bundle);
+    Intent intent = new SampleActivity$$IntentBuilder(Robolectric.application)
+        .defaultKeyExtra("defaultKeyExtra")
+        .extraInt(4)
+        .extraListParcelable(parcelList)
+        .extraParcel(parcel1)
+        .extraParcelable(parcelable)
+        .extraSparseArrayParcelable(parcelSparseArray)
+        .extraString("test")
+        .build();
 
     SampleActivity activity =
-        Robolectric.buildActivity(SampleActivity.class).withIntent(intent).create().get();
+        Robolectric.buildActivity(SampleActivity.class)
+            .withIntent(intent)
+            .create()
+            .get();
 
-    assertThat(activity.defaultKey).isEqualTo("defaultKey");
     assertThat(activity.stringExtra).isEqualTo("test");
     assertThat(activity.intExtra).isEqualTo(4);
     assertThat(activity.parcelableExtra).isEqualTo(parcelable);
-    assertThat(activity.parcelExtra).isEqualTo(parcel);
+    assertThat(activity.parcelExtra).isEqualTo(parcel1);
+    assertThat(activity.listParcelExtra.size()).isEqualTo(2);
+    assertThat(activity.listParcelExtra.get(0)).isEqualTo(parcel1);
+    assertThat(activity.listParcelExtra.get(1)).isEqualTo(parcel2);
+    assertThat(activity.sparseArrayParcelExtra.size()).isEqualTo(2);
+    assertThat(activity.sparseArrayParcelExtra.get(0)).isEqualTo(parcel1);
+    assertThat(activity.sparseArrayParcelExtra.get(2)).isEqualTo(parcel2);
     assertThat(activity.defaultExtra).isEqualTo(SampleActivity.DEFAULT_EXTRA_VALUE);
+    assertThat(activity.defaultKeyExtra).isEqualTo("defaultKeyExtra");
   }
 }
