@@ -5,7 +5,6 @@ import com.f2prateek.dart.common.ExtraInjection;
 import com.f2prateek.dart.common.FieldBinding;
 import com.f2prateek.dart.common.InjectionTarget;
 import com.f2prateek.dart.henson.Bundler;
-import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -20,6 +19,9 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+
+import static com.squareup.javapoet.ClassName.get;
+import static com.squareup.javapoet.ClassName.bestGuess;
 
 /**
  * Creates Java code to create intent builders.
@@ -41,9 +43,11 @@ public class IntentBuilderGenerator extends BaseGenerator {
   public static final String STATE_CLASS_FINAL_STATE = "AllSet";
 
   private final InjectionTarget target;
+  private boolean usesReflection;
 
-  public IntentBuilderGenerator(InjectionTarget target) {
+  public IntentBuilderGenerator(InjectionTarget target, boolean usesReflection) {
     this.target = target;
+    this.usesReflection = usesReflection;
   }
 
   private String builderClassName() {
@@ -67,7 +71,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
   private void emitFields(TypeSpec.Builder intentBuilderTypeBuilder) {
     FieldSpec.Builder intentFieldBuilder =
-        FieldSpec.builder(ClassName.get("android.content", "Intent"), "intent", Modifier.PRIVATE);
+        FieldSpec.builder(get("android.content", "Intent"), "intent", Modifier.PRIVATE);
     intentBuilderTypeBuilder.addField(intentFieldBuilder.build());
     FieldSpec.Builder bundlerFieldBuilder =
         FieldSpec.builder(Bundler.class, "bundler", Modifier.PRIVATE);
@@ -78,12 +82,32 @@ public class IntentBuilderGenerator extends BaseGenerator {
   private void emitConstructor(TypeSpec.Builder intentBuilderTypeBuilder) {
     MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder()
         .addModifiers(Modifier.PUBLIC)
-        .addParameter(ClassName.get("android.content", "Context"), "context")
-        .addStatement("intent = new Intent(context, $L)", target.className + ".class");
+        .addParameter(get("android.content", "Context"), "context");
+    if (usesReflection) {
+        emitGetClassDynamically(intentBuilderTypeBuilder);
+        constructorBuilder.addStatement("intent = new Intent(context, getClassDynamically($S))",
+            target.getFqcn());
+    } else {
+        constructorBuilder.addStatement("intent = new Intent(context, $L.class)",
+            target.className);
+    }
     intentBuilderTypeBuilder.addMethod(constructorBuilder.build());
   }
 
-  private void emitExtraDSLStateMachine(TypeSpec.Builder intentBuilderTypeBuilder) {
+  private void emitGetClassDynamically(TypeSpec.Builder intentBuilderTypeBuilder) {
+    MethodSpec.Builder getClassDynamicallyBuilder = MethodSpec.methodBuilder("getClassDynamically")
+        .addModifiers(Modifier.PUBLIC)
+        .addParameter(get("java.lang", "String"), "className")
+        .returns(get("java.lang", "Class"));
+    getClassDynamicallyBuilder.beginControlFlow("try");
+    getClassDynamicallyBuilder.addStatement("return Class.forName(className)");
+    getClassDynamicallyBuilder.nextControlFlow("catch($T ex)", get("java.lang", "Exception"));
+    getClassDynamicallyBuilder.addStatement("throw new RuntimeException(ex)");
+    getClassDynamicallyBuilder.endControlFlow();
+    intentBuilderTypeBuilder.addMethod(getClassDynamicallyBuilder.build());
+  }
+
+    private void emitExtraDSLStateMachine(TypeSpec.Builder intentBuilderTypeBuilder) {
     //separate required extras from optional extras and sort both sublists.
     List<ExtraInjection> requiredInjections = new ArrayList<>();
     List<ExtraInjection> optionalInjections = new ArrayList<>();
@@ -124,7 +148,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
   private void emitBuildMethod(TypeSpec.Builder builder) {
     MethodSpec.Builder getBuilder = MethodSpec.methodBuilder("build")
         .addModifiers(Modifier.PUBLIC)
-        .returns(ClassName.get("android.content", "Intent"))
+        .returns(get("android.content", "Intent"))
         .addStatement("intent.putExtras(bundler.get())")
         .addStatement("return intent");
     builder.addMethod(getBuilder.build());
@@ -217,7 +241,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
     MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder(injection.getKey())
         .addModifiers(Modifier.PUBLIC)
-        .returns(ClassName.bestGuess(nextStateClassName))
+        .returns(bestGuess(nextStateClassName))
         .addParameter(TypeName.get(extraType), firstInjectedFieldName)
         .addStatement("bundler.put($S," + castToParcelableIfNecessary + " $L)", injection.getKey(),
             value);

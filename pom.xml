@@ -44,8 +44,9 @@
     <junit.version>4.10</junit.version>
     <robolectric.version>2.4</robolectric.version>
     <fest.android.version>1.0.7</fest.android.version>
-    <compile-test.version>0.4</compile-test.version>
+    <compile-test.version>0.9</compile-test.version>
     <parceler.version>1.0.4</parceler.version>
+    <javapoet.version>1.7.0</javapoet.version>
   </properties>
 
   <scm>
@@ -109,7 +110,11 @@
         <artifactId>parceler</artifactId>
         <version>${parceler.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>com.squareup</groupId>
+        <artifactId>javapoet</artifactId>
+        <version>${javapoet.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

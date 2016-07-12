@@ -23,7 +23,7 @@ import javax.tools.JavaFileObject;
 import org.junit.Test;
 
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
-import static org.truth0.Truth.ASSERT;
+import static com.google.common.truth.Truth.assert_;
 
 /**
  * Tests {@link com.f2prateek.dart.henson.processor.HensonExtraProcessor}.
@@ -72,7 +72,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                 "}" //
             ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
@@ -92,7 +92,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .failsToCompile()
@@ -114,7 +114,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
         "}"
     ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .failsToCompile()
@@ -137,7 +137,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
         "}"
     ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .failsToCompile()
@@ -196,7 +196,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
