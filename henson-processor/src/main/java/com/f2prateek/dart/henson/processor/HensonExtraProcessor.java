@@ -62,12 +62,15 @@ import static javax.lang.model.element.Modifier.STATIC;
 public final class HensonExtraProcessor extends AbstractDartProcessor {
 
   public static final String OPTION_HENSON_PACKAGE = "dart.henson.package";
+  public static final String OPTION_HENSON_USE_REFLECTION = "dart.henson.useReflection";
 
   private String hensonPackage;
+  private boolean useReflection;
+
 
   @Override public synchronized void init(ProcessingEnvironment env) {
     super.init(env);
-    hensonPackage = env.getOptions().get(OPTION_HENSON_PACKAGE);
+    parseAnnotationProcessorOptions(env);
   }
 
   @Override public Set<String> getSupportedAnnotationTypes() {
@@ -80,6 +83,7 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
     Set<String> supportedOptions = new LinkedHashSet<>();
     supportedOptions.addAll(super.getSupportedOptions());
     supportedOptions.add(OPTION_HENSON_PACKAGE);
+    supportedOptions.add(OPTION_HENSON_USE_REFLECTION);
     return supportedOptions;
   }
 
@@ -98,7 +102,7 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
         Writer writer = null;
         try {
           IntentBuilderGenerator intentBuilderGenerator =
-              new IntentBuilderGenerator(injectionTarget);
+              new IntentBuilderGenerator(injectionTarget, useReflection);
           JavaFileObject jfo =
               filer.createSourceFile(intentBuilderGenerator.getFqcn(), typeElement);
           writer = jfo.openWriter();
@@ -181,6 +185,22 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
     }
 
     return targetClassMap;
+  }
+
+  public void setUseReflection(boolean useReflection) {
+    this.useReflection = useReflection;
+  }
+
+  private void parseAnnotationProcessorOptions(ProcessingEnvironment env) {
+    hensonPackage = env.getOptions().get(OPTION_HENSON_PACKAGE);
+    final String useReflectionOption = env.getOptions().get(OPTION_HENSON_USE_REFLECTION);
+    if (useReflectionOption != null) {
+      try {
+        useReflection = Boolean.parseBoolean(useReflectionOption);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   private void parseHensonNavigableAnnotatedElements(RoundEnvironment env,

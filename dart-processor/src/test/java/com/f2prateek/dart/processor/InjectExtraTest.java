@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
-import static org.truth0.Truth.ASSERT;
+import static com.google.common.truth.Truth.assert_;
 
 /**
  * Tests {@link com.f2prateek.dart.processor.InjectExtraProcessor}.
@@ -66,7 +66,7 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
@@ -151,7 +151,7 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
@@ -192,7 +192,7 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
@@ -231,7 +231,7 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
@@ -253,7 +253,7 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError();
@@ -287,7 +287,7 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
@@ -325,7 +325,7 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
@@ -345,7 +345,7 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .failsToCompile()
@@ -366,7 +366,7 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .failsToCompile()
@@ -387,7 +387,7 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .failsToCompile()
@@ -408,7 +408,7 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .failsToCompile()
@@ -473,7 +473,7 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()
@@ -534,7 +534,7 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
         .compilesWithoutError()

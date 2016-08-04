@@ -31,4 +31,10 @@ final class ProcessorTestUtilities {
     return Arrays.asList(hensonExtraProcessor);
   }
 
+  static Iterable<? extends Processor> hensonProcessorsWithReflection() {
+    HensonExtraProcessor hensonExtraProcessor = new HensonExtraProcessor();
+    hensonExtraProcessor.setUseReflection(true);
+    return Arrays.asList(hensonExtraProcessor);
+  }
+
 }

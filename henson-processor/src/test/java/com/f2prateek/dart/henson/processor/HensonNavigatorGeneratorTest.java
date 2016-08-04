@@ -19,12 +19,10 @@ package com.f2prateek.dart.henson.processor;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
-import javax.annotation.processing.Processor;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
-
+import static com.google.common.truth.Truth.assert_;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
-import static org.truth0.Truth.ASSERT;
 
 public class HensonNavigatorGeneratorTest {
 
@@ -57,10 +55,10 @@ public class HensonNavigatorGeneratorTest {
                 "      return new test.Test$$IntentBuilder(context);", //
                 "    }", //
                 "  }", //
-                "}" //
+            "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
@@ -99,7 +97,7 @@ public class HensonNavigatorGeneratorTest {
                 "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
@@ -142,7 +140,7 @@ public class HensonNavigatorGeneratorTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError().and()
@@ -177,7 +175,7 @@ public class HensonNavigatorGeneratorTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
@@ -225,7 +223,7 @@ public class HensonNavigatorGeneratorTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
@@ -273,7 +271,7 @@ public class HensonNavigatorGeneratorTest {
             "}" //
         ));
 
-    ASSERT.about(javaSource())
+    assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
