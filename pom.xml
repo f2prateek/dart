@@ -11,7 +11,7 @@
 
   <groupId>com.f2prateek.dart</groupId>
   <artifactId>dart-parent</artifactId>
-  <version>2.0.1</version>
+  <version>2.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Dart (Parent)</name>
@@ -53,7 +53,7 @@
     <url>http://github.com/f2prateek/dart/</url>
     <connection>scm:git:git://github.com/f2prateek/dart.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/f2prateek/dart.git</developerConnection>
-    <tag>dart-parent-2.0.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <issueManagement>
