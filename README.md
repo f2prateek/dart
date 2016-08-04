@@ -91,6 +91,17 @@ class AnotherActivity extends Activity {
 The Henson annotation processor will generate the `Henson` navigator class (used above) in a package that is : 
 * either the package specified by the `dart.henson.package` annotation processor option
 * or if no such option is used, in the common package of all annotated activities. See the Javadoc of `HensonExtraProcessor` for more details.
+ 
+If your activites and fragment are in *different packages*, you will need to specify a package via the `dart.henson.package` annotation processor option.
+If you're using gradle, simply add this to your `build.gradle``
+```groovy 
+apt {
+    arguments {
+        "dart.henson.package" "your.package.name"
+    }
+}
+```
+
 
 Bonus
 -----
