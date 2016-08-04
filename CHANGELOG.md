@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.0.1 *(2016-08-04)*
+----------------------------
+* Upgrade to JavaPoet.
+* Upgrade testing lib for annotation processors. We can now see errors properly displayed in Intelli J.
+* Add option to henson to use reflection when referencing target activity classes, see #128.
+
 Version 2.0.0 *(2016-02-29)*
 ----------------------------
 * Switch to JavaPoet.
