@@ -1,11 +1,21 @@
 Change Log
 ==========
 
-Version 1.2.0 *(In progress)*
+Version 2.0.0 *(2016-02-29)*
+----------------------------
+* Switch to JavaPoet.
+* Use android.support.annotation.Nullable instead of com.f2prateek.dart.Optional.
+* Do not throw UnableToInjectException if there's no @InjectExtras annotation found.
+* Fix keys can be java identifiers.
+* Add support for injecting a service .
+* Add Henson helps to navigate between activities.
+
+Version 1.2.0 
 ----------------------------
 
 * Use variable name as key if one is not provided in annotation.
 * Fix `char` injection.
+
 
 Version 1.1.0 *(2014-01-17)*
 ----------------------------
