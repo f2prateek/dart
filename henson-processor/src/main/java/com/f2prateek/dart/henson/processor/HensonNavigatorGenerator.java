@@ -10,7 +10,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.TreeSet;
 import javax.lang.model.element.Modifier;
 
 /**
@@ -29,7 +29,7 @@ public class HensonNavigatorGenerator extends BaseGenerator {
   public static final String HENSON_NAVIGATOR_CLASS_NAME = "Henson";
   public static final String WITH_CONTEXT_SET_STATE_CLASS_NAME = "WithContextSetState";
   private String packageName;
-  private Collection<String> targetClassNames;
+  private Collection<InjectionTarget> targets;
 
   public HensonNavigatorGenerator(String packageName, Collection<InjectionTarget> targets) {
     if (packageName != null) {
@@ -38,7 +38,7 @@ public class HensonNavigatorGenerator extends BaseGenerator {
       this.packageName = findCommonPackage(targets);
     }
 
-    this.targetClassNames = getClassNamesWhereHensonCanGoto(targets);
+    this.targets = getTargetsWhereHensonCanGoto(targets);
   }
 
   private String hensonNavigatorClassName() {
@@ -78,8 +78,8 @@ public class HensonNavigatorGenerator extends BaseGenerator {
         .addParameter(ClassName.get("android.content", "Context"), "context")
         .addStatement("this.context = context")
         .build());
-    for (String targetClassName : targetClassNames) {
-      emitNavigationMethod(withContextSetStateBuilder, targetClassName);
+    for (InjectionTarget target : targets) {
+      emitNavigationMethod(withContextSetStateBuilder, target);
     }
     hensonNavigatorTypeBuilder.addType(withContextSetStateBuilder.build());
   }
@@ -99,7 +99,10 @@ public class HensonNavigatorGenerator extends BaseGenerator {
     builder.addMethod(gotoMethodBuilder.build());
   }
 
-  private void emitNavigationMethod(TypeSpec.Builder builder, String targetClassName) {
+  private void emitNavigationMethod(TypeSpec.Builder builder, InjectionTarget target) {
+    String targetClassName = target.targetClass;
+    targetClassName =
+            targetClassName.replace(target.className.replaceAll("\\$", "."), "") + target.className;
     TypeName intentBuilderClassName =
         ClassName.bestGuess(targetClassName + IntentBuilderGenerator.BUNDLE_BUILDER_SUFFIX);
     String simpleTargetClassName = targetClassName.substring(targetClassName.lastIndexOf('.') + 1);
@@ -147,13 +150,14 @@ public class HensonNavigatorGenerator extends BaseGenerator {
     return commonRoot;
   }
 
-  private Collection<String> getClassNamesWhereHensonCanGoto(Collection<InjectionTarget> targets) {
-    Collection<String> classNames = new HashSet<>();
+  private Collection<InjectionTarget> getTargetsWhereHensonCanGoto(
+          Collection<InjectionTarget> targets) {
+    Collection<InjectionTarget> canGotoTargets = new TreeSet<>();
     for (InjectionTarget injectionTarget : targets) {
       if (!injectionTarget.isAbstractTargetClass) {
-        classNames.add(injectionTarget.targetClass);
+        canGotoTargets.add(injectionTarget);
       }
     }
-    return classNames;
+    return canGotoTargets;
   }
 }

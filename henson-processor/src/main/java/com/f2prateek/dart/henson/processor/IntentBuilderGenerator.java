@@ -86,10 +86,10 @@ public class IntentBuilderGenerator extends BaseGenerator {
     if (usesReflection) {
         emitGetClassDynamically(intentBuilderTypeBuilder);
         constructorBuilder.addStatement("intent = new Intent(context, getClassDynamically($S))",
-            target.getFqcn());
+            target.getFqcn().replaceAll("\\$", "."));
     } else {
         constructorBuilder.addStatement("intent = new Intent(context, $L.class)",
-            target.className);
+            target.className.replaceAll("\\$", "."));
     }
     intentBuilderTypeBuilder.addMethod(constructorBuilder.build());
   }
