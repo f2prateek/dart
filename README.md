@@ -228,6 +228,11 @@ Maven:
 </dependency>
 ```
 
+Talks & Slides
+-------
+
+* Andev con SF (2016): [slides](https://speakerdeck.com/stephanenicolas/dart-and-henson)
+
 License
 -------
 
