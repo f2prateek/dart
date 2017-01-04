@@ -50,7 +50,6 @@ public class InjectExtraWithParcelerTest {
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
             "public class TestSerializableCollection$$ExtraInjector {", //
-			"  @SuppressWarnings(\"{\"unchecked\",\"rawtypes\"}\")", //
             "  public static void inject(Dart.Finder finder, TestSerializableCollection target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
