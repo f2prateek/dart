@@ -65,7 +65,7 @@ public class ExtraInjectionGenerator extends BaseGenerator {
 
   private void emitInject(TypeSpec.Builder builder) {
     MethodSpec.Builder injectBuilder = MethodSpec.methodBuilder("inject")
-		.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "$S", "{\"unchecked\",\"rawtypes\"}").build())
+		.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "$L", "{\"unchecked\",\"rawtypes\"}").build())
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .addParameter(ClassName.get(Dart.Finder.class), "finder")
         .addParameter(ClassName.bestGuess(target.targetClass), "target")

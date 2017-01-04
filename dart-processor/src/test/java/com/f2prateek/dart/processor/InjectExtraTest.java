@@ -54,6 +54,7 @@ public class InjectExtraTest {
             "import java.lang.Object;", //
             "import java.lang.String;", //
             "public class Test$$ExtraInjector {", //
+			"  @SuppressWarnings(\"{\"unchecked\",\"rawtypes\"}\")", //
             "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
