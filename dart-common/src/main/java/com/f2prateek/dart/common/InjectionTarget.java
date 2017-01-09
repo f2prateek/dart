@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.lang.model.type.TypeMirror;
 
-public final class InjectionTarget {
+public final class InjectionTarget implements Comparable<InjectionTarget> {
   public final Map<String, ExtraInjection> injectionMap = new LinkedHashMap<>();
   public final String classPackage;
   public final String className;
@@ -56,5 +56,11 @@ public final class InjectionTarget {
 
   public String getFqcn() {
     return classPackage + "." + className;
+  }
+
+  @Override
+  public int compareTo(InjectionTarget o) {
+    if (o == null) return 0;
+    return -this.targetClass.compareTo(o.targetClass);
   }
 }
