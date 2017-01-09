@@ -143,7 +143,11 @@ public class HensonNavigatorGenerator extends BaseGenerator {
         break;
       }
     }
+
     String commonRoot = packageName.substring(0, indexCommon);
+    if (commonRoot.endsWith("."))  {
+      commonRoot = commonRoot.substring(0, commonRoot.length());
+    }
     return commonRoot;
   }
 
