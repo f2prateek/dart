@@ -20,7 +20,12 @@ package com.f2prateek.dart.henson.processor;
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
+
+import com.google.testing.compile.JavaSourcesSubjectFactory;
 import org.junit.Test;
+
+import java.util.Arrays;
+
 import static com.google.common.truth.Truth.assert_;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 
@@ -277,5 +282,111 @@ public class HensonNavigatorGeneratorTest {
         .compilesWithoutError()
         .and()
         .generatesSources(expectedSource1);
+  }
+
+  @Test public void samePackage() throws Exception {
+    JavaFileObject source1 = JavaFileObjects.forSourceString("test.TestOne", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "public class TestOne extends Activity {", //
+        "    @InjectExtra(\"key\") String extra;", //
+        "}" //
+    ));
+
+    JavaFileObject source2 = JavaFileObjects.forSourceString("test.TestTwo", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "public class TestTwo extends Activity {", //
+        "    @InjectExtra(\"key\") String extra;", //
+        "}" //
+    ));
+
+    JavaFileObject expectedSource =
+        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "public class Henson {", //
+            "  private Henson() {", //
+            "  }", //
+            "  public static WithContextSetState with(Context context) {", //
+            "    return new test.Henson.WithContextSetState(context);", //
+            "  }", //
+            "  public static class WithContextSetState {", //
+            "    private Context context;", //
+            "    private WithContextSetState(Context context) {", //
+            "      this.context = context;", //
+            "    }", //
+            "    public TestOne$$IntentBuilder gotoTestOne() {", //
+            "      return new test.TestOne$$IntentBuilder(context);", //
+            "    }", //
+            "    public TestTwo$$IntentBuilder gotoTestTwo() {", //
+            "      return new test.TestTwo$$IntentBuilder(context);", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(JavaSourcesSubjectFactory.javaSources())
+            .that(Arrays.asList(source1, source2))
+            .processedWith(ProcessorTestUtilities.hensonProcessors())
+            .compilesWithoutError()
+            .and()
+            .generatesSources(expectedSource);
+  }
+
+  @Test public void differentPackage() throws Exception {
+    JavaFileObject source1 = JavaFileObjects.forSourceString("test.test1.TestOne", Joiner.on('\n').join( //
+        "package test.test1;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "public class TestOne extends Activity {", //
+        "    @InjectExtra(\"key\") String extra;", //
+        "}" //
+    ));
+
+    JavaFileObject source2 = JavaFileObjects.forSourceString("test.test2.TestTwo", Joiner.on('\n').join( //
+        "package test.test2;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "public class TestTwo extends Activity {", //
+        "    @InjectExtra(\"key\") String extra;", //
+        "}" //
+    ));
+
+    JavaFileObject expectedSource =
+        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "import test.test1.TestOne$$IntentBuilder;", //
+            "import test.test2.TestTwo$$IntentBuilder;", //
+            "public class Henson {", //
+            "  private Henson() {", //
+            "  }", //
+            "  public static WithContextSetState with(Context context) {", //
+            "    return new test.Henson.WithContextSetState(context);", //
+            "  }", //
+            "  public static class WithContextSetState {", //
+            "    private Context context;", //
+            "    private WithContextSetState(Context context) {", //
+            "      this.context = context;", //
+            "    }", //
+            "    public TestOne$$IntentBuilder gotoTestOne() {", //
+            "      return new test.test1.TestOne$$IntentBuilder(context);", //
+            "    }", //
+            "    public TestTwo$$IntentBuilder gotoTestTwo() {", //
+            "      return new test.test2.TestTwo$$IntentBuilder(context);", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(JavaSourcesSubjectFactory.javaSources())
+            .that(Arrays.asList(source1, source2))
+            .processedWith(ProcessorTestUtilities.hensonProcessors())
+            .compilesWithoutError()
+            .and()
+            .generatesSources(expectedSource);
   }
 }
