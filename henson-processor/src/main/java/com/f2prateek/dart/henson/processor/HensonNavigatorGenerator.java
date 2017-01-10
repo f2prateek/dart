@@ -9,6 +9,9 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import javax.lang.model.element.Modifier;
@@ -137,18 +140,34 @@ public class HensonNavigatorGenerator extends BaseGenerator {
 
   private String findCommonPackage(String commonPackageName, String packageName) {
     int indexCommon = 0;
-    int maxLength = Math.min(commonPackageName.length(), packageName.length());
+    String[] commonPackages = splitIntoPackages(commonPackageName);
+    String[] packages = splitIntoPackages(packageName);
+    int maxLength = Math.min(commonPackages.length, packages.length);
     for (; indexCommon < maxLength; indexCommon++) {
-      if (commonPackageName.charAt(indexCommon) != packageName.charAt(indexCommon)) {
+      if (!commonPackages[indexCommon].equals(packages[indexCommon])) {
         break;
       }
     }
 
-    String commonRoot = packageName.substring(0, indexCommon);
-    if (commonRoot.endsWith("."))  {
-      commonRoot = commonRoot.substring(0, commonRoot.length());
-    }
+    String commonRoot = join(Arrays.copyOfRange(packages, 0, indexCommon), ".");
     return commonRoot;
+  }
+
+  private String[] splitIntoPackages(String packageName) {
+    String[] packages = packageName.split("\\.");
+    if (packages.length == 0) {
+      return new String[] {packageName};
+    }
+    return packages;
+  }
+
+  private String join(String[] strs, String delimiter) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < strs.length; i++) {
+      if (i != 0) sb.append(delimiter);
+      sb.append(strs[i]);
+    }
+    return sb.toString();
   }
 
   private Collection<String> getClassNamesWhereHensonCanGoto(Collection<InjectionTarget> targets) {
