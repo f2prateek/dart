@@ -102,6 +102,17 @@ apt {
 }
 ```
 
+If you're using the newest version of Android gradle plugin, it's now possible to use a built-in annotationProcessor scope instead of apt. In this case, you can pass arguments to the annotation processors using :
+
+```groovy
+defaultConfig {
+    javaCompileOptions {
+        annotationProcessorOptions {
+            arguments = [ 'dart.henson.package' : 'your.package.name' ]
+        }
+    }
+}
+```
 
 Bonus
 -----
