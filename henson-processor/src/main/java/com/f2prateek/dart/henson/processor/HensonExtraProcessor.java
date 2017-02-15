@@ -26,10 +26,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -95,7 +93,7 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
       InjectionTarget injectionTarget = entry.getValue();
 
       //we unfortunately can't test that nothing is generated in a TRUTH based test
-      if (!injectionTarget.isAbstractTargetClass) {
+      if (!injectionTarget.isAbstractTargetClass && !injectionTarget.isModel) {
         enhanceInjectionTargetWithInheritedInjectionExtras(targetClassMap, injectionTarget);
 
         // Now write the IntentBuilder
@@ -174,17 +172,28 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
 
     // Process each @InjectExtra elements.
     parseInjectExtraAnnotatedElements(env, targetClassMap, erasedTargetTypes);
+    // Try to find a parent injector for each injector. For targets using @InjectExtra
+    findAllTargetParents(targetClassMap, erasedTargetTypes);
+    // Process each @HensonNavigable elements.
     parseHensonNavigableAnnotatedElements(env, targetClassMap, erasedTargetTypes);
-
-    // Try to find a parent injector for each injector.
-    for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
-      String parentClassFqcn = findParentFqcn(entry.getKey(), erasedTargetTypes);
-      if (parentClassFqcn != null) {
-        entry.getValue().setParentTarget(parentClassFqcn);
-      }
-    }
+    // Try to find a parent injector for each injector. For targets using @HensonNavigable
+    findAllTargetParents(targetClassMap, erasedTargetTypes);
 
     return targetClassMap;
+  }
+
+  private void findAllTargetParents(Map<TypeElement, InjectionTarget> targetClassMap,
+      Set<TypeMirror> erasedTargetTypes) {
+    for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
+      TypeElement typeElement = entry.getKey();
+      InjectionTarget injectionTarget = entry.getValue();
+      if (injectionTarget.parentTarget == null) {
+        String parentClassFqcn = findParentFqcn(typeElement, erasedTargetTypes);
+        if (parentClassFqcn != null) {
+          injectionTarget.setParentTarget(parentClassFqcn);
+        }
+      }
+    }
   }
 
   public void setUseReflection(boolean useReflection) {
@@ -205,10 +214,9 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
 
   private void parseHensonNavigableAnnotatedElements(RoundEnvironment env,
       Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes) {
-    List<TypeElement> modelTypeElements = new ArrayList<>();
     for (Element element : env.getElementsAnnotatedWith(HensonNavigable.class)) {
       try {
-        parseHenson((TypeElement) element, targetClassMap, erasedTargetTypes, modelTypeElements);
+        parseHenson((TypeElement) element, targetClassMap, erasedTargetTypes);
       } catch (Exception e) {
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
@@ -217,13 +225,10 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
             stackTrace.toString());
       }
     }
-    for (TypeElement modelTypeElement : modelTypeElements) {
-      targetClassMap.remove(modelTypeElement);
-    }
   }
 
   private void parseHenson(TypeElement element, Map<TypeElement, InjectionTarget> targetClassMap,
-      Set<TypeMirror> erasedTargetTypes, List<TypeElement> modelInjectTargets) {
+      Set<TypeMirror> erasedTargetTypes) {
 
     // Verify common generated code restrictions.
     if (!isValidUsageOfHenson(HensonNavigable.class, element)) {
@@ -244,8 +249,9 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
         }
         //we simply copy all extra injections from the model and add them to the target
         InjectionTarget modelInjectionTarget = getOrCreateTargetClass(targetClassMap, modelElement);
-        modelInjectTargets.add(modelElement);
+        modelInjectionTarget.isModel = true;
         hensonNavigableTarget.injectionMap.putAll(modelInjectionTarget.injectionMap);
+        hensonNavigableTarget.parentTarget = modelInjectionTarget.parentTarget;
       }
     }
 

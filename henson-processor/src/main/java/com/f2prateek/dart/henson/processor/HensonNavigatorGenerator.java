@@ -150,7 +150,7 @@ public class HensonNavigatorGenerator extends BaseGenerator {
   private Collection<String> getClassNamesWhereHensonCanGoto(Collection<InjectionTarget> targets) {
     Collection<String> classNames = new HashSet<>();
     for (InjectionTarget injectionTarget : targets) {
-      if (!injectionTarget.isAbstractTargetClass) {
+      if (!injectionTarget.isAbstractTargetClass && !injectionTarget.isModel) {
         classNames.add(injectionTarget.targetClass);
       }
     }

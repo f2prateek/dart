@@ -28,6 +28,7 @@ public final class InjectionTarget {
   public final String targetClass;
   public String parentTarget;
   public boolean isAbstractTargetClass;
+  public boolean isModel;
 
   public InjectionTarget(String classPackage, String className, String targetClass,
       boolean isAbstractTargetClass) {
