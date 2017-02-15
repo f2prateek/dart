@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 2.0.2 *(2017-02-15)*
+----------------------------
+* Issue #132 resolved. Models can now use inheritance.
+
 Version 2.0.1 *(2016-08-04)*
 ----------------------------
 * Upgrade to JavaPoet.
