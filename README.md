@@ -231,7 +231,8 @@ Maven:
 Talks & Slides
 -------
 
-* Andev con SF (2016): [slides](https://speakerdeck.com/stephanenicolas/dart-and-henson)
+* AndevCon SF (2016): [slides](https://speakerdeck.com/stephanenicolas/dart-and-henson)
+* DroidCon Italy, Turin (2017):[video](https://www.youtube.com/watch?v=EVQewsJu0NA)
 
 License
 -------
