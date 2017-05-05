@@ -244,6 +244,7 @@ Talks & Slides
 
 * AndevCon SF (2016): [slides](https://speakerdeck.com/stephanenicolas/dart-and-henson)
 * DroidCon Italy, Turin (2017):[video](https://www.youtube.com/watch?v=EVQewsJu0NA)
+* "Reducing Intent data passing ‘putExtra’, ‘putInt’, ‘putParcelable’ Boiler plate code" from Take Off Android:[Article](https://blog.f22labs.com/reducing-intent-data-passing-putextra-putint-putparcelable-boiler-plate-code-fd62b449dac3)
 
 License
 -------
