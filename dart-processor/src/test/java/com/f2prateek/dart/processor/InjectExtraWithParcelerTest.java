@@ -40,6 +40,7 @@ public class InjectExtraWithParcelerTest {
         "import java.lang.String;", //
         "import android.util.SparseArray;", //
         "public class TestSerializableCollection extends Activity {", //
+		"@SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
         "  @InjectExtra(\"key\") SparseArray<String> extra;", //
         "}" //
     ));
@@ -49,7 +50,9 @@ public class InjectExtraWithParcelerTest {
             "package test;", //
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
+			"import java.lang.SuppressWarnings;", //
             "public class TestSerializableCollection$$ExtraInjector {", //
+			"@SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, TestSerializableCollection target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -87,7 +90,9 @@ public class InjectExtraWithParcelerTest {
             "package test;", //
         "import com.f2prateek.dart.Dart;", //
         "import java.lang.Object;", //
+		"import java.lang.SuppressWarnings;", //
         "public class TestNonSerializableNonParcelableCollection_withoutParceler$$ExtraInjector {", //
+		"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
         "  public static void inject(Dart.Finder finder, TestNonSerializableNonParcelableCollection_withoutParceler target, Object source) {", //
         "    Object object;", //
         "    object = finder.getExtra(source, \"key\");", //
@@ -126,7 +131,9 @@ public class InjectExtraWithParcelerTest {
             "package test;", //
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
+			"import java.lang.SuppressWarnings;", //
             "public class TestParcelAnnotated$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, TestParcelAnnotated target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -166,7 +173,9 @@ public class InjectExtraWithParcelerTest {
             "package test;", //
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
+			"import java.lang.SuppressWarnings;", //
             "public class TestCollectionParcel$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, TestCollectionParcel target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -212,7 +221,9 @@ public class InjectExtraWithParcelerTest {
             "package test;", //
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
+			"import java.lang.SuppressWarnings;", //
             "public class TestParcelExtendsParcelable$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, TestParcelExtendsParcelable target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -263,7 +274,9 @@ public class InjectExtraWithParcelerTest {
             "package test;", //
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
+			"import java.lang.SuppressWarnings;", //
             "public class TestParcelableExtendsParcelable$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, TestParcelableExtendsParcelable target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //

@@ -27,6 +27,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.AnnotationSpec;
 import java.util.Collection;
 import java.util.List;
 import javax.lang.model.element.Modifier;
@@ -64,6 +65,8 @@ public class ExtraInjectionGenerator extends BaseGenerator {
 
   private void emitInject(TypeSpec.Builder builder) {
     MethodSpec.Builder injectBuilder = MethodSpec.methodBuilder("inject")
+        .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
+                        .addMember("value", "$L", "{\"unchecked\",\"rawtypes\"}").build())
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .addParameter(ClassName.get(Dart.Finder.class), "finder")
         .addParameter(ClassName.bestGuess(target.targetClass), "target")

@@ -53,7 +53,9 @@ public class InjectExtraTest {
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
             "import java.lang.String;", //
+			"import java.lang.SuppressWarnings;", //
             "public class Test$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -96,7 +98,9 @@ public class InjectExtraTest {
             "package test;", //
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
+			"import java.lang.SuppressWarnings;", //
             "public class Test$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key_bool\");", //
@@ -177,7 +181,9 @@ public class InjectExtraTest {
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
             "import java.lang.String;", //
+			"import java.lang.SuppressWarnings;", //
             "public class Test$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -218,7 +224,9 @@ public class InjectExtraTest {
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
             "import java.lang.String;", //
+			"import java.lang.SuppressWarnings;", //
             "public class Test$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -276,7 +284,9 @@ public class InjectExtraTest {
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
             "import java.lang.String;", //
+			"import java.lang.SuppressWarnings;", //
             "public class Test$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -314,7 +324,9 @@ public class InjectExtraTest {
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
             "import java.lang.String;", //
+			"import java.lang.SuppressWarnings;", //
             "public class Test$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -440,7 +452,9 @@ public class InjectExtraTest {
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
             "import java.lang.String;", //
+			"import java.lang.SuppressWarnings;", //
             "public class Test$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -459,7 +473,9 @@ public class InjectExtraTest {
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
             "import java.lang.String;", //
+			"import java.lang.SuppressWarnings;", //
             "public class TestOne$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, TestOne target, Object source) {", //
             "    Test$$ExtraInjector.inject(finder, target, source);", //
             "    Object object;", //
@@ -502,7 +518,9 @@ public class InjectExtraTest {
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
             "import java.lang.String;", //
+			"import java.lang.SuppressWarnings;", //
             "public class Test$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
             "    Object object;", //
             "    object = finder.getExtra(source, \"key\");", //
@@ -521,7 +539,9 @@ public class InjectExtraTest {
             "import com.f2prateek.dart.Dart;", //
             "import java.lang.Object;", //
             "import java.lang.String;", //
+			"import java.lang.SuppressWarnings;", //
             "public class TestOne$$ExtraInjector {", //
+			"  @SuppressWarnings({\"unchecked\",\"rawtypes\"})", //
             "  public static void inject(Dart.Finder finder, TestOne target, Object source) {",
             "    Test$$ExtraInjector.inject(finder, target, source);", //
             "    Object object;", //
