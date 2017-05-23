@@ -114,6 +114,17 @@ defaultConfig {
 }
 ```
 
+If you use [Kotlin](https://kotlinlang.org/), you must pass this argument to KAPT (Kotlin Annotation Processor) instead:
+
+```groovy
+kapt {
+  generateStubs = true
+  arguments {
+    arg("dart.henson.package","your.package.name")
+  }
+}
+```
+
 Bonus
 -----
 As you can see from the examples above, using both Dart & Henson not only provides a very structured generated navigation layer and convenient DSLs; it also allows to wrap/unwrap parcelables automatically.
