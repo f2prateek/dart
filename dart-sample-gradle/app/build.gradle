@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "com.f2prateek.dart.example"
+        minSdkVersion 4
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+apt {
+    arguments {
+        'dart.henson.package' "com.f2prateek.dart.example"
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'com.f2prateek.dart:dart:2.0.0-RC1'
+    compile 'com.f2prateek.dart:henson:2.0.0-RC1'
+    compile 'org.parceler:parceler-api:1.0.4'
+
+    apt 'com.f2prateek.dart:henson-processor:2.0.0-RC1'
+    apt 'com.f2prateek.dart:dart-processor:2.0.0-RC1'
+    apt 'org.parceler:parceler:1.0.4'
+
+    testCompile 'junit:junit:4.12'
+    testCompile "org.robolectric:robolectric:3.0"
+    testCompile 'org.assertj:assertj-core:2.3.0'
+}
