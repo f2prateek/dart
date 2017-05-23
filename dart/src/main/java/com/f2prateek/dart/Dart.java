@@ -103,6 +103,21 @@ public class Dart {
   }
 
   /**
+   * Inject fields annotated with {@link com.f2prateek.dart.InjectExtra} in the specified {@link
+   * android.support.v4.app.Fragment}.
+   * The arguments that this fragment was called with will be used as the source of the extras
+   * bundle.
+   *
+   * @param target Target fragment for field injection.
+   * @throws com.f2prateek.dart.Dart.UnableToInjectException if injection could not be
+   * performed.
+   * @see android.support.v4.app.Fragment#getArguments()
+   */
+  public static void inject(android.support.v4.app.Fragment target) {
+    inject(target, target, Finder.V4FRAGMENT);
+  }
+
+  /**
    * Inject fields annotated with {@link com.f2prateek.dart.InjectExtra} in the specified {@code
    * target} using the {@code source} {@link android.app.Activity}.
    *
@@ -190,6 +205,12 @@ public class Dart {
     FRAGMENT {
       @Override public Object getExtra(Object source, String key) {
         Bundle extras = ((Fragment) source).getArguments();
+        return Finder.BUNDLE.getExtra(extras, key);
+      }
+    },
+    V4FRAGMENT {
+      @Override public Object getExtra(Object source, String key) {
+        Bundle extras = ((android.support.v4.app.Fragment) source).getArguments();
         return Finder.BUNDLE.getExtra(extras, key);
       }
     },

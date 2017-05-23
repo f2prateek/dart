@@ -40,6 +40,7 @@ public class SampleActivity extends Activity {
   private static final String EXTRA_PARCEL = "extraParcel";
   private static final String EXTRA_WITH_DEFAULT = "extraWithDefault";
 
+  @InjectExtra String defaultKey;
   @InjectExtra(EXTRA_STRING) String stringExtra;
   @InjectExtra(EXTRA_INT) int intExtra;
   @InjectExtra(EXTRA_PARCELABLE) ComplexParcelable parcelableExtra;
@@ -68,6 +69,7 @@ public class SampleActivity extends Activity {
     Dart.inject(this);
 
     // Contrived code to use the "injected" extras.
+    defaultKeyExtraTextView.setText(defaultKey);
     stringExtraTextView.setText(stringExtra);
     intExtraTextView.setText(String.valueOf(intExtra));
     parcelableExtraTextView.setText(String.valueOf(parcelableExtra));
