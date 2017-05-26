@@ -41,6 +41,7 @@
     <fest.version>2.0M10</fest.version>
     <android.version>4.1.1.4</android.version>
     <android.platform>16</android.platform>
+    <android-support.version>r7</android-support.version>
     <junit.version>4.10</junit.version>
     <robolectric.version>2.4</robolectric.version>
     <fest.android.version>1.0.7</fest.android.version>
@@ -74,6 +75,11 @@
         <groupId>com.google.android</groupId>
         <artifactId>android</artifactId>
         <version>${android.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.android</groupId>
+        <artifactId>support-v4</artifactId>
+        <version>${android-support.version}</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
