@@ -241,7 +241,7 @@ Maven:
 
 Kotlin
 -----
-For all Kotlin enthousiasts, you may wonder how to use this library to configure your intents. This is perfectly compatible, with a bit of understanding of how Kotlin works, especially when it comes to annotation processing.
+For all Kotlin enthusiasts, you may wonder how to use this library to configure your intents. This is perfectly compatible, with a bit of understanding of how Kotlin works, especially when it comes to annotation processing.
 
 Assuming that your project is already configured with Kotlin, update your `build.gradle` file :
 
