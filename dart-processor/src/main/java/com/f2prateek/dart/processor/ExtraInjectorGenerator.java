@@ -17,39 +17,39 @@
 package com.f2prateek.dart.processor;
 
 import com.f2prateek.dart.Dart;
+import com.f2prateek.dart.common.BaseGenerator;
 import com.f2prateek.dart.common.Binding;
 import com.f2prateek.dart.common.ExtraInjection;
 import com.f2prateek.dart.common.FieldBinding;
-import com.f2prateek.dart.common.BaseGenerator;
 import com.f2prateek.dart.common.InjectionTarget;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import java.util.Collection;
-import java.util.List;
+
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Creates Java code to inject extras into an activity
  * or a {@link android.os.Bundle}.
+ *
  * @see {@link Dart} to use this code at runtime.
  */
-public class ExtraInjectionGenerator extends BaseGenerator {
+public class ExtraInjectorGenerator extends BaseGenerator {
 
   private final InjectionTarget target;
 
-  public ExtraInjectionGenerator(InjectionTarget target) {
+  public ExtraInjectorGenerator(InjectionTarget target) {
     this.target = target;
   }
 
-  @Override
-  public String brewJava() {
+  @Override public String brewJava() {
     TypeSpec.Builder injectorTypeSpec =
-        TypeSpec.classBuilder(target.className + Dart.INJECTOR_SUFFIX)
-        .addModifiers(Modifier.PUBLIC);
+        TypeSpec.classBuilder(injectorClassName()).addModifiers(Modifier.PUBLIC);
     emitInject(injectorTypeSpec);
     JavaFile javaFile = JavaFile.builder(target.classPackage, injectorTypeSpec.build())
         .addFileComment("Generated code from Dart. Do not modify!")
@@ -57,22 +57,25 @@ public class ExtraInjectionGenerator extends BaseGenerator {
     return javaFile.toString();
   }
 
-  @Override
-  public String getFqcn() {
-    return target.getFqcn() + Dart.INJECTOR_SUFFIX;
+  @Override public String getFqcn() {
+    return target.classPackage + "." + injectorClassName();
+  }
+
+  private String injectorClassName() {
+    return target.className + Dart.INJECTOR_SUFFIX;
   }
 
   private void emitInject(TypeSpec.Builder builder) {
     MethodSpec.Builder injectBuilder = MethodSpec.methodBuilder("inject")
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .addParameter(ClassName.get(Dart.Finder.class), "finder")
-        .addParameter(ClassName.bestGuess(target.targetClass), "target")
+        .addParameter(ClassName.bestGuess(target.classFqcnCanonical), "target")
         .addParameter(ClassName.get(Object.class), "source");
 
-    if (target.parentTarget != null) {
+    if (target.parentClassFqcn != null) {
       // Emit a call to the superclass injector, if any.
       injectBuilder.addStatement("$T.inject(finder, target, source)",
-          ClassName.bestGuess(target.parentTarget + Dart.INJECTOR_SUFFIX));
+          ClassName.bestGuess(target.parentClassFqcn + Dart.INJECTOR_SUFFIX));
     }
 
     // Local variable in which all extras will be temporarily stored.
@@ -128,7 +131,9 @@ public class ExtraInjectionGenerator extends BaseGenerator {
   }
 
   //TODO add android annotations dependency to get that annotation plus others.
-  /** Visible for testing*/ String emitHumanDescription(List<Binding> bindings) {
+
+  /** Visible for testing */
+  String emitHumanDescription(List<Binding> bindings) {
     StringBuilder builder = new StringBuilder();
     switch (bindings.size()) {
       case 1:

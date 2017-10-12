@@ -17,45 +17,50 @@
 
 package com.f2prateek.dart.common;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-public final class InjectionTarget {
+public class InjectionTarget {
   public final Map<String, ExtraInjection> injectionMap = new LinkedHashMap<>();
   public final String classPackage;
   public final String className;
-  public final String targetClass;
-  public String parentTarget;
-  public boolean isAbstractTargetClass;
-  public boolean isModel;
+  public final String classFqcnCanonical;  // Canonical: my.package.class.innerclass
+  public final boolean isAbstractClass;
+  public String parentClassFqcn;  // Non-canonical: my.package.class$innerclass
+  public List<TypeElement> childClasses;
+  public boolean isNavigationModel;
+  public String targetClassFqcn;  // Non-canonical: my.package.class$innerclass
+  public String targetClassName;
 
-  public InjectionTarget(String classPackage, String className, String targetClass,
-      boolean isAbstractTargetClass) {
+  public InjectionTarget(String classPackage, String className, String classFqcnCanonical,
+      boolean isAbstractClass) {
     this.classPackage = classPackage;
     this.className = className;
-    this.targetClass = targetClass;
-    this.isAbstractTargetClass = isAbstractTargetClass;
+    this.classFqcnCanonical = classFqcnCanonical;
+    this.isAbstractClass = isAbstractClass;
+    childClasses = new ArrayList<>();
   }
 
-  void addField(String key, String name, TypeMirror type, boolean required, boolean parcel) {
-    getOrCreateExtraBinding(key).addFieldBinding(new FieldBinding(name, type, required, parcel));
-  }
-
-  public void setParentTarget(String parentTarget) {
-    this.parentTarget = parentTarget;
-  }
-
-  private ExtraInjection getOrCreateExtraBinding(String key) {
+  public void addField(String key, String name, TypeMirror type, boolean required, boolean parcel) {
     ExtraInjection extraInjection = injectionMap.get(key);
     if (extraInjection == null) {
       extraInjection = new ExtraInjection(key);
       injectionMap.put(key, extraInjection);
     }
-    return extraInjection;
+    extraInjection.addFieldBinding(new FieldBinding(name, type, required, parcel));
   }
 
-  public String getFqcn() {
-    return classPackage + "." + className;
+  public void setTargetClass(String targetFqcnClass) {
+    this.targetClassFqcn = targetFqcnClass;
+    targetClassName = targetFqcnClass.substring(targetFqcnClass.lastIndexOf('.') + 1);
+    isNavigationModel = true;
+  }
+
+  public void addChild(TypeElement typeElement) {
+    childClasses.add(typeElement);
   }
 }

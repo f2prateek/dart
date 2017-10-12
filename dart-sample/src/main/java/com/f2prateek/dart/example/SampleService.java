@@ -20,17 +20,16 @@ package com.f2prateek.dart.example;
 import android.app.IntentService;
 import android.content.Intent;
 import com.f2prateek.dart.Dart;
-import com.f2prateek.dart.InjectExtra;
 
 public class SampleService extends IntentService {
-  @InjectExtra String stringExtra;
+
+  private SampleServiceNavigationModel navigationModel = new SampleServiceNavigationModel();
 
   public SampleService() {
     super("SampleService");
   }
 
-  @Override
-  protected void onHandleIntent(Intent intent) {
-    Dart.inject(this, intent.getExtras());
+  @Override protected void onHandleIntent(Intent intent) {
+    Dart.inject(navigationModel, intent.getExtras());
   }
 }

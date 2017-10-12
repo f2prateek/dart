@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.util.SparseArray;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,6 @@ public class MainActivity extends Activity {
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
     setContentView(R.layout.activity_main);
 
     ButterKnife.inject(this);
@@ -59,34 +59,16 @@ public class MainActivity extends Activity {
         .extraString("a string")
         .build();
 
-      startActivity(intent);
+    startActivity(intent);
   }
 
   @OnClick(R.id.button2) public void onLaunchButton2Click() {
-    // Include fragment extras
-    Intent intent = Henson.with(this)
-        .gotoSampleModelActivity()
-        .defaultKeyExtra("defaultKeyExtra")
-        .extraInt(4)
-        .extraParcel(new ExampleParcel("Andy"))
-        .extraParcelable(ComplexParcelable.random())
-        .extraString("a string")
-        .build();
-
-    Intent intentSampleFragment = Henson.with(this)
-        .gotoSampleFragment()
-        .foo("bar")
-        .build();
-
-    intent.putExtras(intentSampleFragment);
-    startActivity(intent);
-
     // Service
     Intent intentService = Henson.with(this)
         .gotoSampleService()
         .stringExtra("foo")
         .build();
+
     startService(intentService);
   }
-
 }

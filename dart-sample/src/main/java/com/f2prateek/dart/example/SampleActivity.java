@@ -19,36 +19,12 @@ package com.f2prateek.dart.example;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.SparseArray;
 import android.widget.TextView;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import com.f2prateek.dart.Dart;
-import com.f2prateek.dart.InjectExtra;
-import com.f2prateek.dart.Nullable;
-import java.util.List;
 
 public class SampleActivity extends Activity {
-  public static final String DEFAULT_EXTRA_VALUE = "a default value";
-
-  private static final String EXTRA_STRING = "extraString";
-  private static final String EXTRA_INT = "extraInt";
-  private static final String EXTRA_PARCELABLE = "extraParcelable";
-  private static final String EXTRA_LIST_PARCELABLE = "extraListParcelable";
-  private static final String EXTRA_SPARSE_ARRAY_PARCELABLE = "extraSparseArrayParcelable";
-  private static final String EXTRA_OPTIONAL = "extraOptional";
-  private static final String EXTRA_PARCEL = "extraParcel";
-  private static final String EXTRA_WITH_DEFAULT = "extraWithDefault";
-
-  @InjectExtra(EXTRA_STRING) String stringExtra;
-  @InjectExtra(EXTRA_INT) int intExtra;
-  @InjectExtra(EXTRA_PARCELABLE) ComplexParcelable parcelableExtra;
-  @InjectExtra(EXTRA_PARCEL) ExampleParcel parcelExtra;
-  @InjectExtra(EXTRA_LIST_PARCELABLE) List<ExampleParcel> listParcelExtra;
-  @InjectExtra(EXTRA_SPARSE_ARRAY_PARCELABLE) SparseArray<ExampleParcel> sparseArrayParcelExtra;
-  @Nullable @InjectExtra(EXTRA_OPTIONAL) String optionalExtra;
-  @Nullable @InjectExtra(EXTRA_WITH_DEFAULT) String defaultExtra = DEFAULT_EXTRA_VALUE;
-  @InjectExtra String defaultKeyExtra;
 
   @InjectView(R.id.default_key_extra) TextView defaultKeyExtraTextView;
   @InjectView(R.id.string_extra) TextView stringExtraTextView;
@@ -60,22 +36,25 @@ public class SampleActivity extends Activity {
   @InjectView(R.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
   @InjectView(R.id.default_extra) TextView defaultExtraTextView;
 
+  SampleActivityNavigationModel navigationModel = new SampleActivityNavigationModel();
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_sample);
 
     ButterKnife.inject(this);
-    Dart.inject(this);
+    Dart.inject(navigationModel, this);
 
     // Contrived code to use the "injected" extras.
-    stringExtraTextView.setText(stringExtra);
-    intExtraTextView.setText(String.valueOf(intExtra));
-    parcelableExtraTextView.setText(String.valueOf(parcelableExtra));
-    optionalExtraTextView.setText(String.valueOf(optionalExtra));
-    parcelExtraTextView.setText(String.valueOf(parcelExtra.getName()));
-    listParcelExtraTextView.setText(String.valueOf(listParcelExtra.size()));
-    sparseArrayParcelExtraTextView.setText(String.valueOf(sparseArrayParcelExtra.size()));
-    defaultExtraTextView.setText(String.valueOf(defaultExtra));
-    defaultKeyExtraTextView.setText(defaultKeyExtra);
+    stringExtraTextView.setText(navigationModel.stringExtra);
+    intExtraTextView.setText(String.valueOf(navigationModel.intExtra));
+    parcelableExtraTextView.setText(String.valueOf(navigationModel.parcelableExtra));
+    optionalExtraTextView.setText(String.valueOf(navigationModel.optionalExtra));
+    parcelExtraTextView.setText(String.valueOf(navigationModel.parcelExtra.getName()));
+    listParcelExtraTextView.setText(String.valueOf(navigationModel.listParcelExtra.size()));
+    sparseArrayParcelExtraTextView.setText(
+        String.valueOf(navigationModel.sparseArrayParcelExtra.size()));
+    defaultExtraTextView.setText(String.valueOf(navigationModel.defaultExtra));
+    defaultKeyExtraTextView.setText(navigationModel.defaultKeyExtra);
   }
 }
