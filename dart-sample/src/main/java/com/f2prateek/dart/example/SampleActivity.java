@@ -21,20 +21,20 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+import butterknife.BindView;
 import com.f2prateek.dart.Dart;
 
 public class SampleActivity extends Activity {
 
-  @InjectView(R.id.default_key_extra) TextView defaultKeyExtraTextView;
-  @InjectView(R.id.string_extra) TextView stringExtraTextView;
-  @InjectView(R.id.int_extra) TextView intExtraTextView;
-  @InjectView(R.id.parcelable_extra) TextView parcelableExtraTextView;
-  @InjectView(R.id.optional_extra) TextView optionalExtraTextView;
-  @InjectView(R.id.parcel_extra) TextView parcelExtraTextView;
-  @InjectView(R.id.list_parcel_extra) TextView listParcelExtraTextView;
-  @InjectView(R.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
-  @InjectView(R.id.default_extra) TextView defaultExtraTextView;
+  @BindView(R.id.default_key_extra) TextView defaultKeyExtraTextView;
+  @BindView(R.id.string_extra) TextView stringExtraTextView;
+  @BindView(R.id.int_extra) TextView intExtraTextView;
+  @BindView(R.id.parcelable_extra) TextView parcelableExtraTextView;
+  @BindView(R.id.optional_extra) TextView optionalExtraTextView;
+  @BindView(R.id.parcel_extra) TextView parcelExtraTextView;
+  @BindView(R.id.list_parcel_extra) TextView listParcelExtraTextView;
+  @BindView(R.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
+  @BindView(R.id.default_extra) TextView defaultExtraTextView;
 
   SampleActivityNavigationModel navigationModel = new SampleActivityNavigationModel();
 
@@ -42,7 +42,7 @@ public class SampleActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_sample);
 
-    ButterKnife.inject(this);
+    ButterKnife.bind(this);
     Dart.inject(navigationModel, this);
 
     // Contrived code to use the "injected" extras.
