@@ -17,8 +17,8 @@
 
 package com.f2prateek.dart.processor;
 
-import java.util.Arrays;
 import javax.annotation.processing.Processor;
+import java.util.Arrays;
 
 final class ProcessorTestUtilities {
   static Iterable<? extends Processor> dartProcessors() {
@@ -27,7 +27,7 @@ final class ProcessorTestUtilities {
 
   static Iterable<? extends Processor> dartProcessorsWithoutParceler() {
     InjectExtraProcessor injectExtraProcessor = new InjectExtraProcessor();
-    injectExtraProcessor.setUsesParcelerOption(false);
+    injectExtraProcessor.enableParceler(false);
     return Arrays.asList(injectExtraProcessor);
   }
 

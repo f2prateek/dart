@@ -1,0 +1,47 @@
+buildscript {
+    ext.versions = [
+            'minSdk': 14,
+            'compileSdk': 26,
+
+            'supportLibrary': '27.0.0',
+            'androidPlugin': '3.0.0',
+            'androidTools': '26.0.0',
+    ]
+
+    ext.deps = [
+            android: [
+                    'runtime': 'com.google.android:android:4.1.1.4',
+                    'gradlePlugin': "com.android.tools.build:gradle:${versions.androidPlugin}",
+            ],
+            parceler: [
+                    'runtime': 'org.parceler:parceler-api:1.0.4',
+                    'compiler': 'org.parceler:parceler:1.0.4'
+            ],
+            javapoet: 'com.squareup:javapoet:1.7.0',
+            junit: 'junit:junit:4.12',
+            fest: 'com.squareup:fest-android:1.0.7',
+            truth: 'com.google.truth:truth:0.36',
+            robolectric: 'org.robolectric:robolectric:2.4',
+            compiletesting: 'com.google.testing.compile:compile-testing:0.12',
+    ]
+
+    repositories {
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath deps.android.gradlePlugin
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.3' //version required
+}
+
+subprojects {
+    repositories {
+        jcenter()
+        google()
+    }
+}

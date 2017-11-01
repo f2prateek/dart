@@ -10,48 +10,30 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
 
-import static com.squareup.javapoet.ClassName.get;
 import static com.squareup.javapoet.ClassName.bestGuess;
+import static com.squareup.javapoet.ClassName.get;
 
-/**
- * Creates Java code to create intent builders.
- * They will let devs create intents to
- * a given activity.
- * The intent builders are invoked by Henson, which is
- * created by {@link HensonNavigatorGenerator}.
- *
- * Note: Due to the fact that gradle uses a different classpath to invoke
- * an annotation processor (it doesn't use the same classpath as the one that is used
- * to compile the classes to be compiled), this we can't use android classes in a generator.
- * We should always reference them indirectly via string, not using direct references to types
- * (i.e. not Intent.class but ClassName.get("android.content", "Intent"))
- * See https://github.com/johncarl81/parceler/issues/11
- */
 public class IntentBuilderGenerator extends BaseGenerator {
-  public static final String BUNDLE_BUILDER_SUFFIX = "$$IntentBuilder";
-  public static final String STATE_CLASS_INTERMEDIARY_PREFIX = "AfterSetting";
-  public static final String STATE_CLASS_FINAL_STATE = "AllSet";
+
+  static final String BUNDLE_BUILDER_SUFFIX = "$$IntentBuilder";
+  private static final String STATE_CLASS_INTERMEDIARY_PREFIX = "AfterSetting";
+  private static final String STATE_CLASS_FINAL_STATE = "AllSet";
 
   private final InjectionTarget target;
-  private boolean usesReflection;
 
-  public IntentBuilderGenerator(InjectionTarget target, boolean usesReflection) {
+  public IntentBuilderGenerator(InjectionTarget target) {
     this.target = target;
-    this.usesReflection = usesReflection;
-  }
-
-  private String builderClassName() {
-    return target.className + BUNDLE_BUILDER_SUFFIX;
   }
 
   @Override public String brewJava() {
@@ -60,13 +42,22 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
     emitFields(intentBuilderTypeBuilder);
     emitConstructor(intentBuilderTypeBuilder);
+    emitGetClassDynamically(intentBuilderTypeBuilder);
     emitExtraDSLStateMachine(intentBuilderTypeBuilder);
 
     //build
     JavaFile javaFile = JavaFile.builder(target.classPackage, intentBuilderTypeBuilder.build())
-        .addFileComment("Generated code from Dart. Do not modify!")
+        .addFileComment("Generated code from Henson. Do not modify!")
         .build();
     return javaFile.toString();
+  }
+
+  @Override public String getFqcn() {
+    return target.classPackage + "." + builderClassName();
+  }
+
+  private String builderClassName() {
+    return target.targetClassName + BUNDLE_BUILDER_SUFFIX;
   }
 
   private void emitFields(TypeSpec.Builder intentBuilderTypeBuilder) {
@@ -83,14 +74,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
     MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder()
         .addModifiers(Modifier.PUBLIC)
         .addParameter(get("android.content", "Context"), "context");
-    if (usesReflection) {
-        emitGetClassDynamically(intentBuilderTypeBuilder);
-        constructorBuilder.addStatement("intent = new Intent(context, getClassDynamically($S))",
-            target.getFqcn());
-    } else {
-        constructorBuilder.addStatement("intent = new Intent(context, $L.class)",
-            target.className);
-    }
+    constructorBuilder.addStatement("intent = new Intent(context, getClassDynamically($S))",
+        target.targetClassFqcn.replace("$", "."));
     intentBuilderTypeBuilder.addMethod(constructorBuilder.build());
   }
 
@@ -107,7 +92,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
     intentBuilderTypeBuilder.addMethod(getClassDynamicallyBuilder.build());
   }
 
-    private void emitExtraDSLStateMachine(TypeSpec.Builder intentBuilderTypeBuilder) {
+  private void emitExtraDSLStateMachine(TypeSpec.Builder intentBuilderTypeBuilder) {
     //separate required extras from optional extras and sort both sublists.
     List<ExtraInjection> requiredInjections = new ArrayList<>();
     List<ExtraInjection> optionalInjections = new ArrayList<>();
@@ -139,10 +124,6 @@ public class IntentBuilderGenerator extends BaseGenerator {
     if (lastStateClassBuilder != intentBuilderTypeBuilder) {
       intentBuilderTypeBuilder.addType(lastStateClassBuilder.build());
     }
-  }
-
-  @Override public String getFqcn() {
-    return target.getFqcn() + BUNDLE_BUILDER_SUFFIX;
   }
 
   private void emitBuildMethod(TypeSpec.Builder builder) {

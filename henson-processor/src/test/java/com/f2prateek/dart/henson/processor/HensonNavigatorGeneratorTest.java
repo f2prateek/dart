@@ -1,223 +1,47 @@
-/*
- * Copyright 2013 Jake Wharton
- * Copyright 2014 Prateek Srivastava (@f2prateek)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.f2prateek.dart.henson.processor;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
-import javax.tools.JavaFileObject;
 import org.junit.Test;
+
+import javax.tools.JavaFileObject;
+
 import static com.google.common.truth.Truth.assert_;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
+import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 
 public class HensonNavigatorGeneratorTest {
 
-  @Test public void injectingExtra() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
-        "package test;", //
-        "import android.app.Activity;", //
-        "import com.f2prateek.dart.InjectExtra;", //
-        "public class Test extends Activity {", //
-        "    @InjectExtra(\"key\") String extra;", //
-        "}" //
-    ));
-
-    JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
-            "package test;", //
-                "import android.content.Context;", //
-                "public class Henson {", //
-                "  private Henson() {", //
-                "  }", //
-                "  public static WithContextSetState with(Context context) {", //
-                "    return new test.Henson.WithContextSetState(context);", //
-                "  }", //
-                "  public static class WithContextSetState {", //
-                "    private Context context;", //
-                "    private WithContextSetState(Context context) {", //
-                "      this.context = context;", //
-                "    }", //
-                "    public Test$$IntentBuilder gotoTest() {", //
-                "      return new test.Test$$IntentBuilder(context);", //
-                "    }", //
-                "  }", //
+  @Test
+  public void hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsDefined_and_containsExtras() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "@NavigationModel(\"test.Test\")", //
+            "public class TestNavigationModel {", //
+            "    @InjectExtra(\"key\") String extra;", //
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
-  }
-
-  @Test public void hensonNavigable() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
-        "package test;", //
-        "import android.app.Activity;", //
-        "import com.f2prateek.dart.HensonNavigable;", //
-        "@HensonNavigable public class Test extends Activity {", //
-        "}" //
-    ));
-
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
-            "package test;", //
-                "import android.content.Context;", //
-                "public class Henson {", //
-                "  private Henson() {", //
-                "  }", //
-                "  public static WithContextSetState with(Context context) {", //
-                "    return new test.Henson.WithContextSetState(context);", //
-                "  }", //
-                "  public static class WithContextSetState {", //
-                "    private Context context;", //
-                "    private WithContextSetState(Context context) {", //
-                "      this.context = context;", //
-                "    }", //
-                "    public Test$$IntentBuilder gotoTest() {", //
-                "      return new test.Test$$IntentBuilder(context);", //
-                "    }", //
-                "  }", //
-                "}" //
-        ));
-
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
-  }
-
-  @Test public void hensonNavigable_withModel() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.TestModel", Joiner.on('\n').join( //
-        "package test;", //
-        "import android.app.Activity;", //
-        "import com.f2prateek.dart.InjectExtra;", //
-        "import com.f2prateek.dart.HensonNavigable;", //
-        "@HensonNavigable(model = Foo.class) public class TestModel extends Activity {", //
-        "}", //
-        "class Foo {", //
-        "  @InjectExtra String extra;", //
-        "}" //
-    ));
-
-    JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
-            "package test;", //
+        JavaFileObjects.forSourceString("test.navmodel.Henson", Joiner.on('\n').join( //
+            "package test.navmodel;", //
             "import android.content.Context;", //
             "public class Henson {", //
             "  private Henson() {", //
             "  }", //
             "  public static WithContextSetState with(Context context) {", //
-            "    return new test.Henson.WithContextSetState(context);", //
+            "    return new test.navmodel.Henson.WithContextSetState(context);", //
             "  }", //
             "  public static class WithContextSetState {", //
             "    private Context context;", //
             "    private WithContextSetState(Context context) {", //
             "      this.context = context;", //
-            "    }", //
-            "    public TestModel$$IntentBuilder gotoTestModel() {", //
-            "      return new test.TestModel$$IntentBuilder(context);", //
-            "    }", //
-            "  }", //
-            "}" //
-        ));
-
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError().and()
-        .generatesSources(builderSource);
-  }
-
-  @Test public void hensonNavigable_doesntGotoAbstractClasses() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
-        "package test;", //
-        "import android.app.Activity;", //
-        "import com.f2prateek.dart.HensonNavigable;", //
-        "@HensonNavigable public abstract class Test extends Activity {", //
-        "}" //
-    ));
-
-    JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
-            "package test;", //
-            "import android.content.Context;", //
-            "public class Henson {", //
-            "  private Henson() {", //
-            "  }", //
-            "  public static WithContextSetState with(Context context) {", //
-            "    return new test.Henson.WithContextSetState(context);", //
-            "  }", //
-            "  public static class WithContextSetState {", //
-            "    private Context context;", //
-            "    private WithContextSetState(Context context) {", //
-            "      this.context = context;", //
-            "    }", //
-            "  }", //
-            "}" //
-        ));
-
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
-  }
-
-  @Test public void superclass() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
-        "package test;", //
-        "import android.app.Activity;", //
-        "import com.f2prateek.dart.InjectExtra;", //
-        "public class Test extends Activity {", //
-        "    @InjectExtra(\"key\") String extra;", //
-        "}", //
-        "class TestOne extends Test {", //
-        "    @InjectExtra(\"key\") String extra1;", //
-        "}", //
-        "class TestTwo extends Test {", //
-        "}" //
-    ));
-
-    JavaFileObject expectedSource1 =
-        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
-            "package test;", //
-            "import android.content.Context;", //
-            "public class Henson {", //
-            "  private Henson() {", //
-            "  }", //
-            "  public static WithContextSetState with(Context context) {", //
-            "    return new test.Henson.WithContextSetState(context);", //
-            "  }", //
-            "  public static class WithContextSetState {", //
-            "    private Context context;", //
-            "    private WithContextSetState(Context context) {", //
-            "      this.context = context;", //
-            "    }", //
-            "    public TestOne$$IntentBuilder gotoTestOne() {", //
-            "      return new test.TestOne$$IntentBuilder(context);", //
             "    }", //
             "    public Test$$IntentBuilder gotoTest() {", //
-            "      return new test.Test$$IntentBuilder(context);", //
+            "      return new test.navmodel.Test$$IntentBuilder(context);", //
             "    }", //
             "  }", //
             "}" //
@@ -228,44 +52,38 @@ public class HensonNavigatorGeneratorTest {
         .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
         .and()
-        .generatesSources(expectedSource1);
+        .generatesSources(builderSource);
   }
 
-  @Test public void genericSuperclass() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
-        "package test;", //
-        "import android.app.Activity;", //
-        "import com.f2prateek.dart.InjectExtra;", //
-        "public class Test<T> extends Activity {", //
-        "    @InjectExtra(\"key\") String extra;", //
-        "}", //
-        "class TestOne extends Test<String> {", //
-        "    @InjectExtra(\"key\") String extra1;", //
-        "}", //
-        "class TestTwo extends Test<Object> {", //
-        "}" //
-    ));
+  @Test
+  public void hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsDefined_and_DoesNotContainExtras() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "@NavigationModel(\"test.Test\")", //
+            "public class TestNavigationModel {", //
+            "}" //
+        ));
 
-    JavaFileObject expectedSource1 =
-        JavaFileObjects.forSourceString("test/Henson", Joiner.on('\n').join( //
-            "package test;", //
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test.navmodel.Henson", Joiner.on('\n').join( //
+            "package test.navmodel;", //
             "import android.content.Context;", //
             "public class Henson {", //
             "  private Henson() {", //
             "  }", //
             "  public static WithContextSetState with(Context context) {", //
-            "    return new test.Henson.WithContextSetState(context);", //
+            "    return new test.navmodel.Henson.WithContextSetState(context);", //
             "  }", //
             "  public static class WithContextSetState {", //
             "    private Context context;", //
             "    private WithContextSetState(Context context) {", //
             "      this.context = context;", //
             "    }", //
-            "    public TestOne$$IntentBuilder gotoTestOne() {", //
-            "      return new test.TestOne$$IntentBuilder(context);", //
-            "    }", //
             "    public Test$$IntentBuilder gotoTest() {", //
-            "      return new test.Test$$IntentBuilder(context);", //
+            "      return new test.navmodel.Test$$IntentBuilder(context);", //
             "    }", //
             "  }", //
             "}" //
@@ -276,6 +94,309 @@ public class HensonNavigatorGeneratorTest {
         .processedWith(ProcessorTestUtilities.hensonProcessors())
         .compilesWithoutError()
         .and()
-        .generatesSources(expectedSource1);
+        .generatesSources(builderSource);
+  }
+
+  @Test
+  public void hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsDefined_and_targetClassIsInner() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "@NavigationModel(\"test.Test$MyInnerTest\")", //
+            "public class TestNavigationModel {", //
+            "}" //
+        ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test.navmodel.Henson", Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import android.content.Context;", //
+            "public class Henson {", //
+            "  private Henson() {", //
+            "  }", //
+            "  public static WithContextSetState with(Context context) {", //
+            "    return new test.navmodel.Henson.WithContextSetState(context);", //
+            "  }", //
+            "  public static class WithContextSetState {", //
+            "    private Context context;", //
+            "    private WithContextSetState(Context context) {", //
+            "      this.context = context;", //
+            "    }", //
+            "    public Test$MyInnerTest$$IntentBuilder gotoTest$MyInnerTest() {", //
+            "      return new test.navmodel.Test$MyInnerTest$$IntentBuilder(context);", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test(expected = AssertionError.class)
+  public void hensonNavigatorGenerator_should_notGenerateHensonClass_when_navigationModelIsNotDefined_and_containExtras() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "public class TestNavigationModel {", //
+            "    @InjectExtra(\"key\") String extra;", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesFileNamed(SOURCE_OUTPUT, "test.navmodel", "Henson.java");
+  }
+
+  @Test
+  public void hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsDefinedForMultipleClasses() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "@NavigationModel(\"test.Test1\")", //
+            "public class TestNavigationModel1 {", //
+            "}", //
+            "@NavigationModel(\"test.Test2\")", //
+            "class TestNavigationModel2 extends TestNavigationModel3 {", //
+            "    @InjectExtra(\"key2\") String extra2;", //
+            "}", //
+            "class TestNavigationModel3 {", //
+            "    @InjectExtra(\"key3\") String extra3;", //
+            "}" //
+        ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test.navmodel.Henson", Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import android.content.Context;", //
+            "public class Henson {", //
+            "  private Henson() {", //
+            "  }", //
+            "  public static WithContextSetState with(Context context) {", //
+            "    return new test.navmodel.Henson.WithContextSetState(context);", //
+            "  }", //
+            "  public static class WithContextSetState {", //
+            "    private Context context;", //
+            "    private WithContextSetState(Context context) {", //
+            "      this.context = context;", //
+            "    }", //
+            "    public Test1$$IntentBuilder gotoTest1() {", //
+            "      return new test.navmodel.Test1$$IntentBuilder(context);", //
+            "    }", //
+            "    public Test2$$IntentBuilder gotoTest2() {", //
+            "      return new test.navmodel.Test2$$IntentBuilder(context);", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test
+  public void hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsDefined_and_usingGenerics() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "@NavigationModel(\"test.Test1\")", //
+            "public class TestNavigationModel1 extends TestNavigationModel3<String> {", //
+            "}", //
+            "@NavigationModel(\"test.Test2\")", //
+            "class TestNavigationModel2 extends TestNavigationModel3<Object> {", //
+            "    @InjectExtra(\"key2\") String extra2;", //
+            "}", //
+            "class TestNavigationModel3<T> {", //
+            "    @InjectExtra(\"key3\") String extra3;", //
+            "}" //
+        ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test.navmodel.Henson", Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import android.content.Context;", //
+            "public class Henson {", //
+            "  private Henson() {", //
+            "  }", //
+            "  public static WithContextSetState with(Context context) {", //
+            "    return new test.navmodel.Henson.WithContextSetState(context);", //
+            "  }", //
+            "  public static class WithContextSetState {", //
+            "    private Context context;", //
+            "    private WithContextSetState(Context context) {", //
+            "      this.context = context;", //
+            "    }", //
+            "    public Test1$$IntentBuilder gotoTest1() {", //
+            "      return new test.navmodel.Test1$$IntentBuilder(context);", //
+            "    }", //
+            "    public Test2$$IntentBuilder gotoTest2() {", //
+            "      return new test.navmodel.Test2$$IntentBuilder(context);", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test
+  public void hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsDefined_and_superClassIsAbstract() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "@NavigationModel(\"test.Test1\")", //
+            "public class TestNavigationModel1 extends TestNavigationModel2 {", //
+            "}", //
+            "abstract class TestNavigationModel2 {", //
+            "    @InjectExtra(\"key2\") String extra2;", //
+            "}" //
+        ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test.navmodel.Henson", Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import android.content.Context;", //
+            "public class Henson {", //
+            "  private Henson() {", //
+            "  }", //
+            "  public static WithContextSetState with(Context context) {", //
+            "    return new test.navmodel.Henson.WithContextSetState(context);", //
+            "  }", //
+            "  public static class WithContextSetState {", //
+            "    private Context context;", //
+            "    private WithContextSetState(Context context) {", //
+            "      this.context = context;", //
+            "    }", //
+            "    public Test1$$IntentBuilder gotoTest1() {", //
+            "      return new test.navmodel.Test1$$IntentBuilder(context);", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test
+  public void hensonNavigatorGenerator_should_fail_when_navigationModelAnnotatedClassIsAbstract() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "@NavigationModel(\"test.Test1\")", //
+            "public class TestNavigationModel1 {", //
+            "}", //
+            "@NavigationModel(\"test.Test2\")", //
+            "abstract class TestNavigationModel2 {", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .failsToCompile()
+        .withErrorContaining(
+            "@NavigationModel class TestNavigationModel2 must not be private, static or abstract.");
+  }
+
+  @Test
+  public void hensonNavigatorGenerator_should_fail_when_navigationModelAnnotatedClassIsInner() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "@NavigationModel(\"test.Test1\")", //
+            "public class TestNavigationModel1 {", //
+            "  @NavigationModel(\"test.Test2\")", //
+            "  class TestNavigationModel2 {", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .failsToCompile()
+        .withErrorContaining(
+            "@NavigationModel class TestNavigationModel2 must be a top level class.");
+  }
+
+  @Test
+  public void hensonNavigatorGenerator_should_fail_when_navigationModelAnnotatedClassIsInnerStatic() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "@NavigationModel(\"test.Test1\")", //
+            "public class TestNavigationModel1 {", //
+            "  @NavigationModel(\"test.Test2\")", //
+            "  static class TestNavigationModel2 {", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .failsToCompile()
+        .withErrorContaining(
+            "@NavigationModel class TestNavigationModel2 must not be private, static or abstract.");
+  }
+
+  @Test
+  public void hensonNavigatorGenerator_should_fail_when_navigationModelAnnotatedClassIsPrivate() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+        Joiner.on('\n').join( //
+            "package test.navmodel;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.NavigationModel;", //
+            "@NavigationModel(\"test.Test1\")", //
+            "public class TestNavigationModel1 {", //
+            "  @NavigationModel(\"test.Test2\")", //
+            "  private class TestNavigationModel2 {", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessors())
+        .failsToCompile()
+        .withErrorContaining(
+            "@NavigationModel class TestNavigationModel2 must not be private, static or abstract.");
   }
 }

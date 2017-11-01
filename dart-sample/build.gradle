@@ -1,0 +1,49 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion versions.compileSdk
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_7
+        targetCompatibility = JavaVersion.VERSION_1_7
+    }
+
+    defaultConfig {
+        applicationId 'com.f2prateek.dart.example'
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    lintOptions {
+        textReport true
+        textOutput 'stdout'
+    }
+}
+
+dependencies {
+    implementation project(':dart-annotations')
+    implementation project(':dart')
+    implementation project(':henson')
+    implementation deps.parceler.runtime
+    implementation "com.jakewharton:butterknife:8.8.1"
+
+    annotationProcessor deps.parceler.compiler
+    annotationProcessor "com.jakewharton:butterknife-compiler:8.8.1"
+    annotationProcessor project(':dart-processor')
+    annotationProcessor project(':henson-processor')
+
+    testImplementation deps.junit
+}
+
+afterEvaluate {
+    tasks.withType(com.android.build.gradle.internal.tasks.AndroidTestTask) { task ->
+        task.doFirst {
+            logging.level = LogLevel.INFO
+        }
+        task.doLast {
+            logging.level = LogLevel.LIFECYCLE
+        }
+    }
+}

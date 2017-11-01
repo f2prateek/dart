@@ -1,0 +1,10 @@
+apply plugin: 'java-library'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+
+dependencies {
+    api deps.android.runtime
+}
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

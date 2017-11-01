@@ -32,8 +32,6 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * {@literal @}InjectExtra("key") String title;
  * {@literal @}InjectExtra String content; // "content" is the key for the extra
  * </code></pre>
- *
- * @see Nullable
  */
 @Retention(SOURCE) @Target(FIELD) public @interface InjectExtra {
   String value() default "";

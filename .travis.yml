@@ -1,14 +1,7 @@
-language: android
+language: java
 
 android:
-  components:
-    - build-tools-20.0.0
-    - android-16
-  licenses:
-    - android-sdk-license-5be876d5
-
 jdk:
-  - oraclejdk7
   - oraclejdk8
 
 after_success:

@@ -26,8 +26,7 @@ public class SampleFragment extends Fragment {
 
   @InjectExtra String foo;
 
-  @Override
-  public void onAttach(Activity activity) {
+  @Override public void onAttach(Activity activity) {
     super.onAttach(activity);
     Dart.inject(this, getActivity());
   }

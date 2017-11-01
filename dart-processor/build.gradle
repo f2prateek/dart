@@ -1,0 +1,23 @@
+apply plugin: 'java-library'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+
+dependencies {
+    implementation project(':dart-annotations')
+    implementation project(':dart-common')
+    implementation project(':dart')
+    implementation deps.javapoet
+    implementation deps.parceler.runtime
+    api deps.android.runtime
+
+    testImplementation files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
+    testImplementation deps.junit
+    testImplementation deps.compiletesting
+    testImplementation deps.truth
+    testImplementation deps.fest
+    testImplementation deps.robolectric
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
