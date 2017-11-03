@@ -28,8 +28,9 @@ import java.util.Map;
 
 /**
  * Extra injection utilities. Use this class to simplify getting extras.
- * <p>
- * Injecting extras from your activity is as easy as:
+ *
+ * <p>Injecting extras from your activity is as easy as:
+ *
  * <pre><code>
  * public class ExampleActivity extends Activity {
  *   {@literal @}InjectExtra("key") String extra;
@@ -40,18 +41,21 @@ import java.util.Map;
  *   }
  * }
  * </code></pre>
+ *
  * You can inject an {@link #inject(Activity) activity directly}, {@link
- * #inject(android.app.Fragment) fragment directly}, or inject an
- * {@link #inject(Object, Bundle) bundle into another object}.
- * <p>
- * Be default, extras are required to be present in the bundle for field injections.
- * If an extra is optional add the {@code Nullable @Nullable} annotation.
+ * #inject(android.app.Fragment) fragment directly}, or inject an {@link #inject(Object, Bundle)
+ * bundle into another object}.
+ *
+ * <p>Be default, extras are required to be present in the bundle for field injections. If an extra
+ * is optional add the {@code Nullable @Nullable} annotation.
+ *
  * <pre><code>
  * {@literal @}Nullable {@literal @}InjectExtra("key") String extra;
  * </code></pre>
- * <p>
- * If you need to provide a default value for an extra, simply set an initial value
- * while declaring the field, combined with the {@code Nullable @Nullable} annotation.
+ *
+ * <p>If you need to provide a default value for an extra, simply set an initial value while
+ * declaring the field, combined with the {@code Nullable @Nullable} annotation.
+ *
  * <pre><code>
  * {@literal @}Nullable {@literal @}InjectExtra("key") String extra = "default_value";
  * </code></pre>
@@ -74,13 +78,11 @@ public class Dart {
   }
 
   /**
-   * Inject fields annotated with {@link InjectExtra} in the specified {@link
-   * android.app.Activity}.
+   * Inject fields annotated with {@link InjectExtra} in the specified {@link android.app.Activity}.
    * The intent that called this activity will be used as the source of the extras bundle.
    *
    * @param target Target activity for field injection.
-   * @throws Dart.UnableToInjectException if injection could not be
-   * performed.
+   * @throws Dart.UnableToInjectException if injection could not be performed.
    * @see android.content.Intent#getExtras()
    */
   public static void inject(Activity target) {
@@ -88,14 +90,12 @@ public class Dart {
   }
 
   /**
-   * Inject fields annotated with {@link InjectExtra} in the specified {@link
-   * android.app.Fragment}.
+   * Inject fields annotated with {@link InjectExtra} in the specified {@link android.app.Fragment}.
    * The arguments that this fragment was called with will be used as the source of the extras
    * bundle.
    *
    * @param target Target fragment for field injection.
-   * @throws Dart.UnableToInjectException if injection could not be
-   * performed.
+   * @throws Dart.UnableToInjectException if injection could not be performed.
    * @see android.app.Fragment#getArguments()
    */
   public static void inject(Fragment target) {
@@ -103,13 +103,12 @@ public class Dart {
   }
 
   /**
-   * Inject fields annotated with {@link InjectExtra} in the specified {@code
-   * target} using the {@code source} {@link android.app.Activity}.
+   * Inject fields annotated with {@link InjectExtra} in the specified {@code target} using the
+   * {@code source} {@link android.app.Activity}.
    *
    * @param target Target class for field injection.
    * @param source Activity on which IDs will be looked up.
-   * @throws Dart.UnableToInjectException if injection could not be
-   * performed.
+   * @throws Dart.UnableToInjectException if injection could not be performed.
    * @see android.content.Intent#getExtras()
    */
   public static void inject(Object target, Activity source) {
@@ -117,13 +116,12 @@ public class Dart {
   }
 
   /**
-   * Inject fields annotated with {@link InjectExtra} in the specified {@code
-   * target} using the {@code source} {@link android.os.Bundle} as the source.
+   * Inject fields annotated with {@link InjectExtra} in the specified {@code target} using the
+   * {@code source} {@link android.os.Bundle} as the source.
    *
    * @param target Target class for field injection.
    * @param source Bundle source on which extras will be looked up.
-   * @throws Dart.UnableToInjectException if injection could not be
-   * performed.
+   * @throws Dart.UnableToInjectException if injection could not be performed.
    */
   public static void inject(Object target, Bundle source) {
     inject(target, source, Finder.BUNDLE);
@@ -168,7 +166,7 @@ public class Dart {
   }
 
   /** Simpler version of {@link android.os.Bundle#get(String)} which infers the target type. */
-  @SuppressWarnings({ "unchecked", "UnusedDeclaration" })
+  @SuppressWarnings({"unchecked", "UnusedDeclaration"})
   // Checked by runtime cast. Public API.
   public static <T> T get(Bundle bundle, String key) {
     return (T) bundle.get(key);
@@ -176,25 +174,27 @@ public class Dart {
 
   /**
    * A means of finding an extra in either an {@link android.app.Activity}, {@link
-   * android.app.Fragment} or a {@link android.os.Bundle}. Exposed for use only
-   * by generated code.
+   * android.app.Fragment} or a {@link android.os.Bundle}. Exposed for use only by generated code.
    * If any of the means to get a bundle are null, this will simply return a null.
    */
   public enum Finder {
     ACTIVITY {
-      @Override public Object getExtra(Object source, String key) {
+      @Override
+      public Object getExtra(Object source, String key) {
         Intent intent = ((Activity) source).getIntent();
         return intent == null ? null : Finder.BUNDLE.getExtra(intent.getExtras(), key);
       }
     },
     FRAGMENT {
-      @Override public Object getExtra(Object source, String key) {
+      @Override
+      public Object getExtra(Object source, String key) {
         Bundle extras = ((Fragment) source).getArguments();
         return Finder.BUNDLE.getExtra(extras, key);
       }
     },
     BUNDLE {
-      @Override public Object getExtra(Object source, String key) {
+      @Override
+      public Object getExtra(Object source, String key) {
         return source == null ? null : ((Bundle) source).get(key);
       }
     };

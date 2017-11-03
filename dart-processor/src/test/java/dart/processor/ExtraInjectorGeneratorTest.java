@@ -17,25 +17,26 @@
 
 package dart.processor;
 
-import dart.common.Binding;
-import dart.common.InjectionTarget;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import static java.util.Arrays.asList;
 import static org.fest.assertions.api.Assertions.assertThat;
+
+import dart.common.Binding;
+import dart.common.InjectionTarget;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ExtraInjectorGeneratorTest {
 
   dart.processor.ExtraInjectorGenerator extraInjectorGenerator;
 
-  @Before public void setup() {
+  @Before
+  public void setup() {
     final InjectionTarget injectionTarget = new InjectionTarget("foo", "bar", "qurtz", false);
     extraInjectorGenerator = new dart.processor.ExtraInjectorGenerator(injectionTarget);
   }
 
-  @Test public void humanDescriptionJoinWorks() {
+  @Test
+  public void humanDescriptionJoinWorks() {
     Binding one = new TestBinding("one");
     Binding two = new TestBinding("two");
     Binding three = new TestBinding("three");
@@ -57,11 +58,13 @@ public class ExtraInjectorGeneratorTest {
       this.description = description;
     }
 
-    @Override public String getDescription() {
+    @Override
+    public String getDescription() {
       return description;
     }
 
-    @Override public boolean isRequired() {
+    @Override
+    public boolean isRequired() {
       throw new AssertionError();
     }
   }

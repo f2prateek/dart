@@ -14,21 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package dart.processor;
-
-import java.util.Arrays;
-import javax.annotation.processing.Processor;
-
-final class ProcessorTestUtilities {
-  static Iterable<? extends Processor> dartProcessors() {
-    return Arrays.asList(new dart.processor.InjectExtraProcessor());
-  }
-
-  static Iterable<? extends Processor> dartProcessorsWithoutParceler() {
-    dart.processor.InjectExtraProcessor injectExtraProcessor =
-        new dart.processor.InjectExtraProcessor();
-    injectExtraProcessor.enableParceler(false);
-    return Arrays.asList(injectExtraProcessor);
-  }
-}
+ 

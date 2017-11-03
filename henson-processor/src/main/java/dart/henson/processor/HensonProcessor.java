@@ -1,3 +1,20 @@
+/*
+ * Copyright 2013 Jake Wharton
+ * Copyright 2014 Prateek Srivastava (@f2prateek)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package dart.henson.processor;
 
 import dart.common.InjectionTarget;
@@ -8,7 +25,10 @@ import dart.common.util.InjectionTargetUtil;
 import dart.common.util.LoggingUtil;
 import dart.common.util.NavigationModelUtil;
 import dart.common.util.ParcelerUtil;
-
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -17,17 +37,13 @@ import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 
 @SupportedAnnotationTypes({
-    HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
-    HensonProcessor.INJECT_EXTRA_ANNOTATION_CLASS_NAME
-}) @SupportedOptions({
-    HensonProcessor.OPTION_HENSON_PACKAGE
-}) public class HensonProcessor extends AbstractProcessor {
+  HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
+  HensonProcessor.INJECT_EXTRA_ANNOTATION_CLASS_NAME
+})
+@SupportedOptions({HensonProcessor.OPTION_HENSON_PACKAGE})
+public class HensonProcessor extends AbstractProcessor {
 
   static final String NAVIGATION_MODEL_ANNOTATION_CLASS_NAME = "dart.NavigationModel";
   static final String INJECT_EXTRA_ANNOTATION_CLASS_NAME = "dart.InjectExtra";
@@ -43,7 +59,8 @@ import java.util.Set;
   private String hensonPackage;
   private boolean usesParcelerOption = true;
 
-  @Override public synchronized void init(ProcessingEnvironment processingEnv) {
+  @Override
+  public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
 
     final CompilerUtil compilerUtil = new CompilerUtil(processingEnv);
@@ -53,14 +70,15 @@ import java.util.Set;
     fileUtil = new FileUtil(processingEnv);
     injectionTargetUtil = new InjectionTargetUtil(compilerUtil);
     injectExtraUtil =
-        new InjectExtraUtil(compilerUtil, parcelerUtil, loggingUtil, injectionTargetUtil,
-            processingEnv);
+        new InjectExtraUtil(
+            compilerUtil, parcelerUtil, loggingUtil, injectionTargetUtil, processingEnv);
     navigationModelUtil = new NavigationModelUtil(loggingUtil, injectionTargetUtil, processingEnv);
 
     parseAnnotationProcessorOptions(processingEnv);
   }
 
-  @Override public SourceVersion getSupportedSourceVersion() {
+  @Override
+  public SourceVersion getSupportedSourceVersion() {
     return SourceVersion.latestSupported();
   }
 
@@ -78,8 +96,7 @@ import java.util.Set;
   }
 
   /**
-   * Flag to force enabling/disabling Parceler.
-   * Used for testing.
+   * Flag to force enabling/disabling Parceler. Used for testing.
    *
    * @param enable whether Parceler should be enable
    */
@@ -116,8 +133,11 @@ import java.util.Set;
       try {
         fileUtil.writeFile(new IntentBuilderGenerator(injectionTarget), typeElement);
       } catch (IOException e) {
-        loggingUtil.error(typeElement, "Unable to write intent builder for type %s: %s",
-            typeElement, e.getMessage());
+        loggingUtil.error(
+            typeElement,
+            "Unable to write intent builder for type %s: %s",
+            typeElement,
+            e.getMessage());
       }
     }
   }
@@ -126,11 +146,14 @@ import java.util.Set;
     if (!targetClassMap.values().isEmpty()) {
       Element[] allTypes = targetClassMap.keySet().toArray(new Element[targetClassMap.size()]);
       try {
-        fileUtil.writeFile(new HensonNavigatorGenerator(hensonPackage, targetClassMap.values()),
-            allTypes);
+        fileUtil.writeFile(
+            new HensonNavigatorGenerator(hensonPackage, targetClassMap.values()), allTypes);
       } catch (IOException e) {
         for (Element element : allTypes) {
-          loggingUtil.error(element, "Unable to write henson navigator for types %s: %s", element,
+          loggingUtil.error(
+              element,
+              "Unable to write henson navigator for types %s: %s",
+              element,
               e.getMessage());
         }
       }

@@ -1,25 +1,88 @@
+/*
+ * Copyright 2013 Jake Wharton
+ * Copyright 2014 Prateek Srivastava (@f2prateek)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package dart.common.util;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Utility class for String related methods.
- */
+/** Utility class for String related methods. */
 public class StringUtil {
 
   // @formatter:off
   //You must go to Preferences->Code Style->General->Formatter Control
   // and check Enable formatter markers in comments for this to work.
-  private static final Set<String> JAVA_KEYWORDS = new HashSet<>(
-      Arrays.asList("abstract", "assert", "boolean", "break", "byte", "case", "catch", "char",
-          "class", "const", "continue", "enum", "default", "do", "double", "else", "extends",
-          "while", "false", "final", "finally", "float", "for", "goto", "if", "implements",
-          "import", "instanceof", "int", "interface", "long", "native", "new", "null", "package",
-          "private", "protected", "public", "return", "short", "static", "strictfp", "super",
-          "switch", "synchronized", "this", "throw", "throws", "transient", "true", "try", "void",
-          "volatile"));
+  private static final Set<String> JAVA_KEYWORDS =
+      new HashSet<>(
+          Arrays.asList(
+              "abstract",
+              "assert",
+              "boolean",
+              "break",
+              "byte",
+              "case",
+              "catch",
+              "char",
+              "class",
+              "const",
+              "continue",
+              "enum",
+              "default",
+              "do",
+              "double",
+              "else",
+              "extends",
+              "while",
+              "false",
+              "final",
+              "finally",
+              "float",
+              "for",
+              "goto",
+              "if",
+              "implements",
+              "import",
+              "instanceof",
+              "int",
+              "interface",
+              "long",
+              "native",
+              "new",
+              "null",
+              "package",
+              "private",
+              "protected",
+              "public",
+              "return",
+              "short",
+              "static",
+              "strictfp",
+              "super",
+              "switch",
+              "synchronized",
+              "this",
+              "throw",
+              "throws",
+              "transient",
+              "true",
+              "try",
+              "void",
+              "volatile"));
   // @formatter:on
 
   /**
@@ -33,8 +96,8 @@ public class StringUtil {
   }
 
   /**
-   * Returns true if the string is a valid Java identifier.
-   * See <a href="https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html">Identifiers</a>
+   * Returns true if the string is a valid Java identifier. See <a
+   * href="https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html">Identifiers</a>
    *
    * @param str the string to be examined
    * @return true if str is a valid Java identifier
@@ -79,6 +142,5 @@ public class StringUtil {
     return true;
   }
 
-  private StringUtil() {
-  }
+  private StringUtil() {}
 }

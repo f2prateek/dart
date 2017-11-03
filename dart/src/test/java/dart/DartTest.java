@@ -17,6 +17,9 @@
 
 package dart;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.entry;
+
 import android.app.Activity;
 import org.junit.After;
 import org.junit.Before;
@@ -25,26 +28,26 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-import static org.fest.assertions.api.Assertions.entry;
-
-@RunWith(RobolectricTestRunner.class) @Config(manifest = Config.NONE)
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
 public class DartTest {
-  @Before @After // Clear out cache of injectors  before and after each test.
+  @Before
+  @After // Clear out cache of injectors  before and after each test.
   public void resetExtrasCache() {
     dart.Dart.INJECTORS.clear();
   }
 
-  @Test public void zeroInjectionsInjectDoesNotThrowException() {
-    class Example {
-    }
+  @Test
+  public void zeroInjectionsInjectDoesNotThrowException() {
+    class Example {}
 
     Example example = new Example();
     dart.Dart.inject(example, null, null);
     assertThat(dart.Dart.INJECTORS).contains(entry(Example.class, dart.Dart.NO_OP));
   }
 
-  @Test public void injectingKnownPackagesIsNoOp() {
+  @Test
+  public void injectingKnownPackagesIsNoOp() {
     dart.Dart.inject(new Activity());
     assertThat(dart.Dart.INJECTORS).isEmpty();
     dart.Dart.inject(new Object(), new Activity());

@@ -23,20 +23,21 @@ buildscript {
             truth: 'com.google.truth:truth:0.36',
             robolectric: 'org.robolectric:robolectric:2.4',
             compiletesting: 'com.google.testing.compile:compile-testing:0.12',
+            spotless: 'com.diffplug.spotless:spotless-plugin-gradle:3.6.0',
     ]
 
     repositories {
         jcenter()
         google()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
         classpath deps.android.gradlePlugin
+        classpath deps.spotless
     }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.3' //version required
 }
 
 subprojects {
@@ -45,6 +46,14 @@ subprojects {
         google()
     }
 
+    apply plugin: "com.diffplug.gradle.spotless"
+
+    spotless {
+        java {
+            licenseHeaderFile rootProject.file('spotless.license.java.txt')
+            googleJavaFormat() // use a specific formatter for Java files
+        }
+    }
     tasks.withType(JavaCompile) { task ->
         task.options.compilerArgs << "-Xlint:deprecation"
     }

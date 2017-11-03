@@ -14,30 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package dart.processor;
 
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import dart.Dart;
 import dart.common.BaseGenerator;
 import dart.common.Binding;
 import dart.common.ExtraInjection;
 import dart.common.FieldBinding;
 import dart.common.InjectionTarget;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-
-import javax.lang.model.element.Modifier;
-import javax.lang.model.type.TypeMirror;
 import java.util.Collection;
 import java.util.List;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.type.TypeMirror;
 
 /**
- * Creates Java code to inject extras into an activity
- * or a {@link android.os.Bundle}.
+ * Creates Java code to inject extras into an activity or a {@link android.os.Bundle}.
  *
- * {@link Dart} to use this code at runtime.
+ * <p>{@link Dart} to use this code at runtime.
  */
 public class ExtraInjectorGenerator extends BaseGenerator {
 
@@ -47,17 +46,20 @@ public class ExtraInjectorGenerator extends BaseGenerator {
     this.target = target;
   }
 
-  @Override public String brewJava() {
+  @Override
+  public String brewJava() {
     TypeSpec.Builder injectorTypeSpec =
         TypeSpec.classBuilder(injectorClassName()).addModifiers(Modifier.PUBLIC);
     emitInject(injectorTypeSpec);
-    JavaFile javaFile = JavaFile.builder(target.classPackage, injectorTypeSpec.build())
-        .addFileComment("Generated code from Dart. Do not modify!")
-        .build();
+    JavaFile javaFile =
+        JavaFile.builder(target.classPackage, injectorTypeSpec.build())
+            .addFileComment("Generated code from Dart. Do not modify!")
+            .build();
     return javaFile.toString();
   }
 
-  @Override public String getFqcn() {
+  @Override
+  public String getFqcn() {
     return target.classPackage + "." + injectorClassName();
   }
 
@@ -66,15 +68,17 @@ public class ExtraInjectorGenerator extends BaseGenerator {
   }
 
   private void emitInject(TypeSpec.Builder builder) {
-    MethodSpec.Builder injectBuilder = MethodSpec.methodBuilder("inject")
-        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-        .addParameter(ClassName.get(Dart.Finder.class), "finder")
-        .addParameter(ClassName.bestGuess(target.classFqcnCanonical), "target")
-        .addParameter(ClassName.get(Object.class), "source");
+    MethodSpec.Builder injectBuilder =
+        MethodSpec.methodBuilder("inject")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(ClassName.get(Dart.Finder.class), "finder")
+            .addParameter(ClassName.bestGuess(target.classFqcnCanonical), "target")
+            .addParameter(ClassName.get(Object.class), "source");
 
     if (target.parentClassFqcn != null) {
       // Emit a call to the superclass injector, if any.
-      injectBuilder.addStatement("$T.inject(finder, target, source)",
+      injectBuilder.addStatement(
+          "$T.inject(finder, target, source)",
           ClassName.bestGuess(target.parentClassFqcn + Dart.INJECTOR_SUFFIX));
     }
 
@@ -94,10 +98,13 @@ public class ExtraInjectorGenerator extends BaseGenerator {
 
     List<Binding> requiredBindings = injection.getRequiredBindings();
     if (!requiredBindings.isEmpty()) {
-      builder.beginControlFlow("if (object == null)")
-          .addStatement("throw new IllegalStateException(\"Required extra with key '$L' for $L "
+      builder
+          .beginControlFlow("if (object == null)")
+          .addStatement(
+              "throw new IllegalStateException(\"Required extra with key '$L' for $L "
                   + "was not found. If this extra is optional add '@Nullable' annotation.\")",
-              injection.getKey(), emitHumanDescription(requiredBindings))
+              injection.getKey(),
+              emitHumanDescription(requiredBindings))
           .endControlFlow();
       emitFieldBindings(builder, injection);
     } else {
@@ -140,7 +147,8 @@ public class ExtraInjectorGenerator extends BaseGenerator {
         builder.append(bindings.get(0).getDescription());
         break;
       case 2:
-        builder.append(bindings.get(0).getDescription())
+        builder
+            .append(bindings.get(0).getDescription())
             .append(" and ")
             .append(bindings.get(1).getDescription());
         break;
