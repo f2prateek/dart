@@ -44,4 +44,8 @@ subprojects {
         jcenter()
         google()
     }
+
+    tasks.withType(JavaCompile) { task ->
+        task.options.compilerArgs << "-Xlint:deprecation"
+    }
 }

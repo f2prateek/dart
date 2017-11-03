@@ -18,13 +18,16 @@
 package dart.processor;
 
 import com.google.common.base.Joiner;
+import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
+
 import org.junit.Test;
 
 import javax.tools.JavaFileObject;
 
-import static com.google.common.truth.Truth.assert_;
-import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
+import static dart.processor.ProcessorTestUtilities.dartProcessorsWithoutParceler;
 
 /**
  * Tests {@link dart.processor.InjectExtraProcessor}.
@@ -66,12 +69,12 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(injectorSource);
+    Compilation compilation = javac()
+            .withProcessors(dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/Test$$ExtraInjector")
+            .hasSourceEquivalentTo(injectorSource);
   }
 
   @Test public void injectingAllPrimitives() {
@@ -151,12 +154,12 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(injectorSource);
+    Compilation compilation = javac()
+            .withProcessors(dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/Test$$ExtraInjector")
+            .hasSourceEquivalentTo(injectorSource);
   }
 
   @Test public void oneFindPerKey() {
@@ -192,12 +195,12 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource);
+    Compilation compilation = javac()
+            .withProcessors(dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/Test$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource);
   }
 
   @Test public void defaultKey() {
@@ -231,12 +234,12 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource);
+    Compilation compilation = javac()
+            .withProcessors(dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/Test$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource);
   }
 
   @Test public void fieldVisibility() {
@@ -253,10 +256,11 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .compilesWithoutError();
+    Compilation compilation = javac()
+            .withProcessors(dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .succeededWithoutWarnings();
   }
 
   @Test public void nullable() {
@@ -292,12 +296,12 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/Test$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource);
   }
 
   @Test public void failsIfInPrivateClass() {
@@ -312,15 +316,13 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .failsToCompile()
-        .withErrorContaining(
-            String.format("@InjectExtra fields may not be contained in private classes. (%s)",
-                "test.Test.Inner.extra"))
-        .in(source)
-        .onLine(5);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .hadErrorContaining("@InjectExtra fields may not be contained in private classes. (test.Test.Inner.extra)")
+            .inFile(source)
+            .onLine(5);
   }
 
   @Test public void failsIfPrivate() {
@@ -333,15 +335,13 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .failsToCompile()
-        .withErrorContaining(
-            String.format("@InjectExtra fields must not be private or static. (%s)",
-                "test.Test.extra"))
-        .in(source)
-        .onLine(5);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .hadErrorContaining("@InjectExtra fields must not be private or static. (test.Test.extra)")
+            .inFile(source)
+            .onLine(5);
   }
 
   @Test public void failsIfStatic() {
@@ -354,15 +354,13 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .failsToCompile()
-        .withErrorContaining(
-            String.format("@InjectExtra fields must not be private or static. (%s)",
-                "test.Test.extra"))
-        .in(source)
-        .onLine(5);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .hadErrorContaining("@InjectExtra fields must not be private or static. (test.Test.extra)")
+            .inFile(source)
+            .onLine(5);
   }
 
   @Test public void failsIfInInterface() {
@@ -375,15 +373,13 @@ public class InjectExtraTest {
         "}" //
     ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .failsToCompile()
-        .withErrorContaining(
-            String.format("@InjectExtra fields may only be contained in classes. (%s)",
-                "test.Test.extra"))
-        .in(source)
-        .onLine(4);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .hadErrorContaining("@InjectExtra fields may only be contained in classes. (test.Test.extra)")
+            .inFile(source)
+            .onLine(4);
   }
 
   @Test public void superclass() {
@@ -440,12 +436,15 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource1, expectedSource2);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/Test$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource1);
+    assertThat(compilation)
+            .generatedSourceFile("test/TestOne$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource2);
   }
 
   @Test public void genericSuperclass() {
@@ -501,11 +500,14 @@ public class InjectExtraTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource1, expectedSource2);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/Test$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource1);
+    assertThat(compilation)
+            .generatedSourceFile("test/TestOne$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource2);
   }
 }

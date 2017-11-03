@@ -18,10 +18,13 @@
 package dart.processor;
 
 import com.google.common.base.Joiner;
+import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static com.google.common.truth.Truth.assert_;
 
@@ -61,12 +64,12 @@ public class InjectExtraWithParcelerTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessors())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/TestSerializableCollection$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource);
   }
 
   @Test public void nonSerializableNonParcelableCollection_withoutParceler() {
@@ -83,7 +86,7 @@ public class InjectExtraWithParcelerTest {
     ));
 
     JavaFileObject expectedSource =
-        JavaFileObjects.forSourceString("test/TestSerializableCollection$$ExtraInjector", Joiner.on('\n').join( //
+        JavaFileObjects.forSourceString("test/TestNonSerializableNonParcelableCollection_withoutParceler$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
         "import dart.Dart;", //
         "import java.lang.Object;", //
@@ -99,12 +102,12 @@ public class InjectExtraWithParcelerTest {
         "}"
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessors())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/TestNonSerializableNonParcelableCollection_withoutParceler$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource);
   }
 
   @Test public void parcelAnnotatedType() {
@@ -138,12 +141,12 @@ public class InjectExtraWithParcelerTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessors())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/TestParcelAnnotated$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource);
   }
 
   @Test public void collectionOfParcelAnnotatedType() {
@@ -178,12 +181,12 @@ public class InjectExtraWithParcelerTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessors())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/TestCollectionParcel$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource);
   }
 
   @Test public void injectingParcelThatExtendsParcelableExtra() {
@@ -208,7 +211,7 @@ public class InjectExtraWithParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
+        JavaFileObjects.forSourceString("test/TestParcelExtendsParcelable$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
             "import dart.Dart;", //
             "import java.lang.Object;", //
@@ -224,12 +227,12 @@ public class InjectExtraWithParcelerTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessors())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/TestParcelExtendsParcelable$$ExtraInjector")
+            .hasSourceEquivalentTo(builderSource);
   }
 
   @Test public void injectingParcelableThatExtendsParcelableExtra() {
@@ -259,7 +262,7 @@ public class InjectExtraWithParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
+        JavaFileObjects.forSourceString("test/TestParcelableExtendsParcelable$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
             "import dart.Dart;", //
             "import java.lang.Object;", //
@@ -275,11 +278,11 @@ public class InjectExtraWithParcelerTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessors())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/TestParcelableExtendsParcelable$$ExtraInjector")
+            .hasSourceEquivalentTo(builderSource);
   }
 }

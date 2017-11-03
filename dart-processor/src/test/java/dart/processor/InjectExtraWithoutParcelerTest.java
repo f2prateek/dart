@@ -18,12 +18,15 @@
 package dart.processor;
 
 import com.google.common.base.Joiner;
+import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
-import javax.tools.JavaFileObject;
+
 import org.junit.Test;
 
-import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
-import static com.google.common.truth.Truth.assert_;
+import javax.tools.JavaFileObject;
+
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
 
 /**
  * Tests {@link dart.processor.InjectExtraProcessor}.
@@ -63,12 +66,12 @@ public class InjectExtraWithoutParcelerTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/TestSerializableCollection$$ExtraInjector")
+            .hasSourceEquivalentTo(expectedSource);
   }
 
   @Test public void nonSerializableNonParcelableCollection_withoutParceler() {
@@ -85,12 +88,12 @@ public class InjectExtraWithoutParcelerTest {
         "}" //
     ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .failsToCompile()
-        .withErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable"
-            + " (test.TestNonSerializableNonParcelableCollection_withoutParceler.extra). If you use Parceler, all types supported by Parceler are allowed.");
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable"
+                    + " (test.TestNonSerializableNonParcelableCollection_withoutParceler.extra). If you use Parceler, all types supported by Parceler are allowed.");
   }
 
   @Test public void parcelAnnotatedType() {
@@ -107,12 +110,12 @@ public class InjectExtraWithoutParcelerTest {
         "}"
     ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .failsToCompile()
-        .withErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable"
-            + " (test.TestParcelAnnotated.extra). If you use Parceler, all types supported by Parceler are allowed.");
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable"
+                    + " (test.TestParcelAnnotated.extra). If you use Parceler, all types supported by Parceler are allowed.");
   }
 
   @Test public void collectionOfParcelAnnotatedType() {
@@ -130,12 +133,12 @@ public class InjectExtraWithoutParcelerTest {
         "}"
     ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .failsToCompile()
-        .withErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable"
-            + " (test.TestCollectionParcel.extra). If you use Parceler, all types supported by Parceler are allowed.");
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable"
+                    + " (test.TestCollectionParcel.extra). If you use Parceler, all types supported by Parceler are allowed.");
   }
 
   @Test public void injectingParcelableThatExtendsParcelableExtra() {
@@ -165,7 +168,7 @@ public class InjectExtraWithoutParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test/Test$$ExtraInjector", Joiner.on('\n').join( //
+        JavaFileObjects.forSourceString("test/TestParcelableExtendsParcelable$$ExtraInjector", Joiner.on('\n').join( //
             "package test;", //
             "import dart.Dart;", //
             "import java.lang.Object;", //
@@ -181,11 +184,11 @@ public class InjectExtraWithoutParcelerTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+    Compilation compilation = javac()
+            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compile(source);
+    assertThat(compilation)
+            .generatedSourceFile("test/TestParcelableExtendsParcelable$$ExtraInjector")
+            .hasSourceEquivalentTo(builderSource);
   }
 }

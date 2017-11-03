@@ -1,12 +1,15 @@
 package dart.henson.processor;
 
 import com.google.common.base.Joiner;
+import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.Test;
 
 import javax.tools.JavaFileObject;
 
 import static com.google.common.truth.Truth.assert_;
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
 
@@ -14,9 +17,9 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsExtras() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test\")", //
@@ -26,9 +29,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -61,19 +64,19 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_doesNotContainExtras() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test\")", //
@@ -82,9 +85,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -111,19 +114,19 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test(expected = AssertionError.class)
   public void intentBuilderGenerator_should_notGenerateIntentBuilder_when_navigationModelIsNotDefined_and_containsExtras() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "public class TestNavigationModel {", //
@@ -131,19 +134,18 @@ public class IntentBuilderGeneratorTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesFileNamed(SOURCE_OUTPUT, "test.navmodel", "Test$$IntentBuilder.java");
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder");
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_targetClassIsInner() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test$MyInnerTest\")", //
@@ -152,9 +154,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$MyInnerTest$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$MyInnerTest$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -182,19 +184,19 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$MyInnerTest$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilders_when_navigationModelIsDefined_and_containsExtras_and_sameForParent() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel1",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test1\")", //
@@ -208,9 +210,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource1 =
-        JavaFileObjects.forSourceString("test.navmodel.Test1$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test1$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -250,9 +252,9 @@ public class IntentBuilderGeneratorTest {
             ));
 
     JavaFileObject builderSource2 =
-        JavaFileObjects.forSourceString("test.navmodel.Test2$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test2$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -285,19 +287,22 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource1, builderSource2);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test1$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource1);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test2$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource2);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilders_when_navigationModelIsDefined_and_containsExtras_and_sameForParent_and_keyIsRepeated() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel1",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test1\")", //
@@ -311,9 +316,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource1 =
-        JavaFileObjects.forSourceString("test.navmodel.Test1$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test1$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -348,9 +353,9 @@ public class IntentBuilderGeneratorTest {
             ));
 
     JavaFileObject builderSource2 =
-        JavaFileObjects.forSourceString("test.navmodel.Test2$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test2$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -384,19 +389,22 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource1, builderSource2);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test1$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource1);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test2$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource2);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilderWithParentExtras_when_navigationModelIsDefined_and_doesNotContainExtras() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel1",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test1\")", //
@@ -408,9 +416,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test1$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test1$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -443,19 +451,19 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test1$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   //Test for https://github.com/f2prateek/dart/issues/64
   @Test public void intentBuilderGenerator_should_generateIntentBuilderWithAncestorExtras() {
     JavaFileObject source =
-        JavaFileObjects.forSourceString("test.navmodel.Test", Joiner.on('\n').join( //
-            "package test.navmodel;", //
+        JavaFileObjects.forSourceString("test.navigation.Test", Joiner.on('\n').join( //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "public abstract class Test {", //
@@ -470,9 +478,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject expectedSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test2$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test2$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -504,19 +512,20 @@ public class IntentBuilderGeneratorTest {
                 "  }", //
                 "}" //
             ));
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(expectedSource);
+
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test2$$IntentBuilder")
+              .hasSourceEquivalentTo(expectedSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilderWithParentExtras_when_navigationModelIsDefined_and_doesNotContainExtras_and_parentIsAbstract() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel1",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test1\")", //
@@ -528,9 +537,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test1$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test1$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -563,19 +572,19 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test1$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_parentContainsGenerics() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel1",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel1",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test1\")", //
@@ -588,9 +597,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test1$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test1$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -629,19 +638,19 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test1$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsPrimitiveExtras() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test\")", //
@@ -658,9 +667,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -736,19 +745,19 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsSerializableAndParcelableExtra() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import android.os.Parcelable;", //
             "import java.io.Serializable;", //
             "import dart.InjectExtra;", //
@@ -767,9 +776,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -802,18 +811,18 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test public void intentBuilderGenerator_should_containOnlyOneSetter_when_keysAreRepeated() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test\")", //
@@ -825,9 +834,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -860,18 +869,18 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test public void intentBuilderGenerator_should_useDefaultKey_when_noKeyIsProvided() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test\")", //
@@ -881,9 +890,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -916,19 +925,19 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilder_when_containsMandatoryAndOptionalExtras() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "import java.lang.annotation.Retention;", //
@@ -945,9 +954,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -984,19 +993,19 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateIntentBuilder_when_containsOnlyOptionalExtras() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "import java.lang.annotation.Retention;", //
@@ -1013,9 +1022,9 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -1050,18 +1059,18 @@ public class IntentBuilderGeneratorTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test public void intentBuilderGenerator_should_fail_when_extraKeyIsInvalid() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test\")", //
@@ -1070,17 +1079,17 @@ public class IntentBuilderGeneratorTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .failsToCompile()
-        .withErrorContaining("Keys have to be valid java variable identifiers.");
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .hadErrorContaining("Keys have to be valid java variable identifiers.");
   }
 
   @Test public void intentBuilderGenerator_should_fail_when_extraIsPrivate() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test\")", //
@@ -1089,17 +1098,17 @@ public class IntentBuilderGeneratorTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .failsToCompile()
-        .withErrorContaining("@InjectExtra fields must not be private or static.");
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .hadErrorContaining("@InjectExtra fields must not be private or static.");
   }
 
   @Test public void intentBuilderGenerator_should_fail_when_extraIsStatic() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test\")", //
@@ -1108,17 +1117,17 @@ public class IntentBuilderGeneratorTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .failsToCompile()
-        .withErrorContaining("@InjectExtra fields must not be private or static.");
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .hadErrorContaining("@InjectExtra fields must not be private or static.");
   }
 
   @Test public void intentBuilderGenerator_should_fail_when_extraIsInvalidType() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "@NavigationModel(\"test.Test\")", //
@@ -1127,11 +1136,10 @@ public class IntentBuilderGeneratorTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .failsToCompile()
-        .withErrorContaining(
-            "@InjectExtra field must be a primitive or Serializable or Parcelable");
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable");
   }
 }
