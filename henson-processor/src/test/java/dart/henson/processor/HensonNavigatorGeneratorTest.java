@@ -37,11 +37,11 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") String extra;", //
+                    "    @BindExtra(\"key\") String extra;", //
                     "}" //
                     ));
 
@@ -86,7 +86,7 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
@@ -134,7 +134,7 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test$MyInnerTest\")", //
                     "public class TestNavigationModel {", //
@@ -182,10 +182,10 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") String extra;", //
+                    "    @BindExtra(\"key\") String extra;", //
                     "}" //
                     ));
 
@@ -203,17 +203,17 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 {", //
                     "}", //
                     "@NavigationModel(\"test.Test2\")", //
                     "class TestNavigationModel2 extends TestNavigationModel3 {", //
-                    "    @InjectExtra(\"key2\") String extra2;", //
+                    "    @BindExtra(\"key2\") String extra2;", //
                     "}", //
                     "class TestNavigationModel3 {", //
-                    "    @InjectExtra(\"key3\") String extra3;", //
+                    "    @BindExtra(\"key3\") String extra3;", //
                     "}" //
                     ));
 
@@ -261,17 +261,17 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 extends TestNavigationModel3<String> {", //
                     "}", //
                     "@NavigationModel(\"test.Test2\")", //
                     "class TestNavigationModel2 extends TestNavigationModel3<Object> {", //
-                    "    @InjectExtra(\"key2\") String extra2;", //
+                    "    @BindExtra(\"key2\") String extra2;", //
                     "}", //
                     "class TestNavigationModel3<T> {", //
-                    "    @InjectExtra(\"key3\") String extra3;", //
+                    "    @BindExtra(\"key3\") String extra3;", //
                     "}" //
                     ));
 
@@ -319,13 +319,13 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 extends TestNavigationModel2 {", //
                     "}", //
                     "abstract class TestNavigationModel2 {", //
-                    "    @InjectExtra(\"key2\") String extra2;", //
+                    "    @BindExtra(\"key2\") String extra2;", //
                     "}" //
                     ));
 
@@ -369,7 +369,7 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 {", //
@@ -394,7 +394,7 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 {", //
@@ -420,7 +420,7 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 {", //
@@ -445,7 +445,7 @@ public class HensonNavigatorGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 {", //

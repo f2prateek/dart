@@ -118,7 +118,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
     //separate required extras from optional extras and sort both sublists.
     List<ExtraInjection> requiredInjections = new ArrayList<>();
     List<ExtraInjection> optionalInjections = new ArrayList<>();
-    for (ExtraInjection extraInjection : target.injectionMap.values()) {
+    for (ExtraInjection extraInjection : target.bindingMap.values()) {
       if (!extraInjection.getRequiredBindings().isEmpty()) {
         requiredInjections.add(extraInjection);
       } else {

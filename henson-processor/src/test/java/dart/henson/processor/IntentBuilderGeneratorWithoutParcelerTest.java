@@ -38,11 +38,11 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                 .join( //
                     "package test.navigation;", //
                     "import java.util.ArrayList;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") ArrayList<String> extra;", //
+                    "    @BindExtra(\"key\") ArrayList<String> extra;", //
                     "}" //
                     ));
 
@@ -103,11 +103,11 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                 .join( //
                     "package test.navigation;", //
                     "import java.util.List;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") List<String> extra;", //
+                    "    @BindExtra(\"key\") List<String> extra;", //
                     "}" //
                     ));
 
@@ -116,7 +116,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable");
+        .hadErrorContaining("@BindExtra field must be a primitive or Serializable or Parcelable");
   }
 
   @Test
@@ -128,12 +128,12 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "import org.parceler.Parcel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") Foo extra;", //
+                    "    @BindExtra(\"key\") Foo extra;", //
                     "    @Parcel static class Foo {}", //
                     "}" //
                     ));
@@ -143,7 +143,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable");
+        .hadErrorContaining("@BindExtra field must be a primitive or Serializable or Parcelable");
   }
 
   @Test
@@ -156,11 +156,11 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                 .join( //
                     "package test.navigation;", //
                     "import java.util.List;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") List<Foo> extra;", //
+                    "    @BindExtra(\"key\") List<Foo> extra;", //
                     "    @Parcel static class Foo {}", //
                     "}" //
                     ));
@@ -170,7 +170,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable");
+        .hadErrorContaining("@BindExtra field must be a primitive or Serializable or Parcelable");
   }
 
   @Test
@@ -183,11 +183,11 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "package test.navigation;", //
                     "import java.util.List;", //
                     "import android.os.Parcelable;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") Foo extra;", //
+                    "    @BindExtra(\"key\") Foo extra;", //
                     "    class Foo implements Parcelable {", //
                     "        public void writeToParcel(android.os.Parcel out, int flags) {", //
                     "        }", //
@@ -256,11 +256,11 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "package test.navigation;", //
                     "import java.util.List;", //
                     "import android.os.Parcelable;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") Foo extra;", //
+                    "    @BindExtra(\"key\") Foo extra;", //
                     "    class FooParent implements Parcelable {", //
                     "        public void writeToParcel(android.os.Parcel out, int flags) {", //
                     "        }", //

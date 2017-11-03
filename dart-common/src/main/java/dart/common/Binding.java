@@ -17,7 +17,7 @@
 
 package dart.common;
 
-/** A field or method extra injection binding. */
+/** A field or method extra binding. */
 public interface Binding {
   /** A description of the binding in human readable form (e.g., "field 'foo'"). */
   String getDescription();

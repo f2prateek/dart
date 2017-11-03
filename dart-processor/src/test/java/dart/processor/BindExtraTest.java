@@ -28,7 +28,7 @@ import javax.tools.JavaFileObject;
 import org.junit.Test;
 
 /** Tests {@link dart.processor.InjectExtraProcessor}. For tests not related to Parceler. */
-public class InjectExtraTest {
+public class BindExtraTest {
 
   @Test
   public void testIsDebugDisabled() {
@@ -45,9 +45,9 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "public class Test extends Activity {", //
-                    "    @InjectExtra(\"key\") String extra;", //
+                    "    @BindExtra(\"key\") String extra;", //
                     "}" //
                     ));
 
@@ -89,16 +89,16 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "public class Test extends Activity {", //
-                    "    @InjectExtra(\"key_bool\") boolean aBool;", //
-                    "    @InjectExtra(\"key_byte\") byte aByte;", //
-                    "    @InjectExtra(\"key_short\") short aShort;", //
-                    "    @InjectExtra(\"key_int\") int anInt;", //
-                    "    @InjectExtra(\"key_long\") long aLong;", //
-                    "    @InjectExtra(\"key_char\") char aChar;", //
-                    "    @InjectExtra(\"key_float\") float aFloat;", //
-                    "    @InjectExtra(\"key_double\") double aDouble;", //
+                    "    @BindExtra(\"key_bool\") boolean aBool;", //
+                    "    @BindExtra(\"key_byte\") byte aByte;", //
+                    "    @BindExtra(\"key_short\") short aShort;", //
+                    "    @BindExtra(\"key_int\") int anInt;", //
+                    "    @BindExtra(\"key_long\") long aLong;", //
+                    "    @BindExtra(\"key_char\") char aChar;", //
+                    "    @BindExtra(\"key_float\") float aFloat;", //
+                    "    @BindExtra(\"key_double\") double aDouble;", //
                     "}" //
                     ));
 
@@ -181,11 +181,11 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "public class Test extends Activity {", //
-                    "    @InjectExtra(\"key\") String extra1;", //
-                    "    @InjectExtra(\"key\") String extra2;", //
-                    "    @InjectExtra(\"key\") String extra3;", //
+                    "    @BindExtra(\"key\") String extra1;", //
+                    "    @BindExtra(\"key\") String extra2;", //
+                    "    @BindExtra(\"key\") String extra3;", //
                     "}" //
                     ));
 
@@ -229,11 +229,11 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
                     "public class Test extends Activity {", //
-                    "    @InjectExtra String key;", //
+                    "    @BindExtra String key;", //
                     "}" //
                     ));
 
@@ -275,13 +275,13 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
                     "public class Test extends Activity {", //
-                    "    @InjectExtra(\"key_1\") String extra1;", //
-                    "    @InjectExtra(\"key_2\") String extra2;", //
-                    "    @InjectExtra(\"key_3\") String extra3;", //
+                    "    @BindExtra(\"key_1\") String extra1;", //
+                    "    @BindExtra(\"key_2\") String extra2;", //
+                    "    @BindExtra(\"key_3\") String extra3;", //
                     "}" //
                     ));
 
@@ -299,7 +299,7 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
                     "import java.lang.annotation.Retention;", //
@@ -307,7 +307,7 @@ public class InjectExtraTest {
                     "import static java.lang.annotation.ElementType.FIELD;", //
                     "import static java.lang.annotation.RetentionPolicy.CLASS;", //
                     "public class Test extends Activity {", //
-                    "  @Nullable @InjectExtra(\"key\") String extra;", //
+                    "  @Nullable @BindExtra(\"key\") String extra;", //
                     "}", //
                     "@Retention(CLASS) @Target(FIELD) @interface Nullable {}"));
 
@@ -349,10 +349,10 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "public class Test {", //
                     "  private static class Inner {", //
-                    "    @InjectExtra(\"key\") String extra;", //
+                    "    @BindExtra(\"key\") String extra;", //
                     "  }", //
                     "}" //
                     ));
@@ -363,7 +363,7 @@ public class InjectExtraTest {
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
-            "@InjectExtra fields may not be contained in private classes. (test.Test.Inner.extra)")
+            "@BindExtra fields may not be contained in private classes. (test.Test.Inner.extra)")
         .inFile(source)
         .onLine(5);
   }
@@ -377,9 +377,9 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "public class Test extends Activity {", //
-                    "    @InjectExtra(\"key\") private String extra;", //
+                    "    @BindExtra(\"key\") private String extra;", //
                     "}" //
                     ));
 
@@ -388,7 +388,7 @@ public class InjectExtraTest {
             .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .hadErrorContaining("@InjectExtra fields must not be private or static. (test.Test.extra)")
+        .hadErrorContaining("@BindExtra fields must not be private or static. (test.Test.extra)")
         .inFile(source)
         .onLine(5);
   }
@@ -402,9 +402,9 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "public class Test extends Activity {", //
-                    "    @InjectExtra(\"key\") static String extra;", //
+                    "    @BindExtra(\"key\") static String extra;", //
                     "}" //
                     ));
 
@@ -413,7 +413,7 @@ public class InjectExtraTest {
             .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .hadErrorContaining("@InjectExtra fields must not be private or static. (test.Test.extra)")
+        .hadErrorContaining("@BindExtra fields must not be private or static. (test.Test.extra)")
         .inFile(source)
         .onLine(5);
   }
@@ -427,9 +427,9 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "public interface Test {", //
-                    "    @InjectExtra(\"key\") String extra = null;", //
+                    "    @BindExtra(\"key\") String extra = null;", //
                     "}" //
                     ));
 
@@ -438,8 +438,7 @@ public class InjectExtraTest {
             .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .hadErrorContaining(
-            "@InjectExtra fields may only be contained in classes. (test.Test.extra)")
+        .hadErrorContaining("@BindExtra fields may only be contained in classes. (test.Test.extra)")
         .inFile(source)
         .onLine(4);
   }
@@ -453,12 +452,12 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "public class Test extends Activity {", //
-                    "    @InjectExtra(\"key\") String extra;", //
+                    "    @BindExtra(\"key\") String extra;", //
                     "}", //
                     "class TestOne extends Test {", //
-                    "    @InjectExtra(\"key\") String extra1;", //
+                    "    @BindExtra(\"key\") String extra1;", //
                     "}", //
                     "class TestTwo extends Test {", //
                     "}" //
@@ -530,12 +529,12 @@ public class InjectExtraTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "public class Test<T> extends Activity {", //
-                    "    @InjectExtra(\"key\") String extra;", //
+                    "    @BindExtra(\"key\") String extra;", //
                     "}", //
                     "class TestOne extends Test<String> {", //
-                    "    @InjectExtra(\"key\") String extra1;", //
+                    "    @BindExtra(\"key\") String extra1;", //
                     "}", //
                     "class TestTwo extends Test<Object> {", //
                     "}" //

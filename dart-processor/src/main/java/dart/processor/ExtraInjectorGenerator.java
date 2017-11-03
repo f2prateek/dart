@@ -86,7 +86,7 @@ public class ExtraInjectorGenerator extends BaseGenerator {
     injectBuilder.addStatement("Object object");
 
     // Loop over each extras injection and emit it.
-    for (ExtraInjection injection : target.injectionMap.values()) {
+    for (ExtraInjection injection : target.bindingMap.values()) {
       emitExtraInjection(injectBuilder, injection);
     }
 

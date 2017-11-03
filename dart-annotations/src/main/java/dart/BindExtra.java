@@ -29,12 +29,12 @@ import java.lang.annotation.Target;
  * provided, the variable name will be used.
  *
  * <pre><code>
- * {@literal @}InjectExtra("key") String title;
- * {@literal @}InjectExtra String content; // "content" is the key for the extra
+ * {@literal @}BindExtra("key") String title;
+ * {@literal @}BindExtra String content; // "content" is the key for the extra
  * </code></pre>
  */
 @Retention(SOURCE)
 @Target(FIELD)
-public @interface InjectExtra {
+public @interface BindExtra {
   String value() default "";
 }

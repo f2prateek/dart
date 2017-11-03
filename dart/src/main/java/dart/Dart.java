@@ -27,13 +27,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Extra injection utilities. Use this class to simplify getting extras.
+ * Extra binding utilities. Use this class to simplify getting extras.
  *
  * <p>Injecting extras from your activity is as easy as:
  *
  * <pre><code>
  * public class ExampleActivity extends Activity {
- *   {@literal @}InjectExtra("key") String extra;
+ *   {@literal @}BindExtra("key") String extra;
  *
  *   {@literal @}Override protected void onCreate(Bundle savedInstanceState) {
  *     super.onCreate(savedInstanceState);
@@ -50,14 +50,14 @@ import java.util.Map;
  * is optional add the {@code Nullable @Nullable} annotation.
  *
  * <pre><code>
- * {@literal @}Nullable {@literal @}InjectExtra("key") String extra;
+ * {@literal @}Nullable {@literal @}BindExtra("key") String extra;
  * </code></pre>
  *
  * <p>If you need to provide a default value for an extra, simply set an initial value while
  * declaring the field, combined with the {@code Nullable @Nullable} annotation.
  *
  * <pre><code>
- * {@literal @}Nullable {@literal @}InjectExtra("key") String extra = "default_value";
+ * {@literal @}Nullable {@literal @}BindExtra("key") String extra = "default_value";
  * </code></pre>
  */
 public class Dart {
@@ -78,7 +78,7 @@ public class Dart {
   }
 
   /**
-   * Inject fields annotated with {@link InjectExtra} in the specified {@link android.app.Activity}.
+   * Inject fields annotated with {@link BindExtra} in the specified {@link android.app.Activity}.
    * The intent that called this activity will be used as the source of the extras bundle.
    *
    * @param target Target activity for field injection.
@@ -90,7 +90,7 @@ public class Dart {
   }
 
   /**
-   * Inject fields annotated with {@link InjectExtra} in the specified {@link android.app.Fragment}.
+   * Inject fields annotated with {@link BindExtra} in the specified {@link android.app.Fragment}.
    * The arguments that this fragment was called with will be used as the source of the extras
    * bundle.
    *
@@ -103,8 +103,8 @@ public class Dart {
   }
 
   /**
-   * Inject fields annotated with {@link InjectExtra} in the specified {@code target} using the
-   * {@code source} {@link android.app.Activity}.
+   * Inject fields annotated with {@link BindExtra} in the specified {@code target} using the {@code
+   * source} {@link android.app.Activity}.
    *
    * @param target Target class for field injection.
    * @param source Activity on which IDs will be looked up.
@@ -116,8 +116,8 @@ public class Dart {
   }
 
   /**
-   * Inject fields annotated with {@link InjectExtra} in the specified {@code target} using the
-   * {@code source} {@link android.os.Bundle} as the source.
+   * Inject fields annotated with {@link BindExtra} in the specified {@code target} using the {@code
+   * source} {@link android.os.Bundle} as the source.
    *
    * @param target Target class for field injection.
    * @param source Bundle source on which extras will be looked up.

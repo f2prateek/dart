@@ -21,7 +21,7 @@ import static javax.lang.model.element.ElementKind.CLASS;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 
-import dart.InjectExtra;
+import dart.BindExtra;
 import dart.common.InjectionTarget;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -63,7 +63,7 @@ public class InjectExtraUtil {
   }
 
   public void parseInjectExtraAnnotatedElements(Map<TypeElement, InjectionTarget> targetClassMap) {
-    for (Element element : roundEnv.getElementsAnnotatedWith(InjectExtra.class)) {
+    for (Element element : roundEnv.getElementsAnnotatedWith(BindExtra.class)) {
       try {
         parseInjectExtra(element, targetClassMap);
       } catch (Exception e) {
@@ -71,7 +71,7 @@ public class InjectExtraUtil {
         e.printStackTrace(new PrintWriter(stackTrace));
         loggingUtil.error(
             element,
-            "Unable to generate extra injector when parsing @InjectExtra.\n\n%s",
+            "Unable to generate extra injector when parsing @BindExtra.\n\n%s",
             stackTrace.toString());
       }
     }
@@ -84,7 +84,7 @@ public class InjectExtraUtil {
     }
 
     // Valid annotation value
-    final String annotationValue = element.getAnnotation(InjectExtra.class).value();
+    final String annotationValue = element.getAnnotation(BindExtra.class).value();
     if (!StringUtil.isNullOrEmpty(annotationValue)
         && !StringUtil.isValidJavaIdentifier(annotationValue)) {
       throw new IllegalArgumentException(
@@ -115,7 +115,7 @@ public class InjectExtraUtil {
     if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC)) {
       loggingUtil.error(
           element,
-          "@InjectExtra fields must not be private or static. (%s.%s)",
+          "@BindExtra fields must not be private or static. (%s.%s)",
           enclosingElement.getQualifiedName(),
           element.getSimpleName());
       valid = false;
@@ -128,7 +128,7 @@ public class InjectExtraUtil {
             && parcelerUtil.isValidExtraTypeForParceler(typeElement))) {
       loggingUtil.error(
           element,
-          "@InjectExtra field must be a primitive or Serializable or "
+          "@BindExtra field must be a primitive or Serializable or "
               + "Parcelable (%s.%s). "
               + "If you use Parceler, all types supported by Parceler are allowed.",
           enclosingElement.getQualifiedName(),
@@ -140,7 +140,7 @@ public class InjectExtraUtil {
     if (enclosingElement.getKind() != CLASS) {
       loggingUtil.error(
           enclosingElement,
-          "@InjectExtra fields may only be contained in classes. (%s.%s)",
+          "@BindExtra fields may only be contained in classes. (%s.%s)",
           enclosingElement.getQualifiedName(),
           element.getSimpleName());
       valid = false;
@@ -150,7 +150,7 @@ public class InjectExtraUtil {
     if (enclosingElement.getModifiers().contains(PRIVATE)) {
       loggingUtil.error(
           enclosingElement,
-          "@InjectExtra fields may not be contained in private classes. (%s.%s)",
+          "@BindExtra fields may not be contained in private classes. (%s.%s)",
           enclosingElement.getQualifiedName(),
           element.getSimpleName());
       valid = false;

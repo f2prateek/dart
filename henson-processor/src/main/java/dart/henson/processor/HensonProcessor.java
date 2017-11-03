@@ -46,7 +46,7 @@ import javax.lang.model.element.TypeElement;
 public class HensonProcessor extends AbstractProcessor {
 
   static final String NAVIGATION_MODEL_ANNOTATION_CLASS_NAME = "dart.NavigationModel";
-  static final String INJECT_EXTRA_ANNOTATION_CLASS_NAME = "dart.InjectExtra";
+  static final String INJECT_EXTRA_ANNOTATION_CLASS_NAME = "dart.BindExtra";
 
   static final String OPTION_HENSON_PACKAGE = "dart.henson.package";
 
@@ -113,7 +113,7 @@ public class HensonProcessor extends AbstractProcessor {
 
     // Process each @NavigationModel element.
     navigationModelUtil.parseNavigationModelAnnotatedElements(targetClassMap);
-    // Process each @InjectExtra element.
+    // Process each @BindExtra element.
     injectExtraUtil.parseInjectExtraAnnotatedElements(targetClassMap);
     // Create injection target tree and inherit extra injections.
     injectionTargetUtil.createInjectionTargetTree(targetClassMap);

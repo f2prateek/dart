@@ -37,11 +37,11 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") String extra;", //
+                    "    @BindExtra(\"key\") String extra;", //
                     "}" //
                     ));
 
@@ -99,7 +99,7 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
@@ -154,10 +154,10 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") String extra;", //
+                    "    @BindExtra(\"key\") String extra;", //
                     "}" //
                     ));
 
@@ -175,7 +175,7 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test$MyInnerTest\")", //
                     "public class TestNavigationModel {", //
@@ -231,15 +231,15 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 extends TestNavigationModel2 {", //
-                    "    @InjectExtra(\"key1\") String extra1;", //
+                    "    @BindExtra(\"key1\") String extra1;", //
                     "}", //
                     "@NavigationModel(\"test.Test2\")", //
                     "class TestNavigationModel2 {", //
-                    "    @InjectExtra(\"key2\") String extra2;", //
+                    "    @BindExtra(\"key2\") String extra2;", //
                     "}" //
                     ));
 
@@ -344,15 +344,15 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 extends TestNavigationModel2 {", //
-                    "    @InjectExtra(\"key\") String extra1;", //
+                    "    @BindExtra(\"key\") String extra1;", //
                     "}", //
                     "@NavigationModel(\"test.Test2\")", //
                     "class TestNavigationModel2 {", //
-                    "    @InjectExtra(\"key\") Integer extra2;", //
+                    "    @BindExtra(\"key\") Integer extra2;", //
                     "}" //
                     ));
 
@@ -453,13 +453,13 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 extends TestNavigationModel2 {", //
                     "}", //
                     "class TestNavigationModel2 {", //
-                    "    @InjectExtra(\"key2\") String extra2;", //
+                    "    @BindExtra(\"key2\") String extra2;", //
                     "}" //
                     ));
 
@@ -517,10 +517,10 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "public abstract class Test {", //
-                    "    @InjectExtra(\"key\") String extra;", //
+                    "    @BindExtra(\"key\") String extra;", //
                     "}", //
                     "@NavigationModel(\"test.Test2\")", //
                     "class TestAwo extends TestOne {", //
@@ -584,13 +584,13 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 extends TestNavigationModel2 {", //
                     "}", //
                     "abstract class TestNavigationModel2 {", //
-                    "    @InjectExtra(\"key2\") String extra2;", //
+                    "    @BindExtra(\"key2\") String extra2;", //
                     "}" //
                     ));
 
@@ -648,14 +648,14 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test1\")", //
                     "class TestNavigationModel1 extends TestNavigationModel2<String> {", //
-                    "    @InjectExtra(\"key1\") String extra1;", //
+                    "    @BindExtra(\"key1\") String extra1;", //
                     "}", //
                     "class TestNavigationModel2<T> {", //
-                    "    @InjectExtra(\"key2\") String extra2;", //
+                    "    @BindExtra(\"key2\") String extra2;", //
                     "}" //
                     ));
 
@@ -719,18 +719,18 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key_bool\") boolean aBool;", //
-                    "    @InjectExtra(\"key_byte\") byte aByte;", //
-                    "    @InjectExtra(\"key_short\") short aShort;", //
-                    "    @InjectExtra(\"key_int\") int anInt;", //
-                    "    @InjectExtra(\"key_long\") long aLong;", //
-                    "    @InjectExtra(\"key_char\") char aChar;", //
-                    "    @InjectExtra(\"key_float\") float aFloat;", //
-                    "    @InjectExtra(\"key_double\") double aDouble;", //
+                    "    @BindExtra(\"key_bool\") boolean aBool;", //
+                    "    @BindExtra(\"key_byte\") byte aByte;", //
+                    "    @BindExtra(\"key_short\") short aShort;", //
+                    "    @BindExtra(\"key_int\") int anInt;", //
+                    "    @BindExtra(\"key_long\") long aLong;", //
+                    "    @BindExtra(\"key_char\") char aChar;", //
+                    "    @BindExtra(\"key_float\") float aFloat;", //
+                    "    @BindExtra(\"key_double\") double aDouble;", //
                     "}" //
                     ));
 
@@ -833,7 +833,7 @@ public class IntentBuilderGeneratorTest {
                     "package test.navigation;", //
                     "import android.os.Parcelable;", //
                     "import java.io.Serializable;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "class Extra implements Serializable, Parcelable {", //
                     "  public void writeToParcel(android.os.Parcel out, int flags) {", //
@@ -844,7 +844,7 @@ public class IntentBuilderGeneratorTest {
                     "}", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") Extra extra;", //
+                    "    @BindExtra(\"key\") Extra extra;", //
                     "}" //
                     ));
 
@@ -901,13 +901,13 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") String extra1;", //
-                    "    @InjectExtra(\"key\") String extra2;", //
-                    "    @InjectExtra(\"key\") String extra3;", //
+                    "    @BindExtra(\"key\") String extra1;", //
+                    "    @BindExtra(\"key\") String extra2;", //
+                    "    @BindExtra(\"key\") String extra3;", //
                     "}" //
                     ));
 
@@ -964,11 +964,11 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra String extra;", //
+                    "    @BindExtra String extra;", //
                     "}" //
                     ));
 
@@ -1026,7 +1026,7 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "import java.lang.annotation.Retention;", //
                     "import java.lang.annotation.Target;", //
@@ -1036,8 +1036,8 @@ public class IntentBuilderGeneratorTest {
                     "@interface Nullable {}", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key1\") String extra1;", //
-                    "    @InjectExtra(\"key2\") @Nullable String extra2;", //
+                    "    @BindExtra(\"key1\") String extra1;", //
+                    "    @BindExtra(\"key2\") @Nullable String extra2;", //
                     "}" //
                     ));
 
@@ -1099,7 +1099,7 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "import java.lang.annotation.Retention;", //
                     "import java.lang.annotation.Target;", //
@@ -1109,8 +1109,8 @@ public class IntentBuilderGeneratorTest {
                     "@interface Nullable {}", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key1\") @Nullable String extra1;", //
-                    "    @InjectExtra(\"key2\") @Nullable String extra2;", //
+                    "    @BindExtra(\"key1\") @Nullable String extra1;", //
+                    "    @BindExtra(\"key2\") @Nullable String extra2;", //
                     "}" //
                     ));
 
@@ -1169,11 +1169,11 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"my.key\") String extra;", //
+                    "    @BindExtra(\"my.key\") String extra;", //
                     "}" //
                     ));
 
@@ -1190,18 +1190,17 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") private String extra;", //
+                    "    @BindExtra(\"key\") private String extra;", //
                     "}" //
                     ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
-    assertThat(compilation)
-        .hadErrorContaining("@InjectExtra fields must not be private or static.");
+    assertThat(compilation).hadErrorContaining("@BindExtra fields must not be private or static.");
   }
 
   @Test
@@ -1212,18 +1211,17 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") static String extra;", //
+                    "    @BindExtra(\"key\") static String extra;", //
                     "}" //
                     ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
-    assertThat(compilation)
-        .hadErrorContaining("@InjectExtra fields must not be private or static.");
+    assertThat(compilation).hadErrorContaining("@BindExtra fields must not be private or static.");
   }
 
   @Test
@@ -1234,17 +1232,17 @@ public class IntentBuilderGeneratorTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import dart.NavigationModel;", //
                     "@NavigationModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
-                    "    @InjectExtra(\"key\") Object extra;", //
+                    "    @BindExtra(\"key\") Object extra;", //
                     "}" //
                     ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable");
+        .hadErrorContaining("@BindExtra field must be a primitive or Serializable or Parcelable");
   }
 }
