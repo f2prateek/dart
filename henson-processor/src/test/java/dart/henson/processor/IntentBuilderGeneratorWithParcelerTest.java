@@ -39,8 +39,8 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "package test.navigation;", //
                     "import java.util.ArrayList;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") ArrayList<String> extra;", //
                     "}" //
@@ -102,8 +102,8 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "package test.navigation;", //
                     "import java.util.List;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") List<String> extra;", //
                     "}" //
@@ -165,9 +165,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
+                    "import dart.DartModel;", //
                     "import org.parceler.Parcel;", //
-                    "@NavigationModel(\"test.Test\")", //
+                    "@DartModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") Foo extra;", //
                     "    @Parcel static class Foo {}", //
@@ -230,9 +230,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "package test.navigation;", //
                     "import java.util.List;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
+                    "import dart.DartModel;", //
                     "import org.parceler.Parcel;", //
-                    "@NavigationModel(\"test.Test\")", //
+                    "@DartModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") List<Foo> extra;", //
                     "    @Parcel static class Foo {}", //
@@ -296,7 +296,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.util.List;", //
                     "import java.util.Map;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
+                    "import dart.DartModel;", //
                     "import org.parceler.Parcel;", //
                     "import org.parceler.ParcelConstructor;", //
                     "@Parcel", //
@@ -313,7 +313,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "    return name;", //
                     "  }", //
                     "}", //
-                    "@NavigationModel(\"test.Test\")", //
+                    "@DartModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") ExampleParcel extra;", //
                     "    @BindExtra(\"list\") List<ExampleParcel> listExtra;", //
@@ -395,8 +395,8 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.util.List;", //
                     "import android.os.Parcelable;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") Foo extra;", //
                     "    class FooParent implements Parcelable {", //
@@ -472,9 +472,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.util.List;", //
                     "import android.os.Parcelable;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
+                    "import dart.DartModel;", //
                     "import org.parceler.Parcel;", //
-                    "@NavigationModel(\"test.Test\")", //
+                    "@DartModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") Foo extra;", //
                     "    class FooParent implements Parcelable {", //

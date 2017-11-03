@@ -38,8 +38,8 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") String extra;", //
                     "}" //
@@ -87,8 +87,8 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
                     "}" //
                     ));
@@ -135,8 +135,8 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test$MyInnerTest\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test$MyInnerTest\")", //
                     "public class TestNavigationModel {", //
                     "}" //
                     ));
@@ -183,7 +183,7 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
+                    "import dart.DartModel;", //
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") String extra;", //
                     "}" //
@@ -204,11 +204,11 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test1\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 {", //
                     "}", //
-                    "@NavigationModel(\"test.Test2\")", //
+                    "@DartModel(\"test.Test2\")", //
                     "class TestNavigationModel2 extends TestNavigationModel3 {", //
                     "    @BindExtra(\"key2\") String extra2;", //
                     "}", //
@@ -262,11 +262,11 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test1\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 extends TestNavigationModel3<String> {", //
                     "}", //
-                    "@NavigationModel(\"test.Test2\")", //
+                    "@DartModel(\"test.Test2\")", //
                     "class TestNavigationModel2 extends TestNavigationModel3<Object> {", //
                     "    @BindExtra(\"key2\") String extra2;", //
                     "}", //
@@ -320,8 +320,8 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test1\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 extends TestNavigationModel2 {", //
                     "}", //
                     "abstract class TestNavigationModel2 {", //
@@ -370,11 +370,11 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test1\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 {", //
                     "}", //
-                    "@NavigationModel(\"test.Test2\")", //
+                    "@DartModel(\"test.Test2\")", //
                     "abstract class TestNavigationModel2 {", //
                     "}" //
                     ));
@@ -383,7 +383,7 @@ public class HensonNavigatorGeneratorTest {
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
-            "@NavigationModel class TestNavigationModel2 must not be private, static or abstract.");
+            "@DartModel class TestNavigationModel2 must not be private, static or abstract.");
   }
 
   @Test
@@ -395,10 +395,10 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test1\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 {", //
-                    "  @NavigationModel(\"test.Test2\")", //
+                    "  @DartModel(\"test.Test2\")", //
                     "  class TestNavigationModel2 {", //
                     "  }", //
                     "}" //
@@ -407,8 +407,7 @@ public class HensonNavigatorGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .hadErrorContaining(
-            "@NavigationModel class TestNavigationModel2 must be a top level class.");
+        .hadErrorContaining("@DartModel class TestNavigationModel2 must be a top level class.");
   }
 
   @Test
@@ -421,10 +420,10 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test1\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 {", //
-                    "  @NavigationModel(\"test.Test2\")", //
+                    "  @DartModel(\"test.Test2\")", //
                     "  static class TestNavigationModel2 {", //
                     "  }", //
                     "}" //
@@ -434,7 +433,7 @@ public class HensonNavigatorGeneratorTest {
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
-            "@NavigationModel class TestNavigationModel2 must not be private, static or abstract.");
+            "@DartModel class TestNavigationModel2 must not be private, static or abstract.");
   }
 
   @Test
@@ -446,10 +445,10 @@ public class HensonNavigatorGeneratorTest {
                 .join( //
                     "package test.navigation;", //
                     "import dart.BindExtra;", //
-                    "import dart.NavigationModel;", //
-                    "@NavigationModel(\"test.Test1\")", //
+                    "import dart.DartModel;", //
+                    "@DartModel(\"test.Test1\")", //
                     "public class TestNavigationModel1 {", //
-                    "  @NavigationModel(\"test.Test2\")", //
+                    "  @DartModel(\"test.Test2\")", //
                     "  private class TestNavigationModel2 {", //
                     "  }", //
                     "}" //
@@ -459,6 +458,6 @@ public class HensonNavigatorGeneratorTest {
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
-            "@NavigationModel class TestNavigationModel2 must not be private, static or abstract.");
+            "@DartModel class TestNavigationModel2 must not be private, static or abstract.");
   }
 }

@@ -25,6 +25,6 @@ import java.lang.annotation.Target;
 
 @Retention(SOURCE)
 @Target(TYPE)
-public @interface NavigationModel {
+public @interface DartModel {
   String value() default "";
 }

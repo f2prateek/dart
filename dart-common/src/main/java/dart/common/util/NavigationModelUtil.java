@@ -22,7 +22,7 @@ import static javax.lang.model.element.Modifier.ABSTRACT;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 
-import dart.NavigationModel;
+import dart.DartModel;
 import dart.common.InjectionTarget;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -58,7 +58,7 @@ public class NavigationModelUtil {
 
   public void parseNavigationModelAnnotatedElements(
       Map<TypeElement, InjectionTarget> targetClassMap) {
-    for (Element element : roundEnv.getElementsAnnotatedWith(NavigationModel.class)) {
+    for (Element element : roundEnv.getElementsAnnotatedWith(DartModel.class)) {
       try {
         parseNavigationModel((TypeElement) element, targetClassMap);
       } catch (Exception e) {
@@ -66,7 +66,7 @@ public class NavigationModelUtil {
         e.printStackTrace(new PrintWriter(stackTrace));
         loggingUtil.error(
             element,
-            "Unable to generate extra injector when parsing @NavigationModel.\n\n%s",
+            "Unable to generate extra injector when parsing @DartModel.\n\n%s",
             stackTrace.toString());
       }
     }
@@ -80,7 +80,7 @@ public class NavigationModelUtil {
     }
 
     // Valid annotation value
-    final String annotationValue = element.getAnnotation(NavigationModel.class).value();
+    final String annotationValue = element.getAnnotation(DartModel.class).value();
     if (!StringUtil.isValidFqcn(annotationValue)) {
       throw new IllegalArgumentException(
           "Key has to be a full qualified class name. "
@@ -101,7 +101,7 @@ public class NavigationModelUtil {
     if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC) || modifiers.contains(ABSTRACT)) {
       loggingUtil.error(
           element,
-          "@NavigationModel class %s must not be private, static or abstract.",
+          "@DartModel class %s must not be private, static or abstract.",
           element.getSimpleName());
       valid = false;
     }
@@ -110,7 +110,7 @@ public class NavigationModelUtil {
     if (element.getEnclosingElement() == null
         || element.getEnclosingElement().getKind() != PACKAGE) {
       loggingUtil.error(
-          element, "@NavigationModel class %s must be a top level class.", element.getSimpleName());
+          element, "@DartModel class %s must be a top level class.", element.getSimpleName());
       valid = false;
     }
 
