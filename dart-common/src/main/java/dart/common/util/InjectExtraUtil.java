@@ -1,8 +1,32 @@
+/*
+ * Copyright 2013 Jake Wharton
+ * Copyright 2014 Prateek Srivastava (@f2prateek)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package dart.common.util;
+
+import static javax.lang.model.element.ElementKind.CLASS;
+import static javax.lang.model.element.Modifier.PRIVATE;
+import static javax.lang.model.element.Modifier.STATIC;
 
 import dart.InjectExtra;
 import dart.common.InjectionTarget;
-
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -10,14 +34,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Map;
-import java.util.Set;
-
-import static javax.lang.model.element.ElementKind.CLASS;
-import static javax.lang.model.element.Modifier.PRIVATE;
-import static javax.lang.model.element.Modifier.STATIC;
 
 public class InjectExtraUtil {
 
@@ -29,8 +45,11 @@ public class InjectExtraUtil {
 
   private RoundEnvironment roundEnv;
 
-  public InjectExtraUtil(CompilerUtil compilerUtil, ParcelerUtil parcelerUtil,
-      LoggingUtil loggingUtil, InjectionTargetUtil injectionTargetUtil,
+  public InjectExtraUtil(
+      CompilerUtil compilerUtil,
+      ParcelerUtil parcelerUtil,
+      LoggingUtil loggingUtil,
+      InjectionTargetUtil injectionTargetUtil,
       ProcessingEnvironment processingEnv) {
     this.compilerUtil = compilerUtil;
     this.parcelerUtil = parcelerUtil;
@@ -50,7 +69,8 @@ public class InjectExtraUtil {
       } catch (Exception e) {
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
-        loggingUtil.error(element,
+        loggingUtil.error(
+            element,
             "Unable to generate extra injector when parsing @InjectExtra.\n\n%s",
             stackTrace.toString());
       }
@@ -65,9 +85,11 @@ public class InjectExtraUtil {
 
     // Valid annotation value
     final String annotationValue = element.getAnnotation(InjectExtra.class).value();
-    if (!StringUtil.isNullOrEmpty(annotationValue) && !StringUtil.isValidJavaIdentifier(annotationValue)) {
-      throw new IllegalArgumentException("Keys have to be valid java variable identifiers. "
-          + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html");
+    if (!StringUtil.isNullOrEmpty(annotationValue)
+        && !StringUtil.isValidJavaIdentifier(annotationValue)) {
+      throw new IllegalArgumentException(
+          "Keys have to be valid java variable identifiers. "
+              + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html");
     }
 
     // Assemble information on the injection point.
@@ -91,35 +113,46 @@ public class InjectExtraUtil {
     // Verify modifiers.
     Set<Modifier> modifiers = element.getModifiers();
     if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC)) {
-      loggingUtil.error(element, "@InjectExtra fields must not be private or static. (%s.%s)",
-          enclosingElement.getQualifiedName(), element.getSimpleName());
+      loggingUtil.error(
+          element,
+          "@InjectExtra fields must not be private or static. (%s.%s)",
+          enclosingElement.getQualifiedName(),
+          element.getSimpleName());
       valid = false;
     }
 
     // Verify that the type is primitive, serializable or parcelable.
     TypeMirror typeElement = element.asType();
-    if (!isValidExtraType(typeElement) && !(parcelerUtil.isParcelerAvailable()
-        && parcelerUtil.isValidExtraTypeForParceler(typeElement))) {
-      loggingUtil.error(element, "@InjectExtra field must be a primitive or Serializable or "
+    if (!isValidExtraType(typeElement)
+        && !(parcelerUtil.isParcelerAvailable()
+            && parcelerUtil.isValidExtraTypeForParceler(typeElement))) {
+      loggingUtil.error(
+          element,
+          "@InjectExtra field must be a primitive or Serializable or "
               + "Parcelable (%s.%s). "
               + "If you use Parceler, all types supported by Parceler are allowed.",
-          enclosingElement.getQualifiedName(), element.getSimpleName());
+          enclosingElement.getQualifiedName(),
+          element.getSimpleName());
       valid = false;
     }
 
     // Verify containing type.
     if (enclosingElement.getKind() != CLASS) {
-      loggingUtil.error(enclosingElement,
+      loggingUtil.error(
+          enclosingElement,
           "@InjectExtra fields may only be contained in classes. (%s.%s)",
-          enclosingElement.getQualifiedName(), element.getSimpleName());
+          enclosingElement.getQualifiedName(),
+          element.getSimpleName());
       valid = false;
     }
 
     // Verify containing class visibility is not private.
     if (enclosingElement.getModifiers().contains(PRIVATE)) {
-      loggingUtil.error(enclosingElement,
+      loggingUtil.error(
+          enclosingElement,
           "@InjectExtra fields may not be contained in private classes. (%s.%s)",
-          enclosingElement.getQualifiedName(), element.getSimpleName());
+          enclosingElement.getQualifiedName(),
+          element.getSimpleName());
       valid = false;
     }
 

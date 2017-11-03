@@ -40,11 +40,13 @@ public final class FieldBinding implements Binding {
     return type;
   }
 
-  @Override public String getDescription() {
+  @Override
+  public String getDescription() {
     return "field '" + name + "'";
   }
 
-  @Override public boolean isRequired() {
+  @Override
+  public boolean isRequired() {
     return required;
   }
 

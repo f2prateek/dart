@@ -24,21 +24,19 @@ import dart.common.util.InjectExtraUtil;
 import dart.common.util.InjectionTargetUtil;
 import dart.common.util.LoggingUtil;
 import dart.common.util.ParcelerUtil;
-
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 
-@SupportedAnnotationTypes({
-    InjectExtraProcessor.INJECT_EXTRA_ANNOTATION_CLASS_NAME
-}) public final class InjectExtraProcessor extends AbstractProcessor {
+@SupportedAnnotationTypes({InjectExtraProcessor.INJECT_EXTRA_ANNOTATION_CLASS_NAME})
+public final class InjectExtraProcessor extends AbstractProcessor {
 
   static final String INJECT_EXTRA_ANNOTATION_CLASS_NAME = "dart.InjectExtra";
 
@@ -49,7 +47,8 @@ import java.util.Set;
 
   private boolean usesParcelerOption = true;
 
-  @Override public synchronized void init(ProcessingEnvironment processingEnv) {
+  @Override
+  public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
     final CompilerUtil compilerUtil = new CompilerUtil(processingEnv);
     final ParcelerUtil parcelerUtil =
@@ -58,8 +57,8 @@ import java.util.Set;
     fileUtil = new FileUtil(processingEnv);
     injectionTargetUtil = new InjectionTargetUtil(compilerUtil);
     injectExtraUtil =
-        new InjectExtraUtil(compilerUtil, parcelerUtil, loggingUtil, injectionTargetUtil,
-            processingEnv);
+        new InjectExtraUtil(
+            compilerUtil, parcelerUtil, loggingUtil, injectionTargetUtil, processingEnv);
   }
 
   @Override
@@ -73,13 +72,13 @@ import java.util.Set;
     return false;
   }
 
-  @Override public SourceVersion getSupportedSourceVersion() {
+  @Override
+  public SourceVersion getSupportedSourceVersion() {
     return SourceVersion.latestSupported();
   }
 
   /**
-   * Flag to force enabling/disabling Parceler.
-   * Used for testing.
+   * Flag to force enabling/disabling Parceler. Used for testing.
    *
    * @param enable whether Parceler should be enable
    */
@@ -107,8 +106,11 @@ import java.util.Set;
       try {
         fileUtil.writeFile(new ExtraInjectorGenerator(injectionTarget), typeElement);
       } catch (IOException e) {
-        loggingUtil.error(typeElement, "Unable to write extra injector for type %s: %s",
-            typeElement, e.getMessage());
+        loggingUtil.error(
+            typeElement,
+            "Unable to write extra injector for type %s: %s",
+            typeElement,
+            e.getMessage());
       }
     }
   }

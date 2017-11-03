@@ -1,28 +1,44 @@
+/*
+ * Copyright 2013 Jake Wharton
+ * Copyright 2014 Prateek Srivastava (@f2prateek)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package dart.henson.processor;
 
-import dart.common.BaseGenerator;
-import dart.common.ExtraInjection;
-import dart.common.FieldBinding;
-import dart.common.InjectionTarget;
-import dart.henson.Bundler;
+import static com.squareup.javapoet.ClassName.bestGuess;
+import static com.squareup.javapoet.ClassName.get;
+
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
+import dart.common.BaseGenerator;
+import dart.common.ExtraInjection;
+import dart.common.FieldBinding;
+import dart.common.InjectionTarget;
+import dart.henson.Bundler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static com.squareup.javapoet.ClassName.bestGuess;
-import static com.squareup.javapoet.ClassName.get;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 
 public class IntentBuilderGenerator extends BaseGenerator {
 
@@ -36,7 +52,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
     this.target = target;
   }
 
-  @Override public String brewJava() {
+  @Override
+  public String brewJava() {
     TypeSpec.Builder intentBuilderTypeBuilder =
         TypeSpec.classBuilder(builderClassName()).addModifiers(Modifier.PUBLIC);
 
@@ -46,13 +63,15 @@ public class IntentBuilderGenerator extends BaseGenerator {
     emitExtraDSLStateMachine(intentBuilderTypeBuilder);
 
     //build
-    JavaFile javaFile = JavaFile.builder(target.classPackage, intentBuilderTypeBuilder.build())
-        .addFileComment("Generated code from Henson. Do not modify!")
-        .build();
+    JavaFile javaFile =
+        JavaFile.builder(target.classPackage, intentBuilderTypeBuilder.build())
+            .addFileComment("Generated code from Henson. Do not modify!")
+            .build();
     return javaFile.toString();
   }
 
-  @Override public String getFqcn() {
+  @Override
+  public String getFqcn() {
     return target.classPackage + "." + builderClassName();
   }
 
@@ -71,19 +90,22 @@ public class IntentBuilderGenerator extends BaseGenerator {
   }
 
   private void emitConstructor(TypeSpec.Builder intentBuilderTypeBuilder) {
-    MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder()
-        .addModifiers(Modifier.PUBLIC)
-        .addParameter(get("android.content", "Context"), "context");
-    constructorBuilder.addStatement("intent = new Intent(context, getClassDynamically($S))",
+    MethodSpec.Builder constructorBuilder =
+        MethodSpec.constructorBuilder()
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(get("android.content", "Context"), "context");
+    constructorBuilder.addStatement(
+        "intent = new Intent(context, getClassDynamically($S))",
         target.targetClassFqcn.replace("$", "."));
     intentBuilderTypeBuilder.addMethod(constructorBuilder.build());
   }
 
   private void emitGetClassDynamically(TypeSpec.Builder intentBuilderTypeBuilder) {
-    MethodSpec.Builder getClassDynamicallyBuilder = MethodSpec.methodBuilder("getClassDynamically")
-        .addModifiers(Modifier.PUBLIC)
-        .addParameter(get("java.lang", "String"), "className")
-        .returns(get("java.lang", "Class"));
+    MethodSpec.Builder getClassDynamicallyBuilder =
+        MethodSpec.methodBuilder("getClassDynamically")
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(get("java.lang", "String"), "className")
+            .returns(get("java.lang", "Class"));
     getClassDynamicallyBuilder.beginControlFlow("try");
     getClassDynamicallyBuilder.addStatement("return Class.forName(className)");
     getClassDynamicallyBuilder.nextControlFlow("catch($T ex)", get("java.lang", "Exception"));
@@ -127,16 +149,20 @@ public class IntentBuilderGenerator extends BaseGenerator {
   }
 
   private void emitBuildMethod(TypeSpec.Builder builder) {
-    MethodSpec.Builder getBuilder = MethodSpec.methodBuilder("build")
-        .addModifiers(Modifier.PUBLIC)
-        .returns(get("android.content", "Intent"))
-        .addStatement("intent.putExtras(bundler.get())")
-        .addStatement("return intent");
+    MethodSpec.Builder getBuilder =
+        MethodSpec.methodBuilder("build")
+            .addModifiers(Modifier.PUBLIC)
+            .returns(get("android.content", "Intent"))
+            .addStatement("intent.putExtras(bundler.get())")
+            .addStatement("return intent");
     builder.addMethod(getBuilder.build());
   }
 
-  private void emitSetters(TypeSpec.Builder builder, List<ExtraInjection> injectionList,
-      boolean isOptional, boolean areAllExtrasOptional) {
+  private void emitSetters(
+      TypeSpec.Builder builder,
+      List<ExtraInjection> injectionList,
+      boolean isOptional,
+      boolean areAllExtrasOptional) {
 
     //allow to rotate between states
     TypeSpec.Builder builderStateClass = builder;
@@ -146,7 +172,11 @@ public class IntentBuilderGenerator extends BaseGenerator {
       final boolean isLastMandatorySetter = indexInjection == injectionList.size() - 1;
 
       String nextStateClassName =
-          emitSetter(builderStateClass, injection, isLastMandatorySetter, isOptional,
+          emitSetter(
+              builderStateClass,
+              injection,
+              isLastMandatorySetter,
+              isOptional,
               areAllExtrasOptional);
 
       //optional fields do not rotate
@@ -157,8 +187,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
     }
   }
 
-  private TypeSpec.Builder rotateBuilderStateClass(TypeSpec.Builder builder,
-      TypeSpec.Builder builderStateClass, String nextStateClassName) {
+  private TypeSpec.Builder rotateBuilderStateClass(
+      TypeSpec.Builder builder, TypeSpec.Builder builderStateClass, String nextStateClassName) {
     if (builderStateClass != builder) {
       builder.addType(builderStateClass.build());
     }
@@ -172,13 +202,17 @@ public class IntentBuilderGenerator extends BaseGenerator {
    * @param injection the injection to emit.
    * @param isLastMandatorySetter whether or not the injection is the last mandatory one.
    * @param isOptional whether or not it is optional
-   * @param areAllInjectionsOptional whether or not all injections are optional. i.e. the class
-   * only as optional injections.
+   * @param areAllInjectionsOptional whether or not all injections are optional. i.e. the class only
+   *     as optional injections.
    * @return the name of the next state class to create
    */
   //TODO this method is too long, needs smart refactor
-  private String emitSetter(TypeSpec.Builder builder, ExtraInjection injection,
-      boolean isLastMandatorySetter, boolean isOptional, boolean areAllInjectionsOptional) {
+  private String emitSetter(
+      TypeSpec.Builder builder,
+      ExtraInjection injection,
+      boolean isLastMandatorySetter,
+      boolean isOptional,
+      boolean areAllInjectionsOptional) {
 
     Collection<FieldBinding> fieldBindings = injection.getFieldBindings();
     if (fieldBindings.isEmpty()) {
@@ -220,12 +254,15 @@ public class IntentBuilderGenerator extends BaseGenerator {
     final String firstInjectedFieldName = firstFieldBinding.getName();
     final String value = extractValue(firstFieldBinding);
 
-    MethodSpec.Builder setterBuilder = MethodSpec.methodBuilder(injection.getKey())
-        .addModifiers(Modifier.PUBLIC)
-        .returns(bestGuess(nextStateClassName))
-        .addParameter(TypeName.get(extraType), firstInjectedFieldName)
-        .addStatement("bundler.put($S," + castToParcelableIfNecessary + " $L)", injection.getKey(),
-            value);
+    MethodSpec.Builder setterBuilder =
+        MethodSpec.methodBuilder(injection.getKey())
+            .addModifiers(Modifier.PUBLIC)
+            .returns(bestGuess(nextStateClassName))
+            .addParameter(TypeName.get(extraType), firstInjectedFieldName)
+            .addStatement(
+                "bundler.put($S," + castToParcelableIfNecessary + " $L)",
+                injection.getKey(),
+                value);
 
     if (isOptional) {
       setterBuilder.addStatement("return this");
@@ -238,15 +275,13 @@ public class IntentBuilderGenerator extends BaseGenerator {
   }
 
   /**
-   * This method returns either an empty String or {@code "(Parcelable)"} if
-   * the extra type is Parcelable. We need this explicit conversion in cases
-   * where the extra type is both Parcelable and Serializable. In that
-   * case we will prefer Parcelable. Not that the extra type has to directly
-   * implement Parcelable, not via a super class.
+   * This method returns either an empty String or {@code "(Parcelable)"} if the extra type is
+   * Parcelable. We need this explicit conversion in cases where the extra type is both Parcelable
+   * and Serializable. In that case we will prefer Parcelable. Not that the extra type has to
+   * directly implement Parcelable, not via a super class.
    *
    * @param extraType the type that might be parcelable.
-   * @return either an empty String or {@code "(Parcelable)"} if
-   * the extra type is Parcelable
+   * @return either an empty String or {@code "(Parcelable)"} if the extra type is Parcelable
    */
   private String doCreateParcelableCastIfExtraIsParcelable(TypeMirror extraType) {
     String castToParcelableIfNecessary = "";
@@ -295,7 +330,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
   }
 
   private static class ExtraInjectionComparator implements Comparator<ExtraInjection> {
-    @Override public int compare(ExtraInjection o1, ExtraInjection o2) {
+    @Override
+    public int compare(ExtraInjection o1, ExtraInjection o2) {
       return o1.getKey().compareTo(o2.getKey());
     }
   }
