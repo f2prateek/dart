@@ -1,12 +1,15 @@
 package dart.henson.processor;
 
 import com.google.common.base.Joiner;
+import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.Test;
 
 import javax.tools.JavaFileObject;
 
 import static com.google.common.truth.Truth.assert_;
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 
 /**
@@ -16,9 +19,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
   @Test
   public void intentBuilderGenerator_should_generateCode_when_extraIsSerializableCollection() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.ArrayList;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
@@ -29,9 +32,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -65,19 +68,19 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateCode_when_extraIsNonSerializableCollection() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.List;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
@@ -88,9 +91,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -124,19 +127,19 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateCode_when_extraIsAnnotatedWithParceler_and_parcelerIsOn() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "import org.parceler.Parcel;", //
@@ -148,9 +151,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -183,19 +186,19 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateCode_when_extraIsCollectionOfElementAnnotatedWithParceler_and_parcelerIsOn() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.List;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
@@ -208,9 +211,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -243,20 +246,19 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 "  }", //
                 "}" //
             ));
-
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateCode_when_multipleExtrasAreParceler_and_parcelerIsOn() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.List;", //
             "import java.util.Map;", //
             "import dart.InjectExtra;", //
@@ -287,9 +289,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -338,19 +340,19 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 "  }", //
                 "}"));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateCode_when_extraIsParcelableThatExtendsParcelable() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.List;", //
             "import android.os.Parcelable;", //
             "import dart.InjectExtra;", //
@@ -376,9 +378,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -411,19 +413,19 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateCode_when_extraIsParcelThatExtendsParcelable() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.List;", //
             "import android.os.Parcelable;", //
             "import dart.InjectExtra;", //
@@ -444,9 +446,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -479,11 +481,11 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessors())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessors())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 }

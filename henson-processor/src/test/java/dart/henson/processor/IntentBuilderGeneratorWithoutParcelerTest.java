@@ -1,12 +1,15 @@
 package dart.henson.processor;
 
 import com.google.common.base.Joiner;
+import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.Test;
 
 import javax.tools.JavaFileObject;
 
 import static com.google.common.truth.Truth.assert_;
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
 import static com.google.testing.compile.JavaSourceSubjectFactory.javaSource;
 
 /**
@@ -16,9 +19,9 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
 
   @Test
   public void intentBuilderGenerator_should_generateCode_when_extraIsSerializableCollection() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.ArrayList;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
@@ -29,9 +32,9 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -65,18 +68,18 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessorWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test public void intentBuilderGenerator_should_fail_when_extraIsNonSerializableCollection() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.List;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
@@ -86,19 +89,18 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessorWithoutParceler())
-        .failsToCompile()
-        .withErrorContaining(
-            "@InjectExtra field must be a primitive or Serializable or Parcelable");
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
+              .compile(source);
+      assertThat(compilation)
+              .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable");
   }
 
   @Test
   public void intentBuilderGenerator_should_fail_when_extraIsAnnotatedWithParceler_and_parcelerIsOff() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
             "import org.parceler.Parcel;", //
@@ -109,19 +111,18 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessorWithoutParceler())
-        .failsToCompile()
-        .withErrorContaining(
-            "@InjectExtra field must be a primitive or Serializable or Parcelable");
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
+              .compile(source);
+      assertThat(compilation)
+              .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable");
   }
 
   @Test
   public void intentBuilderGenerator_should_fail_when_extraIsCollectionOfElementAnnotatedWithParceler_and_parcelerIsOff() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.List;", //
             "import dart.InjectExtra;", //
             "import dart.NavigationModel;", //
@@ -132,18 +133,17 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             "}" //
         ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessorWithoutParceler())
-        .failsToCompile()
-        .withErrorContaining(
-            "@InjectExtra field must be a primitive or Serializable or Parcelable");
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
+              .compile(source);
+      assertThat(compilation)
+              .hadErrorContaining("@InjectExtra field must be a primitive or Serializable or Parcelable");
   }
 
   @Test public void intentBuilderGenerator_should_generateCode_when_extraIsParcelable() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.List;", //
             "import android.os.Parcelable;", //
             "import dart.InjectExtra;", //
@@ -162,9 +162,9 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -197,19 +197,19 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessorWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void intentBuilderGenerator_should_generateCode_when_extraIsParcelableThatExtendsParcelable() {
-    JavaFileObject source = JavaFileObjects.forSourceString("test.navmodel.TestNavigationModel",
+    JavaFileObject source = JavaFileObjects.forSourceString("test.navigation.TestNavigationModel",
         Joiner.on('\n').join( //
-            "package test.navmodel;", //
+            "package test.navigation;", //
             "import java.util.List;", //
             "import android.os.Parcelable;", //
             "import dart.InjectExtra;", //
@@ -235,9 +235,9 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
         ));
 
     JavaFileObject builderSource =
-        JavaFileObjects.forSourceString("test.navmodel.Test$$IntentBuilder",
+        JavaFileObjects.forSourceString("test.navigation.Test$$IntentBuilder",
             Joiner.on('\n').join( //
-                "package test.navmodel;", //
+                "package test.navigation;", //
                 "import android.content.Context;", //
                 "import android.content.Intent;", //
                 "import dart.henson.Bundler;", //
@@ -270,11 +270,11 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                 "}" //
             ));
 
-    assert_().about(javaSource())
-        .that(source)
-        .processedWith(ProcessorTestUtilities.hensonProcessorWithoutParceler())
-        .compilesWithoutError()
-        .and()
-        .generatesSources(builderSource);
+      Compilation compilation = javac()
+              .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
+              .compile(source);
+      assertThat(compilation)
+              .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+              .hasSourceEquivalentTo(builderSource);
   }
 }
