@@ -34,17 +34,17 @@ public class InjectionTargetUtil {
 
   public InjectionTarget getOrCreateTargetClass(
       Map<TypeElement, InjectionTarget> targetClassMap, TypeElement typeElement) {
-    InjectionTarget injectionTarget = targetClassMap.get(typeElement);
-    if (injectionTarget == null) {
+    InjectionTarget bindingTarget = targetClassMap.get(typeElement);
+    if (bindingTarget == null) {
       final String targetType = typeElement.getQualifiedName().toString();
       final String classPackage = compilerUtil.getPackageName(typeElement);
       final String className = compilerUtil.getClassName(typeElement, classPackage);
       final boolean isAbstractType = typeElement.getModifiers().contains(Modifier.ABSTRACT);
 
-      injectionTarget = new InjectionTarget(classPackage, className, targetType, isAbstractType);
-      targetClassMap.put(typeElement, injectionTarget);
+      bindingTarget = new InjectionTarget(classPackage, className, targetType, isAbstractType);
+      targetClassMap.put(typeElement, bindingTarget);
     }
-    return injectionTarget;
+    return bindingTarget;
   }
 
   public void createInjectionTargetTree(Map<TypeElement, InjectionTarget> targetClassMap) {
@@ -63,10 +63,10 @@ public class InjectionTargetUtil {
   }
 
   public void inheritExtraInjections(Map<TypeElement, InjectionTarget> targetClassMap) {
-    for (InjectionTarget injectionTarget : targetClassMap.values()) {
+    for (InjectionTarget bindingTarget : targetClassMap.values()) {
       // We start inheriting from the tree roots
-      if (injectionTarget.parentClassFqcn == null) {
-        addExtraInjectionsToDescendants(targetClassMap, injectionTarget);
+      if (bindingTarget.parentClassFqcn == null) {
+        addExtraInjectionsToDescendants(targetClassMap, bindingTarget);
       }
     }
   }
@@ -83,10 +83,10 @@ public class InjectionTargetUtil {
   }
 
   private void addExtraInjectionsToDescendants(
-      Map<TypeElement, InjectionTarget> targetClassMap, InjectionTarget injectionTarget) {
-    for (TypeElement child : injectionTarget.childClasses) {
+      Map<TypeElement, InjectionTarget> targetClassMap, InjectionTarget bindingTarget) {
+    for (TypeElement child : bindingTarget.childClasses) {
       final InjectionTarget childInjectionTarget = targetClassMap.get(child);
-      childInjectionTarget.bindingMap.putAll(injectionTarget.bindingMap);
+      childInjectionTarget.bindingMap.putAll(bindingTarget.bindingMap);
       addExtraInjectionsToDescendants(targetClassMap, childInjectionTarget);
     }
   }

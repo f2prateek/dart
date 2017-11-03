@@ -1,7 +1,7 @@
 Dart [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Dart-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1444)[![Build Status](https://travis-ci.org/f2prateek/dart.svg?branch=master)](https://travis-ci.org/f2prateek/dart)
 ============
 
-Extra "injection" library for Android which uses annotation processing to
+Extra "binding" library for Android which uses annotation processing to
 generate code that does direct field assignment of your extras.
 
 Dart is inspired by [ButterKnife][1].
@@ -15,14 +15,14 @@ class ExampleActivity extends Activity {
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.simple_activity);
-    Dart.inject(this);
-    // TODO Use "injected" extras...
+    Dart.bind(this);
+    // TODO Use "bound" extras...
   }
 }
 ```
 
-Simply call one of the `inject()` methods, which will delegate to generated code.
-You can inject from an Activity (which uses its intent extras), Fragment (which uses its arguments)
+Simply call one of the `bind()` methods, which will delegate to generated code.
+You can bind from an Activity (which uses its intent extras), Fragment (which uses its arguments)
 or directly from a Bundle.
 
 The key used for the extra will be the field name by default. However, it can be set manually as a parameter in the annotation: `@InjectExtra("key")`
@@ -31,7 +31,7 @@ Optional Injection
 ------------------
 By default all `@InjectExtra` fields are required. An exception will be thrown if the target extra cannot be found.
 
-To suppress this behavior and create an optional injection, add the `@Nullable` annotation to the field or method.
+To suppress this behavior and create an optional binding, add the `@Nullable` annotation to the field or method.
 Any annotation with the class name `Nullable` is respected, including ones from the support library annotations and ButterKnife.
 
 ```java
@@ -40,11 +40,11 @@ Any annotation with the class name `Nullable` is respected, including ones from 
 
 Default Values
 --------------
-You can assign any values to your fields to be used as default values, just as you would in regular "injection"-free code.
+You can assign any values to your fields to be used as default values, just as you would in regular "binding"-free code.
 ```java
 @InjectExtra String title = "Default Title";
 ```
-This value will be overridden after you call `inject()`. Remember to use the `@Nullable` annotation, if this injection is optional.
+This value will be overridden after you call `bind()`. Remember to use the `@Nullable` annotation, if this binding is optional.
 
 Bonus
 -----
@@ -122,7 +122,7 @@ Parceler
 -------------------------
 Dart 2.0 offers a built-in support for [Parceler](https://github.com/johncarl81/parceler). Using Parceler with Dart 2 is optional.
 
-If you use Parceler, Dart will automatically detect @Parcel annotated beans (pojos), or collections of them, and wrap them using the Henson DSL and unwrap them when they are injected via Dart.
+If you use Parceler, Dart will automatically detect @Parcel annotated beans (pojos), or collections of them, and wrap them using the Henson DSL and unwrap them when they are bound via Dart.
 
 ```java
 @Parcel
@@ -138,8 +138,8 @@ class OneMoreActivityActivity extends Activity {
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.simple_activity);
-    Dart.inject(this);
-    // TODO Use "injected" extras...
+    Dart.bind(this);
+    // TODO Use "bound" extras...
   }
 }
 ```
@@ -163,7 +163,7 @@ If ProGuard is enabled be sure to add these rules to your configuration:
 
 ```
 -dontwarn com.f2prateek.dart.internal.**
--keep class **$$ExtraInjector { *; }
+-keep class **__ExtraBinder { *; }
 -keepclasseswithmembernames class * {
     @com.f2prateek.dart.* <fields>;
 }

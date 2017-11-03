@@ -42,7 +42,7 @@ public class CompilerUtil {
     typeUtils = processingEnv.getTypeUtils();
   }
 
-  /** Finds the parent injector type in the supplied set, if any. */
+  /** Finds the parent binder type in the supplied set, if any. */
   public TypeElement findParent(TypeElement typeElement, Set<TypeElement> parents) {
     TypeMirror type;
     while (true) {

@@ -52,7 +52,7 @@ public class BindExtraWithoutParcelerTest {
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
-            "test/TestSerializableCollection$$ExtraInjector",
+            "test/TestSerializableCollection__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
@@ -60,8 +60,8 @@ public class BindExtraWithoutParcelerTest {
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
                     "import java.util.ArrayList;", //
-                    "public class TestSerializableCollection$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, TestSerializableCollection target, Object source) {", //
+                    "public class TestSerializableCollection__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, TestSerializableCollection target, Object source) {", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key\");", //
                     "    if (object == null) {", //
@@ -77,7 +77,7 @@ public class BindExtraWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/TestSerializableCollection$$ExtraInjector")
+        .generatedSourceFile("test/TestSerializableCollection__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
   }
 
@@ -168,7 +168,7 @@ public class BindExtraWithoutParcelerTest {
   }
 
   @Test
-  public void injectingParcelableThatExtendsParcelableExtra() {
+  public void bindingParcelableThatExtendsParcelableExtra() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.TestParcelableExtendsParcelable",
@@ -199,14 +199,14 @@ public class BindExtraWithoutParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test/TestParcelableExtendsParcelable$$ExtraInjector",
+            "test/TestParcelableExtendsParcelable__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
                     "import dart.Dart;", //
                     "import java.lang.Object;", //
-                    "public class TestParcelableExtendsParcelable$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, TestParcelableExtendsParcelable target, Object source) {", //
+                    "public class TestParcelableExtendsParcelable__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, TestParcelableExtendsParcelable target, Object source) {", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key\");", //
                     "    if (object == null) {", //
@@ -222,7 +222,7 @@ public class BindExtraWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/TestParcelableExtendsParcelable$$ExtraInjector")
+        .generatedSourceFile("test/TestParcelableExtendsParcelable__ExtraBinder")
         .hasSourceEquivalentTo(builderSource);
   }
 }

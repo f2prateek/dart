@@ -38,17 +38,17 @@ import javax.lang.model.util.Types;
 public class NavigationModelUtil {
 
   private final LoggingUtil loggingUtil;
-  private final InjectionTargetUtil injectionTargetUtil;
+  private final InjectionTargetUtil bindingTargetUtil;
   private final Types typeUtils;
 
   private RoundEnvironment roundEnv;
 
   public NavigationModelUtil(
       LoggingUtil loggingUtil,
-      InjectionTargetUtil injectionTargetUtil,
+      InjectionTargetUtil bindingTargetUtil,
       ProcessingEnvironment processingEnv) {
     this.loggingUtil = loggingUtil;
-    this.injectionTargetUtil = injectionTargetUtil;
+    this.bindingTargetUtil = bindingTargetUtil;
     typeUtils = processingEnv.getTypeUtils();
   }
 
@@ -66,7 +66,7 @@ public class NavigationModelUtil {
         e.printStackTrace(new PrintWriter(stackTrace));
         loggingUtil.error(
             element,
-            "Unable to generate extra injector when parsing @DartModel.\n\n%s",
+            "Unable to generate extra binder when parsing @DartModel.\n\n%s",
             stackTrace.toString());
       }
     }
@@ -87,9 +87,9 @@ public class NavigationModelUtil {
               + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html");
     }
 
-    // Assemble information on the injection point.
+    // Assemble information on the binding point.
     InjectionTarget navigationModelTarget =
-        injectionTargetUtil.getOrCreateTargetClass(targetClassMap, element);
+        bindingTargetUtil.getOrCreateTargetClass(targetClassMap, element);
     navigationModelTarget.setTargetClass(annotationValue);
   }
 

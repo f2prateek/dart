@@ -52,9 +52,9 @@ public class HensonProcessor extends AbstractProcessor {
 
   private LoggingUtil loggingUtil;
   private FileUtil fileUtil;
-  private InjectExtraUtil injectExtraUtil;
+  private InjectExtraUtil bindExtraUtil;
   private NavigationModelUtil navigationModelUtil;
-  private InjectionTargetUtil injectionTargetUtil;
+  private InjectionTargetUtil bindingTargetUtil;
 
   private String hensonPackage;
   private boolean usesParcelerOption = true;
@@ -68,11 +68,11 @@ public class HensonProcessor extends AbstractProcessor {
         new ParcelerUtil(compilerUtil, processingEnv, usesParcelerOption);
     loggingUtil = new LoggingUtil(processingEnv);
     fileUtil = new FileUtil(processingEnv);
-    injectionTargetUtil = new InjectionTargetUtil(compilerUtil);
-    injectExtraUtil =
+    bindingTargetUtil = new InjectionTargetUtil(compilerUtil);
+    bindExtraUtil =
         new InjectExtraUtil(
-            compilerUtil, parcelerUtil, loggingUtil, injectionTargetUtil, processingEnv);
-    navigationModelUtil = new NavigationModelUtil(loggingUtil, injectionTargetUtil, processingEnv);
+            compilerUtil, parcelerUtil, loggingUtil, bindingTargetUtil, processingEnv);
+    navigationModelUtil = new NavigationModelUtil(loggingUtil, bindingTargetUtil, processingEnv);
 
     parseAnnotationProcessorOptions(processingEnv);
   }
@@ -84,7 +84,7 @@ public class HensonProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    injectExtraUtil.setRoundEnvironment(roundEnv);
+    bindExtraUtil.setRoundEnvironment(roundEnv);
     navigationModelUtil.setRoundEnvironment(roundEnv);
 
     Map<TypeElement, InjectionTarget> targetClassMap = findAndParseTargets();
@@ -114,12 +114,12 @@ public class HensonProcessor extends AbstractProcessor {
     // Process each @DartModel element.
     navigationModelUtil.parseNavigationModelAnnotatedElements(targetClassMap);
     // Process each @BindExtra element.
-    injectExtraUtil.parseInjectExtraAnnotatedElements(targetClassMap);
-    // Create injection target tree and inherit extra injections.
-    injectionTargetUtil.createInjectionTargetTree(targetClassMap);
-    injectionTargetUtil.inheritExtraInjections(targetClassMap);
+    bindExtraUtil.parseInjectExtraAnnotatedElements(targetClassMap);
+    // Create binding target tree and inherit extra bindings.
+    bindingTargetUtil.createInjectionTargetTree(targetClassMap);
+    bindingTargetUtil.inheritExtraInjections(targetClassMap);
     // Use only Navigation Models
-    injectionTargetUtil.filterNavigationModels(targetClassMap);
+    bindingTargetUtil.filterNavigationModels(targetClassMap);
 
     return targetClassMap;
   }
@@ -127,11 +127,11 @@ public class HensonProcessor extends AbstractProcessor {
   private void generateIntentBuilders(Map<TypeElement, InjectionTarget> targetClassMap) {
     for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
       TypeElement typeElement = entry.getKey();
-      InjectionTarget injectionTarget = entry.getValue();
+      InjectionTarget bindingTarget = entry.getValue();
 
       //we unfortunately can't test that nothing is generated in a TRUTH based test
       try {
-        fileUtil.writeFile(new IntentBuilderGenerator(injectionTarget), typeElement);
+        fileUtil.writeFile(new IntentBuilderGenerator(bindingTarget), typeElement);
       } catch (IOException e) {
         loggingUtil.error(
             typeElement,
