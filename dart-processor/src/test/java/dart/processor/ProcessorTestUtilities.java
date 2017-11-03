@@ -26,9 +26,9 @@ final class ProcessorTestUtilities {
   }
 
   static Iterable<? extends Processor> dartProcessorsWithoutParceler() {
-    dart.processor.InjectExtraProcessor injectExtraProcessor =
+    dart.processor.InjectExtraProcessor bindExtraProcessor =
         new dart.processor.InjectExtraProcessor();
-    injectExtraProcessor.enableParceler(false);
-    return Arrays.asList(injectExtraProcessor);
+    bindExtraProcessor.enableParceler(false);
+    return Arrays.asList(bindExtraProcessor);
   }
 }

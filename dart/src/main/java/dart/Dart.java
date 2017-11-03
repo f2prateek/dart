@@ -37,17 +37,16 @@ import java.util.Map;
  *
  *   {@literal @}Override protected void onCreate(Bundle savedInstanceState) {
  *     super.onCreate(savedInstanceState);
- *     Dart.inject(this);
+ *     Dart.bind(this);
  *   }
  * }
  * </code></pre>
  *
- * You can inject an {@link #inject(Activity) activity directly}, {@link
- * #inject(android.app.Fragment) fragment directly}, or inject an {@link #inject(Object, Bundle)
- * bundle into another object}.
+ * You can bind an {@link #bind(Activity) activity directly}, {@link #bind(android.app.Fragment)
+ * fragment directly}, or bind an {@link #bind(Object, Bundle) bundle into another object}.
  *
- * <p>Be default, extras are required to be present in the bundle for field injections. If an extra
- * is optional add the {@code Nullable @Nullable} annotation.
+ * <p>Be default, extras are required to be present in the bundle for field bindings. If an extra is
+ * optional add the {@code Nullable @Nullable} annotation.
  *
  * <pre><code>
  * {@literal @}Nullable {@literal @}BindExtra("key") String extra;
@@ -61,9 +60,9 @@ import java.util.Map;
  * </code></pre>
  */
 public class Dart {
-  public static final String INJECTOR_SUFFIX = "$$ExtraInjector";
+  public static final String BINDER_SUFFIX = "__ExtraBinder";
 
-  static final Map<Class<?>, Method> INJECTORS = new LinkedHashMap<Class<?>, Method>();
+  static final Map<Class<?>, Method> BINDERS = new LinkedHashMap<Class<?>, Method>();
   static final Method NO_OP = null;
   private static final String TAG = "Dart";
   private static boolean debug = false;
@@ -81,12 +80,12 @@ public class Dart {
    * Inject fields annotated with {@link BindExtra} in the specified {@link android.app.Activity}.
    * The intent that called this activity will be used as the source of the extras bundle.
    *
-   * @param target Target activity for field injection.
-   * @throws Dart.UnableToInjectException if injection could not be performed.
+   * @param target Target activity for field binding.
+   * @throws Dart.UnableToInjectException if binding could not be performed.
    * @see android.content.Intent#getExtras()
    */
-  public static void inject(Activity target) {
-    inject(target, target, Finder.ACTIVITY);
+  public static void bind(Activity target) {
+    bind(target, target, Finder.ACTIVITY);
   }
 
   /**
@@ -94,59 +93,59 @@ public class Dart {
    * The arguments that this fragment was called with will be used as the source of the extras
    * bundle.
    *
-   * @param target Target fragment for field injection.
-   * @throws Dart.UnableToInjectException if injection could not be performed.
+   * @param target Target fragment for field binding.
+   * @throws Dart.UnableToInjectException if binding could not be performed.
    * @see android.app.Fragment#getArguments()
    */
-  public static void inject(Fragment target) {
-    inject(target, target, Finder.FRAGMENT);
+  public static void bind(Fragment target) {
+    bind(target, target, Finder.FRAGMENT);
   }
 
   /**
    * Inject fields annotated with {@link BindExtra} in the specified {@code target} using the {@code
    * source} {@link android.app.Activity}.
    *
-   * @param target Target class for field injection.
+   * @param target Target class for field binding.
    * @param source Activity on which IDs will be looked up.
-   * @throws Dart.UnableToInjectException if injection could not be performed.
+   * @throws Dart.UnableToInjectException if binding could not be performed.
    * @see android.content.Intent#getExtras()
    */
-  public static void inject(Object target, Activity source) {
-    inject(target, source, Finder.ACTIVITY);
+  public static void bind(Object target, Activity source) {
+    bind(target, source, Finder.ACTIVITY);
   }
 
   /**
    * Inject fields annotated with {@link BindExtra} in the specified {@code target} using the {@code
    * source} {@link android.os.Bundle} as the source.
    *
-   * @param target Target class for field injection.
+   * @param target Target class for field binding.
    * @param source Bundle source on which extras will be looked up.
-   * @throws Dart.UnableToInjectException if injection could not be performed.
+   * @throws Dart.UnableToInjectException if binding could not be performed.
    */
-  public static void inject(Object target, Bundle source) {
-    inject(target, source, Finder.BUNDLE);
+  public static void bind(Object target, Bundle source) {
+    bind(target, source, Finder.BUNDLE);
   }
 
-  static void inject(Object target, Object source, Finder finder) {
+  static void bind(Object target, Object source, Finder finder) {
     Class<?> targetClass = target.getClass();
     try {
-      if (debug) Log.d(TAG, "Looking up extra injector for " + targetClass.getName());
-      Method inject = findInjectorForClass(targetClass);
-      if (inject != null) {
-        inject.invoke(null, finder, target, source);
+      if (debug) Log.d(TAG, "Looking up extra binder for " + targetClass.getName());
+      Method bind = findBinderForClass(targetClass);
+      if (bind != null) {
+        bind.invoke(null, finder, target, source);
       }
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
-      throw new UnableToInjectException("Unable to inject extras for " + target, e);
+      throw new UnableToInjectException("Unable to bind extras for " + target, e);
     }
   }
 
-  private static Method findInjectorForClass(Class<?> cls) throws NoSuchMethodException {
-    Method inject = INJECTORS.get(cls);
-    if (inject != null) {
-      if (debug) Log.d(TAG, "HIT: Cached in injector map.");
-      return inject;
+  private static Method findBinderForClass(Class<?> cls) throws NoSuchMethodException {
+    Method bind = BINDERS.get(cls);
+    if (bind != null) {
+      if (debug) Log.d(TAG, "HIT: Cached in binder map.");
+      return bind;
     }
     String clsName = cls.getName();
     if (clsName.startsWith("android.") || clsName.startsWith("java.")) {
@@ -154,15 +153,15 @@ public class Dart {
       return NO_OP;
     }
     try {
-      Class<?> injector = Class.forName(clsName + INJECTOR_SUFFIX);
-      inject = injector.getMethod("inject", Finder.class, cls, Object.class);
-      if (debug) Log.d(TAG, "HIT: Class loaded injection class.");
+      Class<?> binder = Class.forName(clsName + BINDER_SUFFIX);
+      bind = binder.getMethod("bind", Finder.class, cls, Object.class);
+      if (debug) Log.d(TAG, "HIT: Class loaded binding class.");
     } catch (ClassNotFoundException e) {
       if (debug) Log.d(TAG, "Not found. Trying superclass " + cls.getSuperclass().getName());
-      inject = findInjectorForClass(cls.getSuperclass());
+      bind = findBinderForClass(cls.getSuperclass());
     }
-    INJECTORS.put(cls, inject);
-    return inject;
+    BINDERS.put(cls, bind);
+    return bind;
   }
 
   /** Simpler version of {@link android.os.Bundle#get(String)} which infers the target type. */

@@ -37,7 +37,7 @@ public class BindExtraTest {
   }
 
   @Test
-  public void injectingExtra() {
+  public void bindingExtra() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.Test",
@@ -51,17 +51,17 @@ public class BindExtraTest {
                     "}" //
                     ));
 
-    JavaFileObject injectorSource =
+    JavaFileObject binderSource =
         JavaFileObjects.forSourceString(
-            "test/Test$$ExtraInjector",
+            "test/Test__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
                     "import dart.Dart;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
-                    "public class Test$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+                    "public class Test__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, Test target, Object source) {", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key\");", //
                     "    if (object == null) {", //
@@ -76,12 +76,12 @@ public class BindExtraTest {
     Compilation compilation =
         javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/Test$$ExtraInjector")
-        .hasSourceEquivalentTo(injectorSource);
+        .generatedSourceFile("test/Test__ExtraBinder")
+        .hasSourceEquivalentTo(binderSource);
   }
 
   @Test
-  public void injectingAllPrimitives() {
+  public void bindingAllPrimitives() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.Test",
@@ -102,16 +102,16 @@ public class BindExtraTest {
                     "}" //
                     ));
 
-    JavaFileObject injectorSource =
+    JavaFileObject binderSource =
         JavaFileObjects.forSourceString(
-            "test/Test$$ExtraInjector",
+            "test/Test__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
                     "import dart.Dart;", //
                     "import java.lang.Object;", //
-                    "public class Test$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+                    "public class Test__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, Test target, Object source) {", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key_bool\");", //
                     "    if (object == null) {", //
@@ -168,8 +168,8 @@ public class BindExtraTest {
     Compilation compilation =
         javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/Test$$ExtraInjector")
-        .hasSourceEquivalentTo(injectorSource);
+        .generatedSourceFile("test/Test__ExtraBinder")
+        .hasSourceEquivalentTo(binderSource);
   }
 
   @Test
@@ -191,15 +191,15 @@ public class BindExtraTest {
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
-            "test/Test$$ExtraInjector",
+            "test/Test__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
                     "import dart.Dart;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
-                    "public class Test$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+                    "public class Test__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, Test target, Object source) {", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key\");", //
                     "    if (object == null) {", //
@@ -216,7 +216,7 @@ public class BindExtraTest {
     Compilation compilation =
         javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/Test$$ExtraInjector")
+        .generatedSourceFile("test/Test__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
   }
 
@@ -239,15 +239,15 @@ public class BindExtraTest {
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
-            "test/Test$$ExtraInjector",
+            "test/Test__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
                     "import dart.Dart;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
-                    "public class Test$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+                    "public class Test__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, Test target, Object source) {", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key\");", //
                     "    if (object == null) {", //
@@ -262,7 +262,7 @@ public class BindExtraTest {
     Compilation compilation =
         javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/Test$$ExtraInjector")
+        .generatedSourceFile("test/Test__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
   }
 
@@ -313,15 +313,15 @@ public class BindExtraTest {
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
-            "test/Test$$ExtraInjector",
+            "test/Test__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
                     "import dart.Dart;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
-                    "public class Test$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+                    "public class Test__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, Test target, Object source) {", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key\");", //
                     "    if (object != null) {", //
@@ -336,7 +336,7 @@ public class BindExtraTest {
             .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/Test$$ExtraInjector")
+        .generatedSourceFile("test/Test__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
   }
 
@@ -465,15 +465,15 @@ public class BindExtraTest {
 
     JavaFileObject expectedSource1 =
         JavaFileObjects.forSourceString(
-            "test/Test$$ExtraInjector",
+            "test/Test__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
                     "import dart.Dart;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
-                    "public class Test$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+                    "public class Test__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, Test target, Object source) {", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key\");", //
                     "    if (object == null) {", //
@@ -487,16 +487,16 @@ public class BindExtraTest {
 
     JavaFileObject expectedSource2 =
         JavaFileObjects.forSourceString(
-            "test/TestOne$$ExtraInjector",
+            "test/TestOne__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
                     "import dart.Dart;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
-                    "public class TestOne$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, TestOne target, Object source) {", //
-                    "    Test$$ExtraInjector.inject(finder, target, source);", //
+                    "public class TestOne__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, TestOne target, Object source) {", //
+                    "    Test__ExtraBinder.bind(finder, target, source);", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key\");", //
                     "    if (object == null) {", //
@@ -513,10 +513,10 @@ public class BindExtraTest {
             .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/Test$$ExtraInjector")
+        .generatedSourceFile("test/Test__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource1);
     assertThat(compilation)
-        .generatedSourceFile("test/TestOne$$ExtraInjector")
+        .generatedSourceFile("test/TestOne__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource2);
   }
 
@@ -542,15 +542,15 @@ public class BindExtraTest {
 
     JavaFileObject expectedSource1 =
         JavaFileObjects.forSourceString(
-            "test/Test$$ExtraInjector",
+            "test/Test__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
                     "import dart.Dart;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
-                    "public class Test$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, Test target, Object source) {", //
+                    "public class Test__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, Test target, Object source) {", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key\");", //
                     "    if (object == null) {", //
@@ -564,16 +564,16 @@ public class BindExtraTest {
 
     JavaFileObject expectedSource2 =
         JavaFileObjects.forSourceString(
-            "test/TestOne$$ExtraInjector",
+            "test/TestOne__ExtraBinder",
             Joiner.on('\n')
                 .join( //
                     "package test;", //
                     "import dart.Dart;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
-                    "public class TestOne$$ExtraInjector {", //
-                    "  public static void inject(Dart.Finder finder, TestOne target, Object source) {",
-                    "    Test$$ExtraInjector.inject(finder, target, source);", //
+                    "public class TestOne__ExtraBinder {", //
+                    "  public static void bind(Dart.Finder finder, TestOne target, Object source) {",
+                    "    Test__ExtraBinder.bind(finder, target, source);", //
                     "    Object object;", //
                     "    object = finder.getExtra(source, \"key\");", //
                     "    if (object == null) {", //
@@ -589,10 +589,10 @@ public class BindExtraTest {
             .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/Test$$ExtraInjector")
+        .generatedSourceFile("test/Test__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource1);
     assertThat(compilation)
-        .generatedSourceFile("test/TestOne$$ExtraInjector")
+        .generatedSourceFile("test/TestOne__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource2);
   }
 }

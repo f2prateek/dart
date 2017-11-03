@@ -34,7 +34,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
 /**
- * Creates Java code to inject extras into an activity or a {@link android.os.Bundle}.
+ * Creates Java code to bind extras into an activity or a {@link android.os.Bundle}.
  *
  * <p>{@link Dart} to use this code at runtime.
  */
@@ -48,11 +48,11 @@ public class ExtraInjectorGenerator extends BaseGenerator {
 
   @Override
   public String brewJava() {
-    TypeSpec.Builder injectorTypeSpec =
-        TypeSpec.classBuilder(injectorClassName()).addModifiers(Modifier.PUBLIC);
-    emitInject(injectorTypeSpec);
+    TypeSpec.Builder binderTypeSpec =
+        TypeSpec.classBuilder(binderClassName()).addModifiers(Modifier.PUBLIC);
+    emitInject(binderTypeSpec);
     JavaFile javaFile =
-        JavaFile.builder(target.classPackage, injectorTypeSpec.build())
+        JavaFile.builder(target.classPackage, binderTypeSpec.build())
             .addFileComment("Generated code from Dart. Do not modify!")
             .build();
     return javaFile.toString();
@@ -60,63 +60,63 @@ public class ExtraInjectorGenerator extends BaseGenerator {
 
   @Override
   public String getFqcn() {
-    return target.classPackage + "." + injectorClassName();
+    return target.classPackage + "." + binderClassName();
   }
 
-  private String injectorClassName() {
-    return target.className + Dart.INJECTOR_SUFFIX;
+  private String binderClassName() {
+    return target.className + Dart.BINDER_SUFFIX;
   }
 
   private void emitInject(TypeSpec.Builder builder) {
-    MethodSpec.Builder injectBuilder =
-        MethodSpec.methodBuilder("inject")
+    MethodSpec.Builder bindBuilder =
+        MethodSpec.methodBuilder("bind")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addParameter(ClassName.get(Dart.Finder.class), "finder")
             .addParameter(ClassName.bestGuess(target.classFqcnCanonical), "target")
             .addParameter(ClassName.get(Object.class), "source");
 
     if (target.parentClassFqcn != null) {
-      // Emit a call to the superclass injector, if any.
-      injectBuilder.addStatement(
-          "$T.inject(finder, target, source)",
-          ClassName.bestGuess(target.parentClassFqcn + Dart.INJECTOR_SUFFIX));
+      // Emit a call to the superclass binder, if any.
+      bindBuilder.addStatement(
+          "$T.bind(finder, target, source)",
+          ClassName.bestGuess(target.parentClassFqcn + Dart.BINDER_SUFFIX));
     }
 
     // Local variable in which all extras will be temporarily stored.
-    injectBuilder.addStatement("Object object");
+    bindBuilder.addStatement("Object object");
 
-    // Loop over each extras injection and emit it.
-    for (ExtraInjection injection : target.bindingMap.values()) {
-      emitExtraInjection(injectBuilder, injection);
+    // Loop over each extras binding and emit it.
+    for (ExtraInjection binding : target.bindingMap.values()) {
+      emitExtraInjection(bindBuilder, binding);
     }
 
-    builder.addMethod(injectBuilder.build());
+    builder.addMethod(bindBuilder.build());
   }
 
-  private void emitExtraInjection(MethodSpec.Builder builder, ExtraInjection injection) {
-    builder.addStatement("object = finder.getExtra(source, $S)", injection.getKey());
+  private void emitExtraInjection(MethodSpec.Builder builder, ExtraInjection binding) {
+    builder.addStatement("object = finder.getExtra(source, $S)", binding.getKey());
 
-    List<Binding> requiredBindings = injection.getRequiredBindings();
+    List<Binding> requiredBindings = binding.getRequiredBindings();
     if (!requiredBindings.isEmpty()) {
       builder
           .beginControlFlow("if (object == null)")
           .addStatement(
               "throw new IllegalStateException(\"Required extra with key '$L' for $L "
                   + "was not found. If this extra is optional add '@Nullable' annotation.\")",
-              injection.getKey(),
+              binding.getKey(),
               emitHumanDescription(requiredBindings))
           .endControlFlow();
-      emitFieldBindings(builder, injection);
+      emitFieldBindings(builder, binding);
     } else {
       // an optional extra, wrap it in a check to keep original value, if any
       builder.beginControlFlow("if (object != null)");
-      emitFieldBindings(builder, injection);
+      emitFieldBindings(builder, binding);
       builder.endControlFlow();
     }
   }
 
-  private void emitFieldBindings(MethodSpec.Builder builder, ExtraInjection injection) {
-    Collection<FieldBinding> fieldBindings = injection.getFieldBindings();
+  private void emitFieldBindings(MethodSpec.Builder builder, ExtraInjection binding) {
+    Collection<FieldBinding> fieldBindings = binding.getFieldBindings();
     if (fieldBindings.isEmpty()) {
       return;
     }

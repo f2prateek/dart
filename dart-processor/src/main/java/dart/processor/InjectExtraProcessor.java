@@ -42,8 +42,8 @@ public final class InjectExtraProcessor extends AbstractProcessor {
 
   private LoggingUtil loggingUtil;
   private FileUtil fileUtil;
-  private InjectExtraUtil injectExtraUtil;
-  private InjectionTargetUtil injectionTargetUtil;
+  private InjectExtraUtil bindExtraUtil;
+  private InjectionTargetUtil bindingTargetUtil;
 
   private boolean usesParcelerOption = true;
 
@@ -55,15 +55,15 @@ public final class InjectExtraProcessor extends AbstractProcessor {
         new ParcelerUtil(compilerUtil, processingEnv, usesParcelerOption);
     loggingUtil = new LoggingUtil(processingEnv);
     fileUtil = new FileUtil(processingEnv);
-    injectionTargetUtil = new InjectionTargetUtil(compilerUtil);
-    injectExtraUtil =
+    bindingTargetUtil = new InjectionTargetUtil(compilerUtil);
+    bindExtraUtil =
         new InjectExtraUtil(
-            compilerUtil, parcelerUtil, loggingUtil, injectionTargetUtil, processingEnv);
+            compilerUtil, parcelerUtil, loggingUtil, bindingTargetUtil, processingEnv);
   }
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    injectExtraUtil.setRoundEnvironment(roundEnv);
+    bindExtraUtil.setRoundEnvironment(roundEnv);
 
     Map<TypeElement, InjectionTarget> targetClassMap = findAndParseTargets();
     generateExtraInjectors(targetClassMap);
@@ -90,9 +90,9 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     Map<TypeElement, InjectionTarget> targetClassMap = new LinkedHashMap<>();
 
     // Process each @BindExtra element.
-    injectExtraUtil.parseInjectExtraAnnotatedElements(targetClassMap);
-    // Create injection target tree and inherit extra injections.
-    injectionTargetUtil.createInjectionTargetTree(targetClassMap);
+    bindExtraUtil.parseInjectExtraAnnotatedElements(targetClassMap);
+    // Create binding target tree and inherit extra bindings.
+    bindingTargetUtil.createInjectionTargetTree(targetClassMap);
 
     return targetClassMap;
   }
@@ -100,15 +100,15 @@ public final class InjectExtraProcessor extends AbstractProcessor {
   private void generateExtraInjectors(Map<TypeElement, InjectionTarget> targetClassMap) {
     for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
       TypeElement typeElement = entry.getKey();
-      InjectionTarget injectionTarget = entry.getValue();
+      InjectionTarget bindingTarget = entry.getValue();
 
       //we unfortunately can't test that nothing is generated in a TRUTH based test
       try {
-        fileUtil.writeFile(new ExtraInjectorGenerator(injectionTarget), typeElement);
+        fileUtil.writeFile(new ExtraInjectorGenerator(bindingTarget), typeElement);
       } catch (IOException e) {
         loggingUtil.error(
             typeElement,
-            "Unable to write extra injector for type %s: %s",
+            "Unable to write extra binder for type %s: %s",
             typeElement,
             e.getMessage());
       }

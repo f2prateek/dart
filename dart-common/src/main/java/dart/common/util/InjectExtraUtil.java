@@ -40,7 +40,7 @@ public class InjectExtraUtil {
   private final CompilerUtil compilerUtil;
   private final ParcelerUtil parcelerUtil;
   private final LoggingUtil loggingUtil;
-  private final InjectionTargetUtil injectionTargetUtil;
+  private final InjectionTargetUtil bindingTargetUtil;
   private final Types typeUtils;
 
   private RoundEnvironment roundEnv;
@@ -49,12 +49,12 @@ public class InjectExtraUtil {
       CompilerUtil compilerUtil,
       ParcelerUtil parcelerUtil,
       LoggingUtil loggingUtil,
-      InjectionTargetUtil injectionTargetUtil,
+      InjectionTargetUtil bindingTargetUtil,
       ProcessingEnvironment processingEnv) {
     this.compilerUtil = compilerUtil;
     this.parcelerUtil = parcelerUtil;
     this.loggingUtil = loggingUtil;
-    this.injectionTargetUtil = injectionTargetUtil;
+    this.bindingTargetUtil = bindingTargetUtil;
     typeUtils = processingEnv.getTypeUtils();
   }
 
@@ -71,7 +71,7 @@ public class InjectExtraUtil {
         e.printStackTrace(new PrintWriter(stackTrace));
         loggingUtil.error(
             element,
-            "Unable to generate extra injector when parsing @BindExtra.\n\n%s",
+            "Unable to generate extra binder when parsing @BindExtra.\n\n%s",
             stackTrace.toString());
       }
     }
@@ -92,10 +92,10 @@ public class InjectExtraUtil {
               + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html");
     }
 
-    // Assemble information on the injection point.
+    // Assemble information on the binding point.
     final TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-    final InjectionTarget injectionTarget =
-        injectionTargetUtil.getOrCreateTargetClass(targetClassMap, enclosingElement);
+    final InjectionTarget bindingTarget =
+        bindingTargetUtil.getOrCreateTargetClass(targetClassMap, enclosingElement);
 
     final String name = element.getSimpleName().toString();
     final String key = StringUtil.isNullOrEmpty(annotationValue) ? name : annotationValue;
@@ -103,7 +103,7 @@ public class InjectExtraUtil {
     final boolean required = isRequiredInjection(element);
     final boolean parcel =
         parcelerUtil.isParcelerAvailable() && parcelerUtil.isValidExtraTypeForParceler(type);
-    injectionTarget.addField(key, name, type, required, parcel);
+    bindingTarget.addField(key, name, type, required, parcel);
   }
 
   private boolean isValidUsageOfInjectExtra(Element element) {
@@ -166,7 +166,7 @@ public class InjectExtraUtil {
   }
 
   /**
-   * Returns {@code true} if an injection is deemed to be required. Returns false when a field is
+   * Returns {@code true} if an binding is deemed to be required. Returns false when a field is
    * annotated with any annotation named {@code Optional} or {@code Nullable}.
    */
   private boolean isRequiredInjection(Element element) {

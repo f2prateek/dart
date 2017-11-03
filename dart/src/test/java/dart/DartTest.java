@@ -32,9 +32,9 @@ import org.robolectric.annotation.Config;
 @Config(manifest = Config.NONE)
 public class DartTest {
   @Before
-  @After // Clear out cache of injectors  before and after each test.
+  @After // Clear out cache of biners  before and after each test.
   public void resetExtrasCache() {
-    dart.Dart.INJECTORS.clear();
+    dart.Dart.BINDERS.clear();
   }
 
   @Test
@@ -42,15 +42,15 @@ public class DartTest {
     class Example {}
 
     Example example = new Example();
-    dart.Dart.inject(example, null, null);
-    assertThat(dart.Dart.INJECTORS).contains(entry(Example.class, dart.Dart.NO_OP));
+    dart.Dart.bind(example, null, null);
+    assertThat(dart.Dart.BINDERS).contains(entry(Example.class, dart.Dart.NO_OP));
   }
 
   @Test
-  public void injectingKnownPackagesIsNoOp() {
-    dart.Dart.inject(new Activity());
-    assertThat(dart.Dart.INJECTORS).isEmpty();
-    dart.Dart.inject(new Object(), new Activity());
-    assertThat(dart.Dart.INJECTORS).isEmpty();
+  public void bindingKnownPackagesIsNoOp() {
+    dart.Dart.bind(new Activity());
+    assertThat(dart.Dart.BINDERS).isEmpty();
+    dart.Dart.bind(new Object(), new Activity());
+    assertThat(dart.Dart.BINDERS).isEmpty();
   }
 }

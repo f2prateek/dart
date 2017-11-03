@@ -31,8 +31,8 @@ public class ExtraInjectorGeneratorTest {
 
   @Before
   public void setup() {
-    final InjectionTarget injectionTarget = new InjectionTarget("foo", "bar", "qurtz", false);
-    extraInjectorGenerator = new dart.processor.ExtraInjectorGenerator(injectionTarget);
+    final InjectionTarget bindingTarget = new InjectionTarget("foo", "bar", "qurtz", false);
+    extraInjectorGenerator = new dart.processor.ExtraInjectorGenerator(bindingTarget);
   }
 
   @Test
