@@ -30,6 +30,6 @@ public class SampleService extends IntentService {
   }
 
   @Override protected void onHandleIntent(Intent intent) {
-    Dart.inject(navigationModel, intent.getExtras());
+    Dart.bind(navigationModel, intent.getExtras());
   }
 }

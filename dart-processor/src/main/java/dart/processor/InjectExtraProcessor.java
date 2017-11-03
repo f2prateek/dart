@@ -38,7 +38,7 @@ import javax.lang.model.element.TypeElement;
 @SupportedAnnotationTypes({InjectExtraProcessor.INJECT_EXTRA_ANNOTATION_CLASS_NAME})
 public final class InjectExtraProcessor extends AbstractProcessor {
 
-  static final String INJECT_EXTRA_ANNOTATION_CLASS_NAME = "dart.InjectExtra";
+  static final String INJECT_EXTRA_ANNOTATION_CLASS_NAME = "dart.BindExtra";
 
   private LoggingUtil loggingUtil;
   private FileUtil fileUtil;
@@ -89,7 +89,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
   private Map<TypeElement, InjectionTarget> findAndParseTargets() {
     Map<TypeElement, InjectionTarget> targetClassMap = new LinkedHashMap<>();
 
-    // Process each @InjectExtra element.
+    // Process each @BindExtra element.
     injectExtraUtil.parseInjectExtraAnnotatedElements(targetClassMap);
     // Create injection target tree and inherit extra injections.
     injectionTargetUtil.createInjectionTargetTree(targetClassMap);

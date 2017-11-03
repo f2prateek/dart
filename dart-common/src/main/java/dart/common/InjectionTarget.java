@@ -25,7 +25,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
 public class InjectionTarget {
-  public final Map<String, ExtraInjection> injectionMap = new LinkedHashMap<>();
+  public final Map<String, ExtraInjection> bindingMap = new LinkedHashMap<>();
   public final String classPackage;
   public final String className;
   public final String classFqcnCanonical; // Canonical: my.package.class.innerclass
@@ -46,10 +46,10 @@ public class InjectionTarget {
   }
 
   public void addField(String key, String name, TypeMirror type, boolean required, boolean parcel) {
-    ExtraInjection extraInjection = injectionMap.get(key);
+    ExtraInjection extraInjection = bindingMap.get(key);
     if (extraInjection == null) {
       extraInjection = new ExtraInjection(key);
-      injectionMap.put(key, extraInjection);
+      bindingMap.put(key, extraInjection);
     }
     extraInjection.addFieldBinding(new FieldBinding(name, type, required, parcel));
   }

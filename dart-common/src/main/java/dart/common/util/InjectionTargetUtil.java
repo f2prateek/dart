@@ -86,7 +86,7 @@ public class InjectionTargetUtil {
       Map<TypeElement, InjectionTarget> targetClassMap, InjectionTarget injectionTarget) {
     for (TypeElement child : injectionTarget.childClasses) {
       final InjectionTarget childInjectionTarget = targetClassMap.get(child);
-      childInjectionTarget.injectionMap.putAll(injectionTarget.injectionMap);
+      childInjectionTarget.bindingMap.putAll(injectionTarget.bindingMap);
       addExtraInjectionsToDescendants(targetClassMap, childInjectionTarget);
     }
   }

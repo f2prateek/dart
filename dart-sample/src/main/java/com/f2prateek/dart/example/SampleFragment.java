@@ -28,6 +28,6 @@ public class SampleFragment extends Fragment {
 
   @Override public void onAttach(Activity activity) {
     super.onAttach(activity);
-    Dart.inject(this, getActivity());
+    Dart.bind(this, getActivity());
   }
 }

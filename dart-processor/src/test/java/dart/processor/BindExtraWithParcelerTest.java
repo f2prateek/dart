@@ -30,7 +30,7 @@ import org.junit.Test;
  * Tests {@link dart.processor.InjectExtraProcessor}. For tests related to Parceler and Parceler is
  * available.
  */
-public class InjectExtraWithParcelerTest {
+public class BindExtraWithParcelerTest {
 
   @Test
   public void serializableCollection() {
@@ -41,12 +41,12 @@ public class InjectExtraWithParcelerTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
                     "import android.util.SparseArray;", //
                     "public class TestSerializableCollection extends Activity {", //
-                    "  @InjectExtra(\"key\") SparseArray<String> extra;", //
+                    "  @BindExtra(\"key\") SparseArray<String> extra;", //
                     "}" //
                     ));
 
@@ -86,12 +86,12 @@ public class InjectExtraWithParcelerTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
                     "import java.util.List;", //
                     "public class TestNonSerializableNonParcelableCollection_withoutParceler extends Activity {", //
-                    "  @InjectExtra(\"key\") List<String> extra;", //
+                    "  @BindExtra(\"key\") List<String> extra;", //
                     "}" //
                     ));
 
@@ -131,12 +131,12 @@ public class InjectExtraWithParcelerTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
                     "import org.parceler.Parcel;", //
                     "public class TestParcelAnnotated extends Activity {", //
-                    "  @InjectExtra(\"key\") Foo extra;", //
+                    "  @BindExtra(\"key\") Foo extra;", //
                     "@Parcel static class Foo {}", //
                     "}"));
 
@@ -176,13 +176,13 @@ public class InjectExtraWithParcelerTest {
                 .join( //
                     "package test;", //
                     "import android.app.Activity;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "import java.lang.Object;", //
                     "import java.lang.String;", //
                     "import java.util.List;", //
                     "import org.parceler.Parcel;", //
                     "public class TestCollectionParcel extends Activity {", //
-                    "  @InjectExtra(\"key\") List<Foo> extra;", //
+                    "  @BindExtra(\"key\") List<Foo> extra;", //
                     "@Parcel static class Foo {}", //
                     "}"));
 
@@ -224,7 +224,7 @@ public class InjectExtraWithParcelerTest {
                     "import android.app.Activity;", //
                     "import android.os.Parcelable;", //
                     "import org.parceler.Parcel;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "class ExtraParent implements Parcelable {", //
                     "  public void writeToParcel(android.os.Parcel out, int flags) {", //
                     "  }", //
@@ -234,7 +234,7 @@ public class InjectExtraWithParcelerTest {
                     "}", //
                     "@Parcel class Extra extends ExtraParent {}", //
                     "public class TestParcelExtendsParcelable extends Activity {", //
-                    "    @InjectExtra(\"key\") Extra extra;", //
+                    "    @BindExtra(\"key\") Extra extra;", //
                     "}" //
                     ));
 
@@ -275,7 +275,7 @@ public class InjectExtraWithParcelerTest {
                     "package test;", //
                     "import android.app.Activity;", //
                     "import android.os.Parcelable;", //
-                    "import dart.InjectExtra;", //
+                    "import dart.BindExtra;", //
                     "class ExtraParent implements Parcelable {", //
                     "  public void writeToParcel(android.os.Parcel out, int flags) {", //
                     "  }", //
@@ -291,7 +291,7 @@ public class InjectExtraWithParcelerTest {
                     "  }", //
                     "}", //
                     "public class TestParcelableExtendsParcelable extends Activity {", //
-                    "    @InjectExtra(\"key\") Extra extra;", //
+                    "    @BindExtra(\"key\") Extra extra;", //
                     "}" //
                     ));
 

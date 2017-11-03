@@ -43,9 +43,9 @@ public class SampleActivity extends Activity {
     setContentView(R.layout.activity_sample);
 
     ButterKnife.bind(this);
-    Dart.inject(navigationModel, this);
+    Dart.bind(navigationModel, this);
 
-    // Contrived code to use the "injected" extras.
+    // Contrived code to use the "bound" extras.
     stringExtraTextView.setText(navigationModel.stringExtra);
     intExtraTextView.setText(String.valueOf(navigationModel.intExtra));
     parcelableExtraTextView.setText(String.valueOf(navigationModel.parcelableExtra));
