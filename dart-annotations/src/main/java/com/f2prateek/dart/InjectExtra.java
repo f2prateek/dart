@@ -21,7 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.SOURCE;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 
 /**
  * Annotation for fields which indicate that it should be looked up in the activity intent's extras
@@ -35,6 +35,6 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  *
  * @see Nullable
  */
-@Retention(SOURCE) @Target(FIELD) public @interface InjectExtra {
+@Retention(CLASS) @Target(FIELD) public @interface InjectExtra {
   String value() default "";
 }
