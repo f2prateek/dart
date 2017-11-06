@@ -1,0 +1,5 @@
+// Dart sample with two modules
+include 'app'
+include 'module1'
+
+rootProject.name = 'dart-sample'
