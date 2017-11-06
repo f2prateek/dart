@@ -70,7 +70,7 @@ Intent intent = Henson.with(this)
         .extra2(2)
         .extra3(new User())
         .build();
-        
+
 startActivity(intent);
 ```
 
@@ -88,13 +88,13 @@ class AnotherActivity extends Activity {
 }
 ```
 
-The Henson annotation processor will generate the `Henson` navigator class (used above) in a package that is : 
+The Henson annotation processor will generate the `Henson` navigator class (used above) in a package that is :
 * either the package specified by the `dart.henson.package` annotation processor option
 * or if no such option is used, in the common package of all annotated activities. See the Javadoc of `HensonExtraProcessor` for more details.
- 
+
 If your activites and fragment are in *different packages*, you will need to specify a package via the `dart.henson.package` annotation processor option.
 If you're using gradle, simply add this to your `build.gradle`
-```groovy 
+```groovy
 apt {
     arguments {
         "dart.henson.package" "your.package.name"
@@ -201,13 +201,13 @@ or maven
 </dependency>
 ```
 
-And for using Henson : 
+And for using Henson :
 Gradle:
 ```groovy
 compile 'com.f2prateek.dart:henson:(insert latest version)'
 provided 'com.f2prateek.dart:henson-processor:(insert latest version)'
 ```
-When using Henson, as Android Studio doesn't call live annotation processors when editing a file, you might prefer using the [apt Android Studio plugin](https://bitbucket.org/hvisser/android-apt). It will allow you to use the Henson generated DSL right away when you edit your code. 
+When using Henson, as Android Studio doesn't call live annotation processors when editing a file, you might prefer using the [apt Android Studio plugin](https://bitbucket.org/hvisser/android-apt). It will allow you to use the Henson generated DSL right away when you edit your code.
 
 The Henson annotation processor dependency would then have to be declared within the apt scope instead of provided.
 
@@ -237,6 +237,68 @@ Maven:
   <artifactId>dart</artifactId>
   <version>(insert latest version)</version>
 </dependency>
+```
+
+Kotlin
+-----
+For all Kotlin enthusiasts, you may wonder how to use this library to configure your intents. This is perfectly compatible, with a bit of understanding of how Kotlin works, especially when it comes to annotation processing.
+
+Assuming that your project is already configured with Kotlin, update your `build.gradle` file :
+
+```groovy
+apply plugin: 'kotlin-kapt'
+
+dependencies {
+  implementation 'com.f2prateek.dart:henson:(insert latest version)'
+  kapt 'com.f2prateek.dart:henson-processor:(insert latest version)'
+}
+```
+
+Now you can use `@InjectExtra` annotation to generate either non-null or nullables properties :
+
+```kotlin
+class ExampleActivity : Activity() {
+  @InjectExtra
+  lateinit var title: String
+
+  @InjectExtra
+  var titleDefaultValue: String = "Default Title"
+
+  @Nullable
+  @JvmField
+  @InjectExtra
+  var titleNullable: String? = null
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+      super.onCreate(savedInstanceState)
+      setContentView(R.layout.simple_activity)
+      Dart.inject(this)
+      // TODO Use "injected" extras...
+  }
+}
+```
+
+Note that you still need to use the Java `@Nullable` annotation otherwise Henson won't interpret your property as nullable and will generate a builder with a mandatory field (even though you declared your property as nullable with the "?" Kotlin marker). Finally, you have to add the `@JvmField` annotation or your compiler will complain about not having a backing field.
+
+You may need to add an argument to your `build.gradle` file if your activities and fragments are located in different packages as mentioned above. The Kotlin syntax with **kapt** is :
+
+```groovy
+kapt {
+    arguments {
+        arg("dart.henson.package", "your.package.name")
+    }
+}
+```
+
+Finally, if you are using Parceler that comes built-in with this library, the syntax does not change from Java, except when dealing with **data** classes. Because Parceler requires a default constructor with no argument, here is how you need to declare your **data** class :
+
+```kotlin
+@Parcel(Parcel.Serialization.BEAN)
+data class ParcelExample @ParcelConstructor constructor(
+        val id: Int,
+        val name: String,
+        ...
+}
 ```
 
 Talks & Slides
