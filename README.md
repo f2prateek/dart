@@ -249,7 +249,7 @@ Assuming that your project is already configured with Kotlin, update your `build
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-  compile 'com.f2prateek.dart:henson:(insert latest version)'
+  implementation 'com.f2prateek.dart:henson:(insert latest version)'
   kapt 'com.f2prateek.dart:henson-processor:(insert latest version)'
 }
 ```
