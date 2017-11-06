@@ -18,7 +18,7 @@
 package dart;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.SOURCE;
+import static java.lang.annotation.RetentionPolicy.CLASS;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
  * {@literal @}BindExtra String content; // "content" is the key for the extra
  * </code></pre>
  */
-@Retention(SOURCE)
+@Retention(CLASS)
 @Target(FIELD)
 public @interface BindExtra {
   String value() default "";
