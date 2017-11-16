@@ -45,7 +45,7 @@ public class SampleActivityTest {
     parcelSparseArray.put(0, parcel1);
     parcelSparseArray.put(2, parcel2);
 
-    Intent intent = new SampleActivity$$IntentBuilder(Robolectric.application)
+    Intent intent = new SampleActivity__IntentBuilder(Robolectric.application)
         .defaultKeyExtra("defaultKeyExtra")
         .extraInt(4)
         .extraListParcelable(parcelList)

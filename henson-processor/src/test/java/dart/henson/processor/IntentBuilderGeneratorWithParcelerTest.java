@@ -48,7 +48,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -59,10 +59,10 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
                     "import java.util.ArrayList;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -72,9 +72,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(ArrayList<String> extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(ArrayList<String> extra) {", //
                     "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -88,7 +88,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -111,7 +111,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -122,10 +122,10 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
                     "import java.util.List;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -135,9 +135,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(List<String> extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(List<String> extra) {", //
                     "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -151,7 +151,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -176,7 +176,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -186,10 +186,10 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -199,9 +199,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
                     "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -215,7 +215,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -241,7 +241,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -252,10 +252,10 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
                     "import java.util.List;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -265,9 +265,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(List<TestNavigationModel.Foo> extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(List<TestNavigationModel.Foo> extra) {", //
                     "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -280,7 +280,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -324,7 +324,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -336,10 +336,10 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.lang.String;", //
                     "import java.util.List;", //
                     "import java.util.Map;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -349,23 +349,23 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AfterSettingKey key(ExampleParcel extra) {", //
+                    "  public Test__IntentBuilder.AfterSettingKey key(ExampleParcel extra) {", //
                     "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-                    "    return new Test$$IntentBuilder.AfterSettingKey();", //
+                    "    return new Test__IntentBuilder.AfterSettingKey();", //
                     "  }", //
                     "  public class AfterSettingKey {", //
-                    "    public Test$$IntentBuilder.AfterSettingList list(List<ExampleParcel> listExtra) {",
+                    "    public Test__IntentBuilder.AfterSettingList list(List<ExampleParcel> listExtra) {",
                     //
                     "      bundler.put(\"list\", org.parceler.Parcels.wrap(listExtra));", //
-                    "      return new Test$$IntentBuilder.AfterSettingList();", //
+                    "      return new Test__IntentBuilder.AfterSettingList();", //
                     "    }", //
                     "  }", //
                     "  public class AfterSettingList {", //
-                    "    public Test$$IntentBuilder.AllSet mapNestedExtra(Map<List<String>, List<ExampleParcel>> mapNestedExtra) {",
+                    "    public Test__IntentBuilder.AllSet mapNestedExtra(Map<List<String>, List<ExampleParcel>> mapNestedExtra) {",
                     //
                     "      bundler.put(\"mapNestedExtra\", org.parceler.Parcels.wrap(mapNestedExtra));",
                     //
-                    "      return new Test$$IntentBuilder.AllSet();", //
+                    "      return new Test__IntentBuilder.AllSet();", //
                     "    }", //
                     "  }", //
                     "  public class AllSet {", //
@@ -379,7 +379,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -418,7 +418,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -428,10 +428,10 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -441,9 +441,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
                     "    bundler.put(\"key\",(android.os.Parcelable) extra);", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -457,7 +457,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -490,7 +490,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -500,10 +500,10 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -513,9 +513,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
                     "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra);", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -529,7 +529,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 }

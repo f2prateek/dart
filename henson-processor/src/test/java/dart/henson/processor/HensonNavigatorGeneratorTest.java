@@ -63,8 +63,8 @@ public class HensonNavigatorGeneratorTest {
                     "    private WithContextSetState(Context context) {", //
                     "      this.context = context;", //
                     "    }", //
-                    "    public Test$$IntentBuilder gotoTest() {", //
-                    "      return new test.navigation.Test$$IntentBuilder(context);", //
+                    "    public Test__IntentBuilder gotoTest() {", //
+                    "      return new test.navigation.Test__IntentBuilder(context);", //
                     "    }", //
                     "  }", //
                     "}" //
@@ -111,8 +111,8 @@ public class HensonNavigatorGeneratorTest {
                     "    private WithContextSetState(Context context) {", //
                     "      this.context = context;", //
                     "    }", //
-                    "    public Test$$IntentBuilder gotoTest() {", //
-                    "      return new test.navigation.Test$$IntentBuilder(context);", //
+                    "    public Test__IntentBuilder gotoTest() {", //
+                    "      return new test.navigation.Test__IntentBuilder(context);", //
                     "    }", //
                     "  }", //
                     "}" //
@@ -159,8 +159,8 @@ public class HensonNavigatorGeneratorTest {
                     "    private WithContextSetState(Context context) {", //
                     "      this.context = context;", //
                     "    }", //
-                    "    public Test$MyInnerTest$$IntentBuilder gotoTest$MyInnerTest() {", //
-                    "      return new test.navigation.Test$MyInnerTest$$IntentBuilder(context);", //
+                    "    public Test$MyInnerTest__IntentBuilder gotoTest$MyInnerTest() {", //
+                    "      return new test.navigation.Test$MyInnerTest__IntentBuilder(context);", //
                     "    }", //
                     "  }", //
                     "}" //
@@ -235,11 +235,11 @@ public class HensonNavigatorGeneratorTest {
                     "    private WithContextSetState(Context context) {", //
                     "      this.context = context;", //
                     "    }", //
-                    "    public Test1$$IntentBuilder gotoTest1() {", //
-                    "      return new test.navigation.Test1$$IntentBuilder(context);", //
+                    "    public Test1__IntentBuilder gotoTest1() {", //
+                    "      return new test.navigation.Test1__IntentBuilder(context);", //
                     "    }", //
-                    "    public Test2$$IntentBuilder gotoTest2() {", //
-                    "      return new test.navigation.Test2$$IntentBuilder(context);", //
+                    "    public Test2__IntentBuilder gotoTest2() {", //
+                    "      return new test.navigation.Test2__IntentBuilder(context);", //
                     "    }", //
                     "  }", //
                     "}" //
@@ -293,11 +293,11 @@ public class HensonNavigatorGeneratorTest {
                     "    private WithContextSetState(Context context) {", //
                     "      this.context = context;", //
                     "    }", //
-                    "    public Test1$$IntentBuilder gotoTest1() {", //
-                    "      return new test.navigation.Test1$$IntentBuilder(context);", //
+                    "    public Test1__IntentBuilder gotoTest1() {", //
+                    "      return new test.navigation.Test1__IntentBuilder(context);", //
                     "    }", //
-                    "    public Test2$$IntentBuilder gotoTest2() {", //
-                    "      return new test.navigation.Test2$$IntentBuilder(context);", //
+                    "    public Test2__IntentBuilder gotoTest2() {", //
+                    "      return new test.navigation.Test2__IntentBuilder(context);", //
                     "    }", //
                     "  }", //
                     "}" //
@@ -347,8 +347,8 @@ public class HensonNavigatorGeneratorTest {
                     "    private WithContextSetState(Context context) {", //
                     "      this.context = context;", //
                     "    }", //
-                    "    public Test1$$IntentBuilder gotoTest1() {", //
-                    "      return new test.navigation.Test1$$IntentBuilder(context);", //
+                    "    public Test1__IntentBuilder gotoTest1() {", //
+                    "      return new test.navigation.Test1__IntentBuilder(context);", //
                     "    }", //
                     "  }", //
                     "}" //

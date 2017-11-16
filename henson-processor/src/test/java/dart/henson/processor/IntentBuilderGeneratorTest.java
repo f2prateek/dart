@@ -47,7 +47,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -57,10 +57,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -70,9 +70,9 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(String extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(String extra) {", //
                     "    bundler.put(\"key\", extra);", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -86,7 +86,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -108,7 +108,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -118,10 +118,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -141,7 +141,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -163,7 +163,7 @@ public class IntentBuilderGeneratorTest {
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
-    assertThat(compilation).generatedSourceFile("test.navigation.Test$$IntentBuilder");
+    assertThat(compilation).generatedSourceFile("test.navigation.Test__IntentBuilder");
   }
 
   @Test
@@ -184,7 +184,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$MyInnerTest$$IntentBuilder",
+            "test.navigation.Test$MyInnerTest__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -194,10 +194,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$MyInnerTest$$IntentBuilder {", //
+                    "public class Test$MyInnerTest__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$MyInnerTest$$IntentBuilder(Context context) {", //
+                    "  public Test$MyInnerTest__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test.MyInnerTest\"));",
                     //
                     "  }", //
@@ -218,7 +218,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$MyInnerTest$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test$MyInnerTest__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -245,7 +245,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource1 =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test1$$IntentBuilder",
+            "test.navigation.Test1__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -255,10 +255,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test1$$IntentBuilder {", //
+                    "public class Test1__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test1$$IntentBuilder(Context context) {", //
+                    "  public Test1__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test1\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -268,14 +268,14 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test1$$IntentBuilder.AfterSettingKey1 key1(String extra1) {", //
+                    "  public Test1__IntentBuilder.AfterSettingKey1 key1(String extra1) {", //
                     "    bundler.put(\"key1\", extra1);", //
-                    "    return new Test1$$IntentBuilder.AfterSettingKey1();", //
+                    "    return new Test1__IntentBuilder.AfterSettingKey1();", //
                     "  }", //
                     "  public class AfterSettingKey1 {", //
-                    "    public Test1$$IntentBuilder.AllSet key2(String extra2) {", //
+                    "    public Test1__IntentBuilder.AllSet key2(String extra2) {", //
                     "      bundler.put(\"key2\", extra2);", //
-                    "      return new Test1$$IntentBuilder.AllSet();", //
+                    "      return new Test1__IntentBuilder.AllSet();", //
                     "    }", //
                     "  }", //
                     "  public class AllSet {", //
@@ -289,7 +289,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource2 =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test2$$IntentBuilder",
+            "test.navigation.Test2__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -299,10 +299,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test2$$IntentBuilder {", //
+                    "public class Test2__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test2$$IntentBuilder(Context context) {", //
+                    "  public Test2__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test2\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -312,9 +312,9 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test2$$IntentBuilder.AllSet key2(String extra2) {", //
+                    "  public Test2__IntentBuilder.AllSet key2(String extra2) {", //
                     "    bundler.put(\"key2\", extra2);", //
-                    "    return new Test2$$IntentBuilder.AllSet();", //
+                    "    return new Test2__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -328,10 +328,10 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test1$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource1);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test2$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test2__IntentBuilder")
         .hasSourceEquivalentTo(builderSource2);
   }
 
@@ -358,7 +358,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource1 =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test1$$IntentBuilder",
+            "test.navigation.Test1__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -369,10 +369,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Exception;", //
                     "import java.lang.Integer;", //
                     "import java.lang.String;", //
-                    "public class Test1$$IntentBuilder {", //
+                    "public class Test1__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test1$$IntentBuilder(Context context) {", //
+                    "  public Test1__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test1\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -382,9 +382,9 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test1$$IntentBuilder.AllSet key(Integer extra2) {", //
+                    "  public Test1__IntentBuilder.AllSet key(Integer extra2) {", //
                     "    bundler.put(\"key\", extra2);", //
-                    "    return new Test1$$IntentBuilder.AllSet();", //
+                    "    return new Test1__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -397,7 +397,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource2 =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test2$$IntentBuilder",
+            "test.navigation.Test2__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -408,10 +408,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Exception;", //
                     "import java.lang.Integer;", //
                     "import java.lang.String;", //
-                    "public class Test2$$IntentBuilder {", //
+                    "public class Test2__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test2$$IntentBuilder(Context context) {", //
+                    "  public Test2__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test2\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -421,9 +421,9 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test2$$IntentBuilder.AllSet key(Integer extra2) {", //
+                    "  public Test2__IntentBuilder.AllSet key(Integer extra2) {", //
                     "    bundler.put(\"key\", extra2);", //
-                    "    return new Test2$$IntentBuilder.AllSet();", //
+                    "    return new Test2__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -437,10 +437,10 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test1$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource1);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test2$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test2__IntentBuilder")
         .hasSourceEquivalentTo(builderSource2);
   }
 
@@ -465,7 +465,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test1$$IntentBuilder",
+            "test.navigation.Test1__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -475,10 +475,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test1$$IntentBuilder {", //
+                    "public class Test1__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test1$$IntentBuilder(Context context) {", //
+                    "  public Test1__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test1\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -488,9 +488,9 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test1$$IntentBuilder.AllSet key2(String extra2) {", //
+                    "  public Test1__IntentBuilder.AllSet key2(String extra2) {", //
                     "    bundler.put(\"key2\", extra2);", //
-                    "    return new Test1$$IntentBuilder.AllSet();", //
+                    "    return new Test1__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -504,7 +504,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test1$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -532,7 +532,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test2$$IntentBuilder",
+            "test.navigation.Test2__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -542,10 +542,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test2$$IntentBuilder {", //
+                    "public class Test2__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test2$$IntentBuilder(Context context) {", //
+                    "  public Test2__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test2\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -555,9 +555,9 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test2$$IntentBuilder.AllSet key(String extra) {", //
+                    "  public Test2__IntentBuilder.AllSet key(String extra) {", //
                     "    bundler.put(\"key\", extra);", //
-                    "    return new Test2$$IntentBuilder.AllSet();", //
+                    "    return new Test2__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -571,7 +571,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test2$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test2__IntentBuilder")
         .hasSourceEquivalentTo(expectedSource);
   }
 
@@ -596,7 +596,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test1$$IntentBuilder",
+            "test.navigation.Test1__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -606,10 +606,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test1$$IntentBuilder {", //
+                    "public class Test1__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test1$$IntentBuilder(Context context) {", //
+                    "  public Test1__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test1\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -619,9 +619,9 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test1$$IntentBuilder.AllSet key2(String extra2) {", //
+                    "  public Test1__IntentBuilder.AllSet key2(String extra2) {", //
                     "    bundler.put(\"key2\", extra2);", //
-                    "    return new Test1$$IntentBuilder.AllSet();", //
+                    "    return new Test1__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -635,7 +635,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test1$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -661,7 +661,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test1$$IntentBuilder",
+            "test.navigation.Test1__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -671,10 +671,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test1$$IntentBuilder {", //
+                    "public class Test1__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test1$$IntentBuilder(Context context) {", //
+                    "  public Test1__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test1\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -684,14 +684,14 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test1$$IntentBuilder.AfterSettingKey1 key1(String extra1) {", //
+                    "  public Test1__IntentBuilder.AfterSettingKey1 key1(String extra1) {", //
                     "    bundler.put(\"key1\", extra1);", //
-                    "    return new Test1$$IntentBuilder.AfterSettingKey1();", //
+                    "    return new Test1__IntentBuilder.AfterSettingKey1();", //
                     "  }", //
                     "  public class AfterSettingKey1 {", //
-                    "    public Test1$$IntentBuilder.AllSet key2(String extra2) {", //
+                    "    public Test1__IntentBuilder.AllSet key2(String extra2) {", //
                     "      bundler.put(\"key2\", extra2);", //
-                    "      return new Test1$$IntentBuilder.AllSet();", //
+                    "      return new Test1__IntentBuilder.AllSet();", //
                     "    }", //
                     "  }", //
                     "  public class AllSet {", //
@@ -706,7 +706,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test1$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -736,7 +736,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -746,10 +746,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -759,51 +759,51 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AfterSettingKey_bool key_bool(boolean aBool) {", //
+                    "  public Test__IntentBuilder.AfterSettingKey_bool key_bool(boolean aBool) {", //
                     "    bundler.put(\"key_bool\",aBool);", //
-                    "    return new Test$$IntentBuilder.AfterSettingKey_bool();", //
+                    "    return new Test__IntentBuilder.AfterSettingKey_bool();", //
                     "  }", //
                     "  public class AfterSettingKey_bool {", //
-                    "    public Test$$IntentBuilder.AfterSettingKey_byte key_byte(byte aByte) {", //
+                    "    public Test__IntentBuilder.AfterSettingKey_byte key_byte(byte aByte) {", //
                     "      bundler.put(\"key_byte\",aByte);", //
-                    "      return new Test$$IntentBuilder.AfterSettingKey_byte();", //
+                    "      return new Test__IntentBuilder.AfterSettingKey_byte();", //
                     "    }", //
                     "  }", //
                     "  public class AfterSettingKey_byte {", //
-                    "    public Test$$IntentBuilder.AfterSettingKey_char key_char(char aChar) {", //
+                    "    public Test__IntentBuilder.AfterSettingKey_char key_char(char aChar) {", //
                     "      bundler.put(\"key_char\",aChar);", //
-                    "      return new Test$$IntentBuilder.AfterSettingKey_char();", //
+                    "      return new Test__IntentBuilder.AfterSettingKey_char();", //
                     "    }", //
                     "  }", //
                     "  public class AfterSettingKey_char {", //
-                    "    public Test$$IntentBuilder.AfterSettingKey_double key_double(double aDouble) {",
+                    "    public Test__IntentBuilder.AfterSettingKey_double key_double(double aDouble) {",
                     //
                     "      bundler.put(\"key_double\",aDouble);", //
-                    "      return new Test$$IntentBuilder.AfterSettingKey_double();", //
+                    "      return new Test__IntentBuilder.AfterSettingKey_double();", //
                     "    }", //
                     "  }", //
                     "  public class AfterSettingKey_double {", //
-                    "    public Test$$IntentBuilder.AfterSettingKey_float key_float(float aFloat) {", //
+                    "    public Test__IntentBuilder.AfterSettingKey_float key_float(float aFloat) {", //
                     "      bundler.put(\"key_float\",aFloat);", //
-                    "      return new Test$$IntentBuilder.AfterSettingKey_float();", //
+                    "      return new Test__IntentBuilder.AfterSettingKey_float();", //
                     "    }", //
                     "  }", //
                     "  public class AfterSettingKey_float {", //
-                    "    public Test$$IntentBuilder.AfterSettingKey_int key_int(int anInt) {", //
+                    "    public Test__IntentBuilder.AfterSettingKey_int key_int(int anInt) {", //
                     "      bundler.put(\"key_int\",anInt);", //
-                    "      return new Test$$IntentBuilder.AfterSettingKey_int();", //
+                    "      return new Test__IntentBuilder.AfterSettingKey_int();", //
                     "    }", //
                     "  }", //
                     "  public class AfterSettingKey_int {", //
-                    "    public Test$$IntentBuilder.AfterSettingKey_long key_long(long aLong) {", //
+                    "    public Test__IntentBuilder.AfterSettingKey_long key_long(long aLong) {", //
                     "      bundler.put(\"key_long\",aLong);", //
-                    "      return new Test$$IntentBuilder.AfterSettingKey_long();", //
+                    "      return new Test__IntentBuilder.AfterSettingKey_long();", //
                     "    }", //
                     "  }", //
                     "  public class AfterSettingKey_long {", //
-                    "    public Test$$IntentBuilder.AllSet key_short(short aShort) {", //
+                    "    public Test__IntentBuilder.AllSet key_short(short aShort) {", //
                     "      bundler.put(\"key_short\",aShort);", //
-                    "      return new Test$$IntentBuilder.AllSet();", //
+                    "      return new Test__IntentBuilder.AllSet();", //
                     "    }", //
                     "  }", //
                     "  public class AllSet {", //
@@ -818,7 +818,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -850,7 +850,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -860,10 +860,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -873,9 +873,9 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(Extra extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(Extra extra) {", //
                     "    bundler.put(\"key\",(android.os.Parcelable) extra);", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -889,7 +889,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -913,7 +913,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -923,10 +923,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -936,9 +936,9 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(String extra1) {", //
+                    "  public Test__IntentBuilder.AllSet key(String extra1) {", //
                     "    bundler.put(\"key\", extra1);", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -952,7 +952,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -974,7 +974,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -984,10 +984,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -997,9 +997,9 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet extra(String extra) {", //
+                    "  public Test__IntentBuilder.AllSet extra(String extra) {", //
                     "    bundler.put(\"extra\", extra);", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -1013,7 +1013,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -1043,7 +1043,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -1053,10 +1053,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -1066,12 +1066,12 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key1(String extra1) {", //
+                    "  public Test__IntentBuilder.AllSet key1(String extra1) {", //
                     "    bundler.put(\"key1\", extra1);", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
-                    "    public Test$$IntentBuilder.AllSet key2(String extra2) {", //
+                    "    public Test__IntentBuilder.AllSet key2(String extra2) {", //
                     "      bundler.put(\"key2\", extra2);", //
                     "      return this;", //
                     "    }", //
@@ -1086,7 +1086,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -1116,7 +1116,7 @@ public class IntentBuilderGeneratorTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -1126,10 +1126,10 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -1139,11 +1139,11 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder key1(String extra1) {", //
+                    "  public Test__IntentBuilder key1(String extra1) {", //
                     "    bundler.put(\"key1\", extra1);", //
                     "    return this;", //
                     "  }", //
-                    "  public Test$$IntentBuilder key2(String extra2) {", //
+                    "  public Test__IntentBuilder key2(String extra2) {", //
                     "    bundler.put(\"key2\", extra2);", //
                     "    return this;", //
                     "  }", //
@@ -1157,7 +1157,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
