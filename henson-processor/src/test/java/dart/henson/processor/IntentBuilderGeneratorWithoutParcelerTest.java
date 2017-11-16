@@ -48,7 +48,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -59,10 +59,10 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
                     "import java.util.ArrayList;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -72,9 +72,9 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(ArrayList<String> extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(ArrayList<String> extra) {", //
                     "    bundler.put(\"key\", extra);", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -90,7 +90,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -200,7 +200,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -210,10 +210,10 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -223,9 +223,9 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
                     "    bundler.put(\"key\",(android.os.Parcelable) extra);", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -241,7 +241,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -280,7 +280,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test$$IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -290,10 +290,10 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "import java.lang.Class;", //
                     "import java.lang.Exception;", //
                     "import java.lang.String;", //
-                    "public class Test$$IntentBuilder {", //
+                    "public class Test__IntentBuilder {", //
                     "  private Intent intent;", //
                     "  private Bundler bundler = Bundler.create();", //
-                    "  public Test$$IntentBuilder(Context context) {", //
+                    "  public Test__IntentBuilder(Context context) {", //
                     "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
                     "  }", //
                     "  public Class getClassDynamically(String className) {", //
@@ -303,9 +303,9 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test$$IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
+                    "  public Test__IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
                     "    bundler.put(\"key\",(android.os.Parcelable) extra);", //
-                    "    return new Test$$IntentBuilder.AllSet();", //
+                    "    return new Test__IntentBuilder.AllSet();", //
                     "  }", //
                     "  public class AllSet {", //
                     "    public Intent build() {", //
@@ -321,7 +321,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test$$IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 }

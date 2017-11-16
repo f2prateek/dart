@@ -169,7 +169,7 @@ If ProGuard is enabled be sure to add these rules to your configuration:
 }
 #for dart 2.0 only
 -keep class **Henson { *; }
--keep class **$$IntentBuilder { *; }
+-keep class **__IntentBuilder { *; }
 
 
 #if you use it

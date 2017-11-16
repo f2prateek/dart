@@ -42,7 +42,7 @@ import javax.lang.model.type.TypeMirror;
 
 public class IntentBuilderGenerator extends BaseGenerator {
 
-  static final String BUNDLE_BUILDER_SUFFIX = "$$IntentBuilder";
+  static final String BUNDLE_BUILDER_SUFFIX = "__IntentBuilder";
   private static final String STATE_CLASS_INTERMEDIARY_PREFIX = "AfterSetting";
   private static final String STATE_CLASS_FINAL_STATE = "AllSet";
 
