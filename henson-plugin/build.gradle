@@ -1,0 +1,9 @@
+apply plugin: 'groovy'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}
+
+//TODO : Does the release work ?
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

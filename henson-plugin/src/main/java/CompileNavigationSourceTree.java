@@ -1,0 +1,2 @@
+class CompileNavigationSourceTree extends DefaultTask {
+}
