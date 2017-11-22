@@ -31,6 +31,20 @@ task functionalTest(type: Test) {
 
 check.dependsOn functionalTest
 
+project.afterEvaluate {
+    tasks.getByName('compileGroovy').doFirst {
+        //we create a file in the plugin project containing the current project version
+        //it will be used later by the plugin to add the proper version of
+        //dependencies to the project that uses the plugin
+        def prop = new Properties()
+        def propFile = new File("${project.rootDir}/henson-plugin/src/main/resources/build.properties")
+        propFile.parentFile.mkdirs()
+        prop.setProperty("dart.version", "$version")
+        propFile.createNewFile()
+        prop.store(propFile.newWriter(), null)
+    }
+}
+
 repositories {
     jcenter()
     google()
