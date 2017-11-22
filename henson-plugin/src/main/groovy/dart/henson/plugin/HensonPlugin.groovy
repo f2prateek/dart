@@ -25,7 +25,7 @@ class HensonPlugin implements Plugin<Project> {
 
         //create source sets
         variants.all { variant ->
-            println variants.name
+            println "Variant name: ${variant.name}"
         }
 
         //create configurations

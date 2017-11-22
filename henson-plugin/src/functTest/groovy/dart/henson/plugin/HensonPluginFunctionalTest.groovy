@@ -5,13 +5,17 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 
 import spock.lang.Specification
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class HensonPluginFunctionalTest extends Specification {
     @Rule TemporaryFolder testProjectDir = new TemporaryFolder()
     File buildFile
+    File manifestFile
 
     def setup() {
         buildFile = testProjectDir.newFile('build.gradle')
+        testProjectDir.newFolder('src','main')
+        manifestFile = testProjectDir.newFile('src/main/AndroidManifest.xml')
     }
 
     def "fails on non android projects"() {
@@ -35,6 +39,16 @@ class HensonPluginFunctionalTest extends Specification {
     }
 
     def "applies to android projects"() {
+        manifestFile << """
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            package="test">
+        
+          <application
+              android:label="Test"
+              android:name=".Test"/>
+        </manifest>
+        """
+
         buildFile << """
         buildscript {
             repositories {
@@ -68,13 +82,13 @@ class HensonPluginFunctionalTest extends Specification {
         when:
         def result = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'assembleDebug', '-d', '-s')
+                .withArguments('--no-build-cache', 'assemble', '-d', '-s')
                 .withPluginClasspath()
                 .build()
 
         then:
-        result.output.contains("debug")
-        result.output.contains("release")
-        result.task(":assembleDebug").outcome == SUCCESS
+        result.output.contains("Variant name: debug")
+        result.output.contains("Variant name: release")
+        result.task(":assemble").outcome == SUCCESS
     }
 }
