@@ -76,6 +76,18 @@ class HensonPluginFunctionalTest extends Specification {
                 versionCode 1
                 versionName '1.0.0'
             }
+            flavorDimensions "brand"
+
+            productFlavors {
+                groupon {
+                    applicationId "com.groupon"
+                    dimension "brand"
+                }
+                livingsocial {
+                    applicationId "com.livingsocial.www"
+                    dimension "brand"
+                }
+            }
         }
         """
 

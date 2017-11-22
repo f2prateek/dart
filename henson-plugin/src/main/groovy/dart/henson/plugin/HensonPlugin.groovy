@@ -18,14 +18,39 @@ class HensonPlugin implements Plugin<Project> {
         checkProject(hasAppPlugin, hasLibPlugin)
 
         //get Variants
-        def variants = getVariants(project, hasAppPlugin)
+        //def variants = getVariants(project, hasAppPlugin)
 
         //create extension
         createExtension(project)
 
         //create source sets
-        variants.all { variant ->
-            println "Variant name: ${variant.name}"
+        //the main source set
+        def sourceSetName = "main"
+        def newSourceSetName = "navigation"
+        def newSourceSetPath = "src/navigation/"
+        createNavigationSourceSet(project, sourceSetName, newSourceSetName, newSourceSetPath)
+
+        project.android.buildTypes.all { buildType ->
+            sourceSetName = "${buildType.name}"
+            newSourceSetName = "navigation${buildType.name.capitalize()}"
+            newSourceSetPath = "src/navigation/${buildType.name}"
+            createNavigationSourceSet(project, sourceSetName, newSourceSetName, newSourceSetPath)
+        }
+
+        project.android.productFlavors.all { productFlavor ->
+            sourceSetName = "${productFlavor.name}"
+            newSourceSetName = "navigation${productFlavor.name.capitalize()}"
+            newSourceSetPath = "src/navigation/${productFlavor.name}"
+            createNavigationSourceSet(project, sourceSetName, newSourceSetName, newSourceSetPath)
+        }
+
+        project.android.buildTypes.all { buildType ->
+            project.android.productFlavors.all { productFlavor ->
+                sourceSetName = "${productFlavor.name}${buildType.name.capitalize()}"
+                newSourceSetName = "navigation${productFlavor.name.capitalize()}${buildType.name.capitalize()}"
+                newSourceSetPath = "src/navigation/${productFlavor.name}/${buildType.name}"
+                createNavigationSourceSet(project, sourceSetName, newSourceSetName, newSourceSetPath)
+            }
         }
 
         //create configurations
@@ -41,6 +66,18 @@ class HensonPlugin implements Plugin<Project> {
             outputFiles = extension.outputFiles
         }
 */
+    }
+
+    private void createNavigationSourceSet(Project project, sourceSetName, newSourceSetName, newSourceSetPath) {
+        println "Creating sourceSet: ${sourceSetName}->${newSourceSetName} with root in '${newSourceSetPath}'"
+        project.android.sourceSets {
+            "${newSourceSetName}" {
+                setRoot "${newSourceSetPath}"
+            }
+            "${sourceSetName}" {
+                java.srcDirs = project.android.sourceSets["${sourceSetName}"].java.srcDirs.collect() << "${newSourceSetPath}/java"
+            }
+        }
     }
 
     private boolean checkProject(PluginCollection<AppPlugin> hasApp,
