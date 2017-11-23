@@ -76,16 +76,16 @@ class HensonPluginFunctionalTest extends Specification {
                 versionCode 1
                 versionName '1.0.0'
             }
-            flavorDimensions "brand"
+            flavorDimensions "color"
 
             productFlavors {
-                groupon {
-                    applicationId "com.groupon"
-                    dimension "brand"
+                red {
+                    applicationId "com.blue"
+                    dimension "color"
                 }
-                livingsocial {
-                    applicationId "com.livingsocial.www"
-                    dimension "brand"
+                blue {
+                    applicationId "com.red"
+                    dimension "color"
                 }
             }
         }
@@ -94,13 +94,15 @@ class HensonPluginFunctionalTest extends Specification {
         when:
         def result = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'assemble', '-d', '-s')
+                .withArguments('--no-build-cache', 'assemble', 'intentBuilderJar', 'intentBuilderJarRed', 'intentBuilderJarRelease', 'intentBuilderJarBlueDebug', '-d', '-s')
                 .withPluginClasspath()
                 .build()
 
         then:
-        result.output.contains("Variant name: debug")
-        result.output.contains("Variant name: release")
         result.task(":assemble").outcome == SUCCESS
+        result.task(":intentBuilderJar").outcome == SUCCESS
+        result.task(":intentBuilderJarRed").outcome == SUCCESS
+        result.task(":intentBuilderJarRelease").outcome == SUCCESS
+        result.task(":intentBuilderJarBlueDebug").outcome == SUCCESS
     }
 }
