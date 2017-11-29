@@ -21,12 +21,12 @@ import android.app.IntentService;
 import android.content.Intent;
 import dart.Dart;
 
-public class NavigationService extends IntentService {
+public class Module1Service extends IntentService {
 
-  private NavigationServiceModel navigationModel = new NavigationServiceModel();
+  private Module1ServiceModel navigationModel = new Module1ServiceModel();
 
-  public NavigationService() {
-    super("NavigationService");
+  public Module1Service() {
+    super("Module1Service");
   }
 
   @Override protected void onHandleIntent(Intent intent) {

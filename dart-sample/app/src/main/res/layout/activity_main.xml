@@ -26,18 +26,18 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:text="@string/launchSampleActivity"
-      android:id="@+id/sampleActivityCTA"/>
+      android:id="@+id/navigateToSampleActivity"/>
 
   <Button
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:text="@string/launchNavigationActivity"
-      android:id="@+id/navigationActivityCTA"/>
+      android:text="@string/launchModule1Activity"
+      android:id="@+id/navigateToModule1Activity"/>
 
   <Button
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:text="@string/launchNavigationService"
-      android:id="@+id/navigationServiceCTA"/>
+      android:text="@string/launchModule1Service"
+      android:id="@+id/navigateToModule1Service"/>
 
 </LinearLayout>

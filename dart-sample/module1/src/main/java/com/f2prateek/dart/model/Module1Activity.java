@@ -24,7 +24,7 @@ import butterknife.ButterKnife;
 import butterknife.BindView;
 import dart.Dart;
 
-public class NavigationActivity extends Activity {
+public class Module1Activity extends Activity {
 
   @BindView(R2.id.default_key_extra) TextView defaultKeyExtraTextView;
   @BindView(R2.id.string_extra) TextView stringExtraTextView;
@@ -36,7 +36,7 @@ public class NavigationActivity extends Activity {
   @BindView(R2.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
   @BindView(R2.id.default_extra) TextView defaultExtraTextView;
 
-  NavigationActivityModel navigationModel = new NavigationActivityModel();
+  Module1ActivityModel navigationModel = new Module1ActivityModel();
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

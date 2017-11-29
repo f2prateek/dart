@@ -23,8 +23,8 @@ import dart.BindExtra;
 import dart.DartModel;
 import java.util.List;
 
-@DartModel("com.f2prateek.dart.model.NavigationActivity")
-public class NavigationActivityModel {
+@DartModel("com.f2prateek.dart.model.Module1Activity")
+public class Module1ActivityModel {
 
   public static final String DEFAULT_EXTRA_VALUE = "a default value";
 

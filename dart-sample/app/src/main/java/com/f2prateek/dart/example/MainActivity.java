@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
   }
 
   // Launch Sample Activity residing in the same module
-  @OnClick(R.id.sampleActivityCTA)
+  @OnClick(R.id.navigateToSampleActivity)
   public void onSampleActivityCTAClick() {
     StringParcel parcel1 = new StringParcel("Andy");
     StringParcel parcel2 = new StringParcel("Tony");
@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
   }
 
   // Launch Navigation Activity residing in the navigation module
-  @OnClick(R.id.navigationActivityCTA)
+  @OnClick(R.id.navigateToModule1Activity)
   public void onNavigationActivityCTAClick() {
     StringParcel parcel1 = new StringParcel("Andy");
     StringParcel parcel2 = new StringParcel("Tony");
@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
     parcelSparseArray.put(2, parcel2);
 
     Intent intent = Henson.with(this)
-        .gotoNavigationActivity()
+        .gotoModule1Activity()
         .defaultKeyExtra("defaultKeyExtra")
         .extraInt(4)
         .extraListParcelable(parcelList)
@@ -96,10 +96,10 @@ public class MainActivity extends Activity {
   }
 
   // Launch Navigation Service residing in the navigation module
-  @OnClick(R.id.navigationServiceCTA)
+  @OnClick(R.id.navigateToModule1Service)
   public void onNavigationServiceCTAClick() {
     Intent intentService = Henson.with(this)
-        .gotoNavigationService()
+        .gotoModule1Service()
         .stringExtra("foo")
         .build();
 

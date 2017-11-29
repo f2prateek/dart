@@ -20,7 +20,7 @@
 <resources>
   <string name="app_name">Dart</string>
   <string name="launchSampleActivity">Launch Sample Activity</string>
-  <string name="launchNavigationActivity">Launch Navigation activity</string>
-  <string name="launchNavigationService">Launch Navigation Service</string>
+  <string name="launchModule1Activity">Launch Module1 Activity</string>
+  <string name="launchModule1Service">Launch Module1 Service</string>
   <string name="sampleActivityTitle">Sample Activity</string>
 </resources>

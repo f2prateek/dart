@@ -17,12 +17,8 @@
 
 package com.f2prateek.dart.model;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.util.SparseArray;
-import com.f2prateek.dart.model.ComplexParcelable;
-import com.f2prateek.dart.model.NavigationActivity;
-import com.f2prateek.dart.model.StringParcel;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -32,12 +28,12 @@ import org.robolectric.annotation.Config;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.f2prateek.dart.model.NavigationActivityModel.DEFAULT_EXTRA_VALUE;
+import static com.f2prateek.dart.model.Module1ActivityModel.DEFAULT_EXTRA_VALUE;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(emulateSdk = 18, manifest = "module1/src/main/AndroidManifest.xml")
-public class NavigationActivityTest {
+public class Module1ActivityTest {
   @Test public void verifyExtrasInjection() {
     ComplexParcelable parcelable = ComplexParcelable.random();
     StringParcel parcel1 = new StringParcel("Andy");
@@ -49,7 +45,7 @@ public class NavigationActivityTest {
     parcelSparseArray.put(0, parcel1);
     parcelSparseArray.put(2, parcel2);
 
-    Intent intent = new NavigationActivity__IntentBuilder(Robolectric.application)
+    Intent intent = new Module1Activity__IntentBuilder(Robolectric.application)
         .defaultKeyExtra("defaultKeyExtra")
         .extraInt(4)
         .extraListParcelable(parcelList)
@@ -59,8 +55,8 @@ public class NavigationActivityTest {
         .extraString("test")
         .build();
 
-    NavigationActivity activity =
-        Robolectric.buildActivity(NavigationActivity.class)
+    Module1Activity activity =
+        Robolectric.buildActivity(Module1Activity.class)
             .withIntent(intent)
             .create()
             .get();

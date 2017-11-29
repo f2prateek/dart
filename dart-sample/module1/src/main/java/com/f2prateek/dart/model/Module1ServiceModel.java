@@ -20,8 +20,8 @@ package com.f2prateek.dart.model;
 import dart.BindExtra;
 import dart.DartModel;
 
-@DartModel("com.f2prateek.dart.model.NavigationService")
-public class NavigationServiceModel {
+@DartModel("com.f2prateek.dart.model.Module1Service")
+public class Module1ServiceModel {
 
   @BindExtra String stringExtra;
 }

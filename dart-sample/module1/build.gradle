@@ -1,17 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.jakewharton.butterknife'
 
-buildscript {
-    repositories {
-        jcenter()
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath deps.butterknife.gradlePlugin
-    }
-}
 
 android {
     compileSdkVersion versions.compileSdk
