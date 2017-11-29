@@ -5,10 +5,11 @@ buildscript {
             'minSdk': 14,
             'compileSdk': 26,
 
-            'supportLibrary': '25.3.0',
+            'supportLibrary': '26.0.0',
             'androidPlugin': '3.0.0',
             'androidTools': '26.0.0',
-            'butterknife' : '8.8.1',
+            'parceler' : '1.0.4',
+            'butterknife' : '9.0.0-SNAPSHOT',
             'release': '3.0.0',
     ]
 
@@ -19,8 +20,8 @@ buildscript {
                     'appCompat': "com.android.support:appcompat-v7:${versions.supportLibrary}"
             ],
             parceler: [
-                    'runtime': 'org.parceler:parceler-api:1.0.4',
-                    'compiler': 'org.parceler:parceler:1.0.4'
+                    'runtime': "org.parceler:parceler-api:${versions.parceler}",
+                    'compiler': "org.parceler:parceler:${versions.parceler}"
             ],
             dart: [
                 'runtime': "com.f2prateek.dart:dart:${versions.release}",
@@ -34,8 +35,7 @@ buildscript {
                 'runtime': "com.jakewharton:butterknife:${versions.butterknife}",
                 'compiler': "com.jakewharton:butterknife-compiler:${versions.butterknife}",
                 'annotations': "com.jakewharton:butterknife-annotations:${versions.butterknife}",
-                'gradlePlugin': "com.jakewharton:butterknife-gradle-plugin:${versions.butterknife}",
-                'gradlePluginSnapshot': 'com.jakewharton:butterknife-gradle-plugin:9.0.0-SNAPSHOT'
+                'gradlePlugin': "com.jakewharton:butterknife-gradle-plugin:${versions.butterknife}"
             ],
 
             junit: 'junit:junit:4.12',
@@ -57,7 +57,6 @@ buildscript {
     dependencies {
         classpath deps.android.gradlePlugin
         classpath deps.butterknife.gradlePlugin
-        classpath deps.butterknife.gradlePluginSnapshot
     }
 }
 
@@ -68,6 +67,9 @@ allprojects {
         // TODO: Remove this
         mavenLocal()
         mavenCentral()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+        }
     }
 
     tasks.withType(JavaCompile) { task ->
