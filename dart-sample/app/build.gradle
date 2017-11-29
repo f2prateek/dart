@@ -1,0 +1,45 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion versions.compileSdk
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId 'com.f2prateek.dart.example'
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    lintOptions {
+        textReport true
+        textOutput 'stdout'
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation(project(':module1')) {
+        exclude module: 'com.f2prateek.dart'
+    }
+
+    api deps.butterknife.runtime
+    annotationProcessor deps.dart.compiler
+    annotationProcessor deps.henson.compiler
+    annotationProcessor deps.butterknife.compiler
+
+    testImplementation deps.junit
+    testImplementation deps.robolectric
+    testImplementation deps.fest
+}

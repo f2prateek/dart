@@ -1,49 +1,78 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.jakewharton.butterknife'
 
-android {
-    compileSdkVersion versions.compileSdk
+buildscript {
+    ext.versions = [
+            'minSdk': 14,
+            'compileSdk': 26,
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_7
-        targetCompatibility = JavaVersion.VERSION_1_7
+            'supportLibrary': '26.0.0',
+            'androidPlugin': '3.0.0',
+            'androidTools': '26.0.0',
+            'parceler' : '1.0.4',
+            'butterknife' : '9.0.0-SNAPSHOT',
+            'release': '3.0.0',
+    ]
+
+    ext.deps = [
+            android: [
+                    'runtime': 'com.google.android:android:4.1.1.4',
+                    'gradlePlugin': "com.android.tools.build:gradle:${versions.androidPlugin}",
+                    'appCompat': "com.android.support:appcompat-v7:${versions.supportLibrary}"
+            ],
+            parceler: [
+                    'runtime': "org.parceler:parceler-api:${versions.parceler}",
+                    'compiler': "org.parceler:parceler:${versions.parceler}"
+            ],
+            dart: [
+                'runtime': "com.f2prateek.dart:dart:${versions.release}",
+                'compiler': "com.f2prateek.dart:dart-processor:${versions.release}"
+            ],
+            henson:[
+                'runtime': "com.f2prateek.dart:henson:${versions.release}",
+                'compiler': "com.f2prateek.dart:henson-processor:${versions.release}"
+            ],
+            butterknife:[
+                'runtime': "com.jakewharton:butterknife:${versions.butterknife}",
+                'compiler': "com.jakewharton:butterknife-compiler:${versions.butterknife}",
+                'annotations': "com.jakewharton:butterknife-annotations:${versions.butterknife}",
+                'gradlePlugin': "com.jakewharton:butterknife-gradle-plugin:${versions.butterknife}"
+            ],
+
+            junit: 'junit:junit:4.12',
+            fest: 'com.squareup:fest-android:1.0.7',
+            robolectric: 'org.robolectric:robolectric:2.4',
+    ]
+
+    repositories {
+        jcenter()
+        google()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+        }
     }
 
-    defaultConfig {
-        applicationId 'com.f2prateek.dart.example'
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.compileSdk
-        versionCode 1
-        versionName '1.0.0'
-    }
-
-    lintOptions {
-        textReport true
-        textOutput 'stdout'
+    dependencies {
+        classpath deps.android.gradlePlugin
+        classpath deps.butterknife.gradlePlugin
     }
 }
 
-dependencies {
-    implementation project(':dart-annotations')
-    implementation project(':dart')
-    implementation project(':henson')
-    implementation deps.parceler.runtime
-    implementation "com.jakewharton:butterknife:8.8.1"
-
-    annotationProcessor deps.parceler.compiler
-    annotationProcessor "com.jakewharton:butterknife-compiler:8.8.1"
-    annotationProcessor project(':dart-processor')
-    annotationProcessor project(':henson-processor')
-
-    testImplementation deps.junit
-}
-
-afterEvaluate {
-    tasks.withType(com.android.build.gradle.internal.tasks.AndroidTestTask) { task ->
-        task.doFirst {
-            logging.level = LogLevel.INFO
+allprojects {
+    repositories {
+        jcenter()
+        google()
+        // TODO: Remove this
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
         }
-        task.doLast {
-            logging.level = LogLevel.LIFECYCLE
-        }
+    }
+
+    tasks.withType(JavaCompile) { task ->
+        task.options.compilerArgs << "-Xlint:deprecation"
     }
 }

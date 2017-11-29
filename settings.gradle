@@ -5,8 +5,4 @@ include 'dart-processor'
 include 'henson'
 include 'henson-processor'
 
-//TODO make it self contained, not a child
-//android apps break with a build task
-//include 'dart-sample'
-
 rootProject.name = 'dart-parent'

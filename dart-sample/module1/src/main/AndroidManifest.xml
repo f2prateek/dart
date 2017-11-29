@@ -1,0 +1,16 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.f2prateek.dart.model">
+
+<application
+    android:allowBackup="true"
+    android:label="@string/app_name">
+
+  <activity android:name=".Module1Activity"
+      android:label="@string/navigationActivityTitle" >
+  </activity>
+  <service
+      android:name="com.f2prateek.dart.model.Module1Service" />
+
+</application>
+
+</manifest>

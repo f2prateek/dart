@@ -1,0 +1,29 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jakewharton.butterknife'
+
+
+android {
+    compileSdkVersion versions.compileSdk
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+    }
+}
+
+dependencies {
+    api deps.android.appCompat
+    api deps.dart.runtime
+    api deps.henson.runtime
+    api deps.parceler.runtime
+    api deps.butterknife.runtime
+    api deps.butterknife.annotations
+
+    annotationProcessor deps.parceler.compiler
+    annotationProcessor deps.dart.compiler
+    annotationProcessor deps.henson.compiler
+    annotationProcessor deps.butterknife.compiler
+
+    testImplementation deps.junit
+    testImplementation deps.robolectric
+    testImplementation deps.fest
+}
