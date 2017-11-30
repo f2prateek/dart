@@ -147,14 +147,41 @@ class HensonPluginFunctionalTest extends Specification {
         """
 
         when:
+        def result = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('--no-build-cache', 'tasks', '--all', '-d', '-s')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        result.output.contains("navigationApiCompileJava")
+        result.output.contains("navigationApiCompileJavaRed")
+        result.output.contains("navigationApiCompileJavaBlue")
+        result.output.contains("navigationApiCompileJavaRelease")
+        result.output.contains("navigationApiCompileJavaDebug")
+        result.output.contains("navigationApiCompileJavaBlueRelease")
+        result.output.contains("navigationApiCompileJavaBlueDebug")
+        result.output.contains("navigationApiCompileJavaRedRelease")
+        result.output.contains("navigationApiCompileJavaRedDebug")
+
+        result.output.contains("navigationApiJar")
+        result.output.contains("navigationApiJarRed")
+        result.output.contains("navigationApiJarBlue")
+        result.output.contains("navigationApiJarRelease")
+        result.output.contains("navigationApiJarDebug")
+        result.output.contains("navigationApiJarBlueRelease")
+        result.output.contains("navigationApiJarBlueDebug")
+        result.output.contains("navigationApiJarRedRelease")
+        result.output.contains("navigationApiJarRedDebug")
+
+        when:
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                //.withArguments('--no-build-cache', 'assemble', 'tasks', '--all', '-d', '-s')
                 .withArguments('--no-build-cache', 'clean', 'assemble', 'navigationApiJar', 'navigationApiJarRed', 'navigationApiJarRelease', 'navigationApiJarBlueDebug', '-d', '-s')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir
-        def result = runner.build()
+        result = runner.build()
 
         then:
         println result.output
@@ -165,8 +192,12 @@ class HensonPluginFunctionalTest extends Specification {
         result.task(":navigationApiJarRelease").outcome != FAILED
         result.task(":navigationApiJarBlueDebug").outcome != FAILED
 
+        testJarsContent(projectDir)
+    }
+
+    boolean testJarsContent(projectDir) {
         new File(projectDir, "/build/libs").eachFileRecurse(FILES) { file ->
-            if(file.name.endsWith('.jar')) {
+            if (file.name.endsWith('.jar')) {
                 println "Testing jar: ${file.name}"
                 def content = getJarContent(file)
                 assert content.contains("META-INF/")
@@ -181,6 +212,7 @@ class HensonPluginFunctionalTest extends Specification {
                 assert content.contains("test/TestActivity__IntentBuilder.class")
             }
         }
+        true
     }
 
     List<String> getJarContent(file) {

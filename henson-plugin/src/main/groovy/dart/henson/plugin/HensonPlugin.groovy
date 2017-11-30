@@ -15,7 +15,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 
 class HensonPlugin implements Plugin<Project> {
 
-    public static final String NAVIGATION_API_COMPILE_TASK_PREFIX = 'navigationApiCompile'
+    public static final String NAVIGATION_API_COMPILE_TASK_PREFIX = 'navigationApiCompileJava'
     public static final String NAVIGATION_API_JAR_TASK_PREFIX = 'navigationApiJar'
 
     void apply(Project project) {
@@ -172,7 +172,7 @@ class HensonPlugin implements Plugin<Project> {
         FileCollection effectiveAnnotationProcessorPath = new UnionFileCollection()
         navigationVariant.annotationProcessorConfigurations.each { effectiveAnnotationProcessorPath.add(it) }
 
-        project.tasks.create("navigationApiCompile${taskSuffix}", JavaCompile) {
+        project.tasks.create("${NAVIGATION_API_COMPILE_TASK_PREFIX}${taskSuffix}", JavaCompile) {
             setSource(navigationVariant.sourceSets.collect { sourceSet -> sourceSet.java.sourceFiles })
             setDestinationDir(project.file("${newDestinationDirName}"))
             classpath = effectiveClasspath
