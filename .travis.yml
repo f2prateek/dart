@@ -1,16 +1,37 @@
-language: java
+language: android
 
 android:
+  components:
+    # Update tools and then platform-tools explicitly so lint gets an updated database. Can be removed once 3.0 is out.
+    - tools
+    - platform-tools
+
 jdk:
   - oraclejdk8
-
-after_success:
-  - .buildscript/deploy_snapshot.sh
 
 env:
   global:
     - secure: "S2ANsF5glMuPrjilyE6+JqVp/t9bEQgkLXNHN1quLebTaJcveNFgyCPCvcevKJLiHCb4USY0cteZYj1U0QOvVR3zi/chr6Pxuo1kwgrfKpdBCWa1oxzLt0ipkVgH60VwxQNWjoUQCleOhu3F16X7IvCx32Wu7OqpmenJ6FJZYUw="
     - secure: "ZetM/udS7DJMVdsFlSTCf88D6J4zQPS6hY3qc/f0BfYJP6qpOkHMBuxfIJMxkyQ9Rwi45RAX5kFFHJg/4wYiCQhlCSKy1gZaf4PORbhxTQR+rJCRtUi5dfHz2S2og/qWZm8KgaCalKW1s+f6/shFIBLcHvw8gnQmKvcIv7BHNaQ="
+
+before_install:
+  # Install SDK license so Android Gradle plugin can install deps.
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
+  # Install the rest of tools (e.g., avdmanager)
+  #- sdkmanager tools
+  # Install the system image
+  #- sdkmanager "android-26"
+
+script:
+  - ./gradlew check -s
+
+
+after_success:
+  - .buildscript/deploy_snapshot.sh
+
+after_failure:
+ - cat /home/travis/build/f2prateek/dart/henson-plugin/build/reports/tests/functionalTest/classes/dart.henson.plugin.HensonPluginFunctionalTest.html
 
 branches:
   except:
@@ -23,4 +44,6 @@ sudo: false
 
 cache:
   directories:
-    - $HOME/.m2
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache

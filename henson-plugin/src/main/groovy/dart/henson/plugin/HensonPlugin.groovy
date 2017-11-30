@@ -1,6 +1,5 @@
 package dart.henson.plugin
 
-import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -27,12 +26,17 @@ class HensonPlugin implements Plugin<Project> {
         def hasLibPlugin = project.plugins.withType(LibraryPlugin)
         checkProject(hasAppPlugin, hasLibPlugin)
 
+        //create extension
+        def extension = project.extensions.create('henson', HensonPluginExtension, project)
+
         //we use the file build.properties that contains the version of
         //the extension to use. This avoids all problems related to using version x.y.+
-        def dartVersionName = getVersionName()
-
-        //create extension
-        createExtension(project)
+        def dartVersionName
+        if(extension!=null && extension.dartVersion!=null) {
+            dartVersionName= extension.dartVersion
+        } else{
+            dartVersionName= getVersionName()
+        }
 
         //we do the following for all sourcesets, of all build types, of all flavors, and all variants
         //  create source sets
@@ -267,7 +271,4 @@ class HensonPlugin implements Plugin<Project> {
         return !hasApp
     }
 
-    private void createExtension(Project project) {
-        project.extensions.create('henson', HensonPluginExtension, project)
-    }
 }
