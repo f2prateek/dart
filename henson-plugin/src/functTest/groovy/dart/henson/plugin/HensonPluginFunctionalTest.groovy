@@ -5,17 +5,29 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 
 import spock.lang.Specification
-import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+
+import java.util.zip.ZipFile
+
+import static org.gradle.testkit.runner.TaskOutcome.FAILED
+import static groovy.io.FileType.FILES
 
 class HensonPluginFunctionalTest extends Specification {
     @Rule TemporaryFolder testProjectDir = new TemporaryFolder()
+    File settingsFile
     File buildFile
     File manifestFile
+    File srcMain
+    File srcNavigationMain
 
     def setup() {
+        settingsFile = testProjectDir.newFile('settings.gradle')
         buildFile = testProjectDir.newFile('build.gradle')
         testProjectDir.newFolder('src','main')
         manifestFile = testProjectDir.newFile('src/main/AndroidManifest.xml')
+        testProjectDir.newFolder('src','main', 'java', 'test')
+        srcMain = testProjectDir.newFile('src/main/java/test/FooActivity.java')
+        testProjectDir.newFolder('src','navigation', 'main', 'java', 'test')
+        srcNavigationMain = testProjectDir.newFile('src/navigation/main/java/test/Foo.java')
     }
 
     def "fails on non android projects"() {
@@ -48,12 +60,46 @@ class HensonPluginFunctionalTest extends Specification {
               android:name=".Test"/>
         </manifest>
         """
+        srcMain << """
+        package test;
+        
+        import android.app.Activity;
+        import android.os.Bundle;
+        
+        class FooActivity extends Activity {
+          
+          @Override
+          public void onCreate(Bundle bundle) {
+            super.onCreate(bundle);
+            Foo foo = new Foo();  
+          }
+        }
+        """
+        srcNavigationMain << """
+        package test;
+        
+        import dart.BindExtra;
+        import dart.DartModel;
+        
+        @DartModel("test.TestActivity")
+        class Foo {
+          @BindExtra String s;
+        }
+        """
+
+        settingsFile << """
+        rootProject.name = "test-project"
+        """
 
         buildFile << """
         buildscript {
             repositories {
                 google()
                 jcenter()
+                mavenLocal()
+                maven {
+                  url 'https://oss.sonatype.org/content/repositories/snapshots'
+                }
             }
         
             dependencies {
@@ -89,20 +135,45 @@ class HensonPluginFunctionalTest extends Specification {
                 }
             }
         }
+        
+        repositories {
+            google()
+            jcenter()
+            mavenLocal()
+            maven {
+              url 'https://oss.sonatype.org/content/repositories/snapshots'
+            }
+        }
         """
 
         when:
-        def result = GradleRunner.create()
+        def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'assemble', 'intentBuilderJar', 'intentBuilderJarRed', 'intentBuilderJarRelease', 'intentBuilderJarBlueDebug', '-d', '-s')
+                //.withArguments('--no-build-cache', 'assemble', 'tasks', '--all', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', 'assemble', 'intentBuilderJar', 'intentBuilderJarRed', 'intentBuilderJarRelease', 'intentBuilderJarBlueDebug', '-d', '-s')
                 .withPluginClasspath()
-                .build()
+
+        def projectDir = runner.projectDir
+        def result = runner.build()
 
         then:
-        result.task(":assemble").outcome == SUCCESS
-        result.task(":intentBuilderJar").outcome == SUCCESS
-        result.task(":intentBuilderJarRed").outcome == SUCCESS
-        result.task(":intentBuilderJarRelease").outcome == SUCCESS
-        result.task(":intentBuilderJarBlueDebug").outcome == SUCCESS
+        println result.output
+        result.task(":assemble").outcome != FAILED
+        //result.task(":tasks").outcome == SUCCESS
+        result.task(":intentBuilderJar").outcome != FAILED
+        result.task(":intentBuilderJarRed").outcome != FAILED
+        result.task(":intentBuilderJarRelease").outcome != FAILED
+        result.task(":intentBuilderJarBlueDebug").outcome != FAILED
+        println new File(projectDir, "/build").eachFileRecurse(FILES) {
+            println it
+        }
+        println new File(projectDir, "/build/libs").eachFileRecurse(FILES) {
+            if(it.name.endsWith('.jar')) {
+                def zip = new ZipFile(it)
+                zip.entries().each { entry ->
+                    println entry.name
+                }
+            }
+        }
     }
 }
