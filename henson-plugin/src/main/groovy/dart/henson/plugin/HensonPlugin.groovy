@@ -7,7 +7,6 @@ import org.gradle.api.Project
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Task
-import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.UnionFileCollection
 import org.gradle.api.plugins.PluginCollection
@@ -16,8 +15,8 @@ import org.gradle.api.tasks.compile.JavaCompile
 
 class HensonPlugin implements Plugin<Project> {
 
-    public static final String INTENT_BUILDER_COMPILE_TASK_PREFIX = 'intentBuilderCompile'
-    public static final String INTENT_BUILDER_JAR_TASK_PREFIX = 'intentBuilderJar'
+    public static final String NAVIGATION_API_COMPILE_TASK_PREFIX = 'navigationApiCompile'
+    public static final String NAVIGATION_API_JAR_TASK_PREFIX = 'navigationApiJar'
 
     void apply(Project project) {
         final def log = project.logger
@@ -31,9 +30,6 @@ class HensonPlugin implements Plugin<Project> {
         //we use the file build.properties that contains the version of
         //the extension to use. This avoids all problems related to using version x.y.+
         def dartVersionName = getVersionName()
-
-        //get Variants
-        //def variants = getVariants(project, hasAppPlugin)
 
         //create extension
         createExtension(project)
@@ -52,8 +48,8 @@ class HensonPlugin implements Plugin<Project> {
 
         createSourceSetAndConfiguration(project, sourceSetName, suffix, pathSuffix, dartVersionName)
 
-        createEmptyIntentBuilderCompileTask(project, suffix)
-        createEmptyIntentBuilderJarTask(project, suffix)
+        createEmptyNavigationApiCompileTask(project, suffix)
+        createEmptyNavigationApiJarTask(project, suffix)
 
         project.android.buildTypes.all { buildType ->
             println "Processing buildType: ${buildType.name}"
@@ -82,17 +78,17 @@ class HensonPlugin implements Plugin<Project> {
         createSourceSetAndConfiguration(project, variantName, suffix, pathSuffix, dartVersionName)
 
         def navigationVariant = createNavigationVariant(project, productFlavor, buildType)
-        def intentBuilderCompiler = createIntentBuilderCompileTask(project, suffix, pathSuffix, navigationVariant)
-        def mainCompiler = project.tasks.getByName(INTENT_BUILDER_COMPILE_TASK_PREFIX)
-        def productFlavorCompiler = project.tasks.getByName(INTENT_BUILDER_COMPILE_TASK_PREFIX + String.valueOf(productFlavor.name.capitalize()))
-        def buildTypeCompiler = project.tasks.getByName(INTENT_BUILDER_COMPILE_TASK_PREFIX + String.valueOf(buildType.name.capitalize()))
-        intentBuilderCompiler.dependsOn(mainCompiler, productFlavorCompiler, buildTypeCompiler)
+        def navigationApiCompiler = createNavigationApiCompileTask(project, suffix, pathSuffix, navigationVariant)
+        def mainCompiler = project.tasks.getByName(NAVIGATION_API_COMPILE_TASK_PREFIX)
+        def productFlavorCompiler = project.tasks.getByName(NAVIGATION_API_COMPILE_TASK_PREFIX + String.valueOf(productFlavor.name.capitalize()))
+        def buildTypeCompiler = project.tasks.getByName(NAVIGATION_API_COMPILE_TASK_PREFIX + String.valueOf(buildType.name.capitalize()))
+        navigationApiCompiler.dependsOn(mainCompiler, productFlavorCompiler, buildTypeCompiler)
 
-        def intentBuilderJarTask = createIntentBuilderJarTask(project, intentBuilderCompiler, suffix)
-        def mainIntentBuilderJarTask = project.tasks.getByName(INTENT_BUILDER_JAR_TASK_PREFIX)
-        def productFlavorIntentBuilderJarTask = project.tasks.getByName(INTENT_BUILDER_JAR_TASK_PREFIX + String.valueOf(productFlavor.name.capitalize()))
-        def buildTypeIntentBuilderJarTask = project.tasks.getByName(INTENT_BUILDER_JAR_TASK_PREFIX + String.valueOf(buildType.name.capitalize()))
-        intentBuilderJarTask.dependsOn(mainIntentBuilderJarTask, productFlavorIntentBuilderJarTask, buildTypeIntentBuilderJarTask)
+        def navigationApiJarTask = createNavigationApiJarTask(project, navigationApiCompiler, suffix)
+        def mainNavigationApiJarTask = project.tasks.getByName(NAVIGATION_API_JAR_TASK_PREFIX)
+        def productFlavorNavigationApiJarTask = project.tasks.getByName(NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(productFlavor.name.capitalize()))
+        def buildTypeNavigationApiJarTask = project.tasks.getByName(NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(buildType.name.capitalize()))
+        navigationApiJarTask.dependsOn(mainNavigationApiJarTask, productFlavorNavigationApiJarTask, buildTypeNavigationApiJarTask)
 
         addArtifact(project, suffix, suffix)
         addNavigationArtifactToDependencies(project, suffix, variantName)
@@ -105,8 +101,8 @@ class HensonPlugin implements Plugin<Project> {
 
         createSourceSetAndConfiguration(project, sourceSetName, suffix, pathSuffix, dartVersionName)
 
-        createEmptyIntentBuilderCompileTask(project, suffix)
-        createEmptyIntentBuilderJarTask(project, suffix)
+        createEmptyNavigationApiCompileTask(project, suffix)
+        createEmptyNavigationApiJarTask(project, suffix)
     }
 
     private void createSourceSetAndConfiguration(Project project, String sourceSetName, String suffix, String pathSuffix, dartVersionName) {
@@ -114,7 +110,7 @@ class HensonPlugin implements Plugin<Project> {
         def newSourceSetPath = "src/navigation/" + pathSuffix
         createNavigationSourceSet(project, sourceSetName, newSourceSetName, newSourceSetPath)
 
-        def newArtifactName = "intentBuilder" + suffix
+        def newArtifactName = "navigationApi" + suffix
         createNavigationConfiguration(project, newArtifactName, suffix, dartVersionName)
     }
 
@@ -156,15 +152,15 @@ class HensonPlugin implements Plugin<Project> {
         navigationVariant
     }
 
-    private Task createEmptyIntentBuilderCompileTask(Project project, taskSuffix) {
-        project.tasks.create(INTENT_BUILDER_COMPILE_TASK_PREFIX + String.valueOf(taskSuffix))
+    private Task createEmptyNavigationApiCompileTask(Project project, taskSuffix) {
+        project.tasks.create(NAVIGATION_API_COMPILE_TASK_PREFIX + String.valueOf(taskSuffix))
     }
 
-    private Task createEmptyIntentBuilderJarTask(Project project, taskSuffix) {
-        project.tasks.create(INTENT_BUILDER_JAR_TASK_PREFIX + String.valueOf(taskSuffix))
+    private Task createEmptyNavigationApiJarTask(Project project, taskSuffix) {
+        project.tasks.create(NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(taskSuffix))
     }
 
-    private Task createIntentBuilderCompileTask(Project project, taskSuffix, destinationPath, navigationVariant) {
+    private Task createNavigationApiCompileTask(Project project, taskSuffix, destinationPath, navigationVariant) {
         def newDestinationDirName = "${project.buildDir}/navigation/classes/java/${destinationPath}"
         def newGeneratedDirName = "${project.buildDir}/generated/source/apt/navigation/${destinationPath}"
 
@@ -176,7 +172,7 @@ class HensonPlugin implements Plugin<Project> {
         FileCollection effectiveAnnotationProcessorPath = new UnionFileCollection()
         navigationVariant.annotationProcessorConfigurations.each { effectiveAnnotationProcessorPath.add(it) }
 
-        project.tasks.create("intentBuilderCompile${taskSuffix}", JavaCompile) {
+        project.tasks.create("navigationApiCompile${taskSuffix}", JavaCompile) {
             setSource(navigationVariant.sourceSets.collect { sourceSet -> sourceSet.java.sourceFiles })
             setDestinationDir(project.file("${newDestinationDirName}"))
             classpath = effectiveClasspath
@@ -191,18 +187,18 @@ class HensonPlugin implements Plugin<Project> {
         }
     }
 
-    private Task createIntentBuilderJarTask(Project project, intentBuilderCompileTask, taskSuffix) {
-        def task = project.tasks.create(INTENT_BUILDER_JAR_TASK_PREFIX + String.valueOf(taskSuffix), Jar) {
-            baseName = "${project.name}-intentBuilder${taskSuffix}"
-            from intentBuilderCompileTask.destinationDir
+    private Task createNavigationApiJarTask(Project project, navigationApiCompileTask, taskSuffix) {
+        def task = project.tasks.create(NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(taskSuffix), Jar) {
+            baseName = "${project.name}-navigationApi${taskSuffix}"
+            from navigationApiCompileTask.destinationDir
         }
-        task.dependsOn(intentBuilderCompileTask)
+        task.dependsOn(navigationApiCompileTask)
         task
     }
 
     private void addArtifact(Project project, artifactSuffix, taskSuffix) {
-        println project.configurations.getByName("intentBuilder")
-        project.artifacts.add("intentBuilder${artifactSuffix}", project.tasks[INTENT_BUILDER_JAR_TASK_PREFIX + String.valueOf(taskSuffix)])
+        println project.configurations.getByName("navigationApi")
+        project.artifacts.add("navigationApi${artifactSuffix}", project.tasks[NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(taskSuffix)])
     }
 
     private void addNavigationArtifactToDependencies(Project project, artifactSuffix, configurationPrefix) {
@@ -210,7 +206,7 @@ class HensonPlugin implements Plugin<Project> {
         //we must wait until the variant created the proper configurations to add the dependency.
         project.afterEvaluate {
             //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-            project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "intentBuilder${artifactSuffix}"))
+            project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "navigationApi${artifactSuffix}"))
         }
     }
 
@@ -271,13 +267,6 @@ class HensonPlugin implements Plugin<Project> {
         return !hasApp
     }
 
-    private Collection<BaseVariant> getVariants(Project project, PluginCollection<AppPlugin> hasApp) {
-        if (hasApp) {
-            project.android.applicationVariants
-        } else {
-            project.android.libraryVariants
-        }
-    }
     private void createExtension(Project project) {
         project.extensions.create('henson', HensonPluginExtension, project)
     }

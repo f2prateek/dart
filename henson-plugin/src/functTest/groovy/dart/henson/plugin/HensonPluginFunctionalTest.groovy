@@ -150,7 +150,7 @@ class HensonPluginFunctionalTest extends Specification {
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
                 //.withArguments('--no-build-cache', 'assemble', 'tasks', '--all', '-d', '-s')
-                .withArguments('--no-build-cache', 'clean', 'assemble', 'intentBuilderJar', 'intentBuilderJarRed', 'intentBuilderJarRelease', 'intentBuilderJarBlueDebug', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', 'assemble', 'navigationApiJar', 'navigationApiJarRed', 'navigationApiJarRelease', 'navigationApiJarBlueDebug', '-d', '-s')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir
@@ -160,20 +160,38 @@ class HensonPluginFunctionalTest extends Specification {
         println result.output
         result.task(":assemble").outcome != FAILED
         //result.task(":tasks").outcome == SUCCESS
-        result.task(":intentBuilderJar").outcome != FAILED
-        result.task(":intentBuilderJarRed").outcome != FAILED
-        result.task(":intentBuilderJarRelease").outcome != FAILED
-        result.task(":intentBuilderJarBlueDebug").outcome != FAILED
-        println new File(projectDir, "/build").eachFileRecurse(FILES) {
-            println it
-        }
-        println new File(projectDir, "/build/libs").eachFileRecurse(FILES) {
-            if(it.name.endsWith('.jar')) {
-                def zip = new ZipFile(it)
-                zip.entries().each { entry ->
-                    println entry.name
-                }
+        result.task(":navigationApiJar").outcome != FAILED
+        result.task(":navigationApiJarRed").outcome != FAILED
+        result.task(":navigationApiJarRelease").outcome != FAILED
+        result.task(":navigationApiJarBlueDebug").outcome != FAILED
+
+        new File(projectDir, "/build/libs").eachFileRecurse(FILES) { file ->
+            if(file.name.endsWith('.jar')) {
+                println "Testing jar: ${file.name}"
+                def content = getJarContent(file)
+                assert content.contains("META-INF/")
+                assert content.contains("META-INF/MANIFEST.MF")
+                assert content.contains("test/")
+                assert content.contains("test/Foo.class")
+                assert content.contains("test/Foo__ExtraBinder.class")
+                assert content.contains("test/Henson\$1.class")
+                assert content.contains("test/Henson\$WithContextSetState.class")
+                assert content.contains("test/Henson.class")
+                assert content.contains("test/TestActivity__IntentBuilder\$AllSet.class")
+                assert content.contains("test/TestActivity__IntentBuilder.class")
             }
         }
+    }
+
+    List<String> getJarContent(file) {
+        def List<String> result
+        if(file.name.endsWith('.jar')) {
+            result = new ArrayList<>()
+            def zip = new ZipFile(file)
+            zip.entries().each { entry ->
+                result.add(entry.name)
+            }
+        }
+        result
     }
 }
