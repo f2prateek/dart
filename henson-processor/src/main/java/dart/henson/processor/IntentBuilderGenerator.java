@@ -28,7 +28,7 @@ import com.squareup.javapoet.TypeSpec;
 import dart.common.BaseGenerator;
 import dart.common.ExtraInjection;
 import dart.common.FieldBinding;
-import dart.common.InjectionTarget;
+import dart.common.BindingTarget;
 import dart.henson.Bundler;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,9 +46,9 @@ public class IntentBuilderGenerator extends BaseGenerator {
   private static final String STATE_CLASS_INTERMEDIARY_PREFIX = "AfterSetting";
   private static final String STATE_CLASS_FINAL_STATE = "AllSet";
 
-  private final InjectionTarget target;
+  private final BindingTarget target;
 
-  public IntentBuilderGenerator(InjectionTarget target) {
+  public IntentBuilderGenerator(BindingTarget target) {
     this.target = target;
   }
 

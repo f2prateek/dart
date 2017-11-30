@@ -17,13 +17,13 @@
 
 package dart.henson.processor;
 
-import dart.common.InjectionTarget;
+import dart.common.BindingTarget;
 import dart.common.util.CompilerUtil;
 import dart.common.util.FileUtil;
-import dart.common.util.InjectExtraUtil;
-import dart.common.util.InjectionTargetUtil;
+import dart.common.util.BindExtraUtil;
+import dart.common.util.BindingTargetUtil;
 import dart.common.util.LoggingUtil;
-import dart.common.util.NavigationModelUtil;
+import dart.common.util.DartModelUtil;
 import dart.common.util.ParcelerUtil;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -39,8 +39,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 @SupportedAnnotationTypes({
-  HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
-  HensonProcessor.INJECT_EXTRA_ANNOTATION_CLASS_NAME
+    HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
+    HensonProcessor.INJECT_EXTRA_ANNOTATION_CLASS_NAME
 })
 @SupportedOptions({HensonProcessor.OPTION_HENSON_PACKAGE})
 public class HensonProcessor extends AbstractProcessor {
@@ -52,27 +52,24 @@ public class HensonProcessor extends AbstractProcessor {
 
   private LoggingUtil loggingUtil;
   private FileUtil fileUtil;
-  private InjectExtraUtil bindExtraUtil;
-  private NavigationModelUtil navigationModelUtil;
-  private InjectionTargetUtil bindingTargetUtil;
+  private BindExtraUtil bindExtraUtil;
+  private DartModelUtil dartModelUtil;
+  private BindingTargetUtil bindingTargetUtil;
 
   private String hensonPackage;
-  private boolean usesParcelerOption = true;
+  private boolean usesParceler = true;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
 
     final CompilerUtil compilerUtil = new CompilerUtil(processingEnv);
-    final ParcelerUtil parcelerUtil =
-        new ParcelerUtil(compilerUtil, processingEnv, usesParcelerOption);
+    final ParcelerUtil parcelerUtil = new ParcelerUtil(compilerUtil, processingEnv, usesParceler);
     loggingUtil = new LoggingUtil(processingEnv);
     fileUtil = new FileUtil(processingEnv);
-    bindingTargetUtil = new InjectionTargetUtil(compilerUtil);
-    bindExtraUtil =
-        new InjectExtraUtil(
-            compilerUtil, parcelerUtil, loggingUtil, bindingTargetUtil, processingEnv);
-    navigationModelUtil = new NavigationModelUtil(loggingUtil, bindingTargetUtil, processingEnv);
+    bindExtraUtil = new BindExtraUtil(compilerUtil, parcelerUtil, loggingUtil);
+    bindingTargetUtil = new BindingTargetUtil(compilerUtil, bindExtraUtil);
+    dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil);
 
     parseAnnotationProcessorOptions(processingEnv);
   }
@@ -84,10 +81,9 @@ public class HensonProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    bindExtraUtil.setRoundEnvironment(roundEnv);
-    navigationModelUtil.setRoundEnvironment(roundEnv);
+    dartModelUtil.setRoundEnvironment(roundEnv);
 
-    Map<TypeElement, InjectionTarget> targetClassMap = findAndParseTargets();
+    Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
     generateIntentBuilders(targetClassMap);
     generateHensonNavigator(targetClassMap);
 
@@ -101,33 +97,28 @@ public class HensonProcessor extends AbstractProcessor {
    * @param enable whether Parceler should be enable
    */
   public void enableParceler(boolean enable) {
-    usesParcelerOption = enable;
+    usesParceler = enable;
   }
 
   private void parseAnnotationProcessorOptions(ProcessingEnvironment processingEnv) {
     hensonPackage = processingEnv.getOptions().get(OPTION_HENSON_PACKAGE);
   }
 
-  private Map<TypeElement, InjectionTarget> findAndParseTargets() {
-    Map<TypeElement, InjectionTarget> targetClassMap = new LinkedHashMap<>();
+  private Map<TypeElement, BindingTarget> findAndParseTargets() {
+    Map<TypeElement, BindingTarget> targetClassMap = new LinkedHashMap<>();
 
     // Process each @DartModel element.
-    navigationModelUtil.parseNavigationModelAnnotatedElements(targetClassMap);
-    // Process each @BindExtra element.
-    bindExtraUtil.parseInjectExtraAnnotatedElements(targetClassMap);
+    dartModelUtil.parseDartModelAnnotatedElements(targetClassMap);
     // Create binding target tree and inherit extra bindings.
     bindingTargetUtil.createInjectionTargetTree(targetClassMap);
-    bindingTargetUtil.inheritExtraInjections(targetClassMap);
-    // Use only Navigation Models
-    bindingTargetUtil.filterNavigationModels(targetClassMap);
 
     return targetClassMap;
   }
 
-  private void generateIntentBuilders(Map<TypeElement, InjectionTarget> targetClassMap) {
-    for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
+  private void generateIntentBuilders(Map<TypeElement, BindingTarget> targetClassMap) {
+    for (Map.Entry<TypeElement, BindingTarget> entry : targetClassMap.entrySet()) {
       TypeElement typeElement = entry.getKey();
-      InjectionTarget bindingTarget = entry.getValue();
+      BindingTarget bindingTarget = entry.getValue();
 
       //we unfortunately can't test that nothing is generated in a TRUTH based test
       try {
@@ -142,7 +133,7 @@ public class HensonProcessor extends AbstractProcessor {
     }
   }
 
-  private void generateHensonNavigator(Map<TypeElement, InjectionTarget> targetClassMap) {
+  private void generateHensonNavigator(Map<TypeElement, BindingTarget> targetClassMap) {
     if (!targetClassMap.values().isEmpty()) {
       Element[] allTypes = targetClassMap.keySet().toArray(new Element[targetClassMap.size()]);
       try {

@@ -17,11 +17,11 @@
 
 package dart.processor;
 
-import dart.common.InjectionTarget;
+import dart.common.BindingTarget;
 import dart.common.util.CompilerUtil;
 import dart.common.util.FileUtil;
-import dart.common.util.InjectExtraUtil;
-import dart.common.util.InjectionTargetUtil;
+import dart.common.util.BindExtraUtil;
+import dart.common.util.BindingTargetUtil;
 import dart.common.util.LoggingUtil;
 import dart.common.util.ParcelerUtil;
 import java.io.IOException;
@@ -42,8 +42,8 @@ public final class InjectExtraProcessor extends AbstractProcessor {
 
   private LoggingUtil loggingUtil;
   private FileUtil fileUtil;
-  private InjectExtraUtil bindExtraUtil;
-  private InjectionTargetUtil bindingTargetUtil;
+  private BindExtraUtil bindExtraUtil;
+  private BindingTargetUtil bindingTargetUtil;
 
   private boolean usesParcelerOption = true;
 
@@ -55,9 +55,9 @@ public final class InjectExtraProcessor extends AbstractProcessor {
         new ParcelerUtil(compilerUtil, processingEnv, usesParcelerOption);
     loggingUtil = new LoggingUtil(processingEnv);
     fileUtil = new FileUtil(processingEnv);
-    bindingTargetUtil = new InjectionTargetUtil(compilerUtil);
+    bindingTargetUtil = new BindingTargetUtil(compilerUtil);
     bindExtraUtil =
-        new InjectExtraUtil(
+        new BindExtraUtil(
             compilerUtil, parcelerUtil, loggingUtil, bindingTargetUtil, processingEnv);
   }
 
@@ -65,7 +65,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     bindExtraUtil.setRoundEnvironment(roundEnv);
 
-    Map<TypeElement, InjectionTarget> targetClassMap = findAndParseTargets();
+    Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
     generateExtraInjectors(targetClassMap);
 
     //return false here to let henson process the annotations too
@@ -86,8 +86,8 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     usesParcelerOption = enable;
   }
 
-  private Map<TypeElement, InjectionTarget> findAndParseTargets() {
-    Map<TypeElement, InjectionTarget> targetClassMap = new LinkedHashMap<>();
+  private Map<TypeElement, BindingTarget> findAndParseTargets() {
+    Map<TypeElement, BindingTarget> targetClassMap = new LinkedHashMap<>();
 
     // Process each @BindExtra element.
     bindExtraUtil.parseInjectExtraAnnotatedElements(targetClassMap);
@@ -97,10 +97,10 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     return targetClassMap;
   }
 
-  private void generateExtraInjectors(Map<TypeElement, InjectionTarget> targetClassMap) {
-    for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
+  private void generateExtraInjectors(Map<TypeElement, BindingTarget> targetClassMap) {
+    for (Map.Entry<TypeElement, BindingTarget> entry : targetClassMap.entrySet()) {
       TypeElement typeElement = entry.getKey();
-      InjectionTarget bindingTarget = entry.getValue();
+      BindingTarget bindingTarget = entry.getValue();
 
       //we unfortunately can't test that nothing is generated in a TRUTH based test
       try {

@@ -27,7 +27,7 @@ import dart.common.BaseGenerator;
 import dart.common.Binding;
 import dart.common.ExtraInjection;
 import dart.common.FieldBinding;
-import dart.common.InjectionTarget;
+import dart.common.BindingTarget;
 import java.util.Collection;
 import java.util.List;
 import javax.lang.model.element.Modifier;
@@ -40,9 +40,9 @@ import javax.lang.model.type.TypeMirror;
  */
 public class ExtraInjectorGenerator extends BaseGenerator {
 
-  private final InjectionTarget target;
+  private final BindingTarget target;
 
-  public ExtraInjectorGenerator(InjectionTarget target) {
+  public ExtraInjectorGenerator(BindingTarget target) {
     this.target = target;
   }
 

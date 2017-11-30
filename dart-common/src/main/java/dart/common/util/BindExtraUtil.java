@@ -17,12 +17,8 @@
 
 package dart.common.util;
 
-import static javax.lang.model.element.ElementKind.CLASS;
-import static javax.lang.model.element.Modifier.PRIVATE;
-import static javax.lang.model.element.Modifier.STATIC;
-
 import dart.BindExtra;
-import dart.common.InjectionTarget;
+import dart.common.BindingTarget;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
@@ -32,77 +28,44 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
-public class InjectExtraUtil {
+import static javax.lang.model.element.Modifier.PRIVATE;
+import static javax.lang.model.element.Modifier.STATIC;
+
+public class BindExtraUtil {
 
   private final CompilerUtil compilerUtil;
   private final ParcelerUtil parcelerUtil;
   private final LoggingUtil loggingUtil;
-  private final InjectionTargetUtil bindingTargetUtil;
-  private final Types typeUtils;
 
-  private RoundEnvironment roundEnv;
-
-  public InjectExtraUtil(
-      CompilerUtil compilerUtil,
-      ParcelerUtil parcelerUtil,
-      LoggingUtil loggingUtil,
-      InjectionTargetUtil bindingTargetUtil,
-      ProcessingEnvironment processingEnv) {
+  public BindExtraUtil(CompilerUtil compilerUtil, ParcelerUtil parcelerUtil,
+      LoggingUtil loggingUtil) {
     this.compilerUtil = compilerUtil;
     this.parcelerUtil = parcelerUtil;
     this.loggingUtil = loggingUtil;
-    this.bindingTargetUtil = bindingTargetUtil;
-    typeUtils = processingEnv.getTypeUtils();
   }
 
-  public void setRoundEnvironment(RoundEnvironment roundEnv) {
-    this.roundEnv = roundEnv;
-  }
-
-  public void parseInjectExtraAnnotatedElements(Map<TypeElement, InjectionTarget> targetClassMap) {
-    for (Element element : roundEnv.getElementsAnnotatedWith(BindExtra.class)) {
-      try {
-        parseInjectExtra(element, targetClassMap);
-      } catch (Exception e) {
-        StringWriter stackTrace = new StringWriter();
-        e.printStackTrace(new PrintWriter(stackTrace));
-        loggingUtil.error(
-            element,
-            "Unable to generate extra binder when parsing @BindExtra.\n\n%s",
-            stackTrace.toString());
-      }
-    }
-  }
-
-  private void parseInjectExtra(Element element, Map<TypeElement, InjectionTarget> targetClassMap) {
+  public void parseInjectExtra(VariableElement element, BindingTarget bindingTarget) {
     // Verify common generated code restrictions.
     if (!isValidUsageOfInjectExtra(element)) {
       return;
     }
 
-    // Valid annotation value
-    final String annotationValue = element.getAnnotation(BindExtra.class).value();
-    if (!StringUtil.isNullOrEmpty(annotationValue)
-        && !StringUtil.isValidJavaIdentifier(annotationValue)) {
-      throw new IllegalArgumentException(
-          "Keys have to be valid java variable identifiers. "
-              + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html");
+    String annotationValue = null;
+    final BindExtra annotation = element.getAnnotation(BindExtra.class);
+    if (annotation != null) {
+      annotationValue = annotation.value();
     }
-
-    // Assemble information on the binding point.
-    final TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-    final InjectionTarget bindingTarget =
-        bindingTargetUtil.getOrCreateTargetClass(targetClassMap, enclosingElement);
 
     final String name = element.getSimpleName().toString();
     final String key = StringUtil.isNullOrEmpty(annotationValue) ? name : annotationValue;
     final TypeMirror type = element.asType();
     final boolean required = isRequiredInjection(element);
-    final boolean parcel =
-        parcelerUtil.isParcelerAvailable() && parcelerUtil.isValidExtraTypeForParceler(type);
+    final boolean parcel = parcelerUtil.isParcelerAvailable()
+        && parcelerUtil.isValidExtraTypeForParceler(type);
     bindingTarget.addField(key, name, type, required, parcel);
   }
 
@@ -113,9 +76,8 @@ public class InjectExtraUtil {
     // Verify modifiers.
     Set<Modifier> modifiers = element.getModifiers();
     if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC)) {
-      loggingUtil.error(
-          element,
-          "@BindExtra fields must not be private or static. (%s.%s)",
+      loggingUtil.error(element,
+          "@DartModel fields must not be private or static. (%s.%s)",
           enclosingElement.getQualifiedName(),
           element.getSimpleName());
       valid = false;
@@ -125,10 +87,9 @@ public class InjectExtraUtil {
     TypeMirror typeElement = element.asType();
     if (!isValidExtraType(typeElement)
         && !(parcelerUtil.isParcelerAvailable()
-            && parcelerUtil.isValidExtraTypeForParceler(typeElement))) {
-      loggingUtil.error(
-          element,
-          "@BindExtra field must be a primitive or Serializable or "
+        && parcelerUtil.isValidExtraTypeForParceler(typeElement))) {
+      loggingUtil.error(element,
+          "@DartModel fields must be a primitive or Serializable or "
               + "Parcelable (%s.%s). "
               + "If you use Parceler, all types supported by Parceler are allowed.",
           enclosingElement.getQualifiedName(),
@@ -136,24 +97,19 @@ public class InjectExtraUtil {
       valid = false;
     }
 
-    // Verify containing type.
-    if (enclosingElement.getKind() != CLASS) {
-      loggingUtil.error(
-          enclosingElement,
-          "@BindExtra fields may only be contained in classes. (%s.%s)",
-          enclosingElement.getQualifiedName(),
-          element.getSimpleName());
-      valid = false;
-    }
-
-    // Verify containing class visibility is not private.
-    if (enclosingElement.getModifiers().contains(PRIVATE)) {
-      loggingUtil.error(
-          enclosingElement,
-          "@BindExtra fields may not be contained in private classes. (%s.%s)",
-          enclosingElement.getQualifiedName(),
-          element.getSimpleName());
-      valid = false;
+    // Verify @BindExtra annotation if present.
+    final BindExtra annotation = element.getAnnotation(BindExtra.class);
+    if (annotation != null) {
+      final String annotationValue = annotation.value();
+      if (!StringUtil.isNullOrEmpty(annotationValue)
+          && !StringUtil.isValidJavaIdentifier(annotationValue)) {
+        loggingUtil.error(element,
+            "@BindExtra element keys have to be valid java variable identifiers (%s, %s). "
+                + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html",
+            enclosingElement.getQualifiedName(),
+            element.getSimpleName());
+        valid = false;
+      }
     }
 
     return valid;

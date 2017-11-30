@@ -22,26 +22,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
-public class InjectionTarget {
+public class BindingTarget {
   public final Map<String, ExtraInjection> bindingMap = new LinkedHashMap<>();
   public final String classPackage;
   public final String className;
   public final String classFqcnCanonical; // Canonical: my.package.class.innerclass
-  public final boolean isAbstractClass;
   public String parentClassFqcn; // Non-canonical: my.package.class$innerclass
   public List<TypeElement> childClasses;
-  public boolean isNavigationModel;
-  public String targetClassFqcn; // Non-canonical: my.package.class$innerclass
-  public String targetClassName;
 
-  public InjectionTarget(
-      String classPackage, String className, String classFqcnCanonical, boolean isAbstractClass) {
+  public BindingTarget(String classPackage, String className, String classFqcnCanonical) {
     this.classPackage = classPackage;
     this.className = className;
     this.classFqcnCanonical = classFqcnCanonical;
-    this.isAbstractClass = isAbstractClass;
     childClasses = new ArrayList<>();
   }
 
@@ -52,12 +47,6 @@ public class InjectionTarget {
       bindingMap.put(key, extraInjection);
     }
     extraInjection.addFieldBinding(new FieldBinding(name, type, required, parcel));
-  }
-
-  public void setTargetClass(String targetFqcnClass) {
-    this.targetClassFqcn = targetFqcnClass;
-    targetClassName = targetFqcnClass.substring(targetFqcnClass.lastIndexOf('.') + 1);
-    isNavigationModel = true;
   }
 
   public void addChild(TypeElement typeElement) {
