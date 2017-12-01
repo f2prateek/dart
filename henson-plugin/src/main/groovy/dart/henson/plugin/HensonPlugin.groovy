@@ -6,13 +6,13 @@ import org.gradle.api.Project
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Task
-import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.UnionFileCollection
 import org.gradle.api.plugins.PluginCollection
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 
+import java.security.InvalidParameterException
 import java.util.zip.ZipFile
 
 class HensonPlugin implements Plugin<Project> {
@@ -29,17 +29,13 @@ class HensonPlugin implements Plugin<Project> {
         def hasLibPlugin = project.plugins.withType(LibraryPlugin)
         checkProject(hasAppPlugin, hasLibPlugin)
 
-        //create extension
-        def extension = project.extensions.create('henson', HensonPluginExtension, project)
-
         //we use the file build.properties that contains the version of
-        //the extension to use. This avoids all problems related to using version x.y.+
-        def dartVersionName
-        if(extension!=null && extension.dartVersion!=null) {
-            dartVersionName= extension.dartVersion
-        } else{
-            dartVersionName= getVersionName()
-        }
+        //the dart & henson version to use. This avoids all problems related to using version x.y.+
+        def dartVersionName = getVersionName()
+
+        //the extension is created but will be read only during execution time
+        //(it's not available before)
+        project.extensions.create('henson', HensonPluginExtension)
 
         //we do the following for all sourcesets, of all build types, of all flavors, and all variants
         //  create source sets
@@ -53,47 +49,57 @@ class HensonPlugin implements Plugin<Project> {
         processProductFlavors(project, dartVersionName)
         processVariants(project, dartVersionName)
 
-        detectNavigationApiDependencies(project)
+        //add the artifact of navigation for the variant to the variant configuration
+        addNavigationArtifactsToVariantConfigurations(project)
+
+        //create the task for generating the henson navigator
+        detectNavigationApiDependenciesAndGenerateHensonNavigator(project)
     }
 
-    private void detectNavigationApiDependencies(Project project) {
-        project.afterEvaluate {
-            project.android.applicationVariants.all { variant ->
-                def taskDetectModules = project.tasks.create("detectModule${variant.name.capitalize()}") {
-                    doFirst {
-                        variant.compileConfiguration.resolve()
-                        variant.compileConfiguration.each { dependency ->
-                            println "Detected dependency: ${dependency.properties}"
-                            List<String> targetActivities = new ArrayList()
-                            if (dependency.name.matches(".*-navigationApi.*.jar")) {
-                                println "Detected navigation API dependency: ${dependency.name}"
-                                println "Detected navigation API dependency: ${dependency.name}"
-                                def file = dependency.absoluteFile
-                                def entries = getJarContent(file)
-                                entries.each { entry ->
-                                    if(entry.matches(".*__IntentBuilder.class")) {
-                                        println "Detected intent builder: ${entry}"
-                                        def targetActivityFQN = entry.substring(0, entry.length() - "__IntentBuilder.class".length()).replace('/', '.')
-                                        targetActivities.add(targetActivityFQN)
-                                    }
+    private void detectNavigationApiDependenciesAndGenerateHensonNavigator(Project project) {
+        project.android.applicationVariants.all { variant ->
+            def taskDetectModules = project.tasks.create("detectModule${variant.name.capitalize()}") {
+                doFirst {
+                    //create hensonExtension
+                    def hensonExtension = project.extensions.getByName('henson')
+                    if(hensonExtension==null || hensonExtension.navigatorPackageName == null) {
+                        throw new InvalidParameterException("The property 'henson.navigatorPackageName' must be defined in your build.gradle")
+                    }
+                    def hensonNavigatorPackageName = hensonExtension.navigatorPackageName
+
+                    variant.compileConfiguration.resolve()
+                    variant.compileConfiguration.each { dependency ->
+                        println "Detected dependency: ${dependency.properties}"
+                        List<String> targetActivities = new ArrayList()
+                        if (dependency.name.matches(".*-navigationApi.*.jar")) {
+                            println "Detected navigation API dependency: ${dependency.name}"
+                            println "Detected navigation API dependency: ${dependency.name}"
+                            def file = dependency.absoluteFile
+                            def entries = getJarContent(file)
+                            entries.each { entry ->
+                                if(entry.matches(".*__IntentBuilder.class")) {
+                                    println "Detected intent builder: ${entry}"
+                                    def targetActivityFQN = entry.substring(0, entry.length() - "__IntentBuilder.class".length()).replace('/', '.')
+                                    targetActivities.add(targetActivityFQN)
                                 }
                             }
-                            def targetPackageName = "test"
-                            String hensonNavigator = generateHensonNavigatorClass(targetActivities, targetPackageName)
-                            def folder = new File(project.projectDir, "src/main/java/")
-                            folder.mkdirs()
-                            File generatedFolder =  new File(folder, targetPackageName.replace('.', '/').concat("/"))
-                            generatedFolder.mkdirs()
-                            def generatedFile = new File(generatedFolder, "HensonNavigator.java")
-                            generatedFile.withPrintWriter { out ->
-                                out.println(hensonNavigator)
-                            }
+                        }
+                        def variantSrcFolderName = new File(project.projectDir, "src/${variant.name}/java/")
+                        String hensonNavigator = generateHensonNavigatorClass(targetActivities, hensonNavigatorPackageName)
+                        variantSrcFolderName.mkdirs()
+                        File generatedFolder =  new File(variantSrcFolderName, hensonNavigatorPackageName.replace('.', '/').concat('/'))
+                        generatedFolder.mkdirs()
+                        def generatedFile = new File(generatedFolder, "HensonNavigator.java")
+                        generatedFile.withPrintWriter { out ->
+                            out.println(hensonNavigator)
                         }
                     }
                 }
-                taskDetectModules.dependsOn = variant.javaCompiler.dependsOn
-                variant.javaCompiler.dependsOn(taskDetectModules)
             }
+            //we put the task right before compilation so that all dependencies are resolved
+            // when the task is executed
+            taskDetectModules.dependsOn = variant.javaCompiler.dependsOn
+            variant.javaCompiler.dependsOn(taskDetectModules)
         }
     }
 
@@ -177,7 +183,6 @@ class HensonPlugin implements Plugin<Project> {
         navigationApiJarTask.dependsOn(mainNavigationApiJarTask, productFlavorNavigationApiJarTask, buildTypeNavigationApiJarTask)
 
         addArtifact(project, suffix, suffix)
-        addNavigationArtifactToDependencies(project, suffix, variantName)
     }
 
     private void processFlavorOrBuildType(Project project, productFlavorOrBuildType, dartVersionName) {
@@ -287,11 +292,13 @@ class HensonPlugin implements Plugin<Project> {
         project.artifacts.add("navigationApi${artifactSuffix}", project.tasks[NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(taskSuffix)])
     }
 
-    private void addNavigationArtifactToDependencies(Project project, artifactSuffix, configurationPrefix) {
+    private void addNavigationArtifactsToVariantConfigurations(Project project) {
         //the project main source itself will depend on the navigation
         //we must wait until the variant created the proper configurations to add the dependency.
-        project.afterEvaluate {
+        project.android.applicationVariants.all { variant ->
             //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
+            def configurationPrefix = variant.name
+            def artifactSuffix = variant.name.capitalize()
             project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "navigationApi${artifactSuffix}"))
         }
     }
@@ -354,7 +361,7 @@ class HensonPlugin implements Plugin<Project> {
     }
 
 
-    List<String> getJarContent(file) {
+    private List<String> getJarContent(file) {
         def List<String> result
         if(file.name.endsWith('.jar')) {
             result = new ArrayList<>()

@@ -118,6 +118,10 @@ class HensonPluginFunctionalTest extends Specification {
             id 'dart.henson-plugin'
         }
         
+        henson {
+            navigatorPackageName = "test"
+        }
+
         android {
             compileSdkVersion 26
             defaultConfig {
@@ -149,6 +153,7 @@ class HensonPluginFunctionalTest extends Specification {
               url 'https://oss.sonatype.org/content/repositories/snapshots'
             }
         }
+        
         """
 
         when:
