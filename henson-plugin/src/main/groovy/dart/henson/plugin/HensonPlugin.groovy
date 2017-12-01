@@ -6,11 +6,14 @@ import org.gradle.api.Project
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Task
+import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.UnionFileCollection
 import org.gradle.api.plugins.PluginCollection
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
+
+import java.util.zip.ZipFile
 
 class HensonPlugin implements Plugin<Project> {
 
@@ -45,26 +48,91 @@ class HensonPlugin implements Plugin<Project> {
         //  create tasks: compile and jar
         //  create artifacts
 
-        //the main source set
+        processMain(project, dartVersionName)
+        processBuildTypes(project, dartVersionName)
+        processProductFlavors(project, dartVersionName)
+        processVariants(project, dartVersionName)
+
+        detectNavigationApiDependencies(project)
+    }
+
+    private void detectNavigationApiDependencies(Project project) {
+        project.afterEvaluate {
+            project.android.applicationVariants.all { variant ->
+                def taskDetectModules = project.tasks.create("detectModule${variant.name.capitalize()}") {
+                    doFirst {
+                        variant.compileConfiguration.resolve()
+                        variant.compileConfiguration.each { dependency ->
+                            println "Detected dependency: ${dependency.properties}"
+                            List<String> targetActivities = new ArrayList()
+                            if (dependency.name.matches(".*-navigationApi.*.jar")) {
+                                println "Detected navigation API dependency: ${dependency.name}"
+                                println "Detected navigation API dependency: ${dependency.name}"
+                                def file = dependency.absoluteFile
+                                def entries = getJarContent(file)
+                                entries.each { entry ->
+                                    if(entry.matches(".*__IntentBuilder.class")) {
+                                        println "Detected intent builder: ${entry}"
+                                        def targetActivityFQN = entry.substring(0, entry.length() - "__IntentBuilder.class".length()).replace('/', '.')
+                                        targetActivities.add(targetActivityFQN)
+                                    }
+                                }
+                            }
+                            def targetPackageName = "test"
+                            String hensonNavigator = generateHensonNavigatorClass(targetActivities, targetPackageName)
+                            def folder = new File(project.projectDir, "src/main/java/")
+                            folder.mkdirs()
+                            File generatedFolder =  new File(folder, targetPackageName.replace('.', '/').concat("/"))
+                            generatedFolder.mkdirs()
+                            def generatedFile = new File(generatedFolder, "HensonNavigator.java")
+                            generatedFile.withPrintWriter { out ->
+                                out.println(hensonNavigator)
+                            }
+                        }
+                    }
+                }
+                taskDetectModules.dependsOn = variant.javaCompiler.dependsOn
+                variant.javaCompiler.dependsOn(taskDetectModules)
+            }
+        }
+    }
+
+    private String generateHensonNavigatorClass(List<String> targetActivities, packageName) {
+        String packageStatement = "package ${packageName};\n"
+        String importStatement = "import android.content.Context;\n"
+        targetActivities.each { targetActivity ->
+            importStatement += "import ${targetActivity}__IntentBuilder;\n"
+        }
+        String classStartStatement = "public class HensonNavigator {\n"
+        String methodStatement = ""
+        targetActivities.each { targetActivity ->
+            String targetActivitySimpleName = targetActivity.substring(1+targetActivity.lastIndexOf('.'), targetActivity.length())
+            methodStatement += "public static ${targetActivitySimpleName.capitalize()}__IntentBuilder goto${targetActivitySimpleName.capitalize()}(Context context) {\n"
+            methodStatement += "  return new ${targetActivitySimpleName}__IntentBuilder(context);\n"
+            methodStatement += "}"
+            methodStatement += "\n"
+        }
+        String classEndStatement = "}"
+        new StringBuilder()
+        .append(packageStatement)
+        .append(importStatement)
+        .append(classStartStatement)
+        .append(methodStatement)
+        .append(classEndStatement)
+        .toString()
+    }
+
+    private void processMain(Project project, dartVersionName) {
         def suffix = ""
         def pathSuffix = "main/"
         def sourceSetName = "main"
 
         createSourceSetAndConfiguration(project, sourceSetName, suffix, pathSuffix, dartVersionName)
-
         createEmptyNavigationApiCompileTask(project, suffix)
         createEmptyNavigationApiJarTask(project, suffix)
+    }
 
-        project.android.buildTypes.all { buildType ->
-            println "Processing buildType: ${buildType.name}"
-            processFlavorOrBuildType(project, buildType, dartVersionName)
-        }
-
-        project.android.productFlavors.all { productFlavor ->
-            println "Processing flavor: ${productFlavor.name}"
-            processFlavorOrBuildType(project, productFlavor, dartVersionName)
-        }
-
+    private Object processVariants(Project project, dartVersionName) {
         project.android.with {
             buildTypes.all { buildType ->
                 productFlavors.all { productFlavor ->
@@ -72,6 +140,20 @@ class HensonPlugin implements Plugin<Project> {
                     processVariant(project, productFlavor, buildType, dartVersionName)
                 }
             }
+        }
+    }
+
+    private void processProductFlavors(Project project, dartVersionName) {
+        project.android.productFlavors.all { productFlavor ->
+            println "Processing flavor: ${productFlavor.name}"
+            processFlavorOrBuildType(project, productFlavor, dartVersionName)
+        }
+    }
+
+    private void processBuildTypes(Project project, dartVersionName) {
+        project.android.buildTypes.all { buildType ->
+            println "Processing buildType: ${buildType.name}"
+            processFlavorOrBuildType(project, buildType, dartVersionName)
         }
     }
 
@@ -271,4 +353,16 @@ class HensonPlugin implements Plugin<Project> {
         return !hasApp
     }
 
+
+    List<String> getJarContent(file) {
+        def List<String> result
+        if(file.name.endsWith('.jar')) {
+            result = new ArrayList<>()
+            def zip = new ZipFile(file)
+            zip.entries().each { entry ->
+                result.add(entry.name)
+            }
+        }
+        result
+    }
 }
