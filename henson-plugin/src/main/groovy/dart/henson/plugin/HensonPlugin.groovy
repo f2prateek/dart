@@ -78,7 +78,7 @@ class HensonPlugin implements Plugin<Project> {
     private void processVariant(Project project, productFlavor, buildType, dartVersionName) {
         def variantName = "${productFlavor.name}${buildType.name.capitalize()}"
         def suffix = "${productFlavor.name.capitalize()}${buildType.name.capitalize()}"
-        def pathSuffix = "${productFlavor.name}/${buildType.name.capitalize()}/"
+        def pathSuffix = "${productFlavor.name}${buildType.name.capitalize()}/"
         createSourceSetAndConfiguration(project, variantName, suffix, pathSuffix, dartVersionName)
 
         def navigationVariant = createNavigationVariant(project, productFlavor, buildType)
