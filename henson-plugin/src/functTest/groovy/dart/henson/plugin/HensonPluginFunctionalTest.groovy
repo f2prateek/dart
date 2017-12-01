@@ -65,13 +65,18 @@ class HensonPluginFunctionalTest extends Specification {
         
         import android.app.Activity;
         import android.os.Bundle;
+        import test.HensonNavigator;
+        import android.content.Intent;
         
         class FooActivity extends Activity {
           
           @Override
           public void onCreate(Bundle bundle) {
             super.onCreate(bundle);
-            Foo foo = new Foo();  
+            Foo foo = new Foo();
+            Intent intent = HensonNavigator.gotoTestActivity(this)
+            .s("s")
+            .build();
           }
         }
         """
@@ -113,6 +118,10 @@ class HensonPluginFunctionalTest extends Specification {
             id 'dart.henson-plugin'
         }
         
+        henson {
+            navigatorPackageName = "test"
+        }
+
         android {
             compileSdkVersion 26
             defaultConfig {
@@ -144,6 +153,7 @@ class HensonPluginFunctionalTest extends Specification {
               url 'https://oss.sonatype.org/content/repositories/snapshots'
             }
         }
+        
         """
 
         when:
