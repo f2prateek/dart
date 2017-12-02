@@ -1,0 +1,65 @@
+apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
+
+
+sourceSets {
+    functionalTest {
+        groovy.srcDir file('src/functTest/groovy')
+        resources.srcDir file('src/functTest/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntime
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+gradlePlugin {
+    plugins {
+        hensonPlugin {
+            id = 'dart.henson-plugin'
+            implementationClass = 'dart.henson.plugin.HensonPlugin'
+        }
+    }
+    testSourceSets sourceSets.functionalTest
+}
+
+task functionalTest(type: Test) {
+    description = 'Runs the functional tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+    mustRunAfter test
+}
+
+check.dependsOn functionalTest
+
+project.afterEvaluate {
+    tasks.getByName('compileGroovy').doFirst {
+        //we create a file in the plugin project containing the current project version
+        //it will be used later by the plugin to add the proper version of
+        //dependencies to the project that uses the plugin
+        def prop = new Properties()
+        def propFile = new File("${project.rootDir}/henson-plugin/src/main/resources/build.properties")
+        propFile.parentFile.mkdirs()
+        prop.setProperty("dart.version", "$version")
+        propFile.createNewFile()
+        prop.store(propFile.newWriter(), null)
+    }
+}
+
+repositories {
+    jcenter()
+    google()
+    mavenLocal()
+}
+
+dependencies {
+    compile localGroovy()
+    implementation 'com.android.tools.build:gradle:3.0.0'
+
+    functionalTestCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
+        exclude group: 'org.codehaus.groovy'
+    }
+    functionalTestCompile gradleTestKit()
+}
+
+//TODO : Does the release work ?
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

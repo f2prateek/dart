@@ -4,5 +4,6 @@ include 'dart'
 include 'dart-processor'
 include 'henson'
 include 'henson-processor'
+include 'henson-plugin'
 
 rootProject.name = 'dart-parent'
