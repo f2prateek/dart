@@ -18,12 +18,12 @@
 package dart.henson.processor;
 
 import dart.common.BindingTarget;
-import dart.common.util.CompilerUtil;
-import dart.common.util.FileUtil;
 import dart.common.util.BindExtraUtil;
 import dart.common.util.BindingTargetUtil;
-import dart.common.util.LoggingUtil;
+import dart.common.util.CompilerUtil;
 import dart.common.util.DartModelUtil;
+import dart.common.util.FileUtil;
+import dart.common.util.LoggingUtil;
 import dart.common.util.ParcelerUtil;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -39,20 +39,17 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 @SupportedAnnotationTypes({
-    HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
-    HensonProcessor.INJECT_EXTRA_ANNOTATION_CLASS_NAME
+    HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME
 })
 @SupportedOptions({HensonProcessor.OPTION_HENSON_PACKAGE})
 public class HensonProcessor extends AbstractProcessor {
 
   static final String NAVIGATION_MODEL_ANNOTATION_CLASS_NAME = "dart.DartModel";
-  static final String INJECT_EXTRA_ANNOTATION_CLASS_NAME = "dart.BindExtra";
 
   static final String OPTION_HENSON_PACKAGE = "dart.henson.package";
 
   private LoggingUtil loggingUtil;
   private FileUtil fileUtil;
-  private BindExtraUtil bindExtraUtil;
   private DartModelUtil dartModelUtil;
   private BindingTargetUtil bindingTargetUtil;
 
@@ -66,9 +63,10 @@ public class HensonProcessor extends AbstractProcessor {
     final CompilerUtil compilerUtil = new CompilerUtil(processingEnv);
     final ParcelerUtil parcelerUtil = new ParcelerUtil(compilerUtil, processingEnv, usesParceler);
     loggingUtil = new LoggingUtil(processingEnv);
+    final BindExtraUtil bindExtraUtil = new BindExtraUtil(compilerUtil, parcelerUtil, loggingUtil);
     fileUtil = new FileUtil(processingEnv);
-    bindExtraUtil = new BindExtraUtil(compilerUtil, parcelerUtil, loggingUtil);
-    bindingTargetUtil = new BindingTargetUtil(compilerUtil, bindExtraUtil);
+    bindingTargetUtil =
+        new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil, bindExtraUtil);
     dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil);
 
     parseAnnotationProcessorOptions(processingEnv);
@@ -107,29 +105,37 @@ public class HensonProcessor extends AbstractProcessor {
   private Map<TypeElement, BindingTarget> findAndParseTargets() {
     Map<TypeElement, BindingTarget> targetClassMap = new LinkedHashMap<>();
 
-    // Process each @DartModel element.
     dartModelUtil.parseDartModelAnnotatedElements(targetClassMap);
-    // Create binding target tree and inherit extra bindings.
-    bindingTargetUtil.createInjectionTargetTree(targetClassMap);
+    bindingTargetUtil.createBindingTargetTrees(targetClassMap);
+    bindingTargetUtil.addClosestRequiredAncestorForTargets(targetClassMap);
 
     return targetClassMap;
   }
 
   private void generateIntentBuilders(Map<TypeElement, BindingTarget> targetClassMap) {
     for (Map.Entry<TypeElement, BindingTarget> entry : targetClassMap.entrySet()) {
-      TypeElement typeElement = entry.getKey();
-      BindingTarget bindingTarget = entry.getValue();
-
-      //we unfortunately can't test that nothing is generated in a TRUTH based test
-      try {
-        fileUtil.writeFile(new IntentBuilderGenerator(bindingTarget), typeElement);
-      } catch (IOException e) {
-        loggingUtil.error(
-            typeElement,
-            "Unable to write intent builder for type %s: %s",
-            typeElement,
-            e.getMessage());
+      if (entry.getValue().topLevel) {
+        generateIntentBuildersForTree(targetClassMap, entry.getKey());
       }
+    }
+  }
+
+  private void generateIntentBuildersForTree(Map<TypeElement, BindingTarget> targetClassMap,
+      TypeElement typeElement) {
+    //we unfortunately can't test that nothing is generated in a TRUTH based test
+    final BindingTarget bindingTarget = targetClassMap.get(typeElement);
+    try {
+      fileUtil.writeFile(new IntentBuilderGenerator(bindingTarget), typeElement);
+    } catch (IOException e) {
+      loggingUtil.error(
+          typeElement,
+          "Unable to write intent builder for type %s: %s",
+          typeElement,
+          e.getMessage());
+    }
+
+    for (TypeElement child : bindingTarget.childClasses) {
+      generateIntentBuildersForTree(targetClassMap, child);
     }
   }
 

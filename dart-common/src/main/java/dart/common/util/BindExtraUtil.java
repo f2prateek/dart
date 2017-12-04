@@ -19,18 +19,12 @@ package dart.common.util;
 
 import dart.BindExtra;
 import dart.common.BindingTarget;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Map;
 import java.util.Set;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Types;
 
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
@@ -50,7 +44,7 @@ public class BindExtraUtil {
 
   public void parseInjectExtra(VariableElement element, BindingTarget bindingTarget) {
     // Verify common generated code restrictions.
-    if (!isValidUsageOfInjectExtra(element)) {
+    if (!isValidUsageOfBindExtra(element)) {
       return;
     }
 
@@ -69,7 +63,7 @@ public class BindExtraUtil {
     bindingTarget.addField(key, name, type, required, parcel);
   }
 
-  private boolean isValidUsageOfInjectExtra(Element element) {
+  private boolean isValidUsageOfBindExtra(Element element) {
     final TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
     boolean valid = true;
 

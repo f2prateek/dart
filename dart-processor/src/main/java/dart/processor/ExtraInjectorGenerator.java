@@ -50,7 +50,7 @@ public class ExtraInjectorGenerator extends BaseGenerator {
   public String brewJava() {
     TypeSpec.Builder binderTypeSpec =
         TypeSpec.classBuilder(binderClassName()).addModifiers(Modifier.PUBLIC);
-    emitInject(binderTypeSpec);
+    emitBind(binderTypeSpec);
     JavaFile javaFile =
         JavaFile.builder(target.classPackage, binderTypeSpec.build())
             .addFileComment("Generated code from Dart. Do not modify!")
@@ -67,19 +67,19 @@ public class ExtraInjectorGenerator extends BaseGenerator {
     return target.className + Dart.BINDER_SUFFIX;
   }
 
-  private void emitInject(TypeSpec.Builder builder) {
+  private void emitBind(TypeSpec.Builder builder) {
     MethodSpec.Builder bindBuilder =
         MethodSpec.methodBuilder("bind")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addParameter(ClassName.get(Dart.Finder.class), "finder")
-            .addParameter(ClassName.bestGuess(target.classFqcnCanonical), "target")
+            .addParameter(ClassName.bestGuess(target.getFQN()), "target")
             .addParameter(ClassName.get(Object.class), "source");
 
-    if (target.parentClassFqcn != null) {
+    if (target.parentPackage != null) {
       // Emit a call to the superclass binder, if any.
       bindBuilder.addStatement(
           "$T.bind(finder, target, source)",
-          ClassName.bestGuess(target.parentClassFqcn + Dart.BINDER_SUFFIX));
+          ClassName.bestGuess(target.getParentFQN() + Dart.BINDER_SUFFIX));
     }
 
     // Local variable in which all extras will be temporarily stored.

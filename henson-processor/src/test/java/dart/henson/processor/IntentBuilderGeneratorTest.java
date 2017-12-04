@@ -17,82 +17,90 @@
 
 package dart.henson.processor;
 
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
-
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
+
 public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsExtras() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
-                    "import dart.BindExtra;", //
                     "import dart.DartModel;", //
-                    "@DartModel(\"test.Test\")", //
+                    "@DartModel", //
                     "public class TestNavigationModel {", //
-                    "    @BindExtra(\"key\") String extra;", //
+                    "    String extra;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            "test.navigation.TestNavigationModel__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
+                    "import static dart.henson.ActivityClassFinder.getClassDynamically;", //
                     "import android.content.Context;", //
                     "import android.content.Intent;", //
+                    "import dart.henson.AllRequiredSetState;", //
                     "import dart.henson.Bundler;", //
-                    "import java.lang.Class;", //
-                    "import java.lang.Exception;", //
+                    "import dart.henson.RequiredStateSequence;", //
                     "import java.lang.String;", //
-                    "public class Test__IntentBuilder {", //
-                    "  private Intent intent;", //
-                    "  private Bundler bundler = Bundler.create();", //
-                    "  public Test__IntentBuilder(Context context) {", //
-                    "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
+                    "public class TestNavigationModel__IntentBuilder {", //
+                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {", //
+                    "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));", //
+                    "    final Bundler bundler = Bundler.create();", //
+                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);", //
+                    "    return new RequiredSequence<>(bundler, resolvedAllSet);", //
                     "  }", //
-                    "  public Class getClassDynamically(String className) {", //
-                    "    try {", //
-                    "      return Class.forName(className);", //
-                    "    } catch(Exception ex) {", //
-                    "      throw new RuntimeException(ex);", //
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,", //
+                    "      ALL_SET allSetState) {", //
+                    "    return new RequiredSequence<>(bundler, allSetState);", //
+                    "  }", //
+                    "  public static class RequiredSequence<ALL_SET extends AllSet> extends RequiredStateSequence<ALL_SET> {", //
+                    "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {", //
+                    "      super(bundler, allRequiredSetState);", //
+                    "    }", //
+                    "    public ALL_SET extra(String extra) {", //
+                    "      bundler.put(\"extra\", extra);", //
+                    "      return allRequiredSetState;", //
                     "    }", //
                     "  }", //
-                    "  public Test__IntentBuilder.AllSet key(String extra) {", //
-                    "    bundler.put(\"key\", extra);", //
-                    "    return new Test__IntentBuilder.AllSet();", //
+                    "", //
+                    "  public static class AllSet<SELF extends AllSet<SELF>> extends AllRequiredSetState {", //
+                    "    public AllSet(Bundler bundler, Intent intent) {", //
+                    "      super(bundler, intent);", //
+                    "    }", //
                     "  }", //
-                    "  public class AllSet {", //
-                    "    public Intent build() {", //
-                    "      intent.putExtras(bundler.get());", //
-                    "      return intent;", //
+                    "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {", //
+                    "    public ResolvedAllSet(Bundler bundler, Intent intent) {", //
+                    "      super(bundler, intent);", //
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_doesNotContainExtras() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_doesNotContainExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -104,7 +112,7 @@ public class IntentBuilderGeneratorTest {
                     "@DartModel(\"test.Test\")", //
                     "public class TestNavigationModel {", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -136,7 +144,7 @@ public class IntentBuilderGeneratorTest {
                     "    return intent;", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -147,7 +155,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test(expected = AssertionError.class)
   public void
-      intentBuilderGenerator_should_notGenerateIntentBuilder_when_navigationModelIsNotDefined_and_containsExtras() {
+  intentBuilderGenerator_should_notGenerateIntentBuilder_when_navigationModelIsNotDefined_and_containsExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -159,7 +167,7 @@ public class IntentBuilderGeneratorTest {
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") String extra;", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -168,7 +176,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_targetClassIsInner() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_targetClassIsInner() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -180,7 +188,7 @@ public class IntentBuilderGeneratorTest {
                     "@DartModel(\"test.Test$MyInnerTest\")", //
                     "public class TestNavigationModel {", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -213,7 +221,7 @@ public class IntentBuilderGeneratorTest {
                     "    return intent;", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -224,7 +232,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilders_when_navigationModelIsDefined_and_containsExtras_and_sameForParent() {
+  intentBuilderGenerator_should_generateIntentBuilders_when_navigationModelIsDefined_and_containsExtras_and_sameForParent() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel1",
@@ -241,7 +249,7 @@ public class IntentBuilderGeneratorTest {
                     "class TestNavigationModel2 {", //
                     "    @BindExtra(\"key2\") String extra2;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource1 =
         JavaFileObjects.forSourceString(
@@ -285,7 +293,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource2 =
         JavaFileObjects.forSourceString(
@@ -323,7 +331,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -337,7 +345,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilders_when_navigationModelIsDefined_and_containsExtras_and_sameForParent_and_keyIsRepeated() {
+  intentBuilderGenerator_should_generateIntentBuilders_when_navigationModelIsDefined_and_containsExtras_and_sameForParent_and_keyIsRepeated() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel1",
@@ -354,7 +362,7 @@ public class IntentBuilderGeneratorTest {
                     "class TestNavigationModel2 {", //
                     "    @BindExtra(\"key\") Integer extra2;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource1 =
         JavaFileObjects.forSourceString(
@@ -393,7 +401,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource2 =
         JavaFileObjects.forSourceString(
@@ -432,7 +440,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -446,7 +454,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilderWithParentExtras_when_navigationModelIsDefined_and_doesNotContainExtras() {
+  intentBuilderGenerator_should_generateIntentBuilderWithParentExtras_when_navigationModelIsDefined_and_doesNotContainExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel1",
@@ -461,7 +469,7 @@ public class IntentBuilderGeneratorTest {
                     "class TestNavigationModel2 {", //
                     "    @BindExtra(\"key2\") String extra2;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -499,7 +507,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -528,7 +536,7 @@ public class IntentBuilderGeneratorTest {
                     "@DartModel(\"test.Test1\")", //
                     "class TestOne extends Test {", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
@@ -566,7 +574,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -577,7 +585,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilderWithParentExtras_when_navigationModelIsDefined_and_doesNotContainExtras_and_parentIsAbstract() {
+  intentBuilderGenerator_should_generateIntentBuilderWithParentExtras_when_navigationModelIsDefined_and_doesNotContainExtras_and_parentIsAbstract() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel1",
@@ -592,7 +600,7 @@ public class IntentBuilderGeneratorTest {
                     "abstract class TestNavigationModel2 {", //
                     "    @BindExtra(\"key2\") String extra2;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -630,7 +638,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -641,7 +649,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_parentContainsGenerics() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_parentContainsGenerics() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel1",
@@ -657,7 +665,7 @@ public class IntentBuilderGeneratorTest {
                     "class TestNavigationModel2<T> {", //
                     "    @BindExtra(\"key2\") String extra2;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -701,7 +709,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -712,7 +720,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsPrimitiveExtras() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsPrimitiveExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -732,7 +740,7 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra(\"key_float\") float aFloat;", //
                     "    @BindExtra(\"key_double\") double aDouble;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -759,7 +767,8 @@ public class IntentBuilderGeneratorTest {
                     "      throw new RuntimeException(ex);", //
                     "    }", //
                     "  }", //
-                    "  public Test__IntentBuilder.AfterSettingKey_bool key_bool(boolean aBool) {", //
+                    "  public Test__IntentBuilder.AfterSettingKey_bool key_bool(boolean aBool) {",
+                    //
                     "    bundler.put(\"key_bool\",aBool);", //
                     "    return new Test__IntentBuilder.AfterSettingKey_bool();", //
                     "  }", //
@@ -783,7 +792,8 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "  public class AfterSettingKey_double {", //
-                    "    public Test__IntentBuilder.AfterSettingKey_float key_float(float aFloat) {", //
+                    "    public Test__IntentBuilder.AfterSettingKey_float key_float(float aFloat) {",
+                    //
                     "      bundler.put(\"key_float\",aFloat);", //
                     "      return new Test__IntentBuilder.AfterSettingKey_float();", //
                     "    }", //
@@ -813,7 +823,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -824,7 +834,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsSerializableAndParcelableExtra() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsSerializableAndParcelableExtra() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -846,7 +856,7 @@ public class IntentBuilderGeneratorTest {
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") Extra extra;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -884,7 +894,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -909,7 +919,7 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra(\"key\") String extra2;", //
                     "    @BindExtra(\"key\") String extra3;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -947,7 +957,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -970,7 +980,7 @@ public class IntentBuilderGeneratorTest {
                     "public class TestNavigationModel {", //
                     "    @BindExtra String extra;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -1008,7 +1018,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -1019,7 +1029,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_containsMandatoryAndOptionalExtras() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_containsMandatoryAndOptionalExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -1039,7 +1049,7 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra(\"key1\") String extra1;", //
                     "    @BindExtra(\"key2\") @Nullable String extra2;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -1081,7 +1091,7 @@ public class IntentBuilderGeneratorTest {
                     "    }", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -1092,7 +1102,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_containsOnlyOptionalExtras() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_containsOnlyOptionalExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -1112,7 +1122,7 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra(\"key1\") @Nullable String extra1;", //
                     "    @BindExtra(\"key2\") @Nullable String extra2;", //
                     "}" //
-                    ));
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -1152,7 +1162,7 @@ public class IntentBuilderGeneratorTest {
                     "    return intent;", //
                     "  }", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -1175,7 +1185,7 @@ public class IntentBuilderGeneratorTest {
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"my.key\") String extra;", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -1196,7 +1206,7 @@ public class IntentBuilderGeneratorTest {
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") private String extra;", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -1217,7 +1227,7 @@ public class IntentBuilderGeneratorTest {
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") static String extra;", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -1238,7 +1248,7 @@ public class IntentBuilderGeneratorTest {
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") Object extra;", //
                     "}" //
-                    ));
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);

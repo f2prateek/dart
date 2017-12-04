@@ -22,22 +22,34 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
 public class BindingTarget {
   public final Map<String, ExtraInjection> bindingMap = new LinkedHashMap<>();
   public final String classPackage;
   public final String className;
-  public final String classFqcnCanonical; // Canonical: my.package.class.innerclass
-  public String parentClassFqcn; // Non-canonical: my.package.class$innerclass
+  public String parentPackage;
+  public String parentClass;
+  // Closest ancestor with required fields
+  public String closestRequiredAncestorPackage;
+  public String closestRequiredAncestorClass;
+  public boolean hasRequiredFields;
+  public boolean topLevel;
   public List<TypeElement> childClasses;
 
-  public BindingTarget(String classPackage, String className, String classFqcnCanonical) {
+  public BindingTarget(String classPackage, String className) {
     this.classPackage = classPackage;
     this.className = className;
-    this.classFqcnCanonical = classFqcnCanonical;
     childClasses = new ArrayList<>();
+    topLevel = false;
+  }
+
+  public String getFQN() {
+    return classPackage + "." + className;
+  }
+
+  public String getParentFQN() {
+    return parentPackage + "." + parentClass;
   }
 
   public void addField(String key, String name, TypeMirror type, boolean required, boolean parcel) {
@@ -47,6 +59,7 @@ public class BindingTarget {
       bindingMap.put(key, extraInjection);
     }
     extraInjection.addFieldBinding(new FieldBinding(name, type, required, parcel));
+    hasRequiredFields = hasRequiredFields || required;
   }
 
   public void addChild(TypeElement typeElement) {

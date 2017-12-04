@@ -99,6 +99,10 @@ public class CompilerUtil {
     return isAssignable(type, "java.lang.CharSequence");
   }
 
+  public boolean isAssignable(TypeMirror type, String assignableType) {
+    return typeUtils.isAssignable(type, elementUtils.getTypeElement(assignableType).asType());
+  }
+
   public List<Element> getTypeElements(String[] classNames) {
     List<Element> elements = new ArrayList<>();
     for (String className : classNames) {
@@ -113,7 +117,7 @@ public class CompilerUtil {
 
   public String getClassName(TypeElement type, String packageName) {
     int packageLen = packageName.length() + 1;
-    return type.getQualifiedName().toString().substring(packageLen).replace('.', '$');
+    return type.getQualifiedName().toString().substring(packageLen);
   }
 
   public boolean existsWithin(TypeMirror type, List<Element> supportedTypes) {
@@ -123,11 +127,6 @@ public class CompilerUtil {
       }
     }
     return false;
-  }
-
-  private boolean isAssignable(TypeMirror type, String assignableType) {
-    TypeMirror charSequenceTypeMirror = elementUtils.getTypeElement(assignableType).asType();
-    return typeUtils.isAssignable(type, charSequenceTypeMirror);
   }
 
   private boolean containsTypeMirror(Collection<TypeElement> typeElements, TypeMirror query) {
