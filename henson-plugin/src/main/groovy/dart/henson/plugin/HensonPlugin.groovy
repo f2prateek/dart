@@ -57,7 +57,14 @@ class HensonPlugin implements Plugin<Project> {
     }
 
     private void detectNavigationApiDependenciesAndGenerateHensonNavigator(Project project) {
-        project.android.applicationVariants.all { variant ->
+        def hasApp = project.plugins.withType(AppPlugin)
+        final def variants
+        if (hasApp) {
+            variants = project.android.applicationVariants
+        } else {
+            variants = project.android.libraryVariants
+        }
+        variants.all { variant ->
             def taskDetectModules = project.tasks.create("detectModule${variant.name.capitalize()}") {
                 doFirst {
                     //create hensonExtension
@@ -139,10 +146,18 @@ class HensonPlugin implements Plugin<Project> {
     }
 
     private Object processVariants(Project project, dartVersionName) {
+        def hasApp = project.plugins.withType(AppPlugin)
+        final def variants
+        if (hasApp) {
+            variants = project.android.applicationVariants
+        } else {
+            variants = project.android.libraryVariants
+        }
+
         project.android.with {
-            buildTypes.all { buildType ->
-                productFlavors.all { productFlavor ->
-                    println "Processing variant: ${productFlavor.name}${buildType.name.capitalize()}"
+            variants.all { variant ->
+                variant.productFlavors.all { productFlavor ->
+                    println "Processing variant: ${productFlavor.name}${variant.buildType.name.capitalize()}"
                     processVariant(project, productFlavor, buildType, dartVersionName)
                 }
             }
@@ -171,16 +186,8 @@ class HensonPlugin implements Plugin<Project> {
 
         def navigationVariant = createNavigationVariant(project, productFlavor, buildType)
         def navigationApiCompiler = createNavigationApiCompileTask(project, suffix, pathSuffix, navigationVariant)
-        def mainCompiler = project.tasks.getByName(NAVIGATION_API_COMPILE_TASK_PREFIX)
-        def productFlavorCompiler = project.tasks.getByName(NAVIGATION_API_COMPILE_TASK_PREFIX + String.valueOf(productFlavor.name.capitalize()))
-        def buildTypeCompiler = project.tasks.getByName(NAVIGATION_API_COMPILE_TASK_PREFIX + String.valueOf(buildType.name.capitalize()))
-        navigationApiCompiler.dependsOn(mainCompiler, productFlavorCompiler, buildTypeCompiler)
 
-        def navigationApiJarTask = createNavigationApiJarTask(project, navigationApiCompiler, suffix)
-        def mainNavigationApiJarTask = project.tasks.getByName(NAVIGATION_API_JAR_TASK_PREFIX)
-        def productFlavorNavigationApiJarTask = project.tasks.getByName(NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(productFlavor.name.capitalize()))
-        def buildTypeNavigationApiJarTask = project.tasks.getByName(NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(buildType.name.capitalize()))
-        navigationApiJarTask.dependsOn(mainNavigationApiJarTask, productFlavorNavigationApiJarTask, buildTypeNavigationApiJarTask)
+        createNavigationApiJarTask(project, navigationApiCompiler, suffix)
 
         addArtifact(project, suffix, suffix)
     }
@@ -192,8 +199,8 @@ class HensonPlugin implements Plugin<Project> {
 
         createSourceSetAndConfiguration(project, sourceSetName, suffix, pathSuffix, dartVersionName)
 
-        createEmptyNavigationApiCompileTask(project, suffix)
-        createEmptyNavigationApiJarTask(project, suffix)
+        //createEmptyNavigationApiCompileTask(project, suffix)
+        //createEmptyNavigationApiJarTask(project, suffix)
     }
 
     private void createSourceSetAndConfiguration(Project project, String sourceSetName, String suffix, String pathSuffix, dartVersionName) {
@@ -295,7 +302,15 @@ class HensonPlugin implements Plugin<Project> {
     private void addNavigationArtifactsToVariantConfigurations(Project project) {
         //the project main source itself will depend on the navigation
         //we must wait until the variant created the proper configurations to add the dependency.
-        project.android.applicationVariants.all { variant ->
+        def hasApp = project.plugins.withType(AppPlugin)
+        final def variants
+        if (hasApp) {
+            variants = project.android.applicationVariants
+        } else {
+            variants = project.android.libraryVariants
+        }
+
+        variants.all { variant ->
             //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
             def configurationPrefix = variant.name
             def artifactSuffix = variant.name.capitalize()

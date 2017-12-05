@@ -187,7 +187,7 @@ class HensonPluginFunctionalTest extends Specification {
         when:
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'clean', 'assemble', 'navigationApiJar', 'navigationApiJarRed', 'navigationApiJarRelease', 'navigationApiJarBlueDebug', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', 'assemble', 'navigationApiJarBlueDebug', 'navigationApiJarRedRelease', '-d', '-s')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir
@@ -197,9 +197,6 @@ class HensonPluginFunctionalTest extends Specification {
         println result.output
         result.task(":assemble").outcome != FAILED
         //result.task(":tasks").outcome == SUCCESS
-        result.task(":navigationApiJar").outcome != FAILED
-        result.task(":navigationApiJarRed").outcome != FAILED
-        result.task(":navigationApiJarRelease").outcome != FAILED
         result.task(":navigationApiJarBlueDebug").outcome != FAILED
 
         testJarsContent(projectDir)
