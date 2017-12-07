@@ -21,6 +21,7 @@ class HensonPlugin implements Plugin<Project> {
 
     public static final String NAVIGATION_API_COMPILE_TASK_PREFIX = 'navigationApiCompileJava'
     public static final String NAVIGATION_API_JAR_TASK_PREFIX = 'navigationApiJar'
+    public static final String NAVIGATION_ARTIFACT_PREFIX = 'navigation'
 
     void apply(Project project) {
         final def log = project.logger
@@ -186,9 +187,9 @@ class HensonPlugin implements Plugin<Project> {
                 tupleName = tupleName.capitalize()
                 createNavigationSourceSet(project, "navigation${tupleName}", "${tuplePath}/")
 
-                def newArtifactName = "navigationApi${tupleName}"
-                createNavigationConfiguration(project, newArtifactName, tupleName)
-                addDartAndHensonDependenciesToConfiguration(project, tupleName, dartVersionName)
+                def newArtifactName = "${NAVIGATION_ARTIFACT_PREFIX}${tupleName}"
+                createNavigationConfigurations(project, newArtifactName, tupleName)
+                addDartAndHensonDependenciesToNavigationConfigurations(project, tupleName, dartVersionName)
 
                 navigationVariant.sourceSets << project.sourceSets["navigation${tupleName}"]
                 navigationVariant.apiConfigurations << project.configurations["navigation${tupleName}Api"]
@@ -199,8 +200,8 @@ class HensonPlugin implements Plugin<Project> {
         }
     }
 
-    private void createNavigationConfiguration(Project project, newArtifactName, newConfigurationSuffix) {
-        project.logger.debug "Creating configuration: ${newArtifactName}"
+    private void createNavigationConfigurations(Project project, newArtifactName, newConfigurationSuffix) {
+        project.logger.debug "Creating artifact configuration: ${newArtifactName}"
         project.logger.debug "Creating configurations: navigation${newConfigurationSuffix}*"
         project.configurations {
             //the name of the artifact
@@ -352,8 +353,7 @@ class HensonPlugin implements Plugin<Project> {
 
     private void addArtifact(Project project, artifactSuffix, taskSuffix) {
         if(project.tasks.findByName("${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}") != null) {
-            project.logger.debug(project.configurations.getByName("navigationApi").toString())
-            project.artifacts.add("navigationApi${artifactSuffix}", project.tasks["${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}"])
+            project.artifacts.add("${NAVIGATION_ARTIFACT_PREFIX}${artifactSuffix}", project.tasks["${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}"])
         }
     }
 
@@ -372,11 +372,11 @@ class HensonPlugin implements Plugin<Project> {
             //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
             def configurationPrefix = variant.name
             def artifactSuffix = variant.name.capitalize()
-            project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "navigationApi${artifactSuffix}"))
+            project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "${NAVIGATION_ARTIFACT_PREFIX}${artifactSuffix}"))
         }
     }
 
-    private void addDartAndHensonDependenciesToConfiguration(Project project, configurationSuffix, dartVersionName) {
+    private void addDartAndHensonDependenciesToNavigationConfigurations(Project project, configurationSuffix, dartVersionName) {
         project.dependencies {
             "navigation${configurationSuffix}CompileOnly" "com.google.android:android:4.1.1.4"
             "navigation${configurationSuffix}CompileOnly" "com.f2prateek.dart:dart:${dartVersionName}"

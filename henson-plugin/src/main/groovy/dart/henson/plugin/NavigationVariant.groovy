@@ -3,7 +3,6 @@ package dart.henson.plugin
 import com.android.build.gradle.api.AndroidSourceSet
 
 class NavigationVariant {
-
     def variant
     def combinations
     List<AndroidSourceSet> sourceSets = new ArrayList()
