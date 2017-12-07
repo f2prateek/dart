@@ -79,7 +79,7 @@ class HensonPlugin implements Plugin<Project> {
                     } catch (exception) {
                         project.logger.lifecycle("Could not resolve compileConfiguration for variant: ${variant.name}", exception)
                     }
-                    List<String> targetActivities = new ArrayList()
+                    Set<String> targetActivities = new HashSet()
                     variant.compileConfiguration.each { dependency ->
                         project.logger.debug "Detected dependency: ${dependency.properties}"
                         if (dependency.name.matches(".*-navigationApi.*.jar")) {
@@ -114,7 +114,7 @@ class HensonPlugin implements Plugin<Project> {
         }
     }
 
-    private String generateHensonNavigatorClass(List<String> targetActivities, packageName) {
+    private String generateHensonNavigatorClass(Set<String> targetActivities, packageName) {
         String packageStatement = "package ${packageName};\n"
         String importStatement = "import android.content.Context;\n"
         targetActivities.each { targetActivity ->
