@@ -28,6 +28,7 @@ public class CombinatorTest {
                 new Dimension<>(new Tuple<String>()),
                 new Dimension<>(new Tuple<String>("red"))
         )));
+        System.out.println(result);
     }
 
     @Test
@@ -43,8 +44,9 @@ public class CombinatorTest {
         assertThat(result, isSame(asList(
                 new Dimension<>(new Tuple<String>()),
                 new Dimension<>(new Tuple<>("red"), new Tuple<>("small")),
-                new Dimension<>(new Tuple<>("red", "small"))
+                new Dimension<>(new Tuple<>("small", "red"))
         )));
+        System.out.println(result);
     }
 
     @Test
@@ -60,8 +62,9 @@ public class CombinatorTest {
         assertThat(result, isSame(asList(
                 new Dimension<>(new Tuple<String>()),
                 new Dimension<>(new Tuple<>("red"), new Tuple<>("small"), new Tuple<>("debug")),
-                new Dimension<>(new Tuple<>("red", "small"), new Tuple<>("red", "debug"), new Tuple<>("small", "debug")),
-                new Dimension<>(new Tuple<>("red", "small", "debug"))
+                new Dimension<>(new Tuple<>("small", "red"), new Tuple<>("red", "debug"), new Tuple<>("small", "debug")),
+                new Dimension<>(new Tuple<>("small", "red", "debug"))
         )));
+        System.out.println(result);
     }
 }

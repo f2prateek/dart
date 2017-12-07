@@ -29,10 +29,10 @@ public class DimensionListTypeSafeMatcher extends TypeSafeMatcher<List<Dimension
         mismatchDescription
                 .appendText("The actual result: ")
                 .appendValue(actual)
-                .appendText("didn't match the expected result: ")
+                .appendText(" didn't match the expected result: ")
                 .appendValue(expected)
-                .appendText("The mistmatch comes from:")
-                .appendValue(mismatch);
+                .appendText(". The mistmatch comes from: ")
+                .appendText(mismatch);
     }
 
     @Override
@@ -46,13 +46,13 @@ public class DimensionListTypeSafeMatcher extends TypeSafeMatcher<List<Dimension
 
     private static String assertMatch(List<Dimension<String>> expected, List<Dimension<String>> actual) {
         if (expected.size() != actual.size()) {
-            return format("Expected %s has a different size than actual=%s\n", expected, actual);
+            return format("Expected %s has a different size than actual=%s.", expected, actual);
         }
 
         for (int indexDimension = 0; indexDimension < expected.size(); indexDimension++) {
             String mismatch = assertMatch(expected.get(indexDimension), actual.get(indexDimension));
             if (mismatch != null) {
-                format("Dimensions are different: expected=%s actual=%s\n", expected, actual);
+                return format("Dimensions are different: expected=%s actual=%s. %s", expected, actual, mismatch);
             }
         }
         return null;
@@ -60,36 +60,36 @@ public class DimensionListTypeSafeMatcher extends TypeSafeMatcher<List<Dimension
 
     private static String assertMatch(Dimension<String> expected, Dimension<String> actual) {
         if (expected.size() != actual.size()) {
-            return format("Expected %s has a different size than actual=%s\n", expected, actual);
+            return format("Expected %s has a different size than actual=%s.", expected, actual);
         }
 
         StringBuilder mismatchSet = new StringBuilder();
         for (Tuple<String> expectedTuple : expected) {
-            boolean matchTuple = true;
+            boolean matchTuples = false;
             for (Tuple<String> actualTuple : actual) {
                 String mismatch = assertMatch(expectedTuple, actualTuple);
                 if (mismatch != null) {
-                    matchTuple = false;
+                    mismatchSet.append(format("The tuple expected=%s is different from actual=%s. ", expected, actual));
                     mismatchSet.append(mismatch);
                 }
-                matchTuple = matchTuple || (mismatch != null);
+                matchTuples = matchTuples || (mismatch == null);
             }
-            if (!matchTuple) {
+            if (!matchTuples) {
                 return mismatchSet.toString();
             }
         }
 
         for (Tuple<String> actualTuple : actual) {
-            boolean matchTuple = true;
+            boolean matchTuples = false;
             for (Tuple<String> expectedTuple : expected) {
                 String mismatch = assertMatch(expectedTuple, actualTuple);
                 if (mismatch != null) {
-                    matchTuple = false;
+                    mismatchSet.append(format("The tuple expected=%s is different from actual=%s. ", expected, actual));
                     mismatchSet.append(mismatch);
                 }
-                matchTuple = matchTuple || (mismatch != null);
+                matchTuples = matchTuples || (mismatch == null);
             }
-            if (!matchTuple) {
+            if (!matchTuples) {
                 return mismatchSet.toString();
             }
         }
@@ -99,21 +99,17 @@ public class DimensionListTypeSafeMatcher extends TypeSafeMatcher<List<Dimension
 
     private static String assertMatch(Tuple<String> expected, Tuple<String> actual) {
         if (expected.size() != actual.size()) {
-            return format("Expected %s has a different size than actual=%s\n", expected, actual);
+            return format("Expected %s has a different size than actual=%s.", expected, actual);
         }
 
+        int indexString = 0;
         for (String actualString : actual) {
-            if (!expected.contains(actualString)) {
-                return format("Expected %s doesn't contain actual=%s\n", expected, actualString);
+            String expectedString = expected.get(indexString);
+            if (!expectedString.equals(actualString)) {
+                return format("Expected=%s isn't equal to actual=%s.", expectedString, actualString);
             }
+            indexString ++;
         }
-
-        for (String expectedString : expected) {
-            if (!actual.contains(expectedString)) {
-                return format("Actual %s doesn't contain expected=%s\n", actual, expectedString);
-            }
-        }
-
 
         return null;
     }

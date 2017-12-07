@@ -65,7 +65,7 @@ class HensonPluginFunctionalTest extends Specification {
         
         import android.app.Activity;
         import android.os.Bundle;
-        import test.HensonNavigator;
+        //import test.HensonNavigator;
         import android.content.Intent;
         
         class FooActivity extends Activity {

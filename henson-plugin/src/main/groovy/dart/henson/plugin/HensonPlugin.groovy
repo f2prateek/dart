@@ -15,6 +15,8 @@ import org.gradle.api.tasks.compile.JavaCompile
 import java.security.InvalidParameterException
 import java.util.zip.ZipFile
 
+import static dart.henson.plugin.Combinator.Tuple
+
 class HensonPlugin implements Plugin<Project> {
 
     public static final String NAVIGATION_API_COMPILE_TASK_PREFIX = 'navigationApiCompileJava'
@@ -44,10 +46,23 @@ class HensonPlugin implements Plugin<Project> {
         //  create tasks: compile and jar
         //  create artifacts
 
-        processMain(project, dartVersionName)
-        processBuildTypes(project, dartVersionName)
-        processProductFlavors(project, dartVersionName)
+        log.debug "Detected Variants:"
+        project.android.buildTypes.all { buildType ->
+        }
+
+        project.android.productFlavors.all { productFlavor ->
+            log.debug "ProductFlavor: ${productFlavor.name}"
+        }
+
+        log.debug "------------"
+
+        project.android.sourceSets {
+            "navigation2"
+        }
+        log.debug "------------2"
+
         processVariants(project, dartVersionName)
+        log.debug "------------3"
 
         //add the artifact of navigation for the variant to the variant configuration
         addNavigationArtifactsToVariantConfigurations(project)
@@ -76,16 +91,16 @@ class HensonPlugin implements Plugin<Project> {
 
                     variant.compileConfiguration.resolve()
                     variant.compileConfiguration.each { dependency ->
-                        println "Detected dependency: ${dependency.properties}"
+                        project.logger.debug "Detected dependency: ${dependency.properties}"
                         List<String> targetActivities = new ArrayList()
                         if (dependency.name.matches(".*-navigationApi.*.jar")) {
-                            println "Detected navigation API dependency: ${dependency.name}"
-                            println "Detected navigation API dependency: ${dependency.name}"
+                            project.logger.debug "Detected navigation API dependency: ${dependency.name}"
+                            project.logger.debug "Detected navigation API dependency: ${dependency.name}"
                             def file = dependency.absoluteFile
                             def entries = getJarContent(file)
                             entries.each { entry ->
                                 if(entry.matches(".*__IntentBuilder.class")) {
-                                    println "Detected intent builder: ${entry}"
+                                    project.logger.debug "Detected intent builder: ${entry}"
                                     def targetActivityFQN = entry.substring(0, entry.length() - "__IntentBuilder.class".length()).replace('/', '.')
                                     targetActivities.add(targetActivityFQN)
                                 }
@@ -135,16 +150,6 @@ class HensonPlugin implements Plugin<Project> {
         .toString()
     }
 
-    private void processMain(Project project, dartVersionName) {
-        def suffix = ""
-        def pathSuffix = "main/"
-        def sourceSetName = "main"
-
-        createSourceSetAndConfiguration(project, sourceSetName, suffix, pathSuffix, dartVersionName)
-        createEmptyNavigationApiCompileTask(project, suffix)
-        createEmptyNavigationApiJarTask(project, suffix)
-    }
-
     private Object processVariants(Project project, dartVersionName) {
         def hasApp = project.plugins.withType(AppPlugin)
         final def variants
@@ -154,183 +159,49 @@ class HensonPlugin implements Plugin<Project> {
             variants = project.android.libraryVariants
         }
 
-        project.android.with {
-            variants.all { variant ->
-                variant.productFlavors.all { productFlavor ->
-                    println "Processing variant: ${productFlavor.name}${variant.buildType.name.capitalize()}"
-                    processVariant(project, productFlavor, buildType, dartVersionName)
-                }
-            }
-        }
-    }
-
-    private void processProductFlavors(Project project, dartVersionName) {
-        project.android.productFlavors.all { productFlavor ->
-            println "Processing flavor: ${productFlavor.name}"
-            processFlavorOrBuildType(project, productFlavor, dartVersionName)
-        }
-    }
-
-    private void processBuildTypes(Project project, dartVersionName) {
-        project.android.buildTypes.all { buildType ->
-            println "Processing buildType: ${buildType.name}"
-            processFlavorOrBuildType(project, buildType, dartVersionName)
-        }
-    }
-
-    private void processVariant(Project project, productFlavor, buildType, dartVersionName) {
-        def variantName = "${productFlavor.name}${buildType.name.capitalize()}"
-        def suffix = "${productFlavor.name.capitalize()}${buildType.name.capitalize()}"
-        def pathSuffix = "${productFlavor.name}${buildType.name.capitalize()}/"
-        createSourceSetAndConfiguration(project, variantName, suffix, pathSuffix, dartVersionName)
-
-        def navigationVariant = createNavigationVariant(project, productFlavor, buildType)
-        def navigationApiCompiler = createNavigationApiCompileTask(project, suffix, pathSuffix, navigationVariant)
-
-        createNavigationApiJarTask(project, navigationApiCompiler, suffix)
-
-        addArtifact(project, suffix, suffix)
-    }
-
-    private void processFlavorOrBuildType(Project project, productFlavorOrBuildType, dartVersionName) {
-        def sourceSetName = "${productFlavorOrBuildType.name}"
-        def suffix = "${productFlavorOrBuildType.name.capitalize()}"
-        def pathSuffix = "${productFlavorOrBuildType.name}/"
-
-        createSourceSetAndConfiguration(project, sourceSetName, suffix, pathSuffix, dartVersionName)
-
-        //createEmptyNavigationApiCompileTask(project, suffix)
-        //createEmptyNavigationApiJarTask(project, suffix)
-    }
-
-    private void createSourceSetAndConfiguration(Project project, String sourceSetName, String suffix, String pathSuffix, dartVersionName) {
-        def newSourceSetName = "navigation" + suffix
-        def newSourceSetPath = "src/navigation/" + pathSuffix
-        createNavigationSourceSet(project, sourceSetName, newSourceSetName, newSourceSetPath)
-
-        def newArtifactName = "navigationApi" + suffix
-        createNavigationConfiguration(project, newArtifactName, suffix, dartVersionName)
-    }
-
-    private Object getVersionName() {
-        Properties properties = new Properties()
-        properties.load(getClass().getClassLoader().getResourceAsStream("build.properties"))
-        properties.get("dart.version")
-    }
-
-    private NavigationVariant createNavigationVariant(Project project, productFlavor, buildType) {
-        def navigationVariant = new NavigationVariant()
-        navigationVariant.flavorName = productFlavor.name
-        navigationVariant.buildTypeName = buildType.name
-        navigationVariant.sourceSets = [project.android.sourceSets["navigation"] \
-            , project.android.sourceSets["navigation${navigationVariant.buildTypeName.capitalize()}"] \
-            , project.android.sourceSets["navigation${navigationVariant.flavorName.capitalize()}"] \
-            , project.android.sourceSets["navigation${navigationVariant.flavorName.capitalize()}${navigationVariant.buildTypeName.capitalize()}"]
-                ]
-        navigationVariant.apiConfigurations = [project.configurations["navigationApi"] \
-            , project.configurations["navigation${navigationVariant.buildTypeName.capitalize()}Api"] \
-            , project.configurations["navigation${navigationVariant.flavorName.capitalize()}Api"] \
-            , project.configurations["navigation${navigationVariant.flavorName.capitalize()}${navigationVariant.buildTypeName.capitalize()}Api"]
-                ]
-        navigationVariant.implementationConfigurations = [project.configurations["navigationImplementation"] \
-            , project.configurations["navigation${navigationVariant.buildTypeName.capitalize()}Implementation"] \
-            , project.configurations["navigation${navigationVariant.flavorName.capitalize()}Implementation"] \
-            , project.configurations["navigation${navigationVariant.flavorName.capitalize()}${navigationVariant.buildTypeName.capitalize()}Implementation"]
-                ]
-        navigationVariant.compileOnlyConfigurations = [project.configurations["navigationCompileOnly"] \
-            , project.configurations["navigation${navigationVariant.buildTypeName.capitalize()}CompileOnly"] \
-            , project.configurations["navigation${navigationVariant.flavorName.capitalize()}CompileOnly"] \
-            , project.configurations["navigation${navigationVariant.flavorName.capitalize()}${navigationVariant.buildTypeName.capitalize()}CompileOnly"]
-                ]
-        navigationVariant.annotationProcessorConfigurations = [project.configurations["navigationAnnotationProcessor"] \
-            , project.configurations["navigation${navigationVariant.buildTypeName.capitalize()}AnnotationProcessor"] \
-            , project.configurations["navigation${navigationVariant.flavorName.capitalize()}AnnotationProcessor"] \
-            , project.configurations["navigation${navigationVariant.flavorName.capitalize()}${navigationVariant.buildTypeName.capitalize()}AnnotationProcessor"]
-                ]
-        navigationVariant
-    }
-
-    private Task createEmptyNavigationApiCompileTask(Project project, taskSuffix) {
-        project.tasks.create(NAVIGATION_API_COMPILE_TASK_PREFIX + String.valueOf(taskSuffix))
-    }
-
-    private Task createEmptyNavigationApiJarTask(Project project, taskSuffix) {
-        project.tasks.create(NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(taskSuffix))
-    }
-
-    private Task createNavigationApiCompileTask(Project project, taskSuffix, destinationPath, navigationVariant) {
-        def newDestinationDirName = "${project.buildDir}/navigation/classes/java/${destinationPath}"
-        def newGeneratedDirName = "${project.buildDir}/generated/source/apt/navigation/${destinationPath}"
-
-        FileCollection effectiveClasspath = new UnionFileCollection()
-        navigationVariant.apiConfigurations.each { effectiveClasspath.add(it) }
-        navigationVariant.implementationConfigurations.each { effectiveClasspath.add(it) }
-        navigationVariant.compileOnlyConfigurations.each { effectiveClasspath.add(it) }
-
-        FileCollection effectiveAnnotationProcessorPath = new UnionFileCollection()
-        navigationVariant.annotationProcessorConfigurations.each { effectiveAnnotationProcessorPath.add(it) }
-
-        project.tasks.create("${NAVIGATION_API_COMPILE_TASK_PREFIX}${taskSuffix}", JavaCompile) {
-            setSource(navigationVariant.sourceSets.collect { sourceSet -> sourceSet.java.sourceFiles })
-            setDestinationDir(project.file("${newDestinationDirName}"))
-            classpath = effectiveClasspath
-            options.compilerArgs = ["-s", "${newGeneratedDirName}"]
-            options.annotationProcessorPath = effectiveAnnotationProcessorPath
-            targetCompatibility = JavaVersion.VERSION_1_7
-            sourceCompatibility = JavaVersion.VERSION_1_7
-            doFirst {
-                project.file("${newGeneratedDirName}").mkdirs()
-                project.file("${newDestinationDirName}").mkdirs()
-            }
-        }
-    }
-
-    private Task createNavigationApiJarTask(Project project, navigationApiCompileTask, taskSuffix) {
-        def task = project.tasks.create(NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(taskSuffix), Jar) {
-            baseName = "${project.name}-navigationApi${taskSuffix}"
-            from navigationApiCompileTask.destinationDir
-        }
-        task.dependsOn(navigationApiCompileTask)
-        task
-    }
-
-    private void addArtifact(Project project, artifactSuffix, taskSuffix) {
-        println project.configurations.getByName("navigationApi")
-        project.artifacts.add("navigationApi${artifactSuffix}", project.tasks[NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(taskSuffix)])
-    }
-
-    private void addNavigationArtifactsToVariantConfigurations(Project project) {
-        //the project main source itself will depend on the navigation
-        //we must wait until the variant created the proper configurations to add the dependency.
-        def hasApp = project.plugins.withType(AppPlugin)
-        final def variants
-        if (hasApp) {
-            variants = project.android.applicationVariants
-        } else {
-            variants = project.android.libraryVariants
-        }
-
         variants.all { variant ->
-            //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-            def configurationPrefix = variant.name
-            def artifactSuffix = variant.name.capitalize()
-            project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "navigationApi${artifactSuffix}"))
+            project.logger.debug "Processing variant: ${variant.name}"
+            processVariant(project, variant, dartVersionName)
         }
     }
 
-    private void addDependenciesToConfiguration(Project project, configurationSuffix, dartVersionName) {
-        project.dependencies {
-            "navigation${configurationSuffix}CompileOnly" "com.google.android:android:4.1.1.4"
-            "navigation${configurationSuffix}CompileOnly" "com.f2prateek.dart:dart:${dartVersionName}"
-            "navigation${configurationSuffix}CompileOnly" "com.f2prateek.dart:henson:${dartVersionName}"
-            "navigation${configurationSuffix}Api" "com.f2prateek.dart:dart-annotations:${dartVersionName}"
-            "navigation${configurationSuffix}AnnotationProcessor" "com.f2prateek.dart:henson-processor:${dartVersionName}"
-            "navigation${configurationSuffix}AnnotationProcessor" "com.f2prateek.dart:dart-processor:${dartVersionName}"
+    private void processVariant(Project project, variant, dartVersionName) {
+        Combinator combinator = new Combinator()
+        def navigationVariant = createNavigationVariant(project, variant, combinator)
+        createSourceSetAndConfigurations(project, navigationVariant, dartVersionName)
+        createNavigationCompilerAndJarTasks(project, navigationVariant)
+        addArtifacts(project, navigationVariant)
+    }
+
+    private void createSourceSetAndConfigurations(project, navigationVariant, dartVersionName) {
+        navigationVariant.combinations.each { dimension ->
+            dimension.each { tuple ->
+                def tupleName = merge(tuple)
+                def tuplePath
+                if (tuple.isEmpty()) {
+                    tuplePath = "src/navigation/main/java"
+                } else {
+                    tuplePath = "src/navigation/${tupleName}/java"
+                }
+                tupleName = tupleName.capitalize()
+                createNavigationSourceSet(project, "navigation${tupleName}", "${tuplePath}/")
+
+                def newArtifactName = "navigationApi${tupleName}"
+                createNavigationConfiguration(project, newArtifactName, tupleName)
+                addDartAndHensonDependenciesToConfiguration(project, tupleName, dartVersionName)
+
+                navigationVariant.sourceSets << project.sourceSets["navigation${tupleName}"]
+                navigationVariant.apiConfigurations << project.configurations["navigation${tupleName}Api"]
+                navigationVariant.implementationConfigurations << project.configurations["navigation${tupleName}Implementation"]
+                navigationVariant.compileOnlyConfigurations << project.configurations["navigation${tupleName}CompileOnly"]
+                navigationVariant.annotationProcessorConfigurations << project.configurations["navigation${tupleName}AnnotationProcessor"]
+            }
         }
     }
 
-    private void createNavigationConfiguration(Project project, newArtifactName, newConfigurationSuffix, dartVersionName) {
-        println "Creating configuration: ${newArtifactName}"
+    private void createNavigationConfiguration(Project project, newArtifactName, newConfigurationSuffix) {
+        project.logger.debug "Creating configuration: ${newArtifactName}"
+        project.logger.debug "Creating configurations: navigation${newConfigurationSuffix}*"
         project.configurations {
             //the name of the artifact
             "${newArtifactName}" {
@@ -355,15 +226,164 @@ class HensonPlugin implements Plugin<Project> {
                 canBeResolved true
             }
         }
-        addDependenciesToConfiguration(project, newConfigurationSuffix, dartVersionName)
     }
 
-    private void createNavigationSourceSet(Project project, sourceSetName, newSourceSetName, newSourceSetPath) {
-        println "Creating sourceSet: ${sourceSetName}->${newSourceSetName} with root in '${newSourceSetPath}'"
-        project.android.sourceSets {
+    private void createNavigationSourceSet(Project project, newSourceSetName, newSourceSetPath) {
+        project.logger.debug "Creating sourceSet: ${newSourceSetName} with root in '${newSourceSetPath}'"
+        project.sourceSets {
             "${newSourceSetName}" {
-                setRoot "${newSourceSetPath}"
+                java.srcDirs "${newSourceSetPath}"
             }
+        }
+
+        println "Compiling java"
+        println project.sourceSets["${newSourceSetName}"].java.srcDirs
+    }
+
+    private void createNavigationCompilerAndJarTasks(Project project, navigationVariant) {
+        navigationVariant.combinations.each{ dimension ->
+            dimension.each { tuple ->
+                def tupleName = merge(tuple)
+                def suffix = tupleName.capitalize()
+                def pathSuffix = "${tupleName}/"
+                def navigationApiCompiler = createNavigationApiCompileTask(project, suffix, pathSuffix, navigationVariant)
+                createNavigationApiJarTask(project, navigationApiCompiler, suffix)
+            }
+        }
+    }
+
+    private void addArtifacts(project, navigationVariant) {
+        navigationVariant.combinations.each { dimension ->
+            dimension.each { tuple ->
+                def tupleName = merge(tuple)
+                def suffix = tupleName.capitalize()
+                addArtifact(project, suffix, suffix)
+            }
+        }
+    }
+
+
+
+    private Object getVersionName() {
+        Properties properties = new Properties()
+        properties.load(getClass().getClassLoader().getResourceAsStream("build.properties"))
+        properties.get("dart.version")
+    }
+
+    String merge(Tuple tuple) {
+        if (tuple.empty) {
+            return ""
+        }
+
+        boolean first = true
+        def mergedName = ""
+
+        tuple.each { name ->
+            if(first) {
+                mergedName = name
+                first = false
+            } else {
+                mergedName += name.capitalize()
+            }
+        }
+        mergedName
+    }
+
+    private NavigationVariant createNavigationVariant(Project project, variant, combinator) {
+        def navigationVariant = new NavigationVariant()
+        navigationVariant.variant = variant
+        def flavorNames = variant.productFlavors.collect { it.name }
+        project.logger.debug "Flavors: ${flavorNames}"
+        def flavorNamesAndBuildType = flavorNames << variant.buildType.name
+        project.logger.debug "FlavorNamesAndBuildType: ${flavorNamesAndBuildType}"
+        navigationVariant.combinations = combinator.combine(flavorNamesAndBuildType)
+        project.logger.debug "Combinations: ${navigationVariant.combinations}"
+
+        navigationVariant
+    }
+
+    private Task createEmptyNavigationApiCompileTask(Project project, taskSuffix) {
+        project.tasks.create(NAVIGATION_API_COMPILE_TASK_PREFIX + String.valueOf(taskSuffix))
+    }
+
+    private Task createEmptyNavigationApiJarTask(Project project, taskSuffix) {
+        project.tasks.create(NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(taskSuffix))
+    }
+
+    private Task createNavigationApiCompileTask(Project project, taskSuffix, destinationPath, navigationVariant) {
+        def newDestinationDirName = "${project.buildDir}/navigation/classes/java/${destinationPath}"
+        def newGeneratedDirName = "${project.buildDir}/generated/source/apt/navigation/${destinationPath}"
+
+        FileCollection effectiveClasspath = new UnionFileCollection()
+        navigationVariant.apiConfigurations.each { effectiveClasspath.add(it) }
+        navigationVariant.implementationConfigurations.each { effectiveClasspath.add(it) }
+        navigationVariant.compileOnlyConfigurations.each { effectiveClasspath.add(it) }
+
+        FileCollection effectiveAnnotationProcessorPath = new UnionFileCollection()
+        navigationVariant.annotationProcessorConfigurations.each { effectiveAnnotationProcessorPath.add(it) }
+
+        if(project.tasks.findByName("${NAVIGATION_API_COMPILE_TASK_PREFIX}${taskSuffix}") == null) {
+            project.tasks.create("${NAVIGATION_API_COMPILE_TASK_PREFIX}${taskSuffix}", JavaCompile) {
+                setSource(navigationVariant.sourceSets.collect { sourceSet -> sourceSet.java.files })
+                setDestinationDir(project.file("${newDestinationDirName}"))
+                classpath = effectiveClasspath
+                options.compilerArgs = ["-s", "${newGeneratedDirName}"]
+                options.annotationProcessorPath = effectiveAnnotationProcessorPath
+                targetCompatibility = JavaVersion.VERSION_1_7
+                sourceCompatibility = JavaVersion.VERSION_1_7
+                doFirst {
+                    project.file("${newGeneratedDirName}").mkdirs()
+                    project.file("${newDestinationDirName}").mkdirs()
+                }
+            }
+        }
+    }
+
+    private Task createNavigationApiJarTask(Project project, navigationApiCompileTask, taskSuffix) {
+        if(project.tasks.findByName("${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}") == null) {
+            def task = project.tasks.create("${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}", Jar) {
+                baseName = "${project.name}-navigationApi${taskSuffix}"
+                from navigationApiCompileTask.destinationDir
+            }
+            task.dependsOn(navigationApiCompileTask)
+            task
+        }
+    }
+
+    private void addArtifact(Project project, artifactSuffix, taskSuffix) {
+        if(project.tasks.findByName("${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}") != null) {
+            project.logger.debug(project.configurations.getByName("navigationApi").toString())
+            project.artifacts.add("navigationApi${artifactSuffix}", project.tasks["${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}"])
+        }
+    }
+
+    private void addNavigationArtifactsToVariantConfigurations(Project project) {
+        //the project main source itself will depend on the navigation
+        //we must wait until the variant created the proper configurations to add the dependency.
+        def hasApp = project.plugins.withType(AppPlugin)
+        final def variants
+        if (hasApp) {
+            variants = project.android.applicationVariants
+        } else {
+            variants = project.android.libraryVariants
+        }
+
+        variants.all { variant ->
+            //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
+            def configurationPrefix = variant.name
+            def artifactSuffix = variant.name.capitalize()
+            project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "navigationApi${artifactSuffix}"))
+        }
+    }
+
+    private void addDartAndHensonDependenciesToConfiguration(Project project, configurationSuffix, dartVersionName) {
+        project.dependencies {
+            "navigation${configurationSuffix}CompileOnly" "com.google.android:android:4.1.1.4"
+            "navigation${configurationSuffix}CompileOnly" "com.f2prateek.dart:dart:${dartVersionName}"
+            "navigation${configurationSuffix}CompileOnly" "com.f2prateek.dart:henson:${dartVersionName}"
+            "navigation${configurationSuffix}Api" "com.f2prateek.dart:dart-annotations:${dartVersionName}"
+            "navigation${configurationSuffix}AnnotationProcessor" "com.f2prateek.dart:henson-processor:${dartVersionName}"
+            "navigation${configurationSuffix}AnnotationProcessor" "com.f2prateek.dart:dart-processor:${dartVersionName}"
         }
     }
 

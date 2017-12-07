@@ -40,7 +40,7 @@ public class Combinator<T> {
                 previousDimension.add(copyOf(subTuple));
 
                 Tuple<T> newTuple = copyOf(subTuple);
-                newTuple.add(firstElement);
+                newTuple.add(0, firstElement);
                 nextDimension.add(newTuple);
             }
             newDimensionList.add(previousDimension);
