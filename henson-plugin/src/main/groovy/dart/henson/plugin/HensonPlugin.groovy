@@ -47,23 +47,7 @@ class HensonPlugin implements Plugin<Project> {
         //  create tasks: compile and jar
         //  create artifacts
 
-        log.debug "Detected Variants:"
-        project.android.buildTypes.all { buildType ->
-        }
-
-        project.android.productFlavors.all { productFlavor ->
-            log.debug "ProductFlavor: ${productFlavor.name}"
-        }
-
-        log.debug "------------"
-
-        project.android.sourceSets {
-            "navigation2"
-        }
-        log.debug "------------2"
-
         processVariants(project, dartVersionName)
-        log.debug "------------3"
 
         //add the artifact of navigation for the variant to the variant configuration
         addNavigationArtifactsToVariantConfigurations(project)
@@ -90,10 +74,14 @@ class HensonPlugin implements Plugin<Project> {
                     }
                     def hensonNavigatorPackageName = hensonExtension.navigatorPackageName
 
-                    variant.compileConfiguration.resolve()
+                    try {
+                        variant.compileConfiguration.resolve()
+                    } catch (exception) {
+                        project.logger.lifecycle("Could not resolve compileConfiguration for variant: ${variant.name}", exception)
+                    }
+                    List<String> targetActivities = new ArrayList()
                     variant.compileConfiguration.each { dependency ->
                         project.logger.debug "Detected dependency: ${dependency.properties}"
-                        List<String> targetActivities = new ArrayList()
                         if (dependency.name.matches(".*-navigationApi.*.jar")) {
                             project.logger.debug "Detected navigation API dependency: ${dependency.name}"
                             project.logger.debug "Detected navigation API dependency: ${dependency.name}"
@@ -161,8 +149,11 @@ class HensonPlugin implements Plugin<Project> {
         }
 
         variants.all { variant ->
-            project.logger.debug "Processing variant: ${variant.name}"
-            processVariant(project, variant, dartVersionName)
+            def hensonExtension = project.extensions.getByName('henson')
+            if (hensonExtension!= null && !hensonExtension.navigatorOnly) {
+                project.logger.debug "Processing variant: ${variant.name}"
+                processVariant(project, variant, dartVersionName)
+            }
         }
     }
 
@@ -236,9 +227,6 @@ class HensonPlugin implements Plugin<Project> {
                 java.srcDirs "${newSourceSetPath}"
             }
         }
-
-        println "Compiling java"
-        println project.sourceSets["${newSourceSetName}"].java.srcDirs
     }
 
     private void createNavigationCompilerAndJarTasks(Project project, navigationVariant) {
@@ -369,10 +357,13 @@ class HensonPlugin implements Plugin<Project> {
         }
 
         variants.all { variant ->
-            //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-            def configurationPrefix = variant.name
-            def artifactSuffix = variant.name.capitalize()
-            project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "${NAVIGATION_ARTIFACT_PREFIX}${artifactSuffix}"))
+            def hensonExtension = project.extensions.getByName('henson')
+            if (hensonExtension!= null && !hensonExtension.navigatorOnly) {
+                //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
+                def configurationPrefix = variant.name
+                def artifactSuffix = variant.name.capitalize()
+                project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "${NAVIGATION_ARTIFACT_PREFIX}${artifactSuffix}"))
+            }
         }
     }
 
