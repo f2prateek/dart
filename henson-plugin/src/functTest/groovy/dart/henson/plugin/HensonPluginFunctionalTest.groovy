@@ -165,24 +165,36 @@ class HensonPluginFunctionalTest extends Specification {
 
         then:
         result.output.contains("navigationApiCompileJava")
-        result.output.contains("navigationApiCompileJavaRed")
-        result.output.contains("navigationApiCompileJavaBlue")
-        result.output.contains("navigationApiCompileJavaRelease")
-        result.output.contains("navigationApiCompileJavaDebug")
         result.output.contains("navigationApiCompileJavaBlueRelease")
         result.output.contains("navigationApiCompileJavaBlueDebug")
         result.output.contains("navigationApiCompileJavaRedRelease")
         result.output.contains("navigationApiCompileJavaRedDebug")
 
         result.output.contains("navigationApiJar")
-        result.output.contains("navigationApiJarRed")
-        result.output.contains("navigationApiJarBlue")
-        result.output.contains("navigationApiJarRelease")
-        result.output.contains("navigationApiJarDebug")
         result.output.contains("navigationApiJarBlueRelease")
         result.output.contains("navigationApiJarBlueDebug")
         result.output.contains("navigationApiJarRedRelease")
         result.output.contains("navigationApiJarRedDebug")
+
+        when:
+        result = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('--no-build-cache', 'dependencies', '-d', '-s')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        result.output.contains("navigationApi")
+        result.output.contains("navigationImplementation")
+        result.output.contains("navigationAnnotationProcessor")
+        result.output.contains("navigationBlue")
+        result.output.contains("navigationRed")
+        result.output.contains("navigationDebug")
+        result.output.contains("navigationRelease")
+        result.output.contains("navigationBlueDebug")
+        result.output.contains("navigationBlueRelease")
+        result.output.contains("navigationRedDebug")
+        result.output.contains("navigationRedRelease")
 
         when:
         def runner = GradleRunner.create()

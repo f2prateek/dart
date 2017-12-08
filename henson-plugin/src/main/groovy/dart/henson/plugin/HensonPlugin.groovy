@@ -47,11 +47,33 @@ class HensonPlugin implements Plugin<Project> {
         //  create tasks: compile and jar
         //  create artifacts
 
-        processVariants(project, dartVersionName)
+        //we create all configurations eagerly as we want users
+        //to be able to use them before the creation of variants
+        createNavigationConfigurations(project, "")
 
-        //add the artifact of navigation for the variant to the variant configuration
-        addNavigationArtifactsToVariantConfigurations(project)
+        project.android.buildTypes.all { buildType ->
+            createNavigationConfigurations(project, buildType.name.capitalize())
+        }
+        project.android.productFlavors.all { productFlavor ->
+            createNavigationConfigurations(project, productFlavor.name.capitalize())
+        }
 
+        def hasApp = project.plugins.withType(AppPlugin)
+        final def variants
+        if (hasApp) {
+            variants = project.android.applicationVariants
+        } else {
+            variants = project.android.libraryVariants
+        }
+
+        variants.all { variant ->
+            def hensonExtension = project.extensions.getByName('henson')
+            if (hensonExtension != null && !hensonExtension.navigatorOnly) {
+                project.logger.debug "Processing variant: ${variant.name}"
+                processVariant(project, variant, dartVersionName)
+            }
+        }
+\
         //create the task for generating the henson navigator
         detectNavigationApiDependenciesAndGenerateHensonNavigator(project)
     }
@@ -74,11 +96,7 @@ class HensonPlugin implements Plugin<Project> {
                     }
                     def hensonNavigatorPackageName = hensonExtension.navigatorPackageName
 
-                    try {
-                        variant.compileConfiguration.resolve()
-                    } catch (exception) {
-                        project.logger.lifecycle("Could not resolve compileConfiguration for variant: ${variant.name}", exception)
-                    }
+                    variant.compileConfiguration.resolve()
                     Set<String> targetActivities = new HashSet()
                     variant.compileConfiguration.each { dependency ->
                         project.logger.debug "Detected dependency: ${dependency.properties}"
@@ -95,6 +113,7 @@ class HensonPlugin implements Plugin<Project> {
                                 }
                             }
                         }
+
                         def variantSrcFolderName = new File(project.projectDir, "src/${variant.name}/java/")
                         String hensonNavigator = generateHensonNavigatorClass(targetActivities, hensonNavigatorPackageName)
                         variantSrcFolderName.mkdirs()
@@ -139,30 +158,13 @@ class HensonPlugin implements Plugin<Project> {
         .toString()
     }
 
-    private Object processVariants(Project project, dartVersionName) {
-        def hasApp = project.plugins.withType(AppPlugin)
-        final def variants
-        if (hasApp) {
-            variants = project.android.applicationVariants
-        } else {
-            variants = project.android.libraryVariants
-        }
-
-        variants.all { variant ->
-            def hensonExtension = project.extensions.getByName('henson')
-            if (hensonExtension!= null && !hensonExtension.navigatorOnly) {
-                project.logger.debug "Processing variant: ${variant.name}"
-                processVariant(project, variant, dartVersionName)
-            }
-        }
-    }
-
     private void processVariant(Project project, variant, dartVersionName) {
         Combinator combinator = new Combinator()
         def navigationVariant = createNavigationVariant(project, variant, combinator)
         createSourceSetAndConfigurations(project, navigationVariant, dartVersionName)
-        createNavigationCompilerAndJarTasks(project, navigationVariant)
-        addArtifacts(project, navigationVariant)
+        createNavigationCompilerAndJarTasksAndArtifact(project, navigationVariant)
+        //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
+        addNavigationArtifactsToVariantConfiguration(project, variant)
     }
 
     private void createSourceSetAndConfigurations(project, navigationVariant, dartVersionName) {
@@ -178,8 +180,7 @@ class HensonPlugin implements Plugin<Project> {
                 tupleName = tupleName.capitalize()
                 createNavigationSourceSet(project, "navigation${tupleName}", "${tuplePath}/")
 
-                def newArtifactName = "${NAVIGATION_ARTIFACT_PREFIX}${tupleName}"
-                createNavigationConfigurations(project, newArtifactName, tupleName)
+                createNavigationConfigurations(project, tupleName)
                 addDartAndHensonDependenciesToNavigationConfigurations(project, tupleName, dartVersionName)
 
                 navigationVariant.sourceSets << project.sourceSets["navigation${tupleName}"]
@@ -191,32 +192,9 @@ class HensonPlugin implements Plugin<Project> {
         }
     }
 
-    private void createNavigationConfigurations(Project project, newArtifactName, newConfigurationSuffix) {
-        project.logger.debug "Creating artifact configuration: ${newArtifactName}"
-        project.logger.debug "Creating configurations: navigation${newConfigurationSuffix}*"
-        project.configurations {
-            //the name of the artifact
-            "${newArtifactName}" {
-                canBeResolved true
-            }
-
-            //the api scope: is there any convention ? apiElements?
-            "navigation${newConfigurationSuffix}Api" {
-                canBeResolved true
-            }
-
-            "navigation${newConfigurationSuffix}Implementation" {
-                canBeResolved true
-            }
-
-            "navigation${newConfigurationSuffix}CompileOnly" {
-                canBeResolved true
-            }
-
-            //the ap scope
-            "navigation${newConfigurationSuffix}AnnotationProcessor" {
-                canBeResolved true
-            }
+    private void createNavigationConfigurations(Project project, newConfigurationRadix) {
+        ["Api", "Implementation", "CompileOnly", "AnnotationProcessor"].each { suffix ->
+            project.configurations.maybeCreate("navigation${newConfigurationRadix}${suffix}")
         }
     }
 
@@ -229,29 +207,18 @@ class HensonPlugin implements Plugin<Project> {
         }
     }
 
-    private void createNavigationCompilerAndJarTasks(Project project, navigationVariant) {
-        navigationVariant.combinations.each{ dimension ->
-            dimension.each { tuple ->
-                def tupleName = merge(tuple)
-                def suffix = tupleName.capitalize()
-                def pathSuffix = "${tupleName}/"
-                def navigationApiCompiler = createNavigationApiCompileTask(project, suffix, pathSuffix, navigationVariant)
-                createNavigationApiJarTask(project, navigationApiCompiler, suffix)
-            }
+    private void createNavigationCompilerAndJarTasksAndArtifact(Project project, navigationVariant) {
+        navigationVariant.combinations.last().each { tuple ->
+            def tupleName = merge(tuple)
+            def suffix = tupleName.capitalize()
+            def pathSuffix = "${tupleName}/"
+            def navigationApiCompiler = createNavigationApiCompileTask(project, suffix, pathSuffix, navigationVariant)
+            def navigationApiJarTask = createNavigationApiJarTask(project, navigationApiCompiler, suffix)
+            navigationVariant.compilerTask = navigationApiCompiler
+            navigationVariant.jarTask = navigationApiJarTask
+            addArtifact(project, navigationVariant)
         }
     }
-
-    private void addArtifacts(project, navigationVariant) {
-        navigationVariant.combinations.each { dimension ->
-            dimension.each { tuple ->
-                def tupleName = merge(tuple)
-                def suffix = tupleName.capitalize()
-                addArtifact(project, suffix, suffix)
-            }
-        }
-    }
-
-
 
     private Object getVersionName() {
         Properties properties = new Properties()
@@ -259,7 +226,7 @@ class HensonPlugin implements Plugin<Project> {
         properties.get("dart.version")
     }
 
-    String merge(Tuple tuple) {
+    private String merge(Tuple tuple) {
         if (tuple.empty) {
             return ""
         }
@@ -339,31 +306,41 @@ class HensonPlugin implements Plugin<Project> {
         }
     }
 
-    private void addArtifact(Project project, artifactSuffix, taskSuffix) {
-        if(project.tasks.findByName("${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}") != null) {
-            project.artifacts.add("${NAVIGATION_ARTIFACT_PREFIX}${artifactSuffix}", project.tasks["${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}"])
+    private void addArtifact(Project project, navigationVariant) {
+        def tuple = navigationVariant.combinations.last().first()
+        def tupleName = merge(tuple)
+        def suffix = tupleName.capitalize()
+
+        project.configurations {
+            "${NAVIGATION_ARTIFACT_PREFIX}${suffix}" {
+                canBeResolved true
+            }
+        }
+        if(project.tasks.findByName("${NAVIGATION_API_JAR_TASK_PREFIX}${suffix}") != null) {
+            project.artifacts.add("${NAVIGATION_ARTIFACT_PREFIX}${suffix}", project.tasks["${NAVIGATION_API_JAR_TASK_PREFIX}${suffix}"])
+//            //com.android.build.gradle.BaseExtension.registerJavaArtifact
+//            project.android.registerArtifactType("${NAVIGATION_ARTIFACT_PREFIX}${suffix}", false, ArtifactMetaData.TYPE_JAVA)
+//            project.android.registerJavaArtifact("${NAVIGATION_ARTIFACT_PREFIX}${suffix}",
+//                    navigationVariant.variant,
+//                    navigationVariant.compilerTask.name,
+//                    navigationVariant.jarTask.name,
+//                    Collections.emptyList(),
+//                    Collections.emptyList(),
+//                    project.configurations["${NAVIGATION_ARTIFACT_PREFIX}"],
+//                    null,
+//                    null,
+//                    navigationVariant.sourceSets.collect{ new SourceSetSourceProviderWrapper(it)}
+//            )
         }
     }
 
-    private void addNavigationArtifactsToVariantConfigurations(Project project) {
-        //the project main source itself will depend on the navigation
-        //we must wait until the variant created the proper configurations to add the dependency.
-        def hasApp = project.plugins.withType(AppPlugin)
-        final def variants
-        if (hasApp) {
-            variants = project.android.applicationVariants
-        } else {
-            variants = project.android.libraryVariants
-        }
-
-        variants.all { variant ->
-            def hensonExtension = project.extensions.getByName('henson')
-            if (hensonExtension!= null && !hensonExtension.navigatorOnly) {
-                //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-                def configurationPrefix = variant.name
-                def artifactSuffix = variant.name.capitalize()
-                project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "${NAVIGATION_ARTIFACT_PREFIX}${artifactSuffix}"))
-            }
+    private void addNavigationArtifactsToVariantConfiguration(Project project, variant) {
+        def hensonExtension = project.extensions.getByName('henson')
+        if (hensonExtension!= null && !hensonExtension.navigatorOnly) {
+            //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
+            def configurationPrefix = variant.name
+            def artifactSuffix = variant.name.capitalize()
+            project.dependencies.add("${configurationPrefix}Api", project.dependencies.project(path: "${project.path}", configuration: "${NAVIGATION_ARTIFACT_PREFIX}${artifactSuffix}"))
         }
     }
 

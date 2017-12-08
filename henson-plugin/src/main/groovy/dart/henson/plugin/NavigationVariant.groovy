@@ -10,4 +10,6 @@ class NavigationVariant {
     def implementationConfigurations = new ArrayList()
     def compileOnlyConfigurations = new ArrayList()
     def annotationProcessorConfigurations = new ArrayList()
+    def compilerTask
+    def jarTask
 }
