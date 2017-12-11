@@ -46,6 +46,7 @@ import javax.lang.model.type.TypeMirror;
 import static com.squareup.javapoet.ClassName.get;
 import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
 import static dart.common.util.BindingTargetUtil.INITIAL_STATE_METHOD;
+import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
 
 public class IntentBuilderGenerator extends BaseGenerator {
 
@@ -55,7 +56,6 @@ public class IntentBuilderGenerator extends BaseGenerator {
   private static final String OPTIONAL_SEQUENCE_GENERIC = "ALL_SET";
   private static final String OPTIONAL_SEQUENCE_SUBCLASS_GENERIC = "SELF";
   private static final String REQUIRED_SEQUENCE_INTERMEDIARY_CLASS_PREFIX = "AfterSetting";
-  private static final String NAVIGATION_MODEL_SUFFIX = "NavigationModel";
 
   private final BindingTarget target;
 
@@ -103,7 +103,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
     initialStateGetterForHensonBuilder.addStatement(
         "final $T intent = new $T(context, getClassDynamically($S))",
         Intent.class, Intent.class,
-        targetFqcn.substring(0, targetFqcn.indexOf(NAVIGATION_MODEL_SUFFIX))
+        targetFqcn.substring(0, targetFqcn.indexOf(DART_MODEL_SUFFIX))
     );
     initialStateGetterForHensonBuilder.addStatement(
         "final $T bundler = $T.create()",
@@ -355,7 +355,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
       if (target.parentPackage != null) {
         final String parentIntentBuilderClass = target.parentClass + BUNDLE_BUILDER_SUFFIX;
         setterBuilder.addStatement(
-            "return $T.getInitialState(bundler, allSetState)",
+            "return $T.getInitialState(bundler, allRequiredSetState)",
             get(target.parentPackage, parentIntentBuilderClass)
         );
       } else {

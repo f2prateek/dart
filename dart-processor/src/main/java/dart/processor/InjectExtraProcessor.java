@@ -60,11 +60,13 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     fileUtil = new FileUtil(processingEnv);
     bindingTargetUtil =
         new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil, bindExtraUtil);
-    dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil);
+    dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil, compilerUtil);
   }
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    dartModelUtil.setRoundEnvironment(roundEnv);
+    
     Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
     generateExtraInjectors(targetClassMap);
 

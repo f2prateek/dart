@@ -67,7 +67,7 @@ public class HensonProcessor extends AbstractProcessor {
     fileUtil = new FileUtil(processingEnv);
     bindingTargetUtil =
         new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil, bindExtraUtil);
-    dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil);
+    dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil, compilerUtil);
 
     parseAnnotationProcessorOptions(processingEnv);
   }

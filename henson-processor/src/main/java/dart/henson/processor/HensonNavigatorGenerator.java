@@ -32,6 +32,7 @@ import javax.lang.model.element.Modifier;
 
 import static com.squareup.javapoet.ClassName.get;
 import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
+import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
 import static dart.henson.processor.IntentBuilderGenerator.REQUIRED_SEQUENCE_CLASS;
 import static dart.henson.processor.IntentBuilderGenerator.RESOLVED_OPTIONAL_SEQUENCE_CLASS;
 
@@ -119,9 +120,10 @@ public class HensonNavigatorGenerator extends BaseGenerator {
                 + "."
                 + target.className
                 + BUNDLE_BUILDER_SUFFIX);
-    String simpleTargetClassName = target.className;
+    String simpleTargetComponent =
+        target.className.substring(0, target.className.indexOf(DART_MODEL_SUFFIX));
     MethodSpec.Builder gotoMethodBuilder =
-        MethodSpec.methodBuilder("goto" + simpleTargetClassName)
+        MethodSpec.methodBuilder("goto" + simpleTargetComponent)
             .addModifiers(Modifier.PUBLIC)
             .returns(getInitialStateType(target))
             .addStatement("return $L.getInitialState(context)", intentBuilderClassName);

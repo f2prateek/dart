@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -30,6 +31,8 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import static javax.lang.model.element.Modifier.FINAL;
+import static javax.lang.model.element.Modifier.STATIC;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static javax.lang.model.util.ElementFilter.methodsIn;
 
@@ -59,7 +62,11 @@ public class BindingTargetUtil {
     BindingTarget bindingTarget = new BindingTarget(classPackage, className);
 
     for (VariableElement field : fieldsIn(typeElement.getEnclosedElements())) {
-      bindExtraUtil.parseInjectExtra(field, bindingTarget);
+      Set<Modifier> modifiers = field.getModifiers();
+      // We omit FINAL STATIC fields: constants that should not be taken into account
+      if (!modifiers.contains(FINAL) || !modifiers.contains(STATIC)) {
+        bindExtraUtil.parseInjectExtra(field, bindingTarget);
+      }
     }
 
     return bindingTarget;
@@ -116,7 +123,7 @@ public class BindingTargetUtil {
             return;
           }
           bindingTarget.parentPackage = compilerUtil.getPackageName(superTypeElement);
-          bindingTarget.parentClass = bindingTarget.parentPackage + "." +
+          bindingTarget.parentClass =
               compilerUtil.getClassName(superTypeElement, bindingTarget.parentPackage);
         }
       }

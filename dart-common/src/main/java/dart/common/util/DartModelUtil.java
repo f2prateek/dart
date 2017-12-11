@@ -23,30 +23,32 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Types;
 
 import static javax.lang.model.element.ElementKind.CLASS;
 import static javax.lang.model.element.ElementKind.PACKAGE;
 import static javax.lang.model.element.Modifier.ABSTRACT;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
-import static javax.lang.model.util.ElementFilter.fieldsIn;
 
 public class DartModelUtil {
 
+  public static final String DART_MODEL_SUFFIX = "NavigationModel";
+
   private final LoggingUtil loggingUtil;
   private final BindingTargetUtil bindingTargetUtil;
+  private final CompilerUtil compilerUtil;
 
   private RoundEnvironment roundEnv;
 
-  public DartModelUtil(LoggingUtil loggingUtil, BindingTargetUtil bindingTargetUtil) {
+  public DartModelUtil(LoggingUtil loggingUtil, BindingTargetUtil bindingTargetUtil,
+      CompilerUtil compilerUtil) {
     this.loggingUtil = loggingUtil;
     this.bindingTargetUtil = bindingTargetUtil;
+    this.compilerUtil = compilerUtil;
   }
 
   public void setRoundEnvironment(RoundEnvironment roundEnv) {
@@ -79,7 +81,7 @@ public class DartModelUtil {
     targetClassMap.put(element, navigationModelTarget);
   }
 
-  private boolean isValidUsageOfDartModel(Element element) {
+  private boolean isValidUsageOfDartModel(TypeElement element) {
     boolean valid = true;
 
     // Verify modifiers.
@@ -104,6 +106,16 @@ public class DartModelUtil {
         || element.getEnclosingElement().getKind() != PACKAGE) {
       loggingUtil.error(element,
           "@DartModel class %s must be a top level class.",
+          element.getSimpleName());
+      valid = false;
+    }
+
+    // Verify Dart Model suffix.
+    final String classPackage = compilerUtil.getPackageName(element);
+    final String className = compilerUtil.getClassName(element, classPackage);
+    if (!className.endsWith(DART_MODEL_SUFFIX)) {
+      loggingUtil.error(element,
+          "@DartModel class %s does not follow the naming convention: my.package.TargetComponentNavigationModel.",
           element.getSimpleName());
       valid = false;
     }

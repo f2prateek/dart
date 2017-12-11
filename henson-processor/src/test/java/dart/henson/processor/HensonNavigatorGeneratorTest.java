@@ -460,4 +460,25 @@ public class HensonNavigatorGeneratorTest {
         .hadErrorContaining(
             "@DartModel class TestNavigationModel2 must not be private, static or abstract.");
   }
+
+  @Test
+  public void hensonNavigatorGenerator_should_fail_when_navigationModelDoesNotFollowNamingConvention() {
+    JavaFileObject source =
+        JavaFileObjects.forSourceString(
+            "test.navigation.TestNavigation",
+            Joiner.on('\n')
+                .join( //
+                    "package test.navigation;", //
+                    "import dart.DartModel;", //
+                    "@DartModel", //
+                    "public class TestNavigation {", //
+                    "}" //
+                ));
+
+    Compilation compilation =
+        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    assertThat(compilation)
+        .hadErrorContaining(
+            "@DartModel class TestNavigation does not follow the naming convention: my.package.TargetComponentNavigationModel.");
+  }
 }
