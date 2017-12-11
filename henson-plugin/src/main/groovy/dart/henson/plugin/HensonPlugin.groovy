@@ -6,16 +6,35 @@ import org.gradle.api.Project
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.UnionFileCollection
 import org.gradle.api.plugins.PluginCollection
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
+import com.android.builder.model.ArtifactMetaData
 
 import java.security.InvalidParameterException
 import java.util.zip.ZipFile
 
 import static dart.henson.plugin.Combinator.Tuple
+
+class NavigationAttr {
+    private String variantName
+
+    NavigationAttr(String variantName) {
+        this.variantName = variantName
+    }
+
+    @Override
+    boolean equals(Object o) {
+        if (!(o instanceof NavigationAttr)) {
+            return false
+        }
+        return o.variantName.equals(variantName)
+    }
+}
 
 class HensonPlugin implements Plugin<Project> {
 
@@ -51,11 +70,17 @@ class HensonPlugin implements Plugin<Project> {
         //to be able to use them before the creation of variants
         createNavigationConfigurations(project, "")
 
-        project.android.buildTypes.all { buildType ->
-            createNavigationConfigurations(project, buildType.name.capitalize())
+        //used to communicate the artifact between project
+        project.configurations {
+            "${NAVIGATION_ARTIFACT_PREFIX}" {
+                canBeResolved false
+                canBeConsumed false
+            }
         }
-        project.android.productFlavors.all { productFlavor ->
-            createNavigationConfigurations(project, productFlavor.name.capitalize())
+
+        project.android.buildTypes.all { buildType -> createNavigationConfigurations(project, buildType.name.capitalize())
+        }
+        project.android.productFlavors.all { productFlavor -> createNavigationConfigurations(project, productFlavor.name.capitalize())
         }
 
         def hasApp = project.plugins.withType(AppPlugin)
@@ -66,16 +91,30 @@ class HensonPlugin implements Plugin<Project> {
             variants = project.android.libraryVariants
         }
 
+        detectNavigationApiDependenciesAndGenerateHensonNavigator(project)
         variants.all { variant ->
             def hensonExtension = project.extensions.getByName('henson')
             if (hensonExtension != null && !hensonExtension.navigatorOnly) {
                 project.logger.debug "Processing variant: ${variant.name}"
                 processVariant(project, variant, dartVersionName)
             }
-        }
-\
-        //create the task for generating the henson navigator
-        detectNavigationApiDependenciesAndGenerateHensonNavigator(project)
+            project.configurations {
+                "__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}" {
+                    extendsFrom project.configurations["${NAVIGATION_ARTIFACT_PREFIX}"]
+                    canBeResolved true
+                    canBeConsumed false
+                }
+            }
+            project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].attributes.attribute(Attribute.of(NavigationAttr.class), new NavigationAttr(variant.name))
+            project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].resolve()
+            project.dependencies.add("${variant.name}Implementation", project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
+            //project.configurations["${variant.name}ApiElements"].add(project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
+            //variant.compileConfiguration.extendsFrom.add(project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
+            //variant.javaCompiler.classpath = project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"]
+            //project.dependencies.add()["${variant.name.capitalize()}Implementation"].
+            //variant.javaCompiler.dependsOn project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"]
+            //variant.javaCompiler.classpath.add(project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
+        } //create the task for generating the henson navigator
     }
 
     private void detectNavigationApiDependenciesAndGenerateHensonNavigator(Project project) {
@@ -96,9 +135,9 @@ class HensonPlugin implements Plugin<Project> {
                     }
                     def hensonNavigatorPackageName = hensonExtension.navigatorPackageName
 
-                    variant.compileConfiguration.resolve()
+                    project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].resolve()
                     Set<String> targetActivities = new HashSet()
-                    variant.compileConfiguration.each { dependency ->
+                    project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].each { dependency ->
                         project.logger.debug "Detected dependency: ${dependency.properties}"
                         if (dependency.name.matches(".*-navigationApi.*.jar")) {
                             project.logger.debug "Detected navigation API dependency: ${dependency.name}"
@@ -194,7 +233,9 @@ class HensonPlugin implements Plugin<Project> {
 
     private void createNavigationConfigurations(Project project, newConfigurationRadix) {
         ["Api", "Implementation", "CompileOnly", "AnnotationProcessor"].each { suffix ->
-            project.configurations.maybeCreate("navigation${newConfigurationRadix}${suffix}")
+            Configuration configuration = project.configurations.maybeCreate("navigation${newConfigurationRadix}${suffix}")
+            configuration.canBeResolved = true
+            configuration.canBeConsumed = false
         }
     }
 
@@ -313,11 +354,14 @@ class HensonPlugin implements Plugin<Project> {
 
         project.configurations {
             "${NAVIGATION_ARTIFACT_PREFIX}${suffix}" {
+                canBeConsumed true
                 canBeResolved true
             }
         }
+
+        project.configurations["${NAVIGATION_ARTIFACT_PREFIX}${suffix}"].attributes.attribute(Attribute.of(NavigationAttr.class), new NavigationAttr(navigationVariant.variant.name))
+        project.artifacts.add("${NAVIGATION_ARTIFACT_PREFIX}${suffix}", project.tasks["${NAVIGATION_API_JAR_TASK_PREFIX}${suffix}"])
         if(project.tasks.findByName("${NAVIGATION_API_JAR_TASK_PREFIX}${suffix}") != null) {
-            project.artifacts.add("${NAVIGATION_ARTIFACT_PREFIX}${suffix}", project.tasks["${NAVIGATION_API_JAR_TASK_PREFIX}${suffix}"])
 //            //com.android.build.gradle.BaseExtension.registerJavaArtifact
 //            project.android.registerArtifactType("${NAVIGATION_ARTIFACT_PREFIX}${suffix}", false, ArtifactMetaData.TYPE_JAVA)
 //            project.android.registerJavaArtifact("${NAVIGATION_ARTIFACT_PREFIX}${suffix}",
@@ -329,7 +373,7 @@ class HensonPlugin implements Plugin<Project> {
 //                    project.configurations["${NAVIGATION_ARTIFACT_PREFIX}"],
 //                    null,
 //                    null,
-//                    navigationVariant.sourceSets.collect{ new SourceSetSourceProviderWrapper(it)}
+//                    null
 //            )
         }
     }
