@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.f2prateek.dart.model.Module1ActivityModel.DEFAULT_EXTRA_VALUE;
+import static com.f2prateek.dart.model.Module1ActivityNavigationModel.DEFAULT_EXTRA_VALUE;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)

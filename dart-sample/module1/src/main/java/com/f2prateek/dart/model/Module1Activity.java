@@ -36,7 +36,7 @@ public class Module1Activity extends Activity {
   @BindView(R2.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
   @BindView(R2.id.default_extra) TextView defaultExtraTextView;
 
-  Module1ActivityModel navigationModel = new Module1ActivityModel();
+  Module1ActivityNavigationModel navigationModel = new Module1ActivityNavigationModel();
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

@@ -37,7 +37,7 @@ public class SampleActivity extends Activity {
   @BindView(R2.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
   @BindView(R2.id.default_extra) TextView defaultExtraTextView;
 
-  SampleActivityModel navigationModel = new SampleActivityModel();
+  SampleActivityNavigationModel navigationModel = new SampleActivityNavigationModel();
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

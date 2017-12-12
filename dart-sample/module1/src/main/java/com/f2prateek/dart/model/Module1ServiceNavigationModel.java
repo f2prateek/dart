@@ -17,11 +17,10 @@
 
 package com.f2prateek.dart.model;
 
-import dart.BindExtra;
 import dart.DartModel;
 
-@DartModel("com.f2prateek.dart.model.Module1Service")
-public class Module1ServiceModel {
+@DartModel
+public class Module1ServiceNavigationModel {
 
-  @BindExtra String stringExtra;
+  String stringExtra;
 }

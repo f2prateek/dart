@@ -23,18 +23,18 @@ import dart.BindExtra;
 import dart.DartModel;
 import java.util.List;
 
-@DartModel("com.f2prateek.dart.model.Module1Activity")
-public class Module1ActivityModel {
+@DartModel
+public class Module1ActivityNavigationModel {
 
   public static final String DEFAULT_EXTRA_VALUE = "a default value";
 
   private static final String EXTRA_STRING = "extraString";
   private static final String EXTRA_INT = "extraInt";
   private static final String EXTRA_PARCELABLE = "extraParcelable";
+  private static final String EXTRA_PARCEL = "extraParcel";
   private static final String EXTRA_LIST_PARCELABLE = "extraListParcelable";
   private static final String EXTRA_SPARSE_ARRAY_PARCELABLE = "extraSparseArrayParcelable";
   private static final String EXTRA_OPTIONAL = "extraOptional";
-  private static final String EXTRA_PARCEL = "extraParcel";
   private static final String EXTRA_WITH_DEFAULT = "extraWithDefault";
 
   public @BindExtra(EXTRA_STRING) String stringExtra;
@@ -45,5 +45,5 @@ public class Module1ActivityModel {
   public @BindExtra(EXTRA_SPARSE_ARRAY_PARCELABLE) SparseArray<StringParcel> sparseArrayParcelExtra;
   public @BindExtra(EXTRA_OPTIONAL) @Nullable String optionalExtra;
   public @BindExtra(EXTRA_WITH_DEFAULT) @Nullable String defaultExtra = DEFAULT_EXTRA_VALUE;
-  public @BindExtra String defaultKeyExtra;
+  public String defaultKeyExtra;
 }

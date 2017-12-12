@@ -23,7 +23,7 @@ import dart.Dart;
 
 public class Module1Service extends IntentService {
 
-  private Module1ServiceModel navigationModel = new Module1ServiceModel();
+  private Module1ServiceNavigationModel navigationModel = new Module1ServiceNavigationModel();
 
   public Module1Service() {
     super("Module1Service");
