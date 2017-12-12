@@ -1,4 +1,4 @@
-package dart.henson.plugin;
+package dart.henson.plugin.attributes;
 
 import org.gradle.api.attributes.AttributeCompatibilityRule;
 import org.gradle.api.attributes.CompatibilityCheckDetails;

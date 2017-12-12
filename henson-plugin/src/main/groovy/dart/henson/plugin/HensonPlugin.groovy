@@ -2,6 +2,9 @@ package dart.henson.plugin
 
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.internal.dependency.AndroidTypeAttr
+import dart.henson.plugin.attributes.NavigationTypeAttr
+import dart.henson.plugin.attributes.NavigationTypeAttrCompatRule
+import dart.henson.plugin.attributes.NavigationTypeAttrDisambiguationRule
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
