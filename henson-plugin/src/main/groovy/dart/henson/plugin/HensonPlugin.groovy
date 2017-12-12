@@ -83,14 +83,15 @@ class HensonPlugin implements Plugin<Project> {
             variants = project.android.libraryVariants
         }
 
+        def schema = project.dependencies.attributesSchema
+        AttributeMatchingStrategy<NavigationTypeAttr> navigationAttrStrategy =
+                schema.attribute(NavigationTypeAttr.ATTRIBUTE)
+        navigationAttrStrategy.getCompatibilityRules().add(NavigationTypeAttrCompatRule.class)
+        navigationAttrStrategy.getDisambiguationRules().add(NavigationTypeAttrDisambiguationRule.class)
+
         //create the task for generating the henson navigator
         detectNavigationApiDependenciesAndGenerateHensonNavigator(project)
         variants.all { variant ->
-            def schema = project.dependencies.attributesSchema
-            AttributeMatchingStrategy<NavigationTypeAttr> navigationAttrStrategy =
-                    schema.attribute(NavigationTypeAttr.ATTRIBUTE)
-            navigationAttrStrategy.getCompatibilityRules().add(NavigationTypeAttrCompatRule.class)
-            navigationAttrStrategy.getDisambiguationRules().add(NavigationTypeAttrDisambiguationRule.class)
 
             def hensonExtension = project.extensions.getByName('henson')
             if (hensonExtension != null && !hensonExtension.navigatorOnly) {
@@ -108,8 +109,6 @@ class HensonPlugin implements Plugin<Project> {
             applyAttributesFromVariantCompileToConfiguration(variant, configuration)
 
             project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
-            println schema.properties
-            println schema.attribute(NavigationTypeAttr.ATTRIBUTE).getCompatibilityRules().properties
             project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].resolve()
             project.dependencies.add("${variant.name}Implementation", project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
         }
@@ -368,11 +367,11 @@ class HensonPlugin implements Plugin<Project> {
     }
 
     private void applyAttributesFromVariantCompileToConfiguration(variant, configuration) {
-        variant.compileConfiguration.attributes.keySet().each { attributeKey ->
+        def configFrom = variant.compileConfiguration
+        configFrom.attributes.keySet().each { attributeKey ->
             if(!attributeKey.name.equals(Usage.class.name)
             && !attributeKey.name.equals(AndroidTypeAttr.class.name)) {
-                println "Applying attribute: ${attributeKey}"
-                def value = variant.compileConfiguration.attributes.getAttribute(attributeKey)
+                def value = configFrom.attributes.getAttribute(attributeKey)
                 if (value != null) {
                     configuration.attributes.attribute(attributeKey, value)
                 }
