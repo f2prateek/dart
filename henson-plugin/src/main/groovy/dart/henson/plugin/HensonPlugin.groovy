@@ -28,9 +28,10 @@ class HensonPlugin implements Plugin<Project> {
     private ObjectFactory factory
     private VariantManager variantManager
     private TaskManager taskManager
-    private ConfigurationManager configurationManager
     private ArtifactManager artifactManager
+    private ConfigurationManager configurationManager
     private AttributeManager attributeManager
+    private HensonNavigatorGenerator hensonNavigatorGenerator
 
     void apply(Project project) {
 
@@ -39,8 +40,9 @@ class HensonPlugin implements Plugin<Project> {
         variantManager = new VariantManager(logger)
         taskManager = new TaskManager(project, logger)
         artifactManager = new ArtifactManager(project, logger)
-        attributeManager = new AttributeManager(project, logger)
         configurationManager = new ConfigurationManager(project, logger, artifactManager)
+        attributeManager = new AttributeManager(project, logger)
+        hensonNavigatorGenerator = new HensonNavigatorGenerator()
 
         //check project
         def hasAppPlugin = project.plugins.withType(AppPlugin)
@@ -160,7 +162,7 @@ class HensonPlugin implements Plugin<Project> {
                         }
 
                         def variantSrcFolderName = new File(project.projectDir, "src/${variant.name}/java/")
-                        String hensonNavigator = generateHensonNavigatorClass(targetActivities, hensonNavigatorPackageName)
+                        String hensonNavigator = hensonNavigatorGenerator.generateHensonNavigatorClass(targetActivities, hensonNavigatorPackageName)
                         variantSrcFolderName.mkdirs()
                         File generatedFolder =  new File(variantSrcFolderName, hensonNavigatorPackageName.replace('.', '/').concat('/'))
                         generatedFolder.mkdirs()
@@ -178,30 +180,6 @@ class HensonPlugin implements Plugin<Project> {
         }
     }
 
-    private String generateHensonNavigatorClass(Set<String> targetActivities, packageName) {
-        String packageStatement = "package ${packageName};\n"
-        String importStatement = "import android.content.Context;\n"
-        targetActivities.each { targetActivity ->
-            importStatement += "import ${targetActivity}__IntentBuilder;\n"
-        }
-        String classStartStatement = "public class HensonNavigator {\n"
-        String methodStatement = ""
-        targetActivities.each { targetActivity ->
-            String targetActivitySimpleName = targetActivity.substring(1+targetActivity.lastIndexOf('.'), targetActivity.length())
-            methodStatement += "public static ${targetActivitySimpleName.capitalize()}__IntentBuilder goto${targetActivitySimpleName.capitalize()}(Context context) {\n"
-            methodStatement += "  return new ${targetActivitySimpleName}__IntentBuilder(context);\n"
-            methodStatement += "}"
-            methodStatement += "\n"
-        }
-        String classEndStatement = "}"
-        new StringBuilder()
-        .append(packageStatement)
-        .append(importStatement)
-        .append(classStartStatement)
-        .append(methodStatement)
-        .append(classEndStatement)
-        .toString()
-    }
 
     private void processVariant(Project project, variant, dartVersionName) {
         Combinator combinator = new Combinator()
