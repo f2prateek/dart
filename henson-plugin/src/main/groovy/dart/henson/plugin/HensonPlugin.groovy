@@ -1,6 +1,8 @@
 package dart.henson.plugin
 
+import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.internal.dependency.AndroidTypeAttr
+import org.gradle.api.DomainObjectSet
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -17,6 +19,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.PluginCollection
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger
 
 import java.security.InvalidParameterException
 import java.util.zip.ZipFile
@@ -29,13 +32,14 @@ class HensonPlugin implements Plugin<Project> {
     public static final String NAVIGATION_API_COMPILE_TASK_PREFIX = 'navigationApiCompileJava'
     public static final String NAVIGATION_API_JAR_TASK_PREFIX = 'navigationApiJar'
     public static final String NAVIGATION_ARTIFACT_PREFIX = 'navigation'
+    public static final String LOG_TAG = "HENSON: "
 
-    def ObjectFactory factory
+    private OutputEventListenerBackedLogger logger
+    private ObjectFactory factory
 
     void apply(Project project) {
-        final def log = project.logger
-        final String LOG_TAG = "HENSON"
 
+        logger = project.logger
         factory = project.getObjects()
 
         //check project
@@ -50,6 +54,31 @@ class HensonPlugin implements Plugin<Project> {
         //the extension is created but will be read only during execution time
         //(it's not available before)
         project.extensions.create('henson', HensonPluginExtension)
+        def hensonExtension = project.extensions.getByName('henson')
+        boolean isNavigatorOnly = hensonExtension != null && !hensonExtension.navigatorOnly
+
+        //used to communicate the artifact between project
+        //this configuration is used from the client project
+        //to consume the navigation dependency of a different consummer project
+        //the artifact that will be consumed for real will be variant aware.
+        //This configuration is only used for the client to declare dependencies,
+        //it will not be consumed or resolved directly. We will extend it with a variant
+        //aware configuration on the client side.
+        project.configurations {
+            "${NAVIGATION_ARTIFACT_PREFIX}" {
+                canBeResolved false
+                canBeConsumed false
+            }
+        }
+
+        //custom matching strategy to take into account the new navigation attribute type
+        //we want to match client requests and producer artifacts. For this we introduce
+        //a new navigation attribute and define a matching strategy for it.
+        def schema = project.dependencies.attributesSchema
+        AttributeMatchingStrategy<NavigationTypeAttr> navigationAttrStrategy =
+                schema.attribute(NavigationTypeAttr.ATTRIBUTE)
+        navigationAttrStrategy.getCompatibilityRules().add(NavigationTypeAttrCompatRule.class)
+        navigationAttrStrategy.getDisambiguationRules().add(NavigationTypeAttrDisambiguationRule.class)
 
         //we do the following for all sourcesets, of all build types, of all flavors, and all variants
         //  create source sets
@@ -60,57 +89,46 @@ class HensonPlugin implements Plugin<Project> {
 
         //we create all configurations eagerly as we want users
         //to be able to use them before the creation of variants
+
+        //the main configuration (navigation{Api, Implementation, etc.}
         createNavigationConfigurations(project, "")
 
-        //used to communicate the artifact between project
-        project.configurations {
-            "${NAVIGATION_ARTIFACT_PREFIX}" {
-                canBeResolved false
-                canBeConsumed false
+        //one for each build type
+        project.android.buildTypes.all { buildType ->
+            log "Processing buildType: ${buildType.name}"
+            createNavigationConfigurations(project, buildType.name.capitalize())
+        }
+
+        //one for each flavor
+        project.android.productFlavors.all { productFlavor ->
+            log "Processing productFlavor: ${productFlavor.name}"
+            createNavigationConfigurations(project, productFlavor.name.capitalize())
+        }
+
+
+        final DomainObjectSet<? extends BaseVariant> variants = getVariants(project)
+
+        variants.all { variant ->
+            if (isNavigatorOnly) {
+                log "Processing variant: ${variant.name}"
+                processVariant(project, variant, dartVersionName)
             }
         }
-
-        project.android.buildTypes.all { buildType -> createNavigationConfigurations(project, buildType.name.capitalize())
-        }
-        project.android.productFlavors.all { productFlavor -> createNavigationConfigurations(project, productFlavor.name.capitalize())
-        }
-
-        def hasApp = project.plugins.withType(AppPlugin)
-        final def variants
-        if (hasApp) {
-            variants = project.android.applicationVariants
-        } else {
-            variants = project.android.libraryVariants
-        }
-
-        def schema = project.dependencies.attributesSchema
-        AttributeMatchingStrategy<NavigationTypeAttr> navigationAttrStrategy =
-                schema.attribute(NavigationTypeAttr.ATTRIBUTE)
-        navigationAttrStrategy.getCompatibilityRules().add(NavigationTypeAttrCompatRule.class)
-        navigationAttrStrategy.getDisambiguationRules().add(NavigationTypeAttrDisambiguationRule.class)
 
         //create the task for generating the henson navigator
         detectNavigationApiDependenciesAndGenerateHensonNavigator(project)
-        variants.all { variant ->
+    }
 
-            def hensonExtension = project.extensions.getByName('henson')
-            if (hensonExtension != null && !hensonExtension.navigatorOnly) {
-                project.logger.debug "Processing variant: ${variant.name}"
-                processVariant(project, variant, dartVersionName)
-            }
-            project.configurations {
-                "__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}" {
-                    extendsFrom project.configurations["${NAVIGATION_ARTIFACT_PREFIX}"]
-                    canBeResolved true
-                    canBeConsumed false
-                }
-            }
-            def configuration = project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"]
-            applyAttributesFromVariantCompileToConfiguration(variant, configuration)
+    private void log(String msg) {
+        logger.debug( LOG_TAG + msg)
+    }
 
-            project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
-            project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].resolve()
-            project.dependencies.add("${variant.name}Implementation", project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
+    private DomainObjectSet<? extends BaseVariant> getVariants(Project project) {
+        def hasApp = project.plugins.withType(AppPlugin)
+        if (hasApp) {
+            project.android.applicationVariants
+        } else {
+            project.android.libraryVariants
         }
     }
 
@@ -201,6 +219,22 @@ class HensonPlugin implements Plugin<Project> {
         createNavigationCompilerAndJarTasksAndArtifact(project, navigationVariant)
         //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
         addNavigationArtifactsToVariantConfiguration(project, variant)
+
+        project.configurations {
+            "__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}" {
+                extendsFrom project.configurations["${NAVIGATION_ARTIFACT_PREFIX}"]
+                canBeResolved true
+                canBeConsumed false
+            }
+        }
+
+        def configuration = project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"]
+        applyAttributesFromVariantCompileToConfiguration(variant, configuration)
+
+        project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
+        project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].resolve()
+        project.dependencies.add("${variant.name}Implementation", project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
+
     }
 
     private void createSourceSetAndConfigurations(project, navigationVariant, dartVersionName) {
