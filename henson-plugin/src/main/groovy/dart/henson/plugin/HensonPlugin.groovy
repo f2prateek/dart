@@ -3,17 +3,13 @@ package dart.henson.plugin
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
-import com.android.build.gradle.internal.dependency.AndroidTypeAttr
+import dart.henson.plugin.attributes.AttributeManager
 import dart.henson.plugin.attributes.NavigationTypeAttr
-import dart.henson.plugin.attributes.NavigationTypeAttrCompatRule
-import dart.henson.plugin.attributes.NavigationTypeAttrDisambiguationRule
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Attribute
-import org.gradle.api.attributes.AttributeMatchingStrategy
-import org.gradle.api.attributes.Usage
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.PluginCollection
 import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger
@@ -34,6 +30,7 @@ class HensonPlugin implements Plugin<Project> {
     private TaskManager taskManager
     private ConfigurationManager configurationManager
     private ArtifactManager artifactManager
+    private AttributeManager attributeManager
 
     void apply(Project project) {
 
@@ -42,6 +39,7 @@ class HensonPlugin implements Plugin<Project> {
         variantManager = new VariantManager(logger)
         taskManager = new TaskManager(project, logger)
         artifactManager = new ArtifactManager(project, logger)
+        attributeManager = new AttributeManager(project, logger)
         configurationManager = new ConfigurationManager(project, logger, artifactManager)
 
         //check project
@@ -71,11 +69,7 @@ class HensonPlugin implements Plugin<Project> {
         //custom matching strategy to take into account the new navigation attribute type
         //we want to match client requests and producer artifacts. For this we introduce
         //a new navigation attribute and define a matching strategy for it.
-        def schema = project.dependencies.attributesSchema
-        AttributeMatchingStrategy<NavigationTypeAttr> navigationAttrStrategy =
-                schema.attribute(NavigationTypeAttr.ATTRIBUTE)
-        navigationAttrStrategy.getCompatibilityRules().add(NavigationTypeAttrCompatRule.class)
-        navigationAttrStrategy.getDisambiguationRules().add(NavigationTypeAttrDisambiguationRule.class)
+        attributeManager.applyNavigationAttributeMatchingStrategy();
 
         //we do the following for all sourcesets, of all build types, of all flavors, and all variants
         //  create source sets
@@ -103,7 +97,7 @@ class HensonPlugin implements Plugin<Project> {
         }
 
 
-        final DomainObjectSet<? extends BaseVariant> variants = getVariants(project)
+        final DomainObjectSet<? extends BaseVariant> variants = getAndroidVariants(project)
 
         variants.all { variant ->
             if (isNavigatorOnly) {
@@ -120,7 +114,7 @@ class HensonPlugin implements Plugin<Project> {
         logger.debug( LOG_TAG + msg)
     }
 
-    private DomainObjectSet<? extends BaseVariant> getVariants(Project project) {
+    private DomainObjectSet<? extends BaseVariant> getAndroidVariants(Project project) {
         def hasApp = project.plugins.withType(AppPlugin)
         if (hasApp) {
             project.android.applicationVariants
@@ -218,7 +212,7 @@ class HensonPlugin implements Plugin<Project> {
         addNavigationArtifactsToVariantConfiguration(project, variant)
 
         def internalConfiguration = configurationManager.createClientInternalConfiguration(variant)
-        applyAttributesFromVariantCompileToConfiguration(variant, internalConfiguration)
+        attributeManager.applyAttributesFromVariantCompileToConfiguration(variant, internalConfiguration)
 
         internalConfiguration.attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
         internalConfiguration.resolve()
@@ -308,23 +302,10 @@ class HensonPlugin implements Plugin<Project> {
         //the new artifact configuration
         String artifactName = artifactManager.getNavigationArtifactName(variant)
         Configuration artifactConfiguration = configurationManager.createArtifactConfiguration(variant)
-        applyAttributesFromVariantCompileToConfiguration(variant, artifactConfiguration)
+        attributeManager.applyAttributesFromVariantCompileToConfiguration(variant, artifactConfiguration)
 
         artifactConfiguration.attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
         project.artifacts.add(artifactName, taskManager.getNavigationApiJarTask(suffix))
-    }
-
-    private void applyAttributesFromVariantCompileToConfiguration(variant, configuration) {
-        def configFrom = variant.compileConfiguration
-        configFrom.attributes.keySet().each { attributeKey ->
-            if(!attributeKey.name.equals(Usage.class.name)
-            && !attributeKey.name.equals(AndroidTypeAttr.class.name)) {
-                def value = configFrom.attributes.getAttribute(attributeKey)
-                if (value != null) {
-                    configuration.attributes.attribute(attributeKey, value)
-                }
-            }
-        }
     }
 
     private void addNavigationArtifactsToVariantConfiguration(Project project, variant) {

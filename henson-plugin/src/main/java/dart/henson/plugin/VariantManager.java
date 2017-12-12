@@ -1,8 +1,12 @@
 package dart.henson.plugin;
 
+import com.android.build.gradle.AppPlugin;
+import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.api.BaseVariant;
 import com.android.builder.model.ProductFlavor;
 
+import org.gradle.api.DomainObjectSet;
+import org.gradle.api.Project;
 import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger;
 
 import java.util.List;
@@ -31,5 +35,4 @@ public class VariantManager {
 
         return navigationVariant;
     }
-
 }
