@@ -15,7 +15,6 @@ import org.gradle.api.plugins.PluginCollection
 import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger
 
 import java.security.InvalidParameterException
-import java.util.zip.ZipFile
 
 import static dart.henson.plugin.Combinator.Tuple
 
@@ -38,11 +37,11 @@ class HensonPlugin implements Plugin<Project> {
         logger = project.logger
         factory = project.getObjects()
         variantManager = new VariantManager(logger)
-        taskManager = new TaskManager(project, logger)
         artifactManager = new ArtifactManager(project, logger)
         configurationManager = new ConfigurationManager(project, logger, artifactManager)
-        attributeManager = new AttributeManager(project, logger)
         hensonNavigatorGenerator = new HensonNavigatorGenerator()
+        taskManager = new TaskManager(project, logger, configurationManager, hensonNavigatorGenerator)
+        attributeManager = new AttributeManager(project, logger)
 
         //check project
         def hasAppPlugin = project.plugins.withType(AppPlugin)
@@ -108,8 +107,6 @@ class HensonPlugin implements Plugin<Project> {
             }
         }
 
-        //create the task for generating the henson navigator
-        detectNavigationApiDependenciesAndGenerateHensonNavigator(project)
     }
 
     private void log(String msg) {
@@ -124,62 +121,6 @@ class HensonPlugin implements Plugin<Project> {
             project.android.libraryVariants
         }
     }
-
-    private void detectNavigationApiDependenciesAndGenerateHensonNavigator(Project project) {
-        def hasApp = project.plugins.withType(AppPlugin)
-        final def variants
-        if (hasApp) {
-            variants = project.android.applicationVariants
-        } else {
-            variants = project.android.libraryVariants
-        }
-        variants.all { variant ->
-            def taskDetectModules = project.tasks.create("detectModule${variant.name.capitalize()}") {
-                doFirst {
-                    //create hensonExtension
-                    def hensonExtension = project.extensions.getByName('henson')
-                    if(hensonExtension==null || hensonExtension.navigatorPackageName == null) {
-                        throw new InvalidParameterException("The property 'henson.navigatorPackageName' must be defined in your build.gradle")
-                    }
-                    def hensonNavigatorPackageName = hensonExtension.navigatorPackageName
-
-                    project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].resolve()
-                    Set<String> targetActivities = new HashSet()
-                    project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].each { dependency ->
-                        project.logger.debug "Detected dependency: ${dependency.properties}"
-                        if (dependency.name.matches(".*-navigationApi.*.jar")) {
-                            project.logger.debug "Detected navigation API dependency: ${dependency.name}"
-                            project.logger.debug "Detected navigation API dependency: ${dependency.name}"
-                            def file = dependency.absoluteFile
-                            def entries = getJarContent(file)
-                            entries.each { entry ->
-                                if(entry.matches(".*__IntentBuilder.class")) {
-                                    project.logger.debug "Detected intent builder: ${entry}"
-                                    def targetActivityFQN = entry.substring(0, entry.length() - "__IntentBuilder.class".length()).replace('/', '.')
-                                    targetActivities.add(targetActivityFQN)
-                                }
-                            }
-                        }
-
-                        def variantSrcFolderName = new File(project.projectDir, "src/${variant.name}/java/")
-                        String hensonNavigator = hensonNavigatorGenerator.generateHensonNavigatorClass(targetActivities, hensonNavigatorPackageName)
-                        variantSrcFolderName.mkdirs()
-                        File generatedFolder =  new File(variantSrcFolderName, hensonNavigatorPackageName.replace('.', '/').concat('/'))
-                        generatedFolder.mkdirs()
-                        def generatedFile = new File(generatedFolder, "HensonNavigator.java")
-                        generatedFile.withPrintWriter { out ->
-                            out.println(hensonNavigator)
-                        }
-                    }
-                }
-            }
-            //we put the task right before compilation so that all dependencies are resolved
-            // when the task is executed
-            taskDetectModules.dependsOn = variant.javaCompiler.dependsOn
-            variant.javaCompiler.dependsOn(taskDetectModules)
-        }
-    }
-
 
     private void processVariant(Project project, variant, dartVersionName) {
         Combinator combinator = new Combinator()
@@ -196,6 +137,15 @@ class HensonPlugin implements Plugin<Project> {
         internalConfiguration.resolve()
         project.dependencies.add("${variant.name}Implementation", internalConfiguration)
 
+        //create the task for generating the henson navigator
+        //create hensonExtension
+        HensonPluginExtension hensonExtension = (HensonPluginExtension) project.getExtensions().getByName("henson");
+        if (hensonExtension == null || hensonExtension.navigatorPackageName == null) {
+            throw new InvalidParameterException("The property 'henson.navigatorPackageName' must be defined in your build.gradle");
+        }
+        String hensonNavigatorPackageName = hensonExtension.navigatorPackageName;
+
+        taskManager.detectNavigationApiDependenciesAndGenerateHensonNavigator(project, variant, hensonNavigatorPackageName)
     }
 
     private void createSourceSetAndConfigurations(project, navigationVariant, dartVersionName) {
@@ -313,18 +263,5 @@ class HensonPlugin implements Plugin<Project> {
             throw new IllegalStateException("'android' or 'android-library' plugin required.")
         }
         return !hasApp
-    }
-
-
-    private List<String> getJarContent(file) {
-        def List<String> result
-        if(file.name.endsWith('.jar')) {
-            result = new ArrayList<>()
-            def zip = new ZipFile(file)
-            zip.entries().each { entry ->
-                result.add(entry.name)
-            }
-        }
-        result
     }
 }

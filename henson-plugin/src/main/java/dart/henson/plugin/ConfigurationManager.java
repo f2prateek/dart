@@ -33,8 +33,11 @@ public class ConfigurationManager {
         return artifactConfiguration;
     }
 
+    public Configuration getClientInternalConfiguration(BaseVariant variant) {
+        return project.getConfigurations().findByName("__" + NAVIGATION_CONFIGURATION_PREFIX + capitalize(variant.getName()));
+    }
     public Configuration createClientInternalConfiguration(BaseVariant variant) {
-        Configuration internalConfiguration = project.getConfigurations().maybeCreate("__" + NAVIGATION_CONFIGURATION_PREFIX + variant.getName());
+        Configuration internalConfiguration = project.getConfigurations().maybeCreate("__" + NAVIGATION_CONFIGURATION_PREFIX + capitalize(variant.getName()));
         Configuration artifactConfiguration = getClientPseudoConfiguration();
         internalConfiguration.extendsFrom(artifactConfiguration);
         internalConfiguration.setCanBeConsumed(false);

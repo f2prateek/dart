@@ -19,12 +19,12 @@ public class HensonNavigatorGenerator {
         targetActivities.stream().forEach(targetActivity -> {
                     String targetActivitySimpleName = targetActivity.substring(1 + targetActivity.lastIndexOf('.'), targetActivity.length());
                     String targetActivityCapitalizedName = StringUtil.capitalize(targetActivitySimpleName);
-                    methodStatement.append(format("public static %s__IntentBuilder goto%s(Context context) {\n",
+                    methodStatement.append(format("  public static %s__IntentBuilder goto%s(Context context) {\n",
                             targetActivityCapitalizedName, targetActivityCapitalizedName));
-                    methodStatement.append(format("  return new %s__IntentBuilder(context);\n", targetActivityCapitalizedName));
-                    methodStatement.append("}\n");
+                    methodStatement.append(format("    return new %s__IntentBuilder(context);\n", targetActivityCapitalizedName));
+                    methodStatement.append("  }\n");
                 });
-                String classEndStatement = "}";
+                String classEndStatement = "}\n";
         return new StringBuilder()
                 .append(packageStatement)
                 .append(importStatement)

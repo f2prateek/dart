@@ -1,9 +1,11 @@
 package dart.henson.plugin;
 
+import com.android.build.gradle.api.BaseVariant;
 import com.google.common.collect.Streams;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.file.SourceDirectorySet;
@@ -15,9 +17,21 @@ import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import static dart.henson.plugin.StringUtil.capitalize;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.gradle.api.JavaVersion.VERSION_1_7;
 
@@ -27,15 +41,22 @@ public class TaskManager {
 
     private Project project;
     private OutputEventListenerBackedLogger logger;
+    private ConfigurationManager configurationManager;
+    private HensonNavigatorGenerator hensonNavigatorGenerator;
 
-    public TaskManager(Project project, OutputEventListenerBackedLogger logger) {
+    public TaskManager(Project project,
+                       OutputEventListenerBackedLogger logger,
+                       ConfigurationManager configurationManager,
+                       HensonNavigatorGenerator hensonNavigatorGenerator) {
         this.project = project;
         this.logger = logger;
+        this.configurationManager = configurationManager;
+        this.hensonNavigatorGenerator = hensonNavigatorGenerator;
     }
 
     public JavaCompile createNavigationApiCompileTask(String taskSuffix, String destinationPath, NavigationVariant navigationVariant) {
         File newDestinationDir = new File(project.getBuildDir(), "/navigation/classes/java/" + destinationPath);
-        File newGeneratedDir = new File(project.getBuildDir(),"/generated/source/apt/navigation/" + destinationPath);
+        File newGeneratedDir = new File(project.getBuildDir(), "/generated/source/apt/navigation/" + destinationPath);
 
         FileCollection effectiveClasspath = new UnionFileCollection();
         Streams.concat(navigationVariant.apiConfigurations.stream(),
@@ -49,7 +70,7 @@ public class TaskManager {
 
         String compileTaskName = NAVIGATION_API_COMPILE_TASK_PREFIX + taskSuffix;
         JavaCompile compileTask = (JavaCompile) project.getTasks().findByName(compileTaskName);
-        if(compileTask == null) {
+        if (compileTask == null) {
             compileTask = project.getTasks().create(compileTaskName, JavaCompile.class);
             List<FileTree> sources = navigationVariant.sourceSets
                     .stream()
@@ -85,13 +106,53 @@ public class TaskManager {
     public Jar createNavigationApiJarTask(JavaCompile navigationApiCompileTask, String taskSuffix) {
         String jarTaskName = getNavigationApiJarTaskName(taskSuffix);
         Jar jarTask = (Jar) project.getTasks().findByName(jarTaskName);
-        if( jarTask == null) {
+        if (jarTask == null) {
             jarTask = project.getTasks().create(jarTaskName, Jar.class);
-            jarTask.setBaseName(project.getName() + "-navigationApi" +taskSuffix);
+            jarTask.setBaseName(project.getName() + "-navigationApi" + taskSuffix);
             jarTask.from(navigationApiCompileTask.getDestinationDir());
             jarTask.dependsOn(navigationApiCompileTask);
         }
         return jarTask;
+    }
+
+    private void detectNavigationApiDependenciesAndGenerateHensonNavigator(Project project, BaseVariant variant, String hensonNavigatorPackageName) {
+        Task taskDetectModules = project.getTasks().create("detectModule" + capitalize(variant.getName()));
+        taskDetectModules.doFirst(task -> {
+            Configuration clientInternalConfiguration = configurationManager.getClientInternalConfiguration(variant);
+            clientInternalConfiguration.resolve();
+            Set<String> targetActivities = new HashSet();
+            clientInternalConfiguration.getFiles().forEach(dependency -> {
+                if (dependency.getName().matches(".*-navigationApi.*.jar")) {
+                    logger.debug("Detected navigation API dependency: %s", dependency.getName());
+                    File file = dependency.getAbsoluteFile();
+                    List<String> entries = getJarContent(file);
+                    entries.forEach(entry -> {
+                        if (entry.matches(".*__IntentBuilder.class")) {
+                            logger.debug("Detected intent builder: %s", entry);
+                            String targetActivityFQN = entry.substring(0, entry.length() - "__IntentBuilder.class".length()).replace('/', '.');
+                            targetActivities.add(targetActivityFQN);
+                        }
+                    });
+                }
+
+                File variantSrcFolder = new File(project.getProjectDir(), "src/" + variant.getName() + "/java/");
+                String hensonNavigator = hensonNavigatorGenerator.generateHensonNavigatorClass(targetActivities, hensonNavigatorPackageName);
+                variantSrcFolder.mkdirs();
+                String generatedFolderName = hensonNavigatorPackageName.replace('.', '/').concat("/");
+                File generatedFolder = new File(variantSrcFolder, generatedFolderName);
+                generatedFolder.mkdirs();
+                File generatedFile = new File(generatedFolder, "HensonNavigator.java");
+                try {
+                    Files.write(generatedFile.toPath(), singletonList(hensonNavigator));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        });
+        //we put the task right before compilation so that all dependencies are resolved
+        // when the task is executed
+        taskDetectModules.setDependsOn(variant.getJavaCompiler().getDependsOn());
+        variant.getJavaCompiler().dependsOn(taskDetectModules);
     }
 
     public Task createEmptyNavigationApiCompileTask(Project project, String taskSuffix) {
@@ -100,6 +161,22 @@ public class TaskManager {
 
     public Task createEmptyNavigationApiJarTask(Project project, String taskSuffix) {
         return project.getTasks().create(NAVIGATION_API_JAR_TASK_PREFIX + taskSuffix);
+    }
+
+    private List<String> getJarContent(File file) {
+        final List<String> result = new ArrayList<>();
+        try {
+            if (file.getName().endsWith(".jar")) {
+                ZipFile zip = new ZipFile(file);
+                Collections.list(zip.entries())
+                        .stream()
+                        .map(ZipEntry::getName)
+                        .forEach(result::add);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
     }
 
 }
