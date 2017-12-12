@@ -2,6 +2,8 @@ apply plugin: 'groovy'
 apply plugin: 'java-library'
 apply plugin: 'java-gradle-plugin'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 sourceSets {
     functionalTest {

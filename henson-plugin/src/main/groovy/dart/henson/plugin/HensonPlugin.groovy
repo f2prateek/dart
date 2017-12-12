@@ -1,27 +1,21 @@
 package dart.henson.plugin
 
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.internal.dependency.AndroidTypeAttr
 import dart.henson.plugin.attributes.NavigationTypeAttr
 import dart.henson.plugin.attributes.NavigationTypeAttrCompatRule
 import dart.henson.plugin.attributes.NavigationTypeAttrDisambiguationRule
 import org.gradle.api.DomainObjectSet
-import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryPlugin
-import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.AttributeMatchingStrategy
 import org.gradle.api.attributes.Usage
-import org.gradle.api.file.FileCollection
-import org.gradle.api.internal.file.UnionFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.PluginCollection
-import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger
 
 import java.security.InvalidParameterException
@@ -29,21 +23,22 @@ import java.util.zip.ZipFile
 
 import static dart.henson.plugin.Combinator.Tuple
 
-
 class HensonPlugin implements Plugin<Project> {
 
-    public static final String NAVIGATION_API_COMPILE_TASK_PREFIX = 'navigationApiCompileJava'
-    public static final String NAVIGATION_API_JAR_TASK_PREFIX = 'navigationApiJar'
     public static final String NAVIGATION_ARTIFACT_PREFIX = 'navigation'
     public static final String LOG_TAG = "HENSON: "
 
     private OutputEventListenerBackedLogger logger
     private ObjectFactory factory
+    private VariantManager variantManager
+    private TaskManager taskManager
 
     void apply(Project project) {
 
         logger = project.logger
         factory = project.getObjects()
+        variantManager = new VariantManager(logger)
+        taskManager = new TaskManager(project, logger)
 
         //check project
         def hasAppPlugin = project.plugins.withType(AppPlugin)
@@ -217,7 +212,7 @@ class HensonPlugin implements Plugin<Project> {
 
     private void processVariant(Project project, variant, dartVersionName) {
         Combinator combinator = new Combinator()
-        def navigationVariant = createNavigationVariant(project, variant, combinator)
+        def navigationVariant = variantManager.createNavigationVariant(variant, combinator)
         createSourceSetAndConfigurations(project, navigationVariant, dartVersionName)
         createNavigationCompilerAndJarTasksAndArtifact(project, navigationVariant)
         //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
@@ -287,8 +282,8 @@ class HensonPlugin implements Plugin<Project> {
             def tupleName = merge(tuple)
             def suffix = tupleName.capitalize()
             def pathSuffix = "${tupleName}/"
-            def navigationApiCompiler = createNavigationApiCompileTask(project, suffix, pathSuffix, navigationVariant)
-            def navigationApiJarTask = createNavigationApiJarTask(project, navigationApiCompiler, suffix)
+            def navigationApiCompiler = taskManager.createNavigationApiCompileTask(suffix, pathSuffix, navigationVariant)
+            def navigationApiJarTask = taskManager.createNavigationApiJarTask(navigationApiCompiler, suffix)
             navigationVariant.compilerTask = navigationApiCompiler
             navigationVariant.jarTask = navigationApiJarTask
             addArtifact(project, navigationVariant)
@@ -320,67 +315,6 @@ class HensonPlugin implements Plugin<Project> {
         mergedName
     }
 
-    private NavigationVariant createNavigationVariant(Project project, variant, combinator) {
-        def navigationVariant = new NavigationVariant()
-        navigationVariant.variant = variant
-        def flavorNames = variant.productFlavors.collect { it.name }
-        project.logger.debug "Flavors: ${flavorNames}"
-        def flavorNamesAndBuildType = flavorNames << variant.buildType.name
-        project.logger.debug "FlavorNamesAndBuildType: ${flavorNamesAndBuildType}"
-        navigationVariant.combinations = combinator.combine(flavorNamesAndBuildType)
-        project.logger.debug "Combinations: ${navigationVariant.combinations}"
-
-        navigationVariant
-    }
-
-    private Task createEmptyNavigationApiCompileTask(Project project, taskSuffix) {
-        project.tasks.create(NAVIGATION_API_COMPILE_TASK_PREFIX + String.valueOf(taskSuffix))
-    }
-
-    private Task createEmptyNavigationApiJarTask(Project project, taskSuffix) {
-        project.tasks.create(NAVIGATION_API_JAR_TASK_PREFIX + String.valueOf(taskSuffix))
-    }
-
-    private Task createNavigationApiCompileTask(Project project, taskSuffix, destinationPath, navigationVariant) {
-        def newDestinationDirName = "${project.buildDir}/navigation/classes/java/${destinationPath}"
-        def newGeneratedDirName = "${project.buildDir}/generated/source/apt/navigation/${destinationPath}"
-
-        FileCollection effectiveClasspath = new UnionFileCollection()
-        navigationVariant.apiConfigurations.each { effectiveClasspath.add(it) }
-        navigationVariant.implementationConfigurations.each { effectiveClasspath.add(it) }
-        navigationVariant.compileOnlyConfigurations.each { effectiveClasspath.add(it) }
-
-        FileCollection effectiveAnnotationProcessorPath = new UnionFileCollection()
-        navigationVariant.annotationProcessorConfigurations.each { effectiveAnnotationProcessorPath.add(it) }
-
-        if(project.tasks.findByName("${NAVIGATION_API_COMPILE_TASK_PREFIX}${taskSuffix}") == null) {
-            project.tasks.create("${NAVIGATION_API_COMPILE_TASK_PREFIX}${taskSuffix}", JavaCompile) {
-                setSource(navigationVariant.sourceSets.collect { sourceSet -> sourceSet.java.files })
-                setDestinationDir(project.file("${newDestinationDirName}"))
-                classpath = effectiveClasspath
-                options.compilerArgs = ["-s", "${newGeneratedDirName}"]
-                options.annotationProcessorPath = effectiveAnnotationProcessorPath
-                targetCompatibility = JavaVersion.VERSION_1_7
-                sourceCompatibility = JavaVersion.VERSION_1_7
-                doFirst {
-                    project.file("${newGeneratedDirName}").mkdirs()
-                    project.file("${newDestinationDirName}").mkdirs()
-                }
-            }
-        }
-    }
-
-    private Task createNavigationApiJarTask(Project project, navigationApiCompileTask, taskSuffix) {
-        if(project.tasks.findByName("${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}") == null) {
-            def task = project.tasks.create("${NAVIGATION_API_JAR_TASK_PREFIX}${taskSuffix}", Jar) {
-                baseName = "${project.name}-navigationApi${taskSuffix}"
-                from navigationApiCompileTask.destinationDir
-            }
-            task.dependsOn(navigationApiCompileTask)
-            task
-        }
-    }
-
     private void addArtifact(Project project, navigationVariant) {
         def tuple = navigationVariant.combinations.last().first()
         def tupleName = merge(tuple)
@@ -400,7 +334,7 @@ class HensonPlugin implements Plugin<Project> {
         applyAttributesFromVariantCompileToConfiguration(variant, configuration)
 
         project.configurations["${NAVIGATION_ARTIFACT_PREFIX}${suffix}"].attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
-        project.artifacts.add("${NAVIGATION_ARTIFACT_PREFIX}${suffix}", project.tasks["${NAVIGATION_API_JAR_TASK_PREFIX}${suffix}"])
+        project.artifacts.add("${NAVIGATION_ARTIFACT_PREFIX}${suffix}", project.tasks["${TaskManager.NAVIGATION_API_JAR_TASK_PREFIX}${suffix}"])
     }
 
     private void applyAttributesFromVariantCompileToConfiguration(variant, configuration) {
