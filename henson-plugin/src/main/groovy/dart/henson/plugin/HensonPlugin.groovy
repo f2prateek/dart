@@ -1,5 +1,6 @@
 package dart.henson.plugin
 
+import com.android.build.gradle.internal.dependency.AndroidTypeAttr
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -8,33 +9,20 @@ import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.attributes.Attribute
+import org.gradle.api.attributes.AttributeMatchingStrategy
+import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.file.UnionFileCollection
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.PluginCollection
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
-import com.android.builder.model.ArtifactMetaData
 
 import java.security.InvalidParameterException
 import java.util.zip.ZipFile
 
 import static dart.henson.plugin.Combinator.Tuple
 
-class NavigationAttr {
-    private String variantName
-
-    NavigationAttr(String variantName) {
-        this.variantName = variantName
-    }
-
-    @Override
-    boolean equals(Object o) {
-        if (!(o instanceof NavigationAttr)) {
-            return false
-        }
-        return o.variantName.equals(variantName)
-    }
-}
 
 class HensonPlugin implements Plugin<Project> {
 
@@ -42,9 +30,13 @@ class HensonPlugin implements Plugin<Project> {
     public static final String NAVIGATION_API_JAR_TASK_PREFIX = 'navigationApiJar'
     public static final String NAVIGATION_ARTIFACT_PREFIX = 'navigation'
 
+    def ObjectFactory factory
+
     void apply(Project project) {
         final def log = project.logger
         final String LOG_TAG = "HENSON"
+
+        factory = project.getObjects()
 
         //check project
         def hasAppPlugin = project.plugins.withType(AppPlugin)
@@ -91,8 +83,15 @@ class HensonPlugin implements Plugin<Project> {
             variants = project.android.libraryVariants
         }
 
+        //create the task for generating the henson navigator
         detectNavigationApiDependenciesAndGenerateHensonNavigator(project)
         variants.all { variant ->
+            def schema = project.dependencies.attributesSchema
+            AttributeMatchingStrategy<NavigationTypeAttr> navigationAttrStrategy =
+                    schema.attribute(NavigationTypeAttr.ATTRIBUTE)
+            navigationAttrStrategy.getCompatibilityRules().add(NavigationTypeAttrCompatRule.class)
+            navigationAttrStrategy.getDisambiguationRules().add(NavigationTypeAttrDisambiguationRule.class)
+
             def hensonExtension = project.extensions.getByName('henson')
             if (hensonExtension != null && !hensonExtension.navigatorOnly) {
                 project.logger.debug "Processing variant: ${variant.name}"
@@ -105,16 +104,15 @@ class HensonPlugin implements Plugin<Project> {
                     canBeConsumed false
                 }
             }
-            project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].attributes.attribute(Attribute.of(NavigationAttr.class), new NavigationAttr(variant.name))
+            def configuration = project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"]
+            applyAttributesFromVariantCompileToConfiguration(variant, configuration)
+
+            project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
+            println schema.properties
+            println schema.attribute(NavigationTypeAttr.ATTRIBUTE).getCompatibilityRules().properties
             project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].resolve()
             project.dependencies.add("${variant.name}Implementation", project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
-            //project.configurations["${variant.name}ApiElements"].add(project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
-            //variant.compileConfiguration.extendsFrom.add(project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
-            //variant.javaCompiler.classpath = project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"]
-            //project.dependencies.add()["${variant.name.capitalize()}Implementation"].
-            //variant.javaCompiler.dependsOn project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"]
-            //variant.javaCompiler.classpath.add(project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
-        } //create the task for generating the henson navigator
+        }
     }
 
     private void detectNavigationApiDependenciesAndGenerateHensonNavigator(Project project) {
@@ -359,22 +357,26 @@ class HensonPlugin implements Plugin<Project> {
             }
         }
 
-        project.configurations["${NAVIGATION_ARTIFACT_PREFIX}${suffix}"].attributes.attribute(Attribute.of(NavigationAttr.class), new NavigationAttr(navigationVariant.variant.name))
+        //get the attributes from the compile configuration and apply them to
+        //the new artifact configuration
+        def configuration = project.configurations["${NAVIGATION_ARTIFACT_PREFIX}${suffix}"]
+        def variant = navigationVariant.variant
+        applyAttributesFromVariantCompileToConfiguration(variant, configuration)
+
+        project.configurations["${NAVIGATION_ARTIFACT_PREFIX}${suffix}"].attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
         project.artifacts.add("${NAVIGATION_ARTIFACT_PREFIX}${suffix}", project.tasks["${NAVIGATION_API_JAR_TASK_PREFIX}${suffix}"])
-        if(project.tasks.findByName("${NAVIGATION_API_JAR_TASK_PREFIX}${suffix}") != null) {
-//            //com.android.build.gradle.BaseExtension.registerJavaArtifact
-//            project.android.registerArtifactType("${NAVIGATION_ARTIFACT_PREFIX}${suffix}", false, ArtifactMetaData.TYPE_JAVA)
-//            project.android.registerJavaArtifact("${NAVIGATION_ARTIFACT_PREFIX}${suffix}",
-//                    navigationVariant.variant,
-//                    navigationVariant.compilerTask.name,
-//                    navigationVariant.jarTask.name,
-//                    Collections.emptyList(),
-//                    Collections.emptyList(),
-//                    project.configurations["${NAVIGATION_ARTIFACT_PREFIX}"],
-//                    null,
-//                    null,
-//                    null
-//            )
+    }
+
+    private void applyAttributesFromVariantCompileToConfiguration(variant, configuration) {
+        variant.compileConfiguration.attributes.keySet().each { attributeKey ->
+            if(!attributeKey.name.equals(Usage.class.name)
+            && !attributeKey.name.equals(AndroidTypeAttr.class.name)) {
+                println "Applying attribute: ${attributeKey}"
+                def value = variant.compileConfiguration.attributes.getAttribute(attributeKey)
+                if (value != null) {
+                    configuration.attributes.attribute(attributeKey, value)
+                }
+            }
         }
     }
 
