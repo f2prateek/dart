@@ -32,6 +32,8 @@ class HensonPlugin implements Plugin<Project> {
     private ObjectFactory factory
     private VariantManager variantManager
     private TaskManager taskManager
+    private ConfigurationManager configurationManager
+    private ArtifactManager artifactManager
 
     void apply(Project project) {
 
@@ -39,6 +41,8 @@ class HensonPlugin implements Plugin<Project> {
         factory = project.getObjects()
         variantManager = new VariantManager(logger)
         taskManager = new TaskManager(project, logger)
+        artifactManager = new ArtifactManager(project, logger)
+        configurationManager = new ConfigurationManager(project, logger, artifactManager)
 
         //check project
         def hasAppPlugin = project.plugins.withType(AppPlugin)
@@ -62,12 +66,7 @@ class HensonPlugin implements Plugin<Project> {
         //This configuration is only used for the client to declare dependencies,
         //it will not be consumed or resolved directly. We will extend it with a variant
         //aware configuration on the client side.
-        project.configurations {
-            "${NAVIGATION_ARTIFACT_PREFIX}" {
-                canBeResolved false
-                canBeConsumed false
-            }
-        }
+        configurationManager.createClientPseudoConfiguration();
 
         //custom matching strategy to take into account the new navigation attribute type
         //we want to match client requests and producer artifacts. For this we introduce
@@ -89,18 +88,18 @@ class HensonPlugin implements Plugin<Project> {
         //to be able to use them before the creation of variants
 
         //the main configuration (navigation{Api, Implementation, etc.}
-        createNavigationConfigurations(project, "")
+        configurationManager.createNavigationConfigurations("")
 
         //one for each build type
         project.android.buildTypes.all { buildType ->
             log "Processing buildType: ${buildType.name}"
-            createNavigationConfigurations(project, buildType.name.capitalize())
+            configurationManager.createNavigationConfigurations(buildType.name.capitalize())
         }
 
         //one for each flavor
         project.android.productFlavors.all { productFlavor ->
             log "Processing productFlavor: ${productFlavor.name}"
-            createNavigationConfigurations(project, productFlavor.name.capitalize())
+            configurationManager.createNavigationConfigurations(productFlavor.name.capitalize())
         }
 
 
@@ -218,20 +217,12 @@ class HensonPlugin implements Plugin<Project> {
         //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
         addNavigationArtifactsToVariantConfiguration(project, variant)
 
-        project.configurations {
-            "__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}" {
-                extendsFrom project.configurations["${NAVIGATION_ARTIFACT_PREFIX}"]
-                canBeResolved true
-                canBeConsumed false
-            }
-        }
+        def internalConfiguration = configurationManager.createClientInternalConfiguration(variant)
+        applyAttributesFromVariantCompileToConfiguration(variant, internalConfiguration)
 
-        def configuration = project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"]
-        applyAttributesFromVariantCompileToConfiguration(variant, configuration)
-
-        project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
-        project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"].resolve()
-        project.dependencies.add("${variant.name}Implementation", project.configurations["__${NAVIGATION_ARTIFACT_PREFIX}${variant.name}"])
+        internalConfiguration.attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
+        internalConfiguration.resolve()
+        project.dependencies.add("${variant.name}Implementation", internalConfiguration)
 
     }
 
@@ -248,7 +239,7 @@ class HensonPlugin implements Plugin<Project> {
                 tupleName = tupleName.capitalize()
                 createNavigationSourceSet(project, "navigation${tupleName}", "${tuplePath}/")
 
-                createNavigationConfigurations(project, tupleName)
+                configurationManager.createNavigationConfigurations(tupleName)
                 addDartAndHensonDependenciesToNavigationConfigurations(project, tupleName, dartVersionName)
 
                 navigationVariant.sourceSets << project.sourceSets["navigation${tupleName}"]
@@ -257,14 +248,6 @@ class HensonPlugin implements Plugin<Project> {
                 navigationVariant.compileOnlyConfigurations << project.configurations["navigation${tupleName}CompileOnly"]
                 navigationVariant.annotationProcessorConfigurations << project.configurations["navigation${tupleName}AnnotationProcessor"]
             }
-        }
-    }
-
-    private void createNavigationConfigurations(Project project, newConfigurationRadix) {
-        ["Api", "Implementation", "CompileOnly", "AnnotationProcessor"].each { suffix ->
-            Configuration configuration = project.configurations.maybeCreate("navigation${newConfigurationRadix}${suffix}")
-            configuration.canBeResolved = true
-            configuration.canBeConsumed = false
         }
     }
 
@@ -320,21 +303,15 @@ class HensonPlugin implements Plugin<Project> {
         def tupleName = merge(tuple)
         def suffix = tupleName.capitalize()
 
-        project.configurations {
-            "${NAVIGATION_ARTIFACT_PREFIX}${suffix}" {
-                canBeConsumed true
-                canBeResolved true
-            }
-        }
-
+        BaseVariant variant = navigationVariant.variant
         //get the attributes from the compile configuration and apply them to
         //the new artifact configuration
-        def configuration = project.configurations["${NAVIGATION_ARTIFACT_PREFIX}${suffix}"]
-        def variant = navigationVariant.variant
-        applyAttributesFromVariantCompileToConfiguration(variant, configuration)
+        String artifactName = artifactManager.getNavigationArtifactName(variant)
+        Configuration artifactConfiguration = configurationManager.createArtifactConfiguration(variant)
+        applyAttributesFromVariantCompileToConfiguration(variant, artifactConfiguration)
 
-        project.configurations["${NAVIGATION_ARTIFACT_PREFIX}${suffix}"].attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
-        project.artifacts.add("${NAVIGATION_ARTIFACT_PREFIX}${suffix}", project.tasks["${TaskManager.NAVIGATION_API_JAR_TASK_PREFIX}${suffix}"])
+        artifactConfiguration.attributes.attribute(Attribute.of(NavigationTypeAttr.class), factory.named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION))
+        project.artifacts.add(artifactName, taskManager.getNavigationApiJarTask(suffix))
     }
 
     private void applyAttributesFromVariantCompileToConfiguration(variant, configuration) {

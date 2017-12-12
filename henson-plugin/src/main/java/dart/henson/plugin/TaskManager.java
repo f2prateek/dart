@@ -74,8 +74,16 @@ public class TaskManager {
         return compileTask;
     }
 
+    public String getNavigationApiJarTaskName(String taskSuffix) {
+        return NAVIGATION_API_JAR_TASK_PREFIX + taskSuffix;
+    }
+
+    public Jar getNavigationApiJarTask(String taskSuffix) {
+        return (Jar) project.getTasks().findByName(getNavigationApiJarTaskName(taskSuffix));
+    }
+
     public Jar createNavigationApiJarTask(JavaCompile navigationApiCompileTask, String taskSuffix) {
-        String jarTaskName = NAVIGATION_API_JAR_TASK_PREFIX + taskSuffix;
+        String jarTaskName = getNavigationApiJarTaskName(taskSuffix);
         Jar jarTask = (Jar) project.getTasks().findByName(jarTaskName);
         if( jarTask == null) {
             jarTask = project.getTasks().create(jarTaskName, Jar.class);
