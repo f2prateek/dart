@@ -17,14 +17,14 @@
 
 package dart.henson.processor;
 
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
-
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
+
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
 
 /** For tests related to Parceler, but Parceler is not available. */
 public class IntentBuilderGeneratorWithParcelerTest {
@@ -36,59 +36,66 @@ public class IntentBuilderGeneratorWithParcelerTest {
             "test.navigation.TestNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import java.util.ArrayList;", //
-                    "import dart.BindExtra;", //
-                    "import dart.DartModel;", //
-                    "@DartModel(\"test.Test\")", //
-                    "public class TestNavigationModel {", //
-                    "    @BindExtra(\"key\") ArrayList<String> extra;", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import java.util.ArrayList;",
+                    "import dart.DartModel;",
+                    "@DartModel",
+                    "public class TestNavigationModel {",
+                    "    ArrayList<String> extra;",
+                    "}"
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            "test.navigation.TestNavigationModel__IntentBuilder",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import android.content.Context;", //
-                    "import android.content.Intent;", //
-                    "import dart.henson.Bundler;", //
-                    "import java.lang.Class;", //
-                    "import java.lang.Exception;", //
-                    "import java.lang.String;", //
-                    "import java.util.ArrayList;", //
-                    "public class Test__IntentBuilder {", //
-                    "  private Intent intent;", //
-                    "  private Bundler bundler = Bundler.create();", //
-                    "  public Test__IntentBuilder(Context context) {", //
-                    "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
-                    "  }", //
-                    "  public Class getClassDynamically(String className) {", //
-                    "    try {", //
-                    "      return Class.forName(className);", //
-                    "    } catch(Exception ex) {", //
-                    "      throw new RuntimeException(ex);", //
-                    "    }", //
-                    "  }", //
-                    "  public Test__IntentBuilder.AllSet key(ArrayList<String> extra) {", //
-                    "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-                    "    return new Test__IntentBuilder.AllSet();", //
-                    "  }", //
-                    "  public class AllSet {", //
-                    "    public Intent build() {", //
-                    "      intent.putExtras(bundler.get());", //
-                    "      return intent;", //
-                    "    }", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import static dart.henson.ActivityClassFinder.getClassDynamically;",
+                    "import android.content.Context;",
+                    "import android.content.Intent;",
+                    "import dart.henson.AllRequiredSetState;",
+                    "import dart.henson.Bundler;",
+                    "import dart.henson.RequiredStateSequence;",
+                    "import java.lang.String;",
+                    "import java.util.ArrayList;",
+                    "public class TestNavigationModel__IntentBuilder {",
+                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
+                    "    final Bundler bundler = Bundler.create();",
+                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
+                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "  }",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "      ALL_SET allSetState) {",
+                    "    return new RequiredSequence<>(bundler, allSetState);",
+                    "  }",
+                    "  public static class RequiredSequence<ALL_SET extends AllSet> extends RequiredStateSequence<ALL_SET> {",
+                    "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
+                    "      super(bundler, allRequiredSetState);",
+                    "    }",
+                    "    public ALL_SET extra(ArrayList<String> extra) {",
+                    "      bundler.put(\"extra\", org.parceler.Parcels.wrap(extra));",
+                    "      return allRequiredSetState;",
+                    "    }",
+                    "  }",
+                    "  public static class AllSet<SELF extends AllSet<SELF>> extends AllRequiredSetState {",
+                    "    public AllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
+                    "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -99,365 +106,392 @@ public class IntentBuilderGeneratorWithParcelerTest {
             "test.navigation.TestNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import java.util.List;", //
-                    "import dart.BindExtra;", //
-                    "import dart.DartModel;", //
-                    "@DartModel(\"test.Test\")", //
-                    "public class TestNavigationModel {", //
-                    "    @BindExtra(\"key\") List<String> extra;", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import java.util.List;",
+                    "import dart.DartModel;",
+                    "@DartModel",
+                    "public class TestNavigationModel {",
+                    "    List<String> extra;",
+                    "}"
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            "test.navigation.TestNavigationModel__IntentBuilder",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import android.content.Context;", //
-                    "import android.content.Intent;", //
-                    "import dart.henson.Bundler;", //
-                    "import java.lang.Class;", //
-                    "import java.lang.Exception;", //
-                    "import java.lang.String;", //
-                    "import java.util.List;", //
-                    "public class Test__IntentBuilder {", //
-                    "  private Intent intent;", //
-                    "  private Bundler bundler = Bundler.create();", //
-                    "  public Test__IntentBuilder(Context context) {", //
-                    "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
-                    "  }", //
-                    "  public Class getClassDynamically(String className) {", //
-                    "    try {", //
-                    "      return Class.forName(className);", //
-                    "    } catch(Exception ex) {", //
-                    "      throw new RuntimeException(ex);", //
-                    "    }", //
-                    "  }", //
-                    "  public Test__IntentBuilder.AllSet key(List<String> extra) {", //
-                    "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-                    "    return new Test__IntentBuilder.AllSet();", //
-                    "  }", //
-                    "  public class AllSet {", //
-                    "    public Intent build() {", //
-                    "      intent.putExtras(bundler.get());", //
-                    "      return intent;", //
-                    "    }", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import static dart.henson.ActivityClassFinder.getClassDynamically;",
+                    "import android.content.Context;",
+                    "import android.content.Intent;",
+                    "import dart.henson.AllRequiredSetState;",
+                    "import dart.henson.Bundler;",
+                    "import dart.henson.RequiredStateSequence;",
+                    "import java.lang.String;",
+                    "import java.util.List;",
+                    "public class TestNavigationModel__IntentBuilder {",
+                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
+                    "    final Bundler bundler = Bundler.create();",
+                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
+                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "  }",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "      ALL_SET allSetState) {",
+                    "    return new RequiredSequence<>(bundler, allSetState);",
+                    "  }",
+                    "  public static class RequiredSequence<ALL_SET extends AllSet> extends RequiredStateSequence<ALL_SET> {",
+                    "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
+                    "      super(bundler, allRequiredSetState);",
+                    "    }",
+                    "    public ALL_SET extra(List<String> extra) {",
+                    "      bundler.put(\"extra\", org.parceler.Parcels.wrap(extra));",
+                    "      return allRequiredSetState;",
+                    "    }",
+                    "  }",
+                    "  public static class AllSet<SELF extends AllSet<SELF>> extends AllRequiredSetState {",
+                    "    public AllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
+                    "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void
-      intentBuilderGenerator_should_generateCode_when_extraIsAnnotatedWithParceler_and_parcelerIsOn() {
+  intentBuilderGenerator_should_generateCode_when_extraIsAnnotatedWithParceler_and_parcelerIsOn() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import dart.BindExtra;", //
-                    "import dart.DartModel;", //
-                    "import org.parceler.Parcel;", //
-                    "@DartModel(\"test.Test\")", //
-                    "public class TestNavigationModel {", //
-                    "    @BindExtra(\"key\") Foo extra;", //
-                    "    @Parcel static class Foo {}", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import dart.DartModel;",
+                    "import org.parceler.Parcel;",
+                    "@DartModel",
+                    "public class TestNavigationModel {",
+                    "    Foo extra;",
+                    "    @Parcel static class Foo {}",
+                    "}"
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            "test.navigation.TestNavigationModel__IntentBuilder",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import android.content.Context;", //
-                    "import android.content.Intent;", //
-                    "import dart.henson.Bundler;", //
-                    "import java.lang.Class;", //
-                    "import java.lang.Exception;", //
-                    "import java.lang.String;", //
-                    "public class Test__IntentBuilder {", //
-                    "  private Intent intent;", //
-                    "  private Bundler bundler = Bundler.create();", //
-                    "  public Test__IntentBuilder(Context context) {", //
-                    "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
-                    "  }", //
-                    "  public Class getClassDynamically(String className) {", //
-                    "    try {", //
-                    "      return Class.forName(className);", //
-                    "    } catch(Exception ex) {", //
-                    "      throw new RuntimeException(ex);", //
-                    "    }", //
-                    "  }", //
-                    "  public Test__IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
-                    "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-                    "    return new Test__IntentBuilder.AllSet();", //
-                    "  }", //
-                    "  public class AllSet {", //
-                    "    public Intent build() {", //
-                    "      intent.putExtras(bundler.get());", //
-                    "      return intent;", //
-                    "    }", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import static dart.henson.ActivityClassFinder.getClassDynamically;",
+                    "import android.content.Context;",
+                    "import android.content.Intent;",
+                    "import dart.henson.AllRequiredSetState;",
+                    "import dart.henson.Bundler;",
+                    "import dart.henson.RequiredStateSequence;",
+                    "public class TestNavigationModel__IntentBuilder {",
+                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
+                    "    final Bundler bundler = Bundler.create();",
+                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
+                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "  }",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "      ALL_SET allSetState) {",
+                    "    return new RequiredSequence<>(bundler, allSetState);",
+                    "  }",
+                    "  public static class RequiredSequence<ALL_SET extends AllSet> extends RequiredStateSequence<ALL_SET> {",
+                    "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
+                    "      super(bundler, allRequiredSetState);",
+                    "    }",
+                    "    public ALL_SET extra(TestNavigationModel.Foo extra) {",
+                    "      bundler.put(\"extra\", org.parceler.Parcels.wrap(extra));",
+                    "      return allRequiredSetState;",
+                    "    }",
+                    "  }",
+                    "  public static class AllSet<SELF extends AllSet<SELF>> extends AllRequiredSetState {",
+                    "    public AllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
+                    "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void
-      intentBuilderGenerator_should_generateCode_when_extraIsCollectionOfElementAnnotatedWithParceler_and_parcelerIsOn() {
+  intentBuilderGenerator_should_generateCode_when_extraIsCollectionOfElementAnnotatedWithParceler_and_parcelerIsOn() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import java.util.List;", //
-                    "import dart.BindExtra;", //
-                    "import dart.DartModel;", //
-                    "import org.parceler.Parcel;", //
-                    "@DartModel(\"test.Test\")", //
-                    "public class TestNavigationModel {", //
-                    "    @BindExtra(\"key\") List<Foo> extra;", //
-                    "    @Parcel static class Foo {}", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import java.util.List;",
+                    "import dart.DartModel;",
+                    "import org.parceler.Parcel;",
+                    "@DartModel",
+                    "public class TestNavigationModel {",
+                    "    List<Foo> extra;",
+                    "    @Parcel static class Foo {}",
+                    "}"
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            "test.navigation.TestNavigationModel__IntentBuilder",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import android.content.Context;", //
-                    "import android.content.Intent;", //
-                    "import dart.henson.Bundler;", //
-                    "import java.lang.Class;", //
-                    "import java.lang.Exception;", //
-                    "import java.lang.String;", //
-                    "import java.util.List;", //
-                    "public class Test__IntentBuilder {", //
-                    "  private Intent intent;", //
-                    "  private Bundler bundler = Bundler.create();", //
-                    "  public Test__IntentBuilder(Context context) {", //
-                    "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
-                    "  }", //
-                    "  public Class getClassDynamically(String className) {", //
-                    "    try {", //
-                    "      return Class.forName(className);", //
-                    "    } catch(Exception ex) {", //
-                    "      throw new RuntimeException(ex);", //
-                    "    }", //
-                    "  }", //
-                    "  public Test__IntentBuilder.AllSet key(List<TestNavigationModel.Foo> extra) {", //
-                    "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-                    "    return new Test__IntentBuilder.AllSet();", //
-                    "  }", //
-                    "  public class AllSet {", //
-                    "    public Intent build() {", //
-                    "      intent.putExtras(bundler.get());", //
-                    "      return intent;", //
-                    "    }", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import static dart.henson.ActivityClassFinder.getClassDynamically;",
+                    "import android.content.Context;",
+                    "import android.content.Intent;",
+                    "import dart.henson.AllRequiredSetState;",
+                    "import dart.henson.Bundler;",
+                    "import dart.henson.RequiredStateSequence;",
+                    "import java.util.List;",
+                    "public class TestNavigationModel__IntentBuilder {",
+                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
+                    "    final Bundler bundler = Bundler.create();",
+                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
+                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "  }",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "      ALL_SET allSetState) {",
+                    "    return new RequiredSequence<>(bundler, allSetState);",
+                    "  }",
+                    "  public static class RequiredSequence<ALL_SET extends AllSet> extends RequiredStateSequence<ALL_SET> {",
+                    "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
+                    "      super(bundler, allRequiredSetState);",
+                    "    }",
+                    "    public ALL_SET extra(List<TestNavigationModel.Foo> extra) {",
+                    "      bundler.put(\"extra\", org.parceler.Parcels.wrap(extra));",
+                    "      return allRequiredSetState;",
+                    "    }",
+                    "  }",
+                    "  public static class AllSet<SELF extends AllSet<SELF>> extends AllRequiredSetState {",
+                    "    public AllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
+                    "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "}"
+                ));
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void
-      intentBuilderGenerator_should_generateCode_when_multipleExtrasAreParceler_and_parcelerIsOn() {
+  intentBuilderGenerator_should_generateCode_when_multipleExtrasAreParceler_and_parcelerIsOn() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import java.util.List;", //
-                    "import java.util.Map;", //
-                    "import dart.BindExtra;", //
-                    "import dart.DartModel;", //
-                    "import org.parceler.Parcel;", //
-                    "import org.parceler.ParcelConstructor;", //
-                    "@Parcel", //
-                    "class ExampleParcel {", //
-                    "", //
-                    "  String name;", //
-                    "", //
-                    "  @ParcelConstructor", //
-                    "  public ExampleParcel(String name) {", //
-                    "    this.name = name;", //
-                    "  }", //
-                    "", //
-                    "  public String getName() {", //
-                    "    return name;", //
-                    "  }", //
-                    "}", //
-                    "@DartModel(\"test.Test\")", //
-                    "public class TestNavigationModel {", //
-                    "    @BindExtra(\"key\") ExampleParcel extra;", //
-                    "    @BindExtra(\"list\") List<ExampleParcel> listExtra;", //
-                    "    @BindExtra(\"mapNestedExtra\") Map<List<String>, List<ExampleParcel>> mapNestedExtra;",
+                    "package test.navigation;",
+                    "import java.util.List;",
+                    "import java.util.Map;",
+                    "import dart.DartModel;",
+                    "import org.parceler.Parcel;",
+                    "import org.parceler.ParcelConstructor;",
+                    "@Parcel",
+                    "class ExampleParcel {",
+                    "  String name;",
+                    "  @ParcelConstructor",
+                    "  public ExampleParcel(String name) {",
+                    "    this.name = name;",
+                    "  }",
+                    "  public String getName() {",
+                    "    return name;",
+                    "  }",
+                    "}",
+                    "@DartModel",
+                    "public class TestNavigationModel {",
+                    "    ExampleParcel extra;",
+                    "    List<ExampleParcel> listExtra;",
+                    "    Map<List<String>, List<ExampleParcel>> mapNestedExtra;",
                     //
-                    "}" //
-                    ));
+                    "}"
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            "test.navigation.TestNavigationModel__IntentBuilder",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import android.content.Context;", //
-                    "import android.content.Intent;", //
-                    "import dart.henson.Bundler;", //
-                    "import java.lang.Class;", //
-                    "import java.lang.Exception;", //
-                    "import java.lang.String;", //
-                    "import java.util.List;", //
-                    "import java.util.Map;", //
-                    "public class Test__IntentBuilder {", //
-                    "  private Intent intent;", //
-                    "  private Bundler bundler = Bundler.create();", //
-                    "  public Test__IntentBuilder(Context context) {", //
-                    "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
-                    "  }", //
-                    "  public Class getClassDynamically(String className) {", //
-                    "    try {", //
-                    "      return Class.forName(className);", //
-                    "    } catch(Exception ex) {", //
-                    "      throw new RuntimeException(ex);", //
-                    "    }", //
-                    "  }", //
-                    "  public Test__IntentBuilder.AfterSettingKey key(ExampleParcel extra) {", //
-                    "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra));", //
-                    "    return new Test__IntentBuilder.AfterSettingKey();", //
-                    "  }", //
-                    "  public class AfterSettingKey {", //
-                    "    public Test__IntentBuilder.AfterSettingList list(List<ExampleParcel> listExtra) {",
-                    //
-                    "      bundler.put(\"list\", org.parceler.Parcels.wrap(listExtra));", //
-                    "      return new Test__IntentBuilder.AfterSettingList();", //
-                    "    }", //
-                    "  }", //
-                    "  public class AfterSettingList {", //
-                    "    public Test__IntentBuilder.AllSet mapNestedExtra(Map<List<String>, List<ExampleParcel>> mapNestedExtra) {",
-                    //
-                    "      bundler.put(\"mapNestedExtra\", org.parceler.Parcels.wrap(mapNestedExtra));",
-                    //
-                    "      return new Test__IntentBuilder.AllSet();", //
-                    "    }", //
-                    "  }", //
-                    "  public class AllSet {", //
-                    "    public Intent build() {", //
-                    "      intent.putExtras(bundler.get());", //
-                    "      return intent;", //
-                    "    }", //
-                    "  }", //
-                    "}"));
+                    "package test.navigation;",
+                    "import static dart.henson.ActivityClassFinder.getClassDynamically;",
+                    "import android.content.Context;",
+                    "import android.content.Intent;",
+                    "import dart.henson.AllRequiredSetState;",
+                    "import dart.henson.Bundler;",
+                    "import dart.henson.RequiredStateSequence;",
+                    "import java.lang.String;",
+                    "import java.util.List;",
+                    "import java.util.Map;",
+                    "public class TestNavigationModel__IntentBuilder {",
+                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
+                    "    final Bundler bundler = Bundler.create();",
+                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
+                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "  }",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "      ALL_SET allSetState) {",
+                    "    return new RequiredSequence<>(bundler, allSetState);",
+                    "  }",
+                    "  public static class RequiredSequence<ALL_SET extends AllSet> extends RequiredStateSequence<ALL_SET> {",
+                    "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
+                    "      super(bundler, allRequiredSetState);",
+                    "    }",
+                    "    public AfterSettingExtra extra(ExampleParcel extra) {",
+                    "      bundler.put(\"extra\", org.parceler.Parcels.wrap(extra));",
+                    "      return new AfterSettingExtra();",
+                    "    }",
+                    "    public class AfterSettingExtra {",
+                    "      public AfterSettingListExtra listExtra(List<ExampleParcel> listExtra) {",
+                    "        bundler.put(\"listExtra\", org.parceler.Parcels.wrap(listExtra));",
+                    "        return new AfterSettingListExtra();",
+                    "      }",
+                    "    }",
+                    "    public class AfterSettingListExtra {",
+                    "      public ALL_SET mapNestedExtra(Map<List<String>, List<ExampleParcel>> mapNestedExtra) {",
+                    "        bundler.put(\"mapNestedExtra\", org.parceler.Parcels.wrap(mapNestedExtra));",
+                    "        return allRequiredSetState;",
+                    "      }",
+                    "    }",
+                    "  }",
+                    "  public static class AllSet<SELF extends AllSet<SELF>> extends AllRequiredSetState {",
+                    "    public AllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
+                    "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
   public void
-      intentBuilderGenerator_should_generateCode_when_extraIsParcelableThatExtendsParcelable() {
+  intentBuilderGenerator_should_generateCode_when_extraIsParcelableThatExtendsParcelable() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import java.util.List;", //
-                    "import android.os.Parcelable;", //
-                    "import dart.BindExtra;", //
-                    "import dart.DartModel;", //
-                    "@DartModel(\"test.Test\")", //
-                    "public class TestNavigationModel {", //
-                    "    @BindExtra(\"key\") Foo extra;", //
-                    "    class FooParent implements Parcelable {", //
-                    "        public void writeToParcel(android.os.Parcel out, int flags) {", //
-                    "        }", //
-                    "        public int describeContents() {", //
-                    "            return 0;", //
-                    "        }", //
-                    "    }", //
-                    "    class Foo extends FooParent implements Parcelable {", //
-                    "        public void writeToParcel(android.os.Parcel out, int flags) {", //
-                    "        }", //
-                    "        public int describeContents() {", //
-                    "            return 0;", //
-                    "        }", //
-                    "    }", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import java.util.List;",
+                    "import android.os.Parcelable;",
+                    "import dart.DartModel;",
+                    "@DartModel",
+                    "public class TestNavigationModel {",
+                    "    Foo extra;",
+                    "    class FooParent implements Parcelable {",
+                    "        public void writeToParcel(android.os.Parcel out, int flags) {",
+                    "        }",
+                    "        public int describeContents() {",
+                    "            return 0;",
+                    "        }",
+                    "    }",
+                    "    class Foo extends FooParent implements Parcelable {",
+                    "        public void writeToParcel(android.os.Parcel out, int flags) {",
+                    "        }",
+                    "        public int describeContents() {",
+                    "            return 0;",
+                    "        }",
+                    "    }",
+                    "}"
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            "test.navigation.TestNavigationModel__IntentBuilder",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import android.content.Context;", //
-                    "import android.content.Intent;", //
-                    "import dart.henson.Bundler;", //
-                    "import java.lang.Class;", //
-                    "import java.lang.Exception;", //
-                    "import java.lang.String;", //
-                    "public class Test__IntentBuilder {", //
-                    "  private Intent intent;", //
-                    "  private Bundler bundler = Bundler.create();", //
-                    "  public Test__IntentBuilder(Context context) {", //
-                    "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
-                    "  }", //
-                    "  public Class getClassDynamically(String className) {", //
-                    "    try {", //
-                    "      return Class.forName(className);", //
-                    "    } catch(Exception ex) {", //
-                    "      throw new RuntimeException(ex);", //
-                    "    }", //
-                    "  }", //
-                    "  public Test__IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
-                    "    bundler.put(\"key\",(android.os.Parcelable) extra);", //
-                    "    return new Test__IntentBuilder.AllSet();", //
-                    "  }", //
-                    "  public class AllSet {", //
-                    "    public Intent build() {", //
-                    "      intent.putExtras(bundler.get());", //
-                    "      return intent;", //
-                    "    }", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import static dart.henson.ActivityClassFinder.getClassDynamically;",
+                    "import android.content.Context;",
+                    "import android.content.Intent;",
+                    "import dart.henson.AllRequiredSetState;",
+                    "import dart.henson.Bundler;",
+                    "import dart.henson.RequiredStateSequence;",
+                    "public class TestNavigationModel__IntentBuilder {",
+                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
+                    "    final Bundler bundler = Bundler.create();",
+                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
+                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "  }",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "      ALL_SET allSetState) {",
+                    "    return new RequiredSequence<>(bundler, allSetState);",
+                    "  }",
+                    "  public static class RequiredSequence<ALL_SET extends AllSet> extends RequiredStateSequence<ALL_SET> {",
+                    "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
+                    "      super(bundler, allRequiredSetState);",
+                    "    }",
+                    "    public ALL_SET extra(TestNavigationModel.Foo extra) {",
+                    "      bundler.put(\"extra\",(android.os.Parcelable) extra);",
+                    "      return allRequiredSetState;",
+                    "    }",
+                    "  }",
+                    "  public static class AllSet<SELF extends AllSet<SELF>> extends AllRequiredSetState {",
+                    "    public AllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
+                    "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -468,68 +502,74 @@ public class IntentBuilderGeneratorWithParcelerTest {
             "test.navigation.TestNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import java.util.List;", //
-                    "import android.os.Parcelable;", //
-                    "import dart.BindExtra;", //
-                    "import dart.DartModel;", //
-                    "import org.parceler.Parcel;", //
-                    "@DartModel(\"test.Test\")", //
-                    "public class TestNavigationModel {", //
-                    "    @BindExtra(\"key\") Foo extra;", //
-                    "    class FooParent implements Parcelable {", //
-                    "        public void writeToParcel(android.os.Parcel out, int flags) {", //
-                    "        }", //
-                    "        public int describeContents() {", //
-                    "            return 0;", //
-                    "        }", //
-                    "    }", //
-                    "    @Parcel class Foo extends FooParent {} ", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import java.util.List;",
+                    "import android.os.Parcelable;",
+                    "import dart.DartModel;",
+                    "import org.parceler.Parcel;",
+                    "@DartModel",
+                    "public class TestNavigationModel {",
+                    "    Foo extra;",
+                    "    class FooParent implements Parcelable {",
+                    "        public void writeToParcel(android.os.Parcel out, int flags) {",
+                    "        }",
+                    "        public int describeContents() {",
+                    "            return 0;",
+                    "        }",
+                    "    }",
+                    "    @Parcel class Foo extends FooParent {} ",
+                    "}"
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            "test.navigation.TestNavigationModel__IntentBuilder",
             Joiner.on('\n')
                 .join( //
-                    "package test.navigation;", //
-                    "import android.content.Context;", //
-                    "import android.content.Intent;", //
-                    "import dart.henson.Bundler;", //
-                    "import java.lang.Class;", //
-                    "import java.lang.Exception;", //
-                    "import java.lang.String;", //
-                    "public class Test__IntentBuilder {", //
-                    "  private Intent intent;", //
-                    "  private Bundler bundler = Bundler.create();", //
-                    "  public Test__IntentBuilder(Context context) {", //
-                    "    intent = new Intent(context, getClassDynamically(\"test.Test\"));", //
-                    "  }", //
-                    "  public Class getClassDynamically(String className) {", //
-                    "    try {", //
-                    "      return Class.forName(className);", //
-                    "    } catch(Exception ex) {", //
-                    "      throw new RuntimeException(ex);", //
-                    "    }", //
-                    "  }", //
-                    "  public Test__IntentBuilder.AllSet key(TestNavigationModel.Foo extra) {", //
-                    "    bundler.put(\"key\", org.parceler.Parcels.wrap(extra);", //
-                    "    return new Test__IntentBuilder.AllSet();", //
-                    "  }", //
-                    "  public class AllSet {", //
-                    "    public Intent build() {", //
-                    "      intent.putExtras(bundler.get());", //
-                    "      return intent;", //
-                    "    }", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test.navigation;",
+                    "import static dart.henson.ActivityClassFinder.getClassDynamically;",
+                    "import android.content.Context;",
+                    "import android.content.Intent;",
+                    "import dart.henson.AllRequiredSetState;",
+                    "import dart.henson.Bundler;",
+                    "import dart.henson.RequiredStateSequence;",
+                    "public class TestNavigationModel__IntentBuilder {",
+                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
+                    "    final Bundler bundler = Bundler.create();",
+                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
+                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "  }",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "      ALL_SET allSetState) {",
+                    "    return new RequiredSequence<>(bundler, allSetState);",
+                    "  }",
+                    "  public static class RequiredSequence<ALL_SET extends AllSet> extends RequiredStateSequence<ALL_SET> {",
+                    "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
+                    "      super(bundler, allRequiredSetState);",
+                    "    }",
+                    "    public ALL_SET extra(TestNavigationModel.Foo extra) {",
+                    "      bundler.put(\"extra\", org.parceler.Parcels.wrap(extra));",
+                    "      return allRequiredSetState;",
+                    "    }",
+                    "  }",
+                    "  public static class AllSet<SELF extends AllSet<SELF>> extends AllRequiredSetState {",
+                    "    public AllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
+                    "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 }

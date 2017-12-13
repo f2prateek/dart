@@ -25,5 +25,4 @@ import java.lang.annotation.Target;
 
 @Retention(CLASS)
 @Target(TYPE)
-public @interface DartModel {
-}
+public @interface DartModel {}

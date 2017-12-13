@@ -17,13 +17,13 @@
 
 package dart.processor;
 
-import static java.util.Arrays.asList;
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import dart.common.Binding;
 import dart.common.BindingTarget;
 import org.junit.Before;
 import org.junit.Test;
+
+import static java.util.Arrays.asList;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class ExtraInjectorGeneratorTest {
 
@@ -31,7 +31,7 @@ public class ExtraInjectorGeneratorTest {
 
   @Before
   public void setup() {
-    final BindingTarget bindingTarget = new BindingTarget("foo", "bar", "qurtz", false);
+    final BindingTarget bindingTarget = new BindingTarget("foo", "bar");
     extraInjectorGenerator = new dart.processor.ExtraInjectorGenerator(bindingTarget);
   }
 

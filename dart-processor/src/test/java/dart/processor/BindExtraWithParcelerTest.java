@@ -17,14 +17,14 @@
 
 package dart.processor;
 
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
-
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
+
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
 
 /**
  * Tests {@link dart.processor.InjectExtraProcessor}. For tests related to Parceler and Parceler is
@@ -36,44 +36,45 @@ public class BindExtraWithParcelerTest {
   public void serializableCollection() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
-            "test.TestSerializableCollection",
+            "test.TestSerializableCollectionNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import android.app.Activity;", //
-                    "import dart.BindExtra;", //
-                    "import java.lang.Object;", //
-                    "import java.lang.String;", //
-                    "import android.util.SparseArray;", //
-                    "public class TestSerializableCollection extends Activity {", //
-                    "  @BindExtra(\"key\") SparseArray<String> extra;", //
-                    "}" //
-                    ));
+                    "package test;",
+                    "import dart.BindExtra;",
+                    "import dart.DartModel;",
+                    "import java.lang.Object;",
+                    "import java.lang.String;",
+                    "import android.util.SparseArray;",
+                    "@DartModel",
+                    "public class TestSerializableCollectionNavigationModel {",
+                    "  @BindExtra(\"key\") SparseArray<String> extra;",
+                    "}"
+                ));
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
-            "test/TestSerializableCollection__ExtraBinder",
+            "test/TestSerializableCollectionNavigationModel__ExtraBinder",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import dart.Dart;", //
-                    "import java.lang.Object;", //
-                    "public class TestSerializableCollection__ExtraBinder {", //
-                    "  public static void bind(Dart.Finder finder, TestSerializableCollection target, Object source) {", //
-                    "    Object object;", //
-                    "    object = finder.getExtra(source, \"key\");", //
-                    "    if (object == null) {", //
-                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                    "    }", //
-                    "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test;",
+                    "import dart.Dart;",
+                    "import java.lang.Object;",
+                    "public class TestSerializableCollectionNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestSerializableCollectionNavigationModel target, Object source) {",
+                    "    Object object;",
+                    "    object = finder.getExtra(source, \"key\");",
+                    "    if (object == null) {",
+                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");",
+                    "    }",
+                    "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/TestSerializableCollection__ExtraBinder")
+        .generatedSourceFile("test/TestSerializableCollectionNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
   }
 
@@ -81,44 +82,45 @@ public class BindExtraWithParcelerTest {
   public void nonSerializableNonParcelableCollection_withoutParceler() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
-            "test.TestNonSerializableNonParcelableCollection_withoutParceler",
+            "test.TestNonSerializableNonParcelableCollection_withoutParcelerNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import android.app.Activity;", //
-                    "import dart.BindExtra;", //
-                    "import java.lang.Object;", //
-                    "import java.lang.String;", //
-                    "import java.util.List;", //
-                    "public class TestNonSerializableNonParcelableCollection_withoutParceler extends Activity {", //
-                    "  @BindExtra(\"key\") List<String> extra;", //
-                    "}" //
-                    ));
+                    "package test;",
+                    "import dart.BindExtra;",
+                    "import dart.DartModel;",
+                    "import java.lang.Object;",
+                    "import java.lang.String;",
+                    "import java.util.List;",
+                    "@DartModel",
+                    "public class TestNonSerializableNonParcelableCollection_withoutParcelerNavigationModel {",
+                    "  @BindExtra(\"key\") List<String> extra;",
+                    "}"
+                ));
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
-            "test/TestNonSerializableNonParcelableCollection_withoutParceler__ExtraBinder",
+            "test/TestNonSerializableNonParcelableCollection_withoutParcelerNavigationModel__ExtraBinder",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import dart.Dart;", //
-                    "import java.lang.Object;", //
-                    "public class TestNonSerializableNonParcelableCollection_withoutParceler__ExtraBinder {", //
-                    "  public static void bind(Dart.Finder finder, TestNonSerializableNonParcelableCollection_withoutParceler target, Object source) {", //
-                    "    Object object;", //
-                    "    object = finder.getExtra(source, \"key\");", //
-                    "    if (object == null) {", //
-                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                    "    }", //
-                    "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);", //
-                    "  }", //
+                    "package test;",
+                    "import dart.Dart;",
+                    "import java.lang.Object;",
+                    "public class TestNonSerializableNonParcelableCollection_withoutParcelerNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestNonSerializableNonParcelableCollection_withoutParcelerNavigationModel target, Object source) {",
+                    "    Object object;",
+                    "    object = finder.getExtra(source, \"key\");",
+                    "    if (object == null) {",
+                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");",
+                    "    }",
+                    "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);",
+                    "  }",
                     "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
     assertThat(compilation)
         .generatedSourceFile(
-            "test/TestNonSerializableNonParcelableCollection_withoutParceler__ExtraBinder")
+            "test/TestNonSerializableNonParcelableCollection_withoutParcelerNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
   }
 
@@ -126,44 +128,45 @@ public class BindExtraWithParcelerTest {
   public void parcelAnnotatedType() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
-            "test.TestParcelAnnotated",
+            "test.TestParcelAnnotatedNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import android.app.Activity;", //
-                    "import dart.BindExtra;", //
-                    "import java.lang.Object;", //
-                    "import java.lang.String;", //
-                    "import org.parceler.Parcel;", //
-                    "public class TestParcelAnnotated extends Activity {", //
-                    "  @BindExtra(\"key\") Foo extra;", //
-                    "@Parcel static class Foo {}", //
+                    "package test;",
+                    "import dart.BindExtra;",
+                    "import dart.DartModel;",
+                    "import java.lang.Object;",
+                    "import java.lang.String;",
+                    "import org.parceler.Parcel;",
+                    "@DartModel",
+                    "public class TestParcelAnnotatedNavigationModel {",
+                    "  @BindExtra(\"key\") Foo extra;",
+                    "  @Parcel static class Foo {}",
                     "}"));
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
-            "test/TestParcelAnnotated__ExtraBinder",
+            "test/TestParcelAnnotatedNavigationModel__ExtraBinder",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import dart.Dart;", //
-                    "import java.lang.Object;", //
-                    "public class TestParcelAnnotated__ExtraBinder {", //
-                    "  public static void bind(Dart.Finder finder, TestParcelAnnotated target, Object source) {", //
-                    "    Object object;", //
-                    "    object = finder.getExtra(source, \"key\");", //
-                    "    if (object == null) {", //
-                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                    "    }", //
-                    "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test;",
+                    "import dart.Dart;",
+                    "import java.lang.Object;",
+                    "public class TestParcelAnnotatedNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestParcelAnnotatedNavigationModel target, Object source) {",
+                    "    Object object;",
+                    "    object = finder.getExtra(source, \"key\");",
+                    "    if (object == null) {",
+                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");",
+                    "    }",
+                    "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/TestParcelAnnotated__ExtraBinder")
+        .generatedSourceFile("test/TestParcelAnnotatedNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
   }
 
@@ -171,45 +174,46 @@ public class BindExtraWithParcelerTest {
   public void collectionOfParcelAnnotatedType() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
-            "test.TestCollectionParcel",
+            "test.TestCollectionParcelNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import android.app.Activity;", //
-                    "import dart.BindExtra;", //
-                    "import java.lang.Object;", //
-                    "import java.lang.String;", //
-                    "import java.util.List;", //
-                    "import org.parceler.Parcel;", //
-                    "public class TestCollectionParcel extends Activity {", //
-                    "  @BindExtra(\"key\") List<Foo> extra;", //
-                    "@Parcel static class Foo {}", //
+                    "package test;",
+                    "import dart.BindExtra;",
+                    "import dart.DartModel;",
+                    "import java.lang.Object;",
+                    "import java.lang.String;",
+                    "import java.util.List;",
+                    "import org.parceler.Parcel;",
+                    "@DartModel",
+                    "public class TestCollectionParcelNavigationModel {",
+                    "  @BindExtra(\"key\") List<Foo> extra;",
+                    "@Parcel static class Foo {}",
                     "}"));
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
-            "test/TestCollectionParcel__ExtraBinder",
+            "test/TestCollectionParcelNavigationModel__ExtraBinder",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import dart.Dart;", //
-                    "import java.lang.Object;", //
-                    "public class TestCollectionParcel__ExtraBinder {", //
-                    "  public static void bind(Dart.Finder finder, TestCollectionParcel target, Object source) {", //
-                    "    Object object;", //
-                    "    object = finder.getExtra(source, \"key\");", //
-                    "    if (object == null) {", //
-                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                    "    }", //
-                    "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test;",
+                    "import dart.Dart;",
+                    "import java.lang.Object;",
+                    "public class TestCollectionParcelNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestCollectionParcelNavigationModel target, Object source) {",
+                    "    Object object;",
+                    "    object = finder.getExtra(source, \"key\");",
+                    "    if (object == null) {",
+                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");",
+                    "    }",
+                    "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/TestCollectionParcel__ExtraBinder")
+        .generatedSourceFile("test/TestCollectionParcelNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
   }
 
@@ -217,51 +221,52 @@ public class BindExtraWithParcelerTest {
   public void bindingParcelThatExtendsParcelableExtra() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
-            "test.TestParcelExtendsParcelable",
+            "test.TestParcelExtendsParcelableNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import android.app.Activity;", //
-                    "import android.os.Parcelable;", //
-                    "import org.parceler.Parcel;", //
-                    "import dart.BindExtra;", //
-                    "class ExtraParent implements Parcelable {", //
-                    "  public void writeToParcel(android.os.Parcel out, int flags) {", //
-                    "  }", //
-                    "  public int describeContents() {", //
-                    "    return 0;", //
-                    "  }", //
-                    "}", //
-                    "@Parcel class Extra extends ExtraParent {}", //
-                    "public class TestParcelExtendsParcelable extends Activity {", //
-                    "    @BindExtra(\"key\") Extra extra;", //
-                    "}" //
-                    ));
+                    "package test;",
+                    "import android.os.Parcelable;",
+                    "import org.parceler.Parcel;",
+                    "import dart.BindExtra;",
+                    "import dart.DartModel;",
+                    "class ExtraParent implements Parcelable {",
+                    "  public void writeToParcel(android.os.Parcel out, int flags) {",
+                    "  }",
+                    "  public int describeContents() {",
+                    "    return 0;",
+                    "  }",
+                    "}",
+                    "@Parcel class Extra extends ExtraParent {}",
+                    "@DartModel",
+                    "public class TestParcelExtendsParcelableNavigationModel {",
+                    "    @BindExtra(\"key\") Extra extra;",
+                    "}"
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test/TestParcelExtendsParcelable__ExtraBinder",
+            "test/TestParcelExtendsParcelableNavigationModel__ExtraBinder",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import dart.Dart;", //
-                    "import java.lang.Object;", //
-                    "public class TestParcelExtendsParcelable__ExtraBinder {", //
-                    "  public static void bind(Dart.Finder finder, TestParcelExtendsParcelable target, Object source) {", //
-                    "    Object object;", //
-                    "    object = finder.getExtra(source, \"key\");", //
-                    "    if (object == null) {", //
-                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                    "    }", //
-                    "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test;",
+                    "import dart.Dart;",
+                    "import java.lang.Object;",
+                    "public class TestParcelExtendsParcelableNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestParcelExtendsParcelableNavigationModel target, Object source) {",
+                    "    Object object;",
+                    "    object = finder.getExtra(source, \"key\");",
+                    "    if (object == null) {",
+                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");",
+                    "    }",
+                    "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/TestParcelExtendsParcelable__ExtraBinder")
+        .generatedSourceFile("test/TestParcelExtendsParcelableNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -269,56 +274,57 @@ public class BindExtraWithParcelerTest {
   public void bindingParcelableThatExtendsParcelableExtra() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
-            "test.TestParcelableExtendsParcelable",
+            "test.TestParcelableExtendsParcelableNavigationModel",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import android.app.Activity;", //
-                    "import android.os.Parcelable;", //
-                    "import dart.BindExtra;", //
-                    "class ExtraParent implements Parcelable {", //
-                    "  public void writeToParcel(android.os.Parcel out, int flags) {", //
-                    "  }", //
-                    "  public int describeContents() {", //
-                    "    return 0;", //
-                    "  }", //
-                    "}", //
-                    "class Extra extends ExtraParent implements Parcelable {", //
-                    "  public void writeToParcel(android.os.Parcel out, int flags) {", //
-                    "  }", //
-                    "  public int describeContents() {", //
-                    "    return 0;", //
-                    "  }", //
-                    "}", //
-                    "public class TestParcelableExtendsParcelable extends Activity {", //
-                    "    @BindExtra(\"key\") Extra extra;", //
-                    "}" //
-                    ));
+                    "package test;",
+                    "import android.os.Parcelable;",
+                    "import dart.BindExtra;",
+                    "import dart.DartModel;",
+                    "class ExtraParent implements Parcelable {",
+                    "  public void writeToParcel(android.os.Parcel out, int flags) {",
+                    "  }",
+                    "  public int describeContents() {",
+                    "    return 0;",
+                    "  }",
+                    "}",
+                    "class Extra extends ExtraParent implements Parcelable {",
+                    "  public void writeToParcel(android.os.Parcel out, int flags) {",
+                    "  }",
+                    "  public int describeContents() {",
+                    "    return 0;",
+                    "  }",
+                    "}",
+                    "@DartModel",
+                    "public class TestParcelableExtendsParcelableNavigationModel {",
+                    "    @BindExtra(\"key\") Extra extra;",
+                    "}"
+                ));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test/TestParcelableExtendsParcelable__ExtraBinder",
+            "test/TestParcelableExtendsParcelableNavigationModel__ExtraBinder",
             Joiner.on('\n')
                 .join( //
-                    "package test;", //
-                    "import dart.Dart;", //
-                    "import java.lang.Object;", //
-                    "public class TestParcelableExtendsParcelable__ExtraBinder {", //
-                    "  public static void bind(Dart.Finder finder, TestParcelableExtendsParcelable target, Object source) {", //
-                    "    Object object;", //
-                    "    object = finder.getExtra(source, \"key\");", //
-                    "    if (object == null) {", //
-                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");", //
-                    "    }", //
-                    "    target.extra = (Extra) object;", //
-                    "  }", //
-                    "}" //
-                    ));
+                    "package test;",
+                    "import dart.Dart;",
+                    "import java.lang.Object;",
+                    "public class TestParcelableExtendsParcelableNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestParcelableExtendsParcelableNavigationModel target, Object source) {",
+                    "    Object object;",
+                    "    object = finder.getExtra(source, \"key\");",
+                    "    if (object == null) {",
+                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra' was not found. If this extra is optional add '@Nullable' annotation.\");",
+                    "    }",
+                    "    target.extra = (Extra) object;",
+                    "  }",
+                    "}"
+                ));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/TestParcelableExtendsParcelable__ExtraBinder")
+        .generatedSourceFile("test/TestParcelableExtendsParcelableNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(builderSource);
   }
 }

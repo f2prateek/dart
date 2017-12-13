@@ -718,7 +718,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation).hadErrorContaining(
-        "@DartModel fields must not be private or static. (test.navigation.TestNavigationModel.extra)");
+        "@DartModel field must not be private or static. (test.navigation.TestNavigationModel.extra)");
   }
 
   @Test
@@ -738,7 +738,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation).hadErrorContaining(
-        "@DartModel fields must not be private or static. (test.navigation.TestNavigationModel.extra)");
+        "@DartModel field must not be private or static. (test.navigation.TestNavigationModel.extra)");
   }
 
   @Test
@@ -759,7 +759,7 @@ public class IntentBuilderGeneratorTest {
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
-            "@DartModel fields must be a primitive or Serializable or Parcelable (test.navigation.TestNavigationModel.extra). If you use Parceler, all types supported by Parceler are allowed.");
+            "The fields of class annotated with @DartModel must be primitive, Serializable or Parcelable (test.navigation.TestNavigationModel.extra).");
   }
 
   @Test
@@ -780,7 +780,7 @@ public class IntentBuilderGeneratorTest {
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation).hadErrorContaining(
-        "@BindExtra element keys have to be valid java variable identifiers (test.navigation.TestNavigationModel, extra).");
+        "@BindExtra key has to be valid java variable identifiers (test.navigation.TestNavigationModel, extra).");
   }
 
   @Test
