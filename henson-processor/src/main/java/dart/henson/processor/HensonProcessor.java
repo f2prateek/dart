@@ -45,7 +45,6 @@ import javax.lang.model.element.TypeElement;
 public class HensonProcessor extends AbstractProcessor {
 
   static final String NAVIGATION_MODEL_ANNOTATION_CLASS_NAME = "dart.DartModel";
-
   static final String OPTION_HENSON_PACKAGE = "dart.henson.package";
 
   private LoggingUtil loggingUtil;

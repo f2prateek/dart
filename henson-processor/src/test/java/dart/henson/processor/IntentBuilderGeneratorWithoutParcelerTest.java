@@ -40,7 +40,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "import java.util.ArrayList;", //
                     "import dart.BindExtra;", //
                     "import dart.DartModel;", //
-                    "@DartModel(\"test.Test\")", //
+                    "@DartModel", //
                     "public class TestNavigationModel {", //
                     "    @BindExtra(\"key\") ArrayList<String> extra;", //
                     "}" //
@@ -48,7 +48,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            "test.navigation.TestNavigationModel__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;", //
@@ -90,7 +90,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 

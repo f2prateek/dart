@@ -79,8 +79,7 @@ public class BindingTargetUtil {
       if (parentTypeElement != null) {
         final BindingTarget target = targetClassMap.get(typeElement);
         target.parentPackage = compilerUtil.getPackageName(parentTypeElement);
-        target.parentClass = target.parentPackage + "." +
-            compilerUtil.getClassName(parentTypeElement, target.parentPackage);
+        target.parentClass = compilerUtil.getClassName(parentTypeElement, target.parentPackage);
         targetClassMap.get(parentTypeElement).addChild(typeElement);
       }
     }
@@ -130,20 +129,6 @@ public class BindingTargetUtil {
     }
   }
 
-  private void spreadClosestRequiredAncestorToChildren(
-      Map<TypeElement, BindingTarget> targetClassMap, BindingTarget bindingTarget) {
-    for (TypeElement child : bindingTarget.childClasses) {
-      final BindingTarget childTarget = targetClassMap.get(child);
-      if (bindingTarget.hasRequiredFields) {
-        childTarget.closestRequiredAncestorPackage = bindingTarget.classPackage;
-        childTarget.closestRequiredAncestorClass = bindingTarget.className;
-      } else {
-        childTarget.closestRequiredAncestorPackage = bindingTarget.closestRequiredAncestorPackage;
-        childTarget.closestRequiredAncestorClass = bindingTarget.closestRequiredAncestorClass;
-      }
-    }
-  }
-
   private void setClosestRequiredAncestor(BindingTarget bindingTarget,
       TypeElement superIntentBuilder) {
     for (ExecutableElement method : methodsIn(superIntentBuilder.getEnclosedElements())) {
@@ -161,6 +146,21 @@ public class BindingTargetUtil {
         bindingTarget.closestRequiredAncestorClass =
             intentBuilderClass.substring(0, intentBuilderClass.indexOf(BUNDLE_BUILDER_SUFFIX));
       }
+    }
+  }
+
+  private void spreadClosestRequiredAncestorToChildren(
+      Map<TypeElement, BindingTarget> targetClassMap, BindingTarget bindingTarget) {
+    for (TypeElement child : bindingTarget.childClasses) {
+      final BindingTarget childTarget = targetClassMap.get(child);
+      if (bindingTarget.hasRequiredFields) {
+        childTarget.closestRequiredAncestorPackage = bindingTarget.classPackage;
+        childTarget.closestRequiredAncestorClass = bindingTarget.className;
+      } else {
+        childTarget.closestRequiredAncestorPackage = bindingTarget.closestRequiredAncestorPackage;
+        childTarget.closestRequiredAncestorClass = bindingTarget.closestRequiredAncestorClass;
+      }
+      spreadClosestRequiredAncestorToChildren(targetClassMap, childTarget);
     }
   }
 
