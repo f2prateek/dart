@@ -82,7 +82,7 @@ public class HensonProcessor extends AbstractProcessor {
 
     Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
     generateIntentBuilders(targetClassMap);
-    generateHensonNavigator(targetClassMap);
+    generateHenson(targetClassMap);
 
     //return false here to let dart process the annotations too
     return false;
@@ -138,12 +138,12 @@ public class HensonProcessor extends AbstractProcessor {
     }
   }
 
-  private void generateHensonNavigator(Map<TypeElement, BindingTarget> targetClassMap) {
+  private void generateHenson(Map<TypeElement, BindingTarget> targetClassMap) {
     if (!targetClassMap.values().isEmpty()) {
       Element[] allTypes = targetClassMap.keySet().toArray(new Element[targetClassMap.size()]);
       try {
         fileUtil.writeFile(
-            new HensonNavigatorGenerator(hensonPackage, targetClassMap.values()), allTypes);
+            new HensonGenerator(hensonPackage, targetClassMap.values()), allTypes);
       } catch (IOException e) {
         for (Element element : allTypes) {
           loggingUtil.error(

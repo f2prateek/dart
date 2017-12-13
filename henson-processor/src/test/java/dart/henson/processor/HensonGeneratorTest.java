@@ -26,7 +26,7 @@ import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
-public class HensonNavigatorGeneratorTest {
+public class HensonGeneratorTest {
 
   @Test
   public void

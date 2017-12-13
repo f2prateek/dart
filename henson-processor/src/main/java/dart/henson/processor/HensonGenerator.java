@@ -36,7 +36,7 @@ import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
 import static dart.henson.processor.IntentBuilderGenerator.REQUIRED_SEQUENCE_CLASS;
 import static dart.henson.processor.IntentBuilderGenerator.RESOLVED_OPTIONAL_SEQUENCE_CLASS;
 
-public class HensonNavigatorGenerator extends BaseGenerator {
+public class HensonGenerator extends BaseGenerator {
 
   private static final String HENSON_NAVIGATOR_CLASS_NAME = "Henson";
   private static final String WITH_CONTEXT_SET_STATE_CLASS_NAME = "WithContextSetState";
@@ -44,7 +44,7 @@ public class HensonNavigatorGenerator extends BaseGenerator {
   private String packageName;
   private Collection<BindingTarget> targets;
 
-  public HensonNavigatorGenerator(String packageName, Collection<BindingTarget> targets) {
+  public HensonGenerator(String packageName, Collection<BindingTarget> targets) {
     if (packageName != null) {
       this.packageName = packageName;
     } else {

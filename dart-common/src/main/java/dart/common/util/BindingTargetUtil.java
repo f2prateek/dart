@@ -91,6 +91,7 @@ public class BindingTargetUtil {
       final TypeElement element = target.getKey();
       final BindingTarget bindingTarget = target.getValue();
       if (bindingTarget.topLevel) {
+        // check if parent is outside the current module
         if (bindingTarget.parentPackage != null) {
           setClosestRequiredAncestor(bindingTarget, getIntentBuilder(element.getSuperclass()));
         }

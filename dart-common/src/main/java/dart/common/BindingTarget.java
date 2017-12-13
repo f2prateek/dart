@@ -31,8 +31,14 @@ public class BindingTarget {
   public String parentPackage;
   public String parentClass;
   // Closest ancestor with required fields
+  // we could have made a simpler model and just remember
+  // the name of the required state but we decided to make a richer model
+  // and to remember the name of the full ancestor class that contains required fields.
+  // Closest here means first one in the hierarchy, we discover it without scanning the hierarchy,
+  // just having a look at the parent class is enough to retrieve this information.
   public String closestRequiredAncestorPackage;
   public String closestRequiredAncestorClass;
+
   public boolean hasRequiredFields;
   public boolean topLevel;
   public List<TypeElement> childClasses;
@@ -40,8 +46,8 @@ public class BindingTarget {
   public BindingTarget(String classPackage, String className) {
     this.classPackage = classPackage;
     this.className = className;
-    childClasses = new ArrayList<>();
-    topLevel = false;
+    this.childClasses = new ArrayList<>();
+    this.topLevel = false;
   }
 
   public String getFQN() {

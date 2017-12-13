@@ -71,7 +71,7 @@ public class BindExtraUtil {
     Set<Modifier> modifiers = element.getModifiers();
     if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC)) {
       loggingUtil.error(element,
-          "@DartModel fields must not be private or static. (%s.%s)",
+          "@DartModel field must not be private or static. (%s.%s)",
           enclosingElement.getQualifiedName(),
           element.getSimpleName());
       valid = false;
@@ -83,8 +83,8 @@ public class BindExtraUtil {
         && !(parcelerUtil.isParcelerAvailable()
         && parcelerUtil.isValidExtraTypeForParceler(typeElement))) {
       loggingUtil.error(element,
-          "@DartModel fields must be a primitive or Serializable or "
-              + "Parcelable (%s.%s). "
+          "The fields of class annotated with @DartModel must be primitive, Serializable or "
+              + "Parcelable (%s.%s).\n"
               + "If you use Parceler, all types supported by Parceler are allowed.",
           enclosingElement.getQualifiedName(),
           element.getSimpleName());
@@ -98,8 +98,8 @@ public class BindExtraUtil {
       if (!StringUtil.isNullOrEmpty(annotationValue)
           && !StringUtil.isValidJavaIdentifier(annotationValue)) {
         loggingUtil.error(element,
-            "@BindExtra element keys have to be valid java variable identifiers (%s, %s). "
-                + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html",
+            "@BindExtra key has to be valid java variable identifiers (%s, %s).\n"
+                + "See https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html",
             enclosingElement.getQualifiedName(),
             element.getSimpleName());
         valid = false;
