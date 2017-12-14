@@ -5,12 +5,15 @@ import org.gradle.api.attributes.CompatibilityCheckDetails;
 
 import javax.inject.Inject;
 
-/** Custom Compat rule to handle the different values of AndroidTypeAttr. */
+/**
+ * Custom Compat rule to handle the different values of AndroidTypeAttr.
+ */
 public final class NavigationTypeAttrCompatRule
         implements AttributeCompatibilityRule<NavigationTypeAttr> {
 
     @Inject
-    public NavigationTypeAttrCompatRule() {}
+    public NavigationTypeAttrCompatRule() {
+    }
 
     @Override
     public void execute(CompatibilityCheckDetails<NavigationTypeAttr> details) {
@@ -18,8 +21,8 @@ public final class NavigationTypeAttrCompatRule
         final NavigationTypeAttr producerValue = details.getProducerValue();
         final NavigationTypeAttr consumerValue = details.getConsumerValue();
         if (producerValue == null) {
-            if(consumerValue==null) {
-               details.compatible();
+            if (consumerValue == null) {
+                details.compatible();
             } else {
                 details.incompatible();
             }

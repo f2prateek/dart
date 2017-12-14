@@ -1,4 +1,4 @@
-package dart.henson.plugin;
+package dart.henson.plugin.variant;
 
 import com.android.build.gradle.api.BaseVariant;
 

@@ -1,7 +1,6 @@
-package dart.henson.plugin;
+package dart.henson.plugin.variant;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -30,7 +29,7 @@ public class Combinator<T> {
         T firstElement = elements.get(0);
         List<T> remainingElements = elements.subList(1, elements.size());
         List<Dimension<T>> subDimensionList = combine(remainingElements);
-        List<Dimension<T>> newDimensionList = new ArrayList<>(subDimensionList.size()+1);
+        List<Dimension<T>> newDimensionList = new ArrayList<>(subDimensionList.size() + 1);
 
         Dimension<T> previousDimension = new Dimension<>();
         for (Dimension<T> subDimension : subDimensionList) {

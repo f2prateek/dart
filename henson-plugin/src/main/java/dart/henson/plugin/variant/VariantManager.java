@@ -1,23 +1,19 @@
-package dart.henson.plugin;
+package dart.henson.plugin.variant;
 
-import com.android.build.gradle.AppPlugin;
-import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.api.BaseVariant;
 import com.android.builder.model.ProductFlavor;
 
-import org.gradle.api.DomainObjectSet;
-import org.gradle.api.Project;
-import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger;
+import org.gradle.api.logging.Logger;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
 public class VariantManager {
 
-    private OutputEventListenerBackedLogger logger;
+    private Logger logger;
 
-    public VariantManager(OutputEventListenerBackedLogger logger) {
+    public VariantManager(Logger logger) {
         this.logger = logger;
     }
 

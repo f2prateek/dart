@@ -1,4 +1,4 @@
-package dart.henson.plugin;
+package dart.henson.plugin.util;
 
 public class StringUtil {
     public static String capitalize(String original) {

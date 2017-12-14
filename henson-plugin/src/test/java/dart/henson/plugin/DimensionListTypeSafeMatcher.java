@@ -5,8 +5,8 @@ import org.hamcrest.TypeSafeMatcher;
 
 import java.util.List;
 
-import dart.henson.plugin.Combinator.Dimension;
-import dart.henson.plugin.Combinator.Tuple;
+import dart.henson.plugin.variant.Combinator.Dimension;
+import dart.henson.plugin.variant.Combinator.Tuple;
 
 import static java.lang.String.format;
 

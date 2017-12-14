@@ -4,8 +4,8 @@ import org.junit.Test;
 
 import java.util.List;
 
-import dart.henson.plugin.Combinator.Dimension;
-import dart.henson.plugin.Combinator.Tuple;
+import dart.henson.plugin.variant.Combinator.Dimension;
+import dart.henson.plugin.variant.Combinator.Tuple;
 
 import static dart.henson.plugin.DimensionListTypeSafeMatcher.isSame;
 import static java.util.Arrays.asList;
@@ -20,7 +20,7 @@ public class CombinatorTest {
         List<String> elements = asList("red");
 
         //WHEN
-        List<Dimension<String>> result = new Combinator<String>().combine(elements);
+        List<Dimension<String>> result = new dart.henson.plugin.variant.Combinator<String>().combine(elements);
 
         //TEST
         assertThat(result.size(), is(2));
@@ -37,7 +37,7 @@ public class CombinatorTest {
         List<String> elements = asList("small", "red");
 
         //WHEN
-        List<Dimension<String>> result = new Combinator<String>().combine(elements);
+        List<Dimension<String>> result = new dart.henson.plugin.variant.Combinator<String>().combine(elements);
 
         //TEST
         assertThat(result.size(), is(3));
@@ -55,7 +55,7 @@ public class CombinatorTest {
         List<String> elements = asList("small", "red", "debug");
 
         //WHEN
-        List<Dimension<String>> result = new Combinator<String>().combine(elements);
+        List<Dimension<String>> result = new dart.henson.plugin.variant.Combinator<String>().combine(elements);
 
         //TEST
         assertThat(result.size(), is(4));
