@@ -17,6 +17,12 @@
 
 package dart.common.util;
 
+import static javax.lang.model.element.ElementKind.CLASS;
+import static javax.lang.model.element.ElementKind.PACKAGE;
+import static javax.lang.model.element.Modifier.ABSTRACT;
+import static javax.lang.model.element.Modifier.PRIVATE;
+import static javax.lang.model.element.Modifier.STATIC;
+
 import dart.DartModel;
 import dart.common.BindingTarget;
 import java.io.PrintWriter;
@@ -28,12 +34,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
-import static javax.lang.model.element.ElementKind.CLASS;
-import static javax.lang.model.element.ElementKind.PACKAGE;
-import static javax.lang.model.element.Modifier.ABSTRACT;
-import static javax.lang.model.element.Modifier.PRIVATE;
-import static javax.lang.model.element.Modifier.STATIC;
-
 public class DartModelUtil {
 
   public static final String DART_MODEL_SUFFIX = "NavigationModel";
@@ -44,8 +44,8 @@ public class DartModelUtil {
 
   private RoundEnvironment roundEnv;
 
-  public DartModelUtil(LoggingUtil loggingUtil, BindingTargetUtil bindingTargetUtil,
-      CompilerUtil compilerUtil) {
+  public DartModelUtil(
+      LoggingUtil loggingUtil, BindingTargetUtil bindingTargetUtil, CompilerUtil compilerUtil) {
     this.loggingUtil = loggingUtil;
     this.bindingTargetUtil = bindingTargetUtil;
     this.compilerUtil = compilerUtil;
@@ -87,7 +87,8 @@ public class DartModelUtil {
     // Verify modifiers.
     Set<Modifier> modifiers = element.getModifiers();
     if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC) || modifiers.contains(ABSTRACT)) {
-      loggingUtil.error(element,
+      loggingUtil.error(
+          element,
           "@DartModel class %s must not be private, static or abstract.",
           element.getSimpleName());
       valid = false;
@@ -95,18 +96,16 @@ public class DartModelUtil {
 
     // Verify type.
     if (element.getKind() != CLASS) {
-      loggingUtil.error(element,
-          "@DartModel annotated element %s must be a class.",
-          element.getSimpleName());
+      loggingUtil.error(
+          element, "@DartModel annotated element %s must be a class.", element.getSimpleName());
       valid = false;
     }
 
     // Verify containing type.
     if (element.getEnclosingElement() == null
         || element.getEnclosingElement().getKind() != PACKAGE) {
-      loggingUtil.error(element,
-          "@DartModel class %s must be a top level class.",
-          element.getSimpleName());
+      loggingUtil.error(
+          element, "@DartModel class %s must be a top level class.", element.getSimpleName());
       valid = false;
     }
 
@@ -114,7 +113,8 @@ public class DartModelUtil {
     final String classPackage = compilerUtil.getPackageName(element);
     final String className = compilerUtil.getClassName(element, classPackage);
     if (!className.endsWith(DART_MODEL_SUFFIX)) {
-      loggingUtil.error(element,
+      loggingUtil.error(
+          element,
           "@DartModel class %s does not follow the naming convention: my.package.TargetComponentNavigationModel.",
           element.getSimpleName());
       valid = false;

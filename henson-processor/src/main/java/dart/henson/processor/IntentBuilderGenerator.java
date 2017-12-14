@@ -17,6 +17,11 @@
 
 package dart.henson.processor;
 
+import static com.squareup.javapoet.ClassName.get;
+import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
+import static dart.common.util.BindingTargetUtil.INITIAL_STATE_METHOD;
+import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
+
 import android.content.Intent;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -42,11 +47,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-
-import static com.squareup.javapoet.ClassName.get;
-import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
-import static dart.common.util.BindingTargetUtil.INITIAL_STATE_METHOD;
-import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
 
 public class IntentBuilderGenerator extends BaseGenerator {
 
@@ -102,33 +102,27 @@ public class IntentBuilderGenerator extends BaseGenerator {
     final String targetFqcn = target.getFQN();
     initialStateGetterForHensonBuilder.addStatement(
         "final $T intent = new $T(context, getClassDynamically($S))",
-        Intent.class, Intent.class,
-        targetFqcn.substring(0, targetFqcn.indexOf(DART_MODEL_SUFFIX))
-    );
+        Intent.class,
+        Intent.class,
+        targetFqcn.substring(0, targetFqcn.indexOf(DART_MODEL_SUFFIX)));
     initialStateGetterForHensonBuilder.addStatement(
-        "final $T bundler = $T.create()",
-        Bundler.class, Bundler.class
-    );
+        "final $T bundler = $T.create()", Bundler.class, Bundler.class);
 
     if (!target.hasRequiredFields && target.closestRequiredAncestorPackage == null) {
       initialStateGetterForHensonBuilder.addStatement(
-          "return new $L(bundler, intent)",
-          RESOLVED_OPTIONAL_SEQUENCE_CLASS
-      );
+          "return new $L(bundler, intent)", RESOLVED_OPTIONAL_SEQUENCE_CLASS);
       intentBuilderTypeBuilder.addMethod(initialStateGetterForHensonBuilder.build());
       return;
     }
 
     initialStateGetterForHensonBuilder.addStatement(
         "final $L resolvedAllSet = new $L(bundler, intent)",
-        RESOLVED_OPTIONAL_SEQUENCE_CLASS, RESOLVED_OPTIONAL_SEQUENCE_CLASS
-    );
+        RESOLVED_OPTIONAL_SEQUENCE_CLASS,
+        RESOLVED_OPTIONAL_SEQUENCE_CLASS);
 
     if (target.hasRequiredFields) {
       initialStateGetterForHensonBuilder.addStatement(
-          "return new $L<>(bundler, resolvedAllSet)",
-          REQUIRED_SEQUENCE_CLASS
-      );
+          "return new $L<>(bundler, resolvedAllSet)", REQUIRED_SEQUENCE_CLASS);
       intentBuilderTypeBuilder.addMethod(initialStateGetterForHensonBuilder.build());
       return;
     }
@@ -136,8 +130,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
     final String parentIntentBuilderClass = target.parentClass + BUNDLE_BUILDER_SUFFIX;
     initialStateGetterForHensonBuilder.addStatement(
         "return $T.getInitialState(bundler, resolvedAllSet)",
-        get(target.parentPackage, parentIntentBuilderClass)
-    );
+        get(target.parentPackage, parentIntentBuilderClass));
     intentBuilderTypeBuilder.addMethod(initialStateGetterForHensonBuilder.build());
   }
 
@@ -154,9 +147,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
     if (target.hasRequiredFields) {
       initialStateGetterForSubBuilder.addStatement(
-          "return new $L<>(bundler, allSetState)",
-          REQUIRED_SEQUENCE_CLASS
-      );
+          "return new $L<>(bundler, allSetState)", REQUIRED_SEQUENCE_CLASS);
       intentBuilderTypeBuilder.addMethod(initialStateGetterForSubBuilder.build());
       return;
     }
@@ -165,8 +156,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
       final String parentIntentBuilderClass = target.parentClass + BUNDLE_BUILDER_SUFFIX;
       initialStateGetterForSubBuilder.addStatement(
           "return $T.getInitialState(bundler, allSetState)",
-          get(target.parentPackage, parentIntentBuilderClass)
-      );
+          get(target.parentPackage, parentIntentBuilderClass));
       intentBuilderTypeBuilder.addMethod(initialStateGetterForSubBuilder.build());
       return;
     }
@@ -195,8 +185,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
     emitOptionalSequence(intentBuilderTypeBuilder, optionalInjections);
   }
 
-  private void emitRequiredSequence(TypeSpec.Builder intentBuilderTypeBuilder,
-      List<ExtraInjection> requiredInjections) {
+  private void emitRequiredSequence(
+      TypeSpec.Builder intentBuilderTypeBuilder, List<ExtraInjection> requiredInjections) {
     if (!target.hasRequiredFields) {
       return;
     }
@@ -229,14 +219,14 @@ public class IntentBuilderGenerator extends BaseGenerator {
     intentBuilderTypeBuilder.addType(requiredSequenceBuilder.build());
   }
 
-  private void emitOptionalSequence(TypeSpec.Builder intentBuilderTypeBuilder,
-      List<ExtraInjection> optionalInjections) {
+  private void emitOptionalSequence(
+      TypeSpec.Builder intentBuilderTypeBuilder, List<ExtraInjection> optionalInjections) {
     // find type
     final ClassName optionalSequence =
         get(target.classPackage, builderClassName(), OPTIONAL_SEQUENCE_CLASS);
     final ParameterizedTypeName parameterizedOptionalSequence =
-        ParameterizedTypeName.get(optionalSequence,
-            TypeVariableName.get(OPTIONAL_SEQUENCE_SUBCLASS_GENERIC));
+        ParameterizedTypeName.get(
+            optionalSequence, TypeVariableName.get(OPTIONAL_SEQUENCE_SUBCLASS_GENERIC));
     final TypeVariableName typeVariable =
         TypeVariableName.get(OPTIONAL_SEQUENCE_SUBCLASS_GENERIC, parameterizedOptionalSequence);
 
@@ -244,7 +234,9 @@ public class IntentBuilderGenerator extends BaseGenerator {
     final TypeName superClass;
     if (target.parentPackage != null) {
       final ClassName parentOptionalSequence =
-          get(target.parentPackage, target.parentClass + BUNDLE_BUILDER_SUFFIX,
+          get(
+              target.parentPackage,
+              target.parentClass + BUNDLE_BUILDER_SUFFIX,
               OPTIONAL_SEQUENCE_CLASS);
       superClass = ParameterizedTypeName.get(parentOptionalSequence, typeVariable);
     } else {
@@ -305,8 +297,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
    * @param isLast whether or not the binding is the last mandatory one.
    * @return the name of the next state class to create
    */
-  private String emitRequiredSetter(TypeSpec.Builder builder, ExtraInjection binding,
-      TypeName generic, boolean isLast) {
+  private String emitRequiredSetter(
+      TypeSpec.Builder builder, ExtraInjection binding, TypeName generic, boolean isLast) {
     final Collection<FieldBinding> fieldBindings = binding.getFieldBindings();
     if (fieldBindings.isEmpty()) {
       return null;
@@ -325,7 +317,9 @@ public class IntentBuilderGenerator extends BaseGenerator {
         final String closestRequiredAncestorIntentBuilderClass =
             target.closestRequiredAncestorClass + BUNDLE_BUILDER_SUFFIX;
         final ClassName requiredSequence =
-            get(target.closestRequiredAncestorPackage, closestRequiredAncestorIntentBuilderClass,
+            get(
+                target.closestRequiredAncestorPackage,
+                closestRequiredAncestorIntentBuilderClass,
                 REQUIRED_SEQUENCE_CLASS);
         nextState = ParameterizedTypeName.get(requiredSequence, generic);
       }
@@ -345,10 +339,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
             .addParameter(TypeName.get(extraType), firstFieldBinding.getName())
             .returns(nextState)
             .addStatement(
-                "bundler.put($S," + castToParcelableIfNecessary + " $L)",
-                binding.getKey(),
-                value
-            );
+                "bundler.put($S," + castToParcelableIfNecessary + " $L)", binding.getKey(), value);
 
     // find return statement
     if (isLast) {
@@ -356,8 +347,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
         final String parentIntentBuilderClass = target.parentClass + BUNDLE_BUILDER_SUFFIX;
         setterBuilder.addStatement(
             "return $T.getInitialState(bundler, allRequiredSetState)",
-            get(target.parentPackage, parentIntentBuilderClass)
-        );
+            get(target.parentPackage, parentIntentBuilderClass));
       } else {
         setterBuilder.addStatement("return allRequiredSetState");
       }
@@ -374,8 +364,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
    * @param binding the binding to emit.
    * @param generic generic value.
    */
-  private void emitOptionalSetter(TypeSpec.Builder builder, ExtraInjection binding,
-      TypeName generic) {
+  private void emitOptionalSetter(
+      TypeSpec.Builder builder, ExtraInjection binding, TypeName generic) {
     Collection<FieldBinding> fieldBindings = binding.getFieldBindings();
     if (fieldBindings.isEmpty()) {
       return;
@@ -392,20 +382,14 @@ public class IntentBuilderGenerator extends BaseGenerator {
             .addParameter(TypeName.get(extraType), firstFieldBinding.getName())
             .returns(generic)
             .addStatement(
-                "bundler.put($S," + castToParcelableIfNecessary + " $L)",
-                binding.getKey(),
-                value
-            )
-            .addStatement(
-                "return ($T) this",
-                generic
-            );
+                "bundler.put($S," + castToParcelableIfNecessary + " $L)", binding.getKey(), value)
+            .addStatement("return ($T) this", generic);
 
     builder.addMethod(setterBuilder.build());
   }
 
-  private TypeSpec.Builder rotateBuilderState(TypeSpec.Builder builder,
-      TypeSpec.Builder builderStateClass, String nextStateClassName) {
+  private TypeSpec.Builder rotateBuilderState(
+      TypeSpec.Builder builder, TypeSpec.Builder builderStateClass, String nextStateClassName) {
     if (builderStateClass != builder) {
       builder.addType(builderStateClass.build());
     }
@@ -424,7 +408,9 @@ public class IntentBuilderGenerator extends BaseGenerator {
       final String closestRequiredAncestorIntentBuilderClass =
           target.closestRequiredAncestorClass + BUNDLE_BUILDER_SUFFIX;
       final ClassName requiredSequence =
-          get(target.closestRequiredAncestorPackage, closestRequiredAncestorIntentBuilderClass,
+          get(
+              target.closestRequiredAncestorPackage,
+              closestRequiredAncestorIntentBuilderClass,
               REQUIRED_SEQUENCE_CLASS);
       return ParameterizedTypeName.get(requiredSequence, generic);
     }

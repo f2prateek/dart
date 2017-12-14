@@ -66,7 +66,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     dartModelUtil.setRoundEnvironment(roundEnv);
-    
+
     Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
     generateExtraInjectors(targetClassMap);
 

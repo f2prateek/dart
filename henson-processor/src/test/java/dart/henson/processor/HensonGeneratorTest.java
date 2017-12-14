@@ -17,19 +17,20 @@
 
 package dart.henson.processor;
 
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
+
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
-
 public class HensonGeneratorTest {
 
   @Test
-  public void hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsDefined_and_containsExtras() {
+  public void
+      hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsDefined_and_containsExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -40,8 +41,7 @@ public class HensonGeneratorTest {
                     "@DartModel",
                     "public class TestNavigationModel {",
                     "    String extra;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -65,8 +65,7 @@ public class HensonGeneratorTest {
                     "      return test.navigation.TestNavigationModel__IntentBuilder.getInitialState(context);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -76,7 +75,8 @@ public class HensonGeneratorTest {
   }
 
   @Test
-  public void hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsDefined_and_DoesNotContainExtras() {
+  public void
+      hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsDefined_and_DoesNotContainExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -86,8 +86,7 @@ public class HensonGeneratorTest {
                     "import dart.DartModel;",
                     "@DartModel",
                     "public class TestNavigationModel {",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -111,8 +110,7 @@ public class HensonGeneratorTest {
                     "      return test.navigation.TestNavigationModel__IntentBuilder.getInitialState(context);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -122,7 +120,8 @@ public class HensonGeneratorTest {
   }
 
   @Test(expected = AssertionError.class)
-  public void hensonNavigatorGenerator_should_notGenerateHensonClass_when_navigationModelIsNotDefined_and_containExtras() {
+  public void
+      hensonNavigatorGenerator_should_notGenerateHensonClass_when_navigationModelIsNotDefined_and_containExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -133,8 +132,7 @@ public class HensonGeneratorTest {
                     "import dart.DartModel;",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key\") String extra;",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -142,7 +140,8 @@ public class HensonGeneratorTest {
   }
 
   @Test
-  public void hensonNavigatorGenerator_should_inheritedInitialState_when_superIntentBuilderHasOptionalExtras() {
+  public void
+      hensonNavigatorGenerator_should_inheritedInitialState_when_superIntentBuilderHasOptionalExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -159,8 +158,7 @@ public class HensonGeneratorTest {
                     "}",
                     "@DartModel",
                     "class Test3NavigationModel {",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -190,8 +188,7 @@ public class HensonGeneratorTest {
                     "      return test.navigation.Test3NavigationModel__IntentBuilder.getInitialState(context);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -201,7 +198,8 @@ public class HensonGeneratorTest {
   }
 
   @Test
-  public void hensonNavigatorGenerator_should_inheritedInitialState_when_superIntentBuilderHasRequiredExtras() {
+  public void
+      hensonNavigatorGenerator_should_inheritedInitialState_when_superIntentBuilderHasRequiredExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -219,8 +217,7 @@ public class HensonGeneratorTest {
                     "@DartModel",
                     "class Test3NavigationModel<T> {",
                     "    String extra3;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -250,8 +247,7 @@ public class HensonGeneratorTest {
                     "      return test.navigation.Test3NavigationModel__IntentBuilder.getInitialState(context);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);

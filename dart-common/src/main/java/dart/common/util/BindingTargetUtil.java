@@ -17,6 +17,11 @@
 
 package dart.common.util;
 
+import static javax.lang.model.element.Modifier.FINAL;
+import static javax.lang.model.element.Modifier.STATIC;
+import static javax.lang.model.util.ElementFilter.fieldsIn;
+import static javax.lang.model.util.ElementFilter.methodsIn;
+
 import dart.common.BindingTarget;
 import java.util.Map;
 import java.util.Set;
@@ -31,11 +36,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import static javax.lang.model.element.Modifier.FINAL;
-import static javax.lang.model.element.Modifier.STATIC;
-import static javax.lang.model.util.ElementFilter.fieldsIn;
-import static javax.lang.model.util.ElementFilter.methodsIn;
-
 public class BindingTargetUtil {
 
   public static final String INITIAL_STATE_METHOD = "getInitialState";
@@ -47,8 +47,11 @@ public class BindingTargetUtil {
   private final Elements elementUtils;
   private final Types typeUtils;
 
-  public BindingTargetUtil(CompilerUtil compilerUtil, ProcessingEnvironment processingEnv,
-      LoggingUtil loggingUtil, BindExtraUtil bindExtraUtil) {
+  public BindingTargetUtil(
+      CompilerUtil compilerUtil,
+      ProcessingEnvironment processingEnv,
+      LoggingUtil loggingUtil,
+      BindExtraUtil bindExtraUtil) {
     this.compilerUtil = compilerUtil;
     this.bindExtraUtil = bindExtraUtil;
     this.loggingUtil = loggingUtil;
@@ -109,14 +112,15 @@ public class BindingTargetUtil {
         bindingTarget.topLevel = true;
         final TypeMirror superType = element.getSuperclass();
         // has superclass
-        if (!typeUtils.isSameType(superType,
-            elementUtils.getTypeElement("java.lang.Object").asType())) {
+        if (!typeUtils.isSameType(
+            superType, elementUtils.getTypeElement("java.lang.Object").asType())) {
 
           final TypeElement superTypeElement = (TypeElement) ((DeclaredType) superType).asElement();
           // DartModel contains a parent outside the module that does not have a IntentBuilder:
           // Parent is not a DartModel
           if (getIntentBuilder(superType) == null) {
-            loggingUtil.error(element,
+            loggingUtil.error(
+                element,
                 "@DartModel %s parent does not have an IntentBuilder. Is %s a @DartModel?",
                 element.getQualifiedName(),
                 superTypeElement.getQualifiedName());
@@ -130,8 +134,8 @@ public class BindingTargetUtil {
     }
   }
 
-  private void setClosestRequiredAncestor(BindingTarget bindingTarget,
-      TypeElement superIntentBuilder) {
+  private void setClosestRequiredAncestor(
+      BindingTarget bindingTarget, TypeElement superIntentBuilder) {
     for (ExecutableElement method : methodsIn(superIntentBuilder.getEnclosedElements())) {
       if (method.getSimpleName().contentEquals(INITIAL_STATE_METHOD)) {
         final TypeMirror returnTypeMirror = method.getReturnType();
@@ -142,8 +146,9 @@ public class BindingTargetUtil {
         final TypeElement intentBuilderTypeElement = (TypeElement) reqElement.getEnclosingElement();
         bindingTarget.closestRequiredAncestorPackage =
             compilerUtil.getPackageName(intentBuilderTypeElement);
-        final String intentBuilderClass = compilerUtil.getClassName(intentBuilderTypeElement,
-            bindingTarget.closestRequiredAncestorPackage);
+        final String intentBuilderClass =
+            compilerUtil.getClassName(
+                intentBuilderTypeElement, bindingTarget.closestRequiredAncestorPackage);
         bindingTarget.closestRequiredAncestorClass =
             intentBuilderClass.substring(0, intentBuilderClass.indexOf(BUNDLE_BUILDER_SUFFIX));
       }

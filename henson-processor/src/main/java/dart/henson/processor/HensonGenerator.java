@@ -17,6 +17,12 @@
 
 package dart.henson.processor;
 
+import static com.squareup.javapoet.ClassName.get;
+import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
+import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
+import static dart.henson.processor.IntentBuilderGenerator.REQUIRED_SEQUENCE_CLASS;
+import static dart.henson.processor.IntentBuilderGenerator.RESOLVED_OPTIONAL_SEQUENCE_CLASS;
+
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -29,12 +35,6 @@ import dart.common.BindingTarget;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.lang.model.element.Modifier;
-
-import static com.squareup.javapoet.ClassName.get;
-import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
-import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
-import static dart.henson.processor.IntentBuilderGenerator.REQUIRED_SEQUENCE_CLASS;
-import static dart.henson.processor.IntentBuilderGenerator.RESOLVED_OPTIONAL_SEQUENCE_CLASS;
 
 public class HensonGenerator extends BaseGenerator {
 
@@ -99,8 +99,7 @@ public class HensonGenerator extends BaseGenerator {
         TypeSpec.classBuilder(WITH_CONTEXT_SET_STATE_CLASS_NAME)
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
     withContextSetStateBuilder.addField(
-        FieldSpec.builder(get("android.content", "Context"), "context", Modifier.PRIVATE)
-            .build());
+        FieldSpec.builder(get("android.content", "Context"), "context", Modifier.PRIVATE).build());
     withContextSetStateBuilder.addMethod(
         MethodSpec.constructorBuilder()
             .addModifiers(Modifier.PRIVATE)
@@ -115,11 +114,7 @@ public class HensonGenerator extends BaseGenerator {
 
   private void emitNavigationMethod(TypeSpec.Builder builder, BindingTarget target) {
     TypeName intentBuilderClassName =
-        ClassName.bestGuess(
-            target.classPackage
-                + "."
-                + target.className
-                + BUNDLE_BUILDER_SUFFIX);
+        ClassName.bestGuess(target.classPackage + "." + target.className + BUNDLE_BUILDER_SUFFIX);
     String simpleTargetComponent =
         target.className.substring(0, target.className.indexOf(DART_MODEL_SUFFIX));
     MethodSpec.Builder gotoMethodBuilder =
@@ -180,7 +175,9 @@ public class HensonGenerator extends BaseGenerator {
       final String closestRequiredAncestorIntentBuilderClass =
           target.closestRequiredAncestorClass + BUNDLE_BUILDER_SUFFIX;
       final ClassName requiredSequence =
-          get(target.closestRequiredAncestorPackage, closestRequiredAncestorIntentBuilderClass,
+          get(
+              target.closestRequiredAncestorPackage,
+              closestRequiredAncestorIntentBuilderClass,
               REQUIRED_SEQUENCE_CLASS);
       return ParameterizedTypeName.get(requiredSequence, generic);
     }

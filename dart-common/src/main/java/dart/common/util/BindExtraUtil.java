@@ -17,6 +17,9 @@
 
 package dart.common.util;
 
+import static javax.lang.model.element.Modifier.PRIVATE;
+import static javax.lang.model.element.Modifier.STATIC;
+
 import dart.BindExtra;
 import dart.common.BindingTarget;
 import java.util.Set;
@@ -26,17 +29,14 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
-import static javax.lang.model.element.Modifier.PRIVATE;
-import static javax.lang.model.element.Modifier.STATIC;
-
 public class BindExtraUtil {
 
   private final CompilerUtil compilerUtil;
   private final ParcelerUtil parcelerUtil;
   private final LoggingUtil loggingUtil;
 
-  public BindExtraUtil(CompilerUtil compilerUtil, ParcelerUtil parcelerUtil,
-      LoggingUtil loggingUtil) {
+  public BindExtraUtil(
+      CompilerUtil compilerUtil, ParcelerUtil parcelerUtil, LoggingUtil loggingUtil) {
     this.compilerUtil = compilerUtil;
     this.parcelerUtil = parcelerUtil;
     this.loggingUtil = loggingUtil;
@@ -58,8 +58,8 @@ public class BindExtraUtil {
     final String key = StringUtil.isNullOrEmpty(annotationValue) ? name : annotationValue;
     final TypeMirror type = element.asType();
     final boolean required = isRequiredInjection(element);
-    final boolean parcel = parcelerUtil.isParcelerAvailable()
-        && parcelerUtil.isValidExtraTypeForParceler(type);
+    final boolean parcel =
+        parcelerUtil.isParcelerAvailable() && parcelerUtil.isValidExtraTypeForParceler(type);
     bindingTarget.addField(key, name, type, required, parcel);
   }
 
@@ -70,7 +70,8 @@ public class BindExtraUtil {
     // Verify modifiers.
     Set<Modifier> modifiers = element.getModifiers();
     if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC)) {
-      loggingUtil.error(element,
+      loggingUtil.error(
+          element,
           "@DartModel field must not be private or static. (%s.%s)",
           enclosingElement.getQualifiedName(),
           element.getSimpleName());
@@ -81,8 +82,9 @@ public class BindExtraUtil {
     TypeMirror typeElement = element.asType();
     if (!isValidExtraType(typeElement)
         && !(parcelerUtil.isParcelerAvailable()
-        && parcelerUtil.isValidExtraTypeForParceler(typeElement))) {
-      loggingUtil.error(element,
+            && parcelerUtil.isValidExtraTypeForParceler(typeElement))) {
+      loggingUtil.error(
+          element,
           "The fields of class annotated with @DartModel must be primitive, Serializable or "
               + "Parcelable (%s.%s).\n"
               + "If you use Parceler, all types supported by Parceler are allowed.",
@@ -97,7 +99,8 @@ public class BindExtraUtil {
       final String annotationValue = annotation.value();
       if (!StringUtil.isNullOrEmpty(annotationValue)
           && !StringUtil.isValidJavaIdentifier(annotationValue)) {
-        loggingUtil.error(element,
+        loggingUtil.error(
+            element,
             "@BindExtra key has to be valid java variable identifiers (%s, %s).\n"
                 + "See https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html",
             enclosingElement.getQualifiedName(),

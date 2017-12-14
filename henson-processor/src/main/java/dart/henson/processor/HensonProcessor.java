@@ -38,9 +38,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
-@SupportedAnnotationTypes({
-    HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME
-})
+@SupportedAnnotationTypes({HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME})
 @SupportedOptions({HensonProcessor.OPTION_HENSON_PACKAGE})
 public class HensonProcessor extends AbstractProcessor {
 
@@ -119,8 +117,8 @@ public class HensonProcessor extends AbstractProcessor {
     }
   }
 
-  private void generateIntentBuildersForTree(Map<TypeElement, BindingTarget> targetClassMap,
-      TypeElement typeElement) {
+  private void generateIntentBuildersForTree(
+      Map<TypeElement, BindingTarget> targetClassMap, TypeElement typeElement) {
     //we unfortunately can't test that nothing is generated in a TRUTH based test
     final BindingTarget bindingTarget = targetClassMap.get(typeElement);
     try {
@@ -142,8 +140,7 @@ public class HensonProcessor extends AbstractProcessor {
     if (!targetClassMap.values().isEmpty()) {
       Element[] allTypes = targetClassMap.keySet().toArray(new Element[targetClassMap.size()]);
       try {
-        fileUtil.writeFile(
-            new HensonGenerator(hensonPackage, targetClassMap.values()), allTypes);
+        fileUtil.writeFile(new HensonGenerator(hensonPackage, targetClassMap.values()), allTypes);
       } catch (IOException e) {
         for (Element element : allTypes) {
           loggingUtil.error(

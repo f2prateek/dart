@@ -17,14 +17,14 @@
 
 package dart.processor;
 
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
+
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
-
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
 
 /**
  * Tests {@link dart.processor.InjectExtraProcessor}. For tests related to Parceler and Parceler is
@@ -48,8 +48,7 @@ public class BindExtraWithParcelerTest {
                     "@DartModel",
                     "public class TestSerializableCollectionNavigationModel {",
                     "  @BindExtra(\"key\") SparseArray<String> extra;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
@@ -68,8 +67,7 @@ public class BindExtraWithParcelerTest {
                     "    }",
                     "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
@@ -94,8 +92,7 @@ public class BindExtraWithParcelerTest {
                     "@DartModel",
                     "public class TestNonSerializableNonParcelableCollection_withoutParcelerNavigationModel {",
                     "  @BindExtra(\"key\") List<String> extra;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
@@ -160,8 +157,7 @@ public class BindExtraWithParcelerTest {
                     "    }",
                     "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
@@ -207,8 +203,7 @@ public class BindExtraWithParcelerTest {
                     "    }",
                     "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
@@ -240,8 +235,7 @@ public class BindExtraWithParcelerTest {
                     "@DartModel",
                     "public class TestParcelExtendsParcelableNavigationModel {",
                     "    @BindExtra(\"key\") Extra extra;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -260,8 +254,7 @@ public class BindExtraWithParcelerTest {
                     "    }",
                     "    target.extra = org.parceler.Parcels.unwrap((android.os.Parcelable) object);",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
@@ -298,8 +291,7 @@ public class BindExtraWithParcelerTest {
                     "@DartModel",
                     "public class TestParcelableExtendsParcelableNavigationModel {",
                     "    @BindExtra(\"key\") Extra extra;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -318,8 +310,7 @@ public class BindExtraWithParcelerTest {
                     "    }",
                     "    target.extra = (Extra) object;",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);

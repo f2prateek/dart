@@ -17,15 +17,15 @@
 
 package dart.processor;
 
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
+import static dart.processor.ProcessorTestUtilities.dartProcessorsWithoutParceler;
+
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
-
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
-import static dart.processor.ProcessorTestUtilities.dartProcessorsWithoutParceler;
 
 /** Tests {@link dart.processor.InjectExtraProcessor}. For tests not related to Parceler. */
 public class BindExtraTest {
@@ -36,20 +36,21 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key\") String extra;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject binderSource =
         JavaFileObjects.forSourceString(
             "test/TestNavigationModel__ExtraBinder",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.Dart;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
@@ -62,8 +63,7 @@ public class BindExtraTest {
                     "    }",
                     "    target.extra = (String) object;",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
@@ -78,7 +78,8 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "@DartModel",
@@ -91,14 +92,14 @@ public class BindExtraTest {
                     "    @BindExtra(\"key_char\") char aChar;",
                     "    @BindExtra(\"key_float\") float aFloat;",
                     "    @BindExtra(\"key_double\") double aDouble;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject binderSource =
         JavaFileObjects.forSourceString(
             "test/TestNavigationModel__ExtraBinder",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.Dart;",
                     "import java.lang.Object;",
                     "public class TestNavigationModel__ExtraBinder {",
@@ -145,8 +146,7 @@ public class BindExtraTest {
                     "    }",
                     "    target.aDouble = (double) object;",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
@@ -161,7 +161,8 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "@DartModel",
@@ -169,14 +170,14 @@ public class BindExtraTest {
                     "    @BindExtra(\"key\") String extra1;",
                     "    @BindExtra(\"key\") String extra2;",
                     "    @BindExtra(\"key\") String extra3;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
             "test/TestNavigationModel__ExtraBinder",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.Dart;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
@@ -191,8 +192,7 @@ public class BindExtraTest {
                     "    target.extra2 = (String) object;",
                     "    target.extra3 = (String) object;",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
@@ -207,7 +207,8 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "import java.lang.Object;",
@@ -215,14 +216,14 @@ public class BindExtraTest {
                     "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra String key;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
             "test/TestNavigationModel__ExtraBinder",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.Dart;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
@@ -235,8 +236,7 @@ public class BindExtraTest {
                     "    }",
                     "    target.key = (String) object;",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
@@ -251,7 +251,8 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "import java.lang.Object;",
@@ -261,8 +262,7 @@ public class BindExtraTest {
                     "    @BindExtra(\"key_1\") String extra1;",
                     "    @BindExtra(\"key_2\") String extra2;",
                     "    @BindExtra(\"key_3\") String extra3;",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
@@ -275,7 +275,8 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "import java.lang.Object;",
@@ -294,7 +295,8 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test/TestNavigationModel__ExtraBinder",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.Dart;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
@@ -306,8 +308,7 @@ public class BindExtraTest {
                     "      target.extra = (String) object;",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac()
@@ -324,7 +325,8 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "public class TestNavigationModel {",
@@ -332,16 +334,14 @@ public class BindExtraTest {
                     "  private static class Inner {",
                     "    @BindExtra(\"key\") String extra;",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac()
             .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .hadErrorContaining(
-            "DartModel class Inner must not be private, static or abstract.")
+        .hadErrorContaining("DartModel class Inner must not be private, static or abstract.")
         .inFile(source)
         .onLine(6);
   }
@@ -352,14 +352,14 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key\") private String extra;",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac()
@@ -378,14 +378,14 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key\") static String extra;",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac()
@@ -404,14 +404,14 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "@DartModel",
                     "public interface TestNavigationModel {",
                     "    @BindExtra(\"key\") String extra = null;",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac()
@@ -430,7 +430,8 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "@DartModel",
@@ -443,14 +444,14 @@ public class BindExtraTest {
                     "}",
                     "@DartModel",
                     "class TestTwoNavigationModel extends TestNavigationModel {",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject expectedSource1 =
         JavaFileObjects.forSourceString(
             "test/TestNavigationModel__ExtraBinder",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.Dart;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
@@ -463,14 +464,14 @@ public class BindExtraTest {
                     "    }",
                     "    target.extra = (String) object;",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject expectedSource2 =
         JavaFileObjects.forSourceString(
             "test/TestOneNavigationModel__ExtraBinder",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.Dart;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
@@ -484,8 +485,7 @@ public class BindExtraTest {
                     "    }",
                     "    target.extra1 = (String) object;",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac()
@@ -505,7 +505,8 @@ public class BindExtraTest {
         JavaFileObjects.forSourceString(
             "test.TestNavigationModel",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
                     "@DartModel",
@@ -518,14 +519,14 @@ public class BindExtraTest {
                     "}",
                     "@DartModel",
                     "class TestTwoNavigationModel extends TestNavigationModel<Object> {",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject expectedSource1 =
         JavaFileObjects.forSourceString(
             "test/TestNavigationModel__ExtraBinder",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.Dart;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
@@ -538,14 +539,14 @@ public class BindExtraTest {
                     "    }",
                     "    target.extra = (String) object;",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject expectedSource2 =
         JavaFileObjects.forSourceString(
             "test/TestOneNavigationModel__ExtraBinder",
             Joiner.on('\n')
-                .join("package test;",
+                .join(
+                    "package test;",
                     "import dart.Dart;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
@@ -559,8 +560,7 @@ public class BindExtraTest {
                     "    }",
                     "    target.extra1 = (String) object;",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac()

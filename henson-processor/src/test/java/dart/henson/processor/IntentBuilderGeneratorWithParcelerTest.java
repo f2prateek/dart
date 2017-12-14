@@ -17,14 +17,14 @@
 
 package dart.henson.processor;
 
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
+
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
-
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
 
 /** For tests related to Parceler, but Parceler is not available. */
 public class IntentBuilderGeneratorWithParcelerTest {
@@ -42,8 +42,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "@DartModel",
                     "public class TestNavigationModel {",
                     "    ArrayList<String> extra;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -89,8 +88,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -112,8 +110,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "@DartModel",
                     "public class TestNavigationModel {",
                     "    List<String> extra;",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -159,8 +156,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -171,7 +167,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
   @Test
   public void
-  intentBuilderGenerator_should_generateCode_when_extraIsAnnotatedWithParceler_and_parcelerIsOn() {
+      intentBuilderGenerator_should_generateCode_when_extraIsAnnotatedWithParceler_and_parcelerIsOn() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -184,8 +180,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "public class TestNavigationModel {",
                     "    Foo extra;",
                     "    @Parcel static class Foo {}",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -229,8 +224,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -241,7 +235,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
   @Test
   public void
-  intentBuilderGenerator_should_generateCode_when_extraIsCollectionOfElementAnnotatedWithParceler_and_parcelerIsOn() {
+      intentBuilderGenerator_should_generateCode_when_extraIsCollectionOfElementAnnotatedWithParceler_and_parcelerIsOn() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -255,8 +249,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "public class TestNavigationModel {",
                     "    List<Foo> extra;",
                     "    @Parcel static class Foo {}",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -301,8 +294,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
@@ -312,7 +304,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
   @Test
   public void
-  intentBuilderGenerator_should_generateCode_when_multipleExtrasAreParceler_and_parcelerIsOn() {
+      intentBuilderGenerator_should_generateCode_when_multipleExtrasAreParceler_and_parcelerIsOn() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -341,8 +333,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "    List<ExampleParcel> listExtra;",
                     "    Map<List<String>, List<ExampleParcel>> mapNestedExtra;",
                     //
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -401,8 +392,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -413,7 +403,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
   @Test
   public void
-  intentBuilderGenerator_should_generateCode_when_extraIsParcelableThatExtendsParcelable() {
+      intentBuilderGenerator_should_generateCode_when_extraIsParcelableThatExtendsParcelable() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -440,8 +430,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "            return 0;",
                     "        }",
                     "    }",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -485,8 +474,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
@@ -518,8 +506,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "        }",
                     "    }",
                     "    @Parcel class Foo extends FooParent {} ",
-                    "}"
-                ));
+                    "}"));
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
@@ -563,8 +550,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
-                    "}"
-                ));
+                    "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
