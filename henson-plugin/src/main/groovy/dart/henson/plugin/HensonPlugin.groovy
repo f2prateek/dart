@@ -29,7 +29,6 @@ class HensonPlugin implements Plugin<Project> {
     private ArtifactManager artifactManager
     private ConfigurationManager configurationManager
     private AttributeManager attributeManager
-    private HensonNavigatorGenerator hensonNavigatorGenerator
     private DependencyManager dependencyManager
 
     void apply(Project project) {
@@ -45,7 +44,6 @@ class HensonPlugin implements Plugin<Project> {
         variantManager = hensonManager.variantManager
         artifactManager = hensonManager.artifactManager
         configurationManager = hensonManager.configurationManager
-        hensonNavigatorGenerator = hensonManager.hensonNavigatorGenerator
         taskManager = hensonManager.taskManager
         attributeManager = hensonManager.attributeManager
         dependencyManager = hensonManager.dependencyManager
@@ -90,6 +88,10 @@ class HensonPlugin implements Plugin<Project> {
         final DomainObjectSet<? extends BaseVariant> variants = getAndroidVariants(project)
         variants.all { variant ->
             hensonManager.process(variant, dartVersionName)
+        }
+
+        project.afterEvaluate {
+            hensonManager.createListNavigationSourceSetsTask()
         }
     }
 

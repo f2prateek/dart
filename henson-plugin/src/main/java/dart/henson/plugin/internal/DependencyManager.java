@@ -15,17 +15,11 @@ public class DependencyManager {
 
     private Project project;
     private Logger logger;
-    private ArtifactManager artifactManager;
-    private ConfigurationManager configurationManager;
 
     public DependencyManager(Project project,
-                             Logger logger,
-                             ArtifactManager artifactManager,
-                             ConfigurationManager configurationManager) {
+                             Logger logger) {
         this.project = project;
         this.logger = logger;
-        this.artifactManager = artifactManager;
-        this.configurationManager = configurationManager;
     }
 
     public void addDartAndHensonDependenciesToNavigationConfigurations(String prefix, String dartVersionName) {
@@ -49,10 +43,9 @@ public class DependencyManager {
         dependencies.add(apiRuntime, dartAnnotations);
     }
 
-    public void addNavigationArtifactsToVariantConfiguration(BaseVariant variant) {
+    public void addNavigationArtifactToVariantConfiguration(String artifactName, BaseVariant variant) {
         //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
         String configurationName = variant.getName() + "Api";
-        String artifactName = artifactManager.getNavigationArtifactName(variant);
         Map<String, Object> map = new HashMap(2);
         map.put("path", project.getPath());
         map.put("configuration", artifactName);

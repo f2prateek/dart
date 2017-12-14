@@ -2,18 +2,19 @@ package dart.henson.plugin.internal;
 
 import com.android.build.gradle.api.BaseVariant;
 
-import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
+/**
+ * We create one artifact per variant.
+ * It will include all the classes of the navigation source tree (code + generated code).
+ */
 public class ArtifactManager {
 
     public static final String NAVIGATION_ARTIFACT_PREFIX = "NavigationArtifact";
 
-    private Project project;
     private Logger logger;
 
-    public ArtifactManager(Project project, Logger logger) {
-        this.project = project;
+    public ArtifactManager(Logger logger) {
         this.logger = logger;
     }
 

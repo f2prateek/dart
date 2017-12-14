@@ -39,23 +39,92 @@ import static org.gradle.api.JavaVersion.VERSION_1_7;
 public class TaskManager {
     public static final String NAVIGATION_API_COMPILE_TASK_PREFIX = "navigationApiCompileJava";
     public static final String NAVIGATION_API_JAR_TASK_PREFIX = "navigationApiJar";
+    private static final String LIST_ALL_SOURCESETS_TASK = "navigationSourceSets";
 
     private Project project;
     private Logger logger;
-    private ConfigurationManager configurationManager;
     private HensonNavigatorGenerator hensonNavigatorGenerator;
 
-    public TaskManager(Project project,
-                       Logger logger,
-                       ConfigurationManager configurationManager,
-                       HensonNavigatorGenerator hensonNavigatorGenerator) {
+    public TaskManager(Project project, Logger logger) {
         this.project = project;
         this.logger = logger;
-        this.configurationManager = configurationManager;
-        this.hensonNavigatorGenerator = hensonNavigatorGenerator;
+        this.hensonNavigatorGenerator = new HensonNavigatorGenerator();
     }
 
-    public JavaCompile createNavigationApiCompileTask(String taskSuffix, String destinationPath, NavigationVariant navigationVariant) {
+    public void createNavigationCompilerAndJarTasks(NavigationVariant navigationVariant) {
+        createNavigationApiCompileTask(navigationVariant);
+        createNavigationApiJarTask(navigationVariant);
+    }
+
+    public void detectNavigationApiDependenciesAndGenerateHensonNavigator(NavigationVariant navigationVariant, String hensonNavigatorPackageName) {
+        BaseVariant variant = navigationVariant.variant;
+        Task taskDetectModules = project.getTasks().create("detectModule" + capitalize(variant.getName()));
+        taskDetectModules.doFirst(task -> {
+            Configuration clientInternalConfiguration = navigationVariant.clientInternalConfiguration;
+            clientInternalConfiguration.resolve();
+            Set<String> targetActivities = new HashSet();
+            clientInternalConfiguration.getFiles().forEach(dependency -> {
+                if (dependency.getName().matches(".*-navigationApi.*.jar")) {
+                    logger.debug("Detected navigation API dependency: %s", dependency.getName());
+                    File file = dependency.getAbsoluteFile();
+                    List<String> entries = getJarContent(file);
+                    entries.forEach(entry -> {
+                        if (entry.matches(".*__IntentBuilder.class")) {
+                            logger.debug("Detected intent builder: %s", entry);
+                            String targetActivityFQN = entry.substring(0, entry.length() - "__IntentBuilder.class".length()).replace('/', '.');
+                            targetActivities.add(targetActivityFQN);
+                        }
+                    });
+                }
+
+                File variantSrcFolder = new File(project.getProjectDir(), "src/" + variant.getName() + "/java/");
+                String hensonNavigator = hensonNavigatorGenerator.generateHensonNavigatorClass(targetActivities, hensonNavigatorPackageName);
+                variantSrcFolder.mkdirs();
+                String generatedFolderName = hensonNavigatorPackageName.replace('.', '/').concat("/");
+                File generatedFolder = new File(variantSrcFolder, generatedFolderName);
+                generatedFolder.mkdirs();
+                File generatedFile = new File(generatedFolder, "HensonNavigator.java");
+                try {
+                    Files.write(generatedFile.toPath(), singletonList(hensonNavigator));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        });
+        //we put the task right before compilation so that all dependencies are resolved
+        // when the task is executed
+        taskDetectModules.setDependsOn(variant.getJavaCompiler().getDependsOn());
+        variant.getJavaCompiler().dependsOn(taskDetectModules);
+    }
+
+    public void createListSourceSetTask(List<SourceSet> javaSourceSets) {
+        Task task = project.getTasks().create(LIST_ALL_SOURCESETS_TASK);
+        task.setActions(singletonList(task1 -> {
+            logger.lifecycle("\n");
+            javaSourceSets
+                    .stream()
+                    .forEach(sourceSet -> {
+                        String sourceSetName = sourceSet.getName();
+                        logger.lifecycle(sourceSetName);
+
+                        //separator
+                        StringBuilder builder = new StringBuilder();
+                        for (int indexChar = 0; indexChar < sourceSetName.length(); indexChar++) {
+                            builder.append('-');
+                        }
+                        logger.lifecycle(builder.toString());
+
+                        logger.lifecycle("build.gradle name: project.sourceSets" + sourceSetName);
+                        logger.lifecycle("java sources: " + sourceSet.getJava().getSrcDirs());
+
+                        logger.lifecycle("\n");
+                    });
+        }));
+    }
+
+    private void createNavigationApiCompileTask(NavigationVariant navigationVariant) {
+        String taskSuffix = capitalize(navigationVariant.variant.getName());
+        String destinationPath = navigationVariant.variant.getName() + "/";
         File newDestinationDir = new File(project.getBuildDir(), "/navigation/classes/java/" + destinationPath);
         File newGeneratedDir = new File(project.getBuildDir(), "/generated/source/apt/navigation/" + destinationPath);
 
@@ -93,75 +162,18 @@ public class TaskManager {
                 newDestinationDir.mkdirs();
             });
         }
-        return compileTask;
+        navigationVariant.compilerTask = compileTask;
     }
 
-    public String getNavigationApiJarTaskName(String taskSuffix) {
-        return NAVIGATION_API_JAR_TASK_PREFIX + taskSuffix;
-    }
-
-    public Jar getNavigationApiJarTask(String taskSuffix) {
-        return (Jar) project.getTasks().findByName(getNavigationApiJarTaskName(taskSuffix));
-    }
-
-    public Jar createNavigationApiJarTask(JavaCompile navigationApiCompileTask, String taskSuffix) {
-        String jarTaskName = getNavigationApiJarTaskName(taskSuffix);
-        Jar jarTask = (Jar) project.getTasks().findByName(jarTaskName);
-        if (jarTask == null) {
-            jarTask = project.getTasks().create(jarTaskName, Jar.class);
-            jarTask.setBaseName(project.getName() + "-navigationApi" + taskSuffix);
-            jarTask.from(navigationApiCompileTask.getDestinationDir());
-            jarTask.dependsOn(navigationApiCompileTask);
-        }
-        return jarTask;
-    }
-
-    public void detectNavigationApiDependenciesAndGenerateHensonNavigator(BaseVariant variant, String hensonNavigatorPackageName) {
-        Task taskDetectModules = project.getTasks().create("detectModule" + capitalize(variant.getName()));
-        taskDetectModules.doFirst(task -> {
-            Configuration clientInternalConfiguration = configurationManager.getClientInternalConfiguration(variant);
-            clientInternalConfiguration.resolve();
-            Set<String> targetActivities = new HashSet();
-            clientInternalConfiguration.getFiles().forEach(dependency -> {
-                if (dependency.getName().matches(".*-navigationApi.*.jar")) {
-                    logger.debug("Detected navigation API dependency: %s", dependency.getName());
-                    File file = dependency.getAbsoluteFile();
-                    List<String> entries = getJarContent(file);
-                    entries.forEach(entry -> {
-                        if (entry.matches(".*__IntentBuilder.class")) {
-                            logger.debug("Detected intent builder: %s", entry);
-                            String targetActivityFQN = entry.substring(0, entry.length() - "__IntentBuilder.class".length()).replace('/', '.');
-                            targetActivities.add(targetActivityFQN);
-                        }
-                    });
-                }
-
-                File variantSrcFolder = new File(project.getProjectDir(), "src/" + variant.getName() + "/java/");
-                String hensonNavigator = hensonNavigatorGenerator.generateHensonNavigatorClass(targetActivities, hensonNavigatorPackageName);
-                variantSrcFolder.mkdirs();
-                String generatedFolderName = hensonNavigatorPackageName.replace('.', '/').concat("/");
-                File generatedFolder = new File(variantSrcFolder, generatedFolderName);
-                generatedFolder.mkdirs();
-                File generatedFile = new File(generatedFolder, "HensonNavigator.java");
-                try {
-                    Files.write(generatedFile.toPath(), singletonList(hensonNavigator));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        });
-        //we put the task right before compilation so that all dependencies are resolved
-        // when the task is executed
-        taskDetectModules.setDependsOn(variant.getJavaCompiler().getDependsOn());
-        variant.getJavaCompiler().dependsOn(taskDetectModules);
-    }
-
-    public Task createEmptyNavigationApiCompileTask(String taskSuffix) {
-        return project.getTasks().create(NAVIGATION_API_COMPILE_TASK_PREFIX + taskSuffix);
-    }
-
-    public Task createEmptyNavigationApiJarTask(String taskSuffix) {
-        return project.getTasks().create(NAVIGATION_API_JAR_TASK_PREFIX + taskSuffix);
+    private void createNavigationApiJarTask(NavigationVariant navigationVariant) {
+        JavaCompile navigationApiCompileTask = navigationVariant.compilerTask;
+        String taskSuffix = capitalize(navigationVariant.variant.getName());
+        String jarTaskName = NAVIGATION_API_JAR_TASK_PREFIX + taskSuffix;
+        Jar jarTask = project.getTasks().create(jarTaskName, Jar.class);
+        jarTask.setBaseName(project.getName() + "-navigationApi" + taskSuffix);
+        jarTask.from(navigationApiCompileTask.getDestinationDir());
+        jarTask.dependsOn(navigationApiCompileTask);
+        navigationVariant.jarTask = jarTask;
     }
 
     private List<String> getJarContent(File file) {
