@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart.model;
+package dart.henson;
 
-import dart.BindExtra;
-import dart.DartModel;
-
-@DartModel("com.f2prateek.dart.model.Module1Service")
-public class Module1ServiceModel {
-
-  @BindExtra String stringExtra;
+public class ActivityClassFinder {
+  public static Class getClassDynamically(String className) {
+    try {
+      return Class.forName(className);
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
+    }
+  }
 }

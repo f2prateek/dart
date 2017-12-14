@@ -17,13 +17,13 @@
 
 package dart.henson.processor;
 
-import dart.common.InjectionTarget;
+import dart.common.BindingTarget;
+import dart.common.util.BindExtraUtil;
+import dart.common.util.BindingTargetUtil;
 import dart.common.util.CompilerUtil;
+import dart.common.util.DartModelUtil;
 import dart.common.util.FileUtil;
-import dart.common.util.InjectExtraUtil;
-import dart.common.util.InjectionTargetUtil;
 import dart.common.util.LoggingUtil;
-import dart.common.util.NavigationModelUtil;
 import dart.common.util.ParcelerUtil;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -38,41 +38,33 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
-@SupportedAnnotationTypes({
-  HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
-  HensonProcessor.INJECT_EXTRA_ANNOTATION_CLASS_NAME
-})
+@SupportedAnnotationTypes({HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME})
 @SupportedOptions({HensonProcessor.OPTION_HENSON_PACKAGE})
 public class HensonProcessor extends AbstractProcessor {
 
   static final String NAVIGATION_MODEL_ANNOTATION_CLASS_NAME = "dart.DartModel";
-  static final String INJECT_EXTRA_ANNOTATION_CLASS_NAME = "dart.BindExtra";
-
   static final String OPTION_HENSON_PACKAGE = "dart.henson.package";
 
   private LoggingUtil loggingUtil;
   private FileUtil fileUtil;
-  private InjectExtraUtil bindExtraUtil;
-  private NavigationModelUtil navigationModelUtil;
-  private InjectionTargetUtil bindingTargetUtil;
+  private DartModelUtil dartModelUtil;
+  private BindingTargetUtil bindingTargetUtil;
 
   private String hensonPackage;
-  private boolean usesParcelerOption = true;
+  private boolean usesParceler = true;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
 
     final CompilerUtil compilerUtil = new CompilerUtil(processingEnv);
-    final ParcelerUtil parcelerUtil =
-        new ParcelerUtil(compilerUtil, processingEnv, usesParcelerOption);
+    final ParcelerUtil parcelerUtil = new ParcelerUtil(compilerUtil, processingEnv, usesParceler);
     loggingUtil = new LoggingUtil(processingEnv);
+    final BindExtraUtil bindExtraUtil = new BindExtraUtil(compilerUtil, parcelerUtil, loggingUtil);
     fileUtil = new FileUtil(processingEnv);
-    bindingTargetUtil = new InjectionTargetUtil(compilerUtil);
-    bindExtraUtil =
-        new InjectExtraUtil(
-            compilerUtil, parcelerUtil, loggingUtil, bindingTargetUtil, processingEnv);
-    navigationModelUtil = new NavigationModelUtil(loggingUtil, bindingTargetUtil, processingEnv);
+    bindingTargetUtil =
+        new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil, bindExtraUtil);
+    dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil, compilerUtil);
 
     parseAnnotationProcessorOptions(processingEnv);
   }
@@ -84,12 +76,11 @@ public class HensonProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    bindExtraUtil.setRoundEnvironment(roundEnv);
-    navigationModelUtil.setRoundEnvironment(roundEnv);
+    dartModelUtil.setRoundEnvironment(roundEnv);
 
-    Map<TypeElement, InjectionTarget> targetClassMap = findAndParseTargets();
+    Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
     generateIntentBuilders(targetClassMap);
-    generateHensonNavigator(targetClassMap);
+    generateHenson(targetClassMap);
 
     //return false here to let dart process the annotations too
     return false;
@@ -101,53 +92,55 @@ public class HensonProcessor extends AbstractProcessor {
    * @param enable whether Parceler should be enable
    */
   public void enableParceler(boolean enable) {
-    usesParcelerOption = enable;
+    usesParceler = enable;
   }
 
   private void parseAnnotationProcessorOptions(ProcessingEnvironment processingEnv) {
     hensonPackage = processingEnv.getOptions().get(OPTION_HENSON_PACKAGE);
   }
 
-  private Map<TypeElement, InjectionTarget> findAndParseTargets() {
-    Map<TypeElement, InjectionTarget> targetClassMap = new LinkedHashMap<>();
+  private Map<TypeElement, BindingTarget> findAndParseTargets() {
+    Map<TypeElement, BindingTarget> targetClassMap = new LinkedHashMap<>();
 
-    // Process each @DartModel element.
-    navigationModelUtil.parseNavigationModelAnnotatedElements(targetClassMap);
-    // Process each @BindExtra element.
-    bindExtraUtil.parseInjectExtraAnnotatedElements(targetClassMap);
-    // Create binding target tree and inherit extra bindings.
-    bindingTargetUtil.createInjectionTargetTree(targetClassMap);
-    bindingTargetUtil.inheritExtraInjections(targetClassMap);
-    // Use only Navigation Models
-    bindingTargetUtil.filterNavigationModels(targetClassMap);
+    dartModelUtil.parseDartModelAnnotatedElements(targetClassMap);
+    bindingTargetUtil.createBindingTargetTrees(targetClassMap);
+    bindingTargetUtil.addClosestRequiredAncestorForTargets(targetClassMap);
 
     return targetClassMap;
   }
 
-  private void generateIntentBuilders(Map<TypeElement, InjectionTarget> targetClassMap) {
-    for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
-      TypeElement typeElement = entry.getKey();
-      InjectionTarget bindingTarget = entry.getValue();
-
-      //we unfortunately can't test that nothing is generated in a TRUTH based test
-      try {
-        fileUtil.writeFile(new IntentBuilderGenerator(bindingTarget), typeElement);
-      } catch (IOException e) {
-        loggingUtil.error(
-            typeElement,
-            "Unable to write intent builder for type %s: %s",
-            typeElement,
-            e.getMessage());
+  private void generateIntentBuilders(Map<TypeElement, BindingTarget> targetClassMap) {
+    for (Map.Entry<TypeElement, BindingTarget> entry : targetClassMap.entrySet()) {
+      if (entry.getValue().topLevel) {
+        generateIntentBuildersForTree(targetClassMap, entry.getKey());
       }
     }
   }
 
-  private void generateHensonNavigator(Map<TypeElement, InjectionTarget> targetClassMap) {
+  private void generateIntentBuildersForTree(
+      Map<TypeElement, BindingTarget> targetClassMap, TypeElement typeElement) {
+    //we unfortunately can't test that nothing is generated in a TRUTH based test
+    final BindingTarget bindingTarget = targetClassMap.get(typeElement);
+    try {
+      fileUtil.writeFile(new IntentBuilderGenerator(bindingTarget), typeElement);
+    } catch (IOException e) {
+      loggingUtil.error(
+          typeElement,
+          "Unable to write intent builder for type %s: %s",
+          typeElement,
+          e.getMessage());
+    }
+
+    for (TypeElement child : bindingTarget.childClasses) {
+      generateIntentBuildersForTree(targetClassMap, child);
+    }
+  }
+
+  private void generateHenson(Map<TypeElement, BindingTarget> targetClassMap) {
     if (!targetClassMap.values().isEmpty()) {
       Element[] allTypes = targetClassMap.keySet().toArray(new Element[targetClassMap.size()]);
       try {
-        fileUtil.writeFile(
-            new HensonNavigatorGenerator(hensonPackage, targetClassMap.values()), allTypes);
+        fileUtil.writeFile(new HensonGenerator(hensonPackage, targetClassMap.values()), allTypes);
       } catch (IOException e) {
         for (Element element : allTypes) {
           loggingUtil.error(

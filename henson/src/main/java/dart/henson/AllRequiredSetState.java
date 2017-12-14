@@ -15,21 +15,20 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart.model;
+package dart.henson;
 
-import android.app.IntentService;
 import android.content.Intent;
-import dart.Dart;
 
-public class Module1Service extends IntentService {
+public class AllRequiredSetState extends State {
+  private Intent intent;
 
-  private Module1ServiceNavigationModel navigationModel = new Module1ServiceNavigationModel();
-
-  public Module1Service() {
-    super("Module1Service");
+  public AllRequiredSetState(Bundler bundler, Intent intent) {
+    super(bundler);
+    this.intent = intent;
   }
 
-  @Override protected void onHandleIntent(Intent intent) {
-    Dart.bind(navigationModel, intent.getExtras());
+  public Intent build() {
+    intent.putExtras(bundler.get());
+    return intent;
   }
 }

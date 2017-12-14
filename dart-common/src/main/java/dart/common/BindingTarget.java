@@ -24,25 +24,38 @@ import java.util.Map;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
-public class InjectionTarget {
+public class BindingTarget {
   public final Map<String, ExtraInjection> bindingMap = new LinkedHashMap<>();
   public final String classPackage;
   public final String className;
-  public final String classFqcnCanonical; // Canonical: my.package.class.innerclass
-  public final boolean isAbstractClass;
-  public String parentClassFqcn; // Non-canonical: my.package.class$innerclass
-  public List<TypeElement> childClasses;
-  public boolean isNavigationModel;
-  public String targetClassFqcn; // Non-canonical: my.package.class$innerclass
-  public String targetClassName;
+  public String parentPackage;
+  public String parentClass;
+  // Closest ancestor with required fields
+  // we could have made a simpler model and just remember
+  // the name of the required state but we decided to make a richer model
+  // and to remember the name of the full ancestor class that contains required fields.
+  // Closest here means first one in the hierarchy, we discover it without scanning the hierarchy,
+  // just having a look at the parent class is enough to retrieve this information.
+  public String closestRequiredAncestorPackage;
+  public String closestRequiredAncestorClass;
 
-  public InjectionTarget(
-      String classPackage, String className, String classFqcnCanonical, boolean isAbstractClass) {
+  public boolean hasRequiredFields;
+  public boolean topLevel;
+  public List<TypeElement> childClasses;
+
+  public BindingTarget(String classPackage, String className) {
     this.classPackage = classPackage;
     this.className = className;
-    this.classFqcnCanonical = classFqcnCanonical;
-    this.isAbstractClass = isAbstractClass;
-    childClasses = new ArrayList<>();
+    this.childClasses = new ArrayList<>();
+    this.topLevel = false;
+  }
+
+  public String getFQN() {
+    return classPackage + "." + className;
+  }
+
+  public String getParentFQN() {
+    return parentPackage + "." + parentClass;
   }
 
   public void addField(String key, String name, TypeMirror type, boolean required, boolean parcel) {
@@ -52,12 +65,7 @@ public class InjectionTarget {
       bindingMap.put(key, extraInjection);
     }
     extraInjection.addFieldBinding(new FieldBinding(name, type, required, parcel));
-  }
-
-  public void setTargetClass(String targetFqcnClass) {
-    this.targetClassFqcn = targetFqcnClass;
-    targetClassName = targetFqcnClass.substring(targetFqcnClass.lastIndexOf('.') + 1);
-    isNavigationModel = true;
+    hasRequiredFields = hasRequiredFields || required;
   }
 
   public void addChild(TypeElement typeElement) {

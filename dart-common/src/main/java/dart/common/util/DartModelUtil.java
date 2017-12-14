@@ -17,50 +17,48 @@
 
 package dart.common.util;
 
+import static javax.lang.model.element.ElementKind.CLASS;
 import static javax.lang.model.element.ElementKind.PACKAGE;
 import static javax.lang.model.element.Modifier.ABSTRACT;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 
 import dart.DartModel;
-import dart.common.InjectionTarget;
+import dart.common.BindingTarget;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Types;
 
-public class NavigationModelUtil {
+public class DartModelUtil {
+
+  public static final String DART_MODEL_SUFFIX = "NavigationModel";
 
   private final LoggingUtil loggingUtil;
-  private final InjectionTargetUtil bindingTargetUtil;
-  private final Types typeUtils;
+  private final BindingTargetUtil bindingTargetUtil;
+  private final CompilerUtil compilerUtil;
 
   private RoundEnvironment roundEnv;
 
-  public NavigationModelUtil(
-      LoggingUtil loggingUtil,
-      InjectionTargetUtil bindingTargetUtil,
-      ProcessingEnvironment processingEnv) {
+  public DartModelUtil(
+      LoggingUtil loggingUtil, BindingTargetUtil bindingTargetUtil, CompilerUtil compilerUtil) {
     this.loggingUtil = loggingUtil;
     this.bindingTargetUtil = bindingTargetUtil;
-    typeUtils = processingEnv.getTypeUtils();
+    this.compilerUtil = compilerUtil;
   }
 
   public void setRoundEnvironment(RoundEnvironment roundEnv) {
     this.roundEnv = roundEnv;
   }
 
-  public void parseNavigationModelAnnotatedElements(
-      Map<TypeElement, InjectionTarget> targetClassMap) {
+  public void parseDartModelAnnotatedElements(Map<TypeElement, BindingTarget> targetClassMap) {
     for (Element element : roundEnv.getElementsAnnotatedWith(DartModel.class)) {
       try {
-        parseNavigationModel((TypeElement) element, targetClassMap);
+        parseDartModel((TypeElement) element, targetClassMap);
       } catch (Exception e) {
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
@@ -72,28 +70,18 @@ public class NavigationModelUtil {
     }
   }
 
-  private void parseNavigationModel(
-      TypeElement element, Map<TypeElement, InjectionTarget> targetClassMap) {
+  private void parseDartModel(TypeElement element, Map<TypeElement, BindingTarget> targetClassMap) {
     // Verify common generated code restrictions.
-    if (!isValidUsageOfNavigationModel(element)) {
+    if (!isValidUsageOfDartModel(element)) {
       return;
     }
 
-    // Valid annotation value
-    final String annotationValue = element.getAnnotation(DartModel.class).value();
-    if (!StringUtil.isValidFqcn(annotationValue)) {
-      throw new IllegalArgumentException(
-          "Key has to be a full qualified class name. "
-              + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html");
-    }
-
     // Assemble information on the binding point.
-    InjectionTarget navigationModelTarget =
-        bindingTargetUtil.getOrCreateTargetClass(targetClassMap, element);
-    navigationModelTarget.setTargetClass(annotationValue);
+    BindingTarget navigationModelTarget = bindingTargetUtil.createTargetClass(element);
+    targetClassMap.put(element, navigationModelTarget);
   }
 
-  private boolean isValidUsageOfNavigationModel(Element element) {
+  private boolean isValidUsageOfDartModel(TypeElement element) {
     boolean valid = true;
 
     // Verify modifiers.
@@ -106,11 +94,29 @@ public class NavigationModelUtil {
       valid = false;
     }
 
+    // Verify type.
+    if (element.getKind() != CLASS) {
+      loggingUtil.error(
+          element, "@DartModel annotated element %s must be a class.", element.getSimpleName());
+      valid = false;
+    }
+
     // Verify containing type.
     if (element.getEnclosingElement() == null
         || element.getEnclosingElement().getKind() != PACKAGE) {
       loggingUtil.error(
           element, "@DartModel class %s must be a top level class.", element.getSimpleName());
+      valid = false;
+    }
+
+    // Verify Dart Model suffix.
+    final String classPackage = compilerUtil.getPackageName(element);
+    final String className = compilerUtil.getClassName(element, classPackage);
+    if (!className.endsWith(DART_MODEL_SUFFIX)) {
+      loggingUtil.error(
+          element,
+          "@DartModel class %s does not follow the naming convention: my.package.TargetComponentNavigationModel.",
+          element.getSimpleName());
       valid = false;
     }
 

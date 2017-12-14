@@ -25,6 +25,4 @@ import java.lang.annotation.Target;
 
 @Retention(CLASS)
 @Target(TYPE)
-public @interface DartModel {
-  String value() default "";
-}
+public @interface DartModel {}

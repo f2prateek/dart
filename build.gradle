@@ -17,7 +17,7 @@ buildscript {
                     'runtime': 'org.parceler:parceler-api:1.0.4',
                     'compiler': 'org.parceler:parceler:1.0.4'
             ],
-            javapoet: 'com.squareup:javapoet:1.7.0',
+            javapoet: 'com.squareup:javapoet:1.9.0',
             junit: 'junit:junit:4.12',
             fest: 'com.squareup:fest-android:1.0.7',
             truth: 'com.google.truth:truth:0.36',

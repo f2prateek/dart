@@ -17,7 +17,6 @@
 
 package com.f2prateek.dart.example;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.util.SparseArray;
 import com.f2prateek.dart.model.ComplexParcelable;
@@ -31,7 +30,7 @@ import org.robolectric.annotation.Config;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.f2prateek.dart.example.SampleActivityModel.DEFAULT_EXTRA_VALUE;
+import static com.f2prateek.dart.example.SampleActivityNavigationModel.DEFAULT_EXTRA_VALUE;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 @RunWith(RobolectricTestRunner.class)

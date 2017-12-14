@@ -17,19 +17,10 @@
 
 package com.f2prateek.dart.model;
 
-import android.app.IntentService;
-import android.content.Intent;
-import dart.Dart;
+import dart.DartModel;
 
-public class Module1Service extends IntentService {
+@DartModel
+public class Module1ServiceNavigationModel {
 
-  private Module1ServiceNavigationModel navigationModel = new Module1ServiceNavigationModel();
-
-  public Module1Service() {
-    super("Module1Service");
-  }
-
-  @Override protected void onHandleIntent(Intent intent) {
-    Dart.bind(navigationModel, intent.getExtras());
-  }
+  String stringExtra;
 }

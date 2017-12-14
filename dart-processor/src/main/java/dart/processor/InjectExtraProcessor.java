@@ -17,11 +17,12 @@
 
 package dart.processor;
 
-import dart.common.InjectionTarget;
+import dart.common.BindingTarget;
+import dart.common.util.BindExtraUtil;
+import dart.common.util.BindingTargetUtil;
 import dart.common.util.CompilerUtil;
+import dart.common.util.DartModelUtil;
 import dart.common.util.FileUtil;
-import dart.common.util.InjectExtraUtil;
-import dart.common.util.InjectionTargetUtil;
 import dart.common.util.LoggingUtil;
 import dart.common.util.ParcelerUtil;
 import java.io.IOException;
@@ -35,37 +36,38 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
-@SupportedAnnotationTypes({InjectExtraProcessor.INJECT_EXTRA_ANNOTATION_CLASS_NAME})
+@SupportedAnnotationTypes({InjectExtraProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME})
 public final class InjectExtraProcessor extends AbstractProcessor {
 
-  static final String INJECT_EXTRA_ANNOTATION_CLASS_NAME = "dart.BindExtra";
+  static final String NAVIGATION_MODEL_ANNOTATION_CLASS_NAME = "dart.DartModel";
 
   private LoggingUtil loggingUtil;
   private FileUtil fileUtil;
-  private InjectExtraUtil bindExtraUtil;
-  private InjectionTargetUtil bindingTargetUtil;
+  private BindingTargetUtil bindingTargetUtil;
+  private DartModelUtil dartModelUtil;
 
   private boolean usesParcelerOption = true;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
+
     final CompilerUtil compilerUtil = new CompilerUtil(processingEnv);
     final ParcelerUtil parcelerUtil =
         new ParcelerUtil(compilerUtil, processingEnv, usesParcelerOption);
     loggingUtil = new LoggingUtil(processingEnv);
+    BindExtraUtil bindExtraUtil = new BindExtraUtil(compilerUtil, parcelerUtil, loggingUtil);
     fileUtil = new FileUtil(processingEnv);
-    bindingTargetUtil = new InjectionTargetUtil(compilerUtil);
-    bindExtraUtil =
-        new InjectExtraUtil(
-            compilerUtil, parcelerUtil, loggingUtil, bindingTargetUtil, processingEnv);
+    bindingTargetUtil =
+        new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil, bindExtraUtil);
+    dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil, compilerUtil);
   }
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    bindExtraUtil.setRoundEnvironment(roundEnv);
+    dartModelUtil.setRoundEnvironment(roundEnv);
 
-    Map<TypeElement, InjectionTarget> targetClassMap = findAndParseTargets();
+    Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
     generateExtraInjectors(targetClassMap);
 
     //return false here to let henson process the annotations too
@@ -86,21 +88,19 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     usesParcelerOption = enable;
   }
 
-  private Map<TypeElement, InjectionTarget> findAndParseTargets() {
-    Map<TypeElement, InjectionTarget> targetClassMap = new LinkedHashMap<>();
+  private Map<TypeElement, BindingTarget> findAndParseTargets() {
+    Map<TypeElement, BindingTarget> targetClassMap = new LinkedHashMap<>();
 
-    // Process each @BindExtra element.
-    bindExtraUtil.parseInjectExtraAnnotatedElements(targetClassMap);
-    // Create binding target tree and inherit extra bindings.
-    bindingTargetUtil.createInjectionTargetTree(targetClassMap);
+    dartModelUtil.parseDartModelAnnotatedElements(targetClassMap);
+    bindingTargetUtil.createBindingTargetTrees(targetClassMap);
 
     return targetClassMap;
   }
 
-  private void generateExtraInjectors(Map<TypeElement, InjectionTarget> targetClassMap) {
-    for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
+  private void generateExtraInjectors(Map<TypeElement, BindingTarget> targetClassMap) {
+    for (Map.Entry<TypeElement, BindingTarget> entry : targetClassMap.entrySet()) {
       TypeElement typeElement = entry.getKey();
-      InjectionTarget bindingTarget = entry.getValue();
+      BindingTarget bindingTarget = entry.getValue();
 
       //we unfortunately can't test that nothing is generated in a TRUTH based test
       try {
