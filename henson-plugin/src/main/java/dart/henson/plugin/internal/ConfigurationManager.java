@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static dart.henson.plugin.util.StringUtil.capitalize;
 import static java.util.Arrays.asList;
 
 public class ConfigurationManager {
@@ -71,23 +70,16 @@ public class ConfigurationManager {
 
     public Map<String, Configuration> createNavigationConfigurations(String prefix) {
         Map<String, Configuration> result = new HashMap<>(CONFIGURATION_SUFFIXES.size());
-        System.out.println("Adding configuration: suffixes: " + CONFIGURATION_SUFFIXES);
-        System.out.println("Adding configuration: suffixes: " + CONFIGURATION_SUFFIXES.size());
-
         CONFIGURATION_SUFFIXES
                 .forEach(suffix -> {
                     String configurationName = getConfigurationName(prefix, suffix);
-                    System.out.println("Adding configuration: " + configurationName);
                     Configuration configuration = project.getConfigurations().findByName(configurationName);
                     if (configuration == null) {
-                        System.out.println("Creating configuration: " + configurationName);
                         configuration = project.getConfigurations().create(configurationName);
                     }
                     configuration.setCanBeResolved(true);
                     configuration.setCanBeConsumed(false);
                     result.put(suffix, configuration);
-                    System.out.println("Added configuration: " + configurationName);
-                    System.out.println("Added configuration: canBeResolved: " + configuration.isCanBeResolved());
                 });
         return result;
     }

@@ -3,16 +3,12 @@ package dart.henson.plugin.internal;
 import com.android.build.gradle.api.BaseVariant;
 
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.logging.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static dart.henson.plugin.internal.ArtifactManager.NAVIGATION_ARTIFACT_PREFIX;
-import static dart.henson.plugin.internal.ConfigurationManager.NAVIGATION_CONFIGURATION_SUFFIX_API;
-import static dart.henson.plugin.util.StringUtil.capitalize;
 import static java.lang.String.format;
 
 public class DependencyManager {
@@ -54,7 +50,6 @@ public class DependencyManager {
     }
 
     public void addNavigationArtifactsToVariantConfiguration(BaseVariant variant) {
-        System.out.println("addNavigationArtifactsToVariantConfiguration for variant: " + variant.getName());
         //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
         String configurationName = variant.getName() + "Api";
         String artifactName = artifactManager.getNavigationArtifactName(variant);

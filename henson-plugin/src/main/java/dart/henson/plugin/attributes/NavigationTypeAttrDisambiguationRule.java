@@ -19,7 +19,6 @@ public final class NavigationTypeAttrDisambiguationRule
 
     @Override
     public void execute(MultipleCandidatesDetails<NavigationTypeAttr> details) {
-        System.out.println("executing NavigationTypeAttrDisambiguationRule");
         Set<NavigationTypeAttr> candidates = details.getCandidateValues();
         final NavigationTypeAttr consumerValue = details.getConsumerValue();
 

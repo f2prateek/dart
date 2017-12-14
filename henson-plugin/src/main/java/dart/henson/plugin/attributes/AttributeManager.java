@@ -57,6 +57,6 @@ public class AttributeManager {
         Attribute<NavigationTypeAttr> attributeKey = of(NavigationTypeAttr.class);
         configuration.getAttributes().attribute(attributeKey, value);
 
-        System.out.println("attr: " + configuration.getName() + " attrs: " + configuration.getAttributes().keySet());
+        logger.debug("navigation attributes for configuration: " + configuration.getName() + " are : " + configuration.getAttributes().keySet());
     }
 }

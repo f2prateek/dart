@@ -8,7 +8,6 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.JavaCompile;
 
@@ -118,9 +117,6 @@ public class HensonManager {
 
         Configuration internalConfiguration = configurationManager.createClientInternalConfiguration(variant);
         attributeManager.applyAttributes(variant, internalConfiguration);
-        System.out.println("Before resolve");
-        internalConfiguration.resolve();
-        System.out.println("After resolve");
         project.getDependencies().add(variant.getName() + "Implementation", internalConfiguration);
 
         //create the task for generating the henson navigator
@@ -136,44 +132,29 @@ public class HensonManager {
     private void createSourceSetAndConfigurations(NavigationVariant navigationVariant, String dartVersionName) {
         BaseVariant variant = navigationVariant.variant;
         sourceSetManager.createNavigationSourceSet(variant);
-        System.out.println("Adding sourceset main");
         navigationVariant.sourceSets.add(sourceSetManager.getNavigationSourceSetForMain());
-        System.out.println("Adding sourceset build type sourcesets");
         navigationVariant.sourceSets.add(sourceSetManager.getNavigationSourceSet(variant.getBuildType()));
-        System.out.println("Adding sourceset product flavor sourcesets");
-        variant.getProductFlavors().stream().forEach( productFlavor -> {
+        variant.getProductFlavors().stream().forEach(productFlavor -> {
             navigationVariant.sourceSets.add(sourceSetManager.getNavigationSourceSet(productFlavor));
         });
-        System.out.println("Added sourcesets");
-
-        for (SourceSet source : navigationVariant.sourceSets) {
-            System.out.println("source tree: " + source.getName() + " : " + source.getJava().getSrcDirs());
-            System.out.println("source tree: " + source.getName() + " : " + source.getJava().getFiles());
-        }
 
         String variantName = variant.getName();
         Map<String, Configuration> navigationConfigurations = configurationManager.createNavigationConfigurations(variantName);
         dependencyManager.addDartAndHensonDependenciesToNavigationConfigurations(variantName, dartVersionName);
 
-        System.out.println("Adding configurations for variant");
         addNavigationConfigurationsToNavigationVariant(navigationVariant, navigationConfigurations);
 
-        System.out.println("Adding configurations for buildType");
         Map<String, Configuration> navigationConfigurationsBuildType = configurationManager.getNavigationConfigurations(variant.getBuildType().getName());
         addNavigationConfigurationsToNavigationVariant(navigationVariant, navigationConfigurationsBuildType);
 
-        System.out.println("Adding configurations for product flavors");
         variant.getProductFlavors().stream().forEach(productFlavor -> {
             Map<String, Configuration> navigationConfigurationsProductFlavor
                     = configurationManager.getNavigationConfigurations(productFlavor.getName());
             addNavigationConfigurationsToNavigationVariant(navigationVariant, navigationConfigurationsProductFlavor);
         });
 
-        System.out.println("Adding configurations for main");
         Map<String, Configuration> navigationConfigurationsMain = configurationManager.getNavigationConfigurations("");
         addNavigationConfigurationsToNavigationVariant(navigationVariant, navigationConfigurationsMain);
-
-        System.out.println("Added configurations");
     }
 
     private void addNavigationConfigurationsToNavigationVariant(NavigationVariant navigationVariant, Map<String, Configuration> navigationConfigurations) {
@@ -181,10 +162,6 @@ public class HensonManager {
         Configuration implementation = navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_IMPLEMENTATION);
         Configuration compileOnly = navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_COMPILE_ONLY);
         Configuration annotationProcessors = navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_ANNOTATION_PROCESSOR);
-        System.out.println("Configuration api:" + api);
-        System.out.println("Configuration implementation:" + implementation);
-        System.out.println("Configuration compileOnly:" + compileOnly);
-        System.out.println("Configuration annotationProcessors:" + annotationProcessors);
         navigationVariant.apiConfigurations.add(api);
         navigationVariant.implementationConfigurations.add(implementation);
         navigationVariant.compileOnlyConfigurations.add(compileOnly);
@@ -211,8 +188,6 @@ public class HensonManager {
         String artifactName = artifactManager.getNavigationArtifactName(variant);
         Configuration artifactConfiguration = configurationManager.createArtifactConfiguration(variant);
         attributeManager.applyAttributes(variant, artifactConfiguration);
-        System.out.println("Adding artifact name: " + artifactName);
-        System.out.println("Adding artifact configuration: " + artifactConfiguration);
         project.getArtifacts().add(artifactName, taskManager.getNavigationApiJarTask(suffix));
     }
 }

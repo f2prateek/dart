@@ -64,7 +64,7 @@ public class SourceSetManager {
 
     private void createNavigationSourceSet(String newSourceSetName, String newSourceSetPath) {
         SourceSet sourceSet = getSourceSets().findByName(newSourceSetName);
-        if(sourceSet == null) {
+        if (sourceSet == null) {
             logger.debug("Creating sourceSet: " + newSourceSetName + " with root in " + newSourceSetPath);
             sourceSet = getSourceSets().create(newSourceSetName);
             sourceSet.getJava().setSrcDirs(singletonList(newSourceSetPath));

@@ -71,7 +71,6 @@ public class TaskManager {
 
         String compileTaskName = NAVIGATION_API_COMPILE_TASK_PREFIX + taskSuffix;
         JavaCompile compileTask = (JavaCompile) project.getTasks().findByName(compileTaskName);
-        System.out.println("Before source trees");
         if (compileTask == null) {
             compileTask = project.getTasks().create(compileTaskName, JavaCompile.class);
             List<FileTree> sources = navigationVariant.sourceSets
@@ -79,23 +78,6 @@ public class TaskManager {
                     .map(SourceSet::getJava)
                     .map(SourceDirectorySet::getAsFileTree)
                     .collect(toList());
-            for (SourceSet sourceSet : navigationVariant.sourceSets) {
-                System.out.println("source tree: " + sourceSet.getName());
-            }
-            for (FileTree source : sources) {
-                System.out.println("source tree: " + source.getAsPath() + " : " + source.getFiles());
-            }
-            navigationVariant.apiConfigurations.stream().forEach( configuration -> {
-                System.out.println("classpath: " + configuration.getName());
-                //System.out.println("classpath: " + configuration.getAsPath());
-            });
-
-            navigationVariant.implementationConfigurations.stream().forEach( configuration -> {
-                System.out.println("implementation classpath: " + configuration.getName());
-                //System.out.println("implementation classpath: " + configuration.getAsPath());
-                System.out.println("implementation classpath: " + configuration.isCanBeResolved());
-                System.out.println("implementation classpath: " + configuration.isCanBeConsumed());
-            });
             String javaVersion = VERSION_1_7.toString();
 
             compileTask.setSource(sources);
@@ -138,9 +120,7 @@ public class TaskManager {
         Task taskDetectModules = project.getTasks().create("detectModule" + capitalize(variant.getName()));
         taskDetectModules.doFirst(task -> {
             Configuration clientInternalConfiguration = configurationManager.getClientInternalConfiguration(variant);
-            System.out.println("Before resolve 2");
             clientInternalConfiguration.resolve();
-            System.out.println("After resolve 2");
             Set<String> targetActivities = new HashSet();
             clientInternalConfiguration.getFiles().forEach(dependency -> {
                 if (dependency.getName().matches(".*-navigationApi.*.jar")) {

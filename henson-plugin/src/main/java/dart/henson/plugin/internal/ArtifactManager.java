@@ -5,10 +5,6 @@ import com.android.build.gradle.api.BaseVariant;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
-import dart.henson.plugin.util.StringUtil;
-
-import static dart.henson.plugin.util.StringUtil.capitalize;
-
 public class ArtifactManager {
 
     public static final String NAVIGATION_ARTIFACT_PREFIX = "NavigationArtifact";

@@ -17,7 +17,6 @@ public final class NavigationTypeAttrCompatRule
 
     @Override
     public void execute(CompatibilityCheckDetails<NavigationTypeAttr> details) {
-        System.out.println("executing NavigationTypeAttrCompatRule");
         final NavigationTypeAttr producerValue = details.getProducerValue();
         final NavigationTypeAttr consumerValue = details.getConsumerValue();
         if (producerValue == null) {
