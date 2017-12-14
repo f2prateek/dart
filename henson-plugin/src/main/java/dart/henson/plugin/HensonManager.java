@@ -85,21 +85,21 @@ public class HensonManager {
      */
     public void createMainNavigationConfigurationsAndSourceSet() {
         configurationManager.maybeCreateNavigationConfigurations("");
-        sourceSetManager.createNavigationSourceSetForMain();
+        sourceSetManager.maybeCreateNavigationSourceSet();
     }
 
     public void process(BuildType buildType) {
         String buildTypeName = buildType.getName();
         logger.debug("Processing buildType: %s", buildTypeName);
         configurationManager.maybeCreateNavigationConfigurations(buildTypeName);
-        sourceSetManager.createNavigationSourceSet(buildType);
+        sourceSetManager.maybeCreateNavigationSourceSet(buildType);
     }
 
     public void process(ProductFlavor productFlavor) {
         String productFlavorName = productFlavor.getName();
         logger.debug("Processing productFlavor: %s", productFlavorName);
         configurationManager.maybeCreateNavigationConfigurations(productFlavorName);
-        sourceSetManager.createNavigationSourceSet(productFlavor);
+        sourceSetManager.maybeCreateNavigationSourceSet(productFlavor);
     }
 
     public void process(BaseVariant variant, String dartVersionName) {
@@ -130,11 +130,11 @@ public class HensonManager {
 
     private void createSourceSetAndConfigurations(NavigationVariant navigationVariant, String dartVersionName) {
         BaseVariant variant = navigationVariant.variant;
-        sourceSetManager.createNavigationSourceSet(variant);
-        navigationVariant.sourceSets.add(sourceSetManager.getNavigationSourceSetForMain());
-        navigationVariant.sourceSets.add(sourceSetManager.getNavigationSourceSet(variant.getBuildType()));
+        sourceSetManager.maybeCreateNavigationSourceSet(variant);
+        navigationVariant.sourceSets.add(sourceSetManager.maybeCreateNavigationSourceSet());
+        navigationVariant.sourceSets.add(sourceSetManager.maybeCreateNavigationSourceSet(variant.getBuildType()));
         variant.getProductFlavors().stream().forEach(productFlavor -> {
-            navigationVariant.sourceSets.add(sourceSetManager.getNavigationSourceSet(productFlavor));
+            navigationVariant.sourceSets.add(sourceSetManager.maybeCreateNavigationSourceSet(productFlavor));
         });
 
         String variantName = variant.getName();

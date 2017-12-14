@@ -15,6 +15,16 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 
+/**
+ * We create multiple sourceset in the project:
+ * <ul>
+ *     <li> a navigation source set per variant in src/navigation/&lt;<variant name>&gt;/java
+ *     <li> a navigation source set per build type in src/navigation/&lt;<build type name>&gt;/java
+ *     <li> a navigation source set per product flavor in src/navigation/&lt;<product flavor name>&gt;/java
+ *     <li> a main navigation source set in src/navigation/main/java
+ * </ul>
+ * They are taken into account in this order (we currently don't merge and priority is not tested).
+ */
 public class SourceSetManager {
     private static final String NAVIGATION_SOURCESET_RADIX = "navigationSourceSet";
     private static final String NAVIGATION_SOURCESET_SUFFIX = "NavigationSourceSet";
@@ -27,43 +37,31 @@ public class SourceSetManager {
         this.logger = logger;
     }
 
-    public void createNavigationSourceSetForMain() {
+    public SourceSet maybeCreateNavigationSourceSet() {
         String newSourceSetName = NAVIGATION_SOURCESET_RADIX;
         String newSourceSetPath = getSourceSetPath("main");
-        createNavigationSourceSet(newSourceSetName, newSourceSetPath);
+        return maybeCreateNavigationSourceSet(newSourceSetName, newSourceSetPath);
     }
 
-    public SourceSet getNavigationSourceSetForMain() {
-        return getSourceSets().findByName(NAVIGATION_SOURCESET_RADIX);
-    }
-
-    public void createNavigationSourceSet(BuildType buildType) {
+    public SourceSet maybeCreateNavigationSourceSet(BuildType buildType) {
         String name = buildType.getName();
         String newSourceSetName = getSourceSetName(name);
         String newSourceSetPath = getSourceSetPath(name);
-        createNavigationSourceSet(newSourceSetName, newSourceSetPath);
+        return maybeCreateNavigationSourceSet(newSourceSetName, newSourceSetPath);
     }
 
-    public SourceSet getNavigationSourceSet(BuildType buildType) {
-        return getSourceSets().findByName(getSourceSetName(buildType.getName()));
-    }
-
-    public void createNavigationSourceSet(ProductFlavor productFlavor) {
+    public SourceSet maybeCreateNavigationSourceSet(ProductFlavor productFlavor) {
         String name = productFlavor.getName();
         String newSourceSetName = getSourceSetName(name);
         String newSourceSetPath = getSourceSetPath(name);
-        createNavigationSourceSet(newSourceSetName, newSourceSetPath);
+        return maybeCreateNavigationSourceSet(newSourceSetName, newSourceSetPath);
     }
 
-    public SourceSet getNavigationSourceSet(ProductFlavor productFlavor) {
-        return getSourceSets().findByName(getSourceSetName(productFlavor.getName()));
-    }
-
-    public void createNavigationSourceSet(BaseVariant variant) {
+    public SourceSet maybeCreateNavigationSourceSet(BaseVariant variant) {
         String name = variant.getName();
         String newSourceSetName = getSourceSetName(name);
         String newSourceSetPath = getSourceSetPath(name);
-        createNavigationSourceSet(newSourceSetName, newSourceSetPath);
+        return maybeCreateNavigationSourceSet(newSourceSetName, newSourceSetPath);
     }
 
     public List<SourceSet> getAllNavigationSourceSets() {
@@ -78,13 +76,11 @@ public class SourceSetManager {
         return "src/navigation/" + name + "/java";
     }
 
-    private void createNavigationSourceSet(String newSourceSetName, String newSourceSetPath) {
-        SourceSet sourceSet = getSourceSets().findByName(newSourceSetName);
-        if (sourceSet == null) {
-            logger.debug("Creating sourceSet: " + newSourceSetName + " with root in " + newSourceSetPath);
-            sourceSet = getSourceSets().create(newSourceSetName);
-            sourceSet.getJava().setSrcDirs(singletonList(newSourceSetPath));
-        }
+    private SourceSet maybeCreateNavigationSourceSet(String newSourceSetName, String newSourceSetPath) {
+        logger.debug("Creating sourceSet: " + newSourceSetName + " with root in " + newSourceSetPath);
+        SourceSet sourceSet = getSourceSets().maybeCreate(newSourceSetName);
+        sourceSet.getJava().setSrcDirs(singletonList(newSourceSetPath));
+        return sourceSet;
     }
 
     private SourceSetContainer getSourceSets() {
