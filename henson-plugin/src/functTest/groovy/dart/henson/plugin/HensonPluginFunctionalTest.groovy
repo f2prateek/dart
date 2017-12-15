@@ -215,8 +215,8 @@ class HensonPluginFunctionalTest extends Specification {
 
         //this seems to be buggy, the whole henson navigator generation is buggy
         //for a single module. It's strange
-        //testProjectDir.newFile('src/blueDebug/java/test/HensonNavigator.java').exists()
-        //testProjectDir.newFile('src/redRelease/java/test/HensonNavigator.java').exists()
+        testProjectDir.newFile('src/blueDebug/java/test/HensonNavigator.java').exists()
+        testProjectDir.newFile('src/redRelease/java/test/HensonNavigator.java').exists()
     }
 
     boolean testJarsContent(projectDir) {
