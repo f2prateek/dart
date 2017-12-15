@@ -61,10 +61,9 @@ public class DependencyManager {
   public void addNavigationArtifactToVariantConfiguration(
       String artifactName, BaseVariant variant) {
     //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-    String configurationName = variant.getName() + "Api";
-    Map<String, Object> map = new HashMap(2);
+    String configurationName = "navigation";
+    Map<String, Object> map = new HashMap(1);
     map.put("path", project.getPath());
-    map.put("configuration", artifactName);
     project.getDependencies().add(configurationName, project.getDependencies().project(map));
   }
 }

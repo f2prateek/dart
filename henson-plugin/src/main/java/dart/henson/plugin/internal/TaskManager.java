@@ -80,9 +80,8 @@ public class TaskManager {
           Configuration clientInternalConfiguration = navigationVariant.clientInternalConfiguration;
           logger.debug("Analyzing configuration: " + clientInternalConfiguration.getName());
           clientInternalConfiguration.resolve();
-          Set<String> targetActivities = new HashSet();
-          clientInternalConfiguration
-              .getFiles()
+          Set<String> targetActivities = new HashSet<>();
+          Streams.stream(clientInternalConfiguration)
               .forEach(
                   dependency -> {
                     logger.debug("Detected dependency: %s", dependency.getName());
@@ -116,6 +115,8 @@ public class TaskManager {
                     generatedFolder.mkdirs();
                     File generatedFile = new File(generatedFolder, "HensonNavigator.java");
                     try {
+                      logger.debug(
+                          "Generating Henson navigator in " + generatedFile.getAbsolutePath());
                       Files.write(generatedFile.toPath(), singletonList(hensonNavigator));
                     } catch (IOException e) {
                       throw new RuntimeException(e);

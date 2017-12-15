@@ -73,10 +73,9 @@ class HensonPluginFunctionalTest extends Specification {
           public void onCreate(Bundle bundle) {
             super.onCreate(bundle);
             Foo foo = new Foo();
-            //using the navigator should work, but it doesn't in a single module app
-//            Intent intent = HensonNavigator.gotoTestActivity(this)
-//            .s("s")
-//            .build();
+            Intent intent = HensonNavigator.gotoTestActivity(this)
+            .s("s")
+            .build();
           }
         }
         """
@@ -213,10 +212,8 @@ class HensonPluginFunctionalTest extends Specification {
 
         testJarsContent(projectDir)
 
-        //this seems to be buggy, the whole henson navigator generation is buggy
-        //for a single module. It's strange
-        testProjectDir.newFile('src/blueDebug/java/test/HensonNavigator.java').exists()
-        testProjectDir.newFile('src/redRelease/java/test/HensonNavigator.java').exists()
+        new File(testProjectDir.root, 'src/blueDebug/java/test/HensonNavigator.java').exists()
+        new File(testProjectDir.root, 'src/redRelease/java/test/HensonNavigator.java').exists()
     }
 
     boolean testJarsContent(projectDir) {
