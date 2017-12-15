@@ -1,6 +1,9 @@
 apply plugin: 'groovy'
+apply plugin: 'java-library'
 apply plugin: 'java-gradle-plugin'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 sourceSets {
     functionalTest {
@@ -59,6 +62,8 @@ dependencies {
         exclude group: 'org.codehaus.groovy'
     }
     functionalTestCompile gradleTestKit()
+
+    testImplementation 'junit:junit:4.12'
 }
 
 //TODO : Does the release work ?

@@ -65,7 +65,6 @@ class HensonPluginFunctionalTest extends Specification {
         
         import android.app.Activity;
         import android.os.Bundle;
-        import test.HensonNavigator;
         import android.content.Intent;
         
         class FooActivity extends Activity {
@@ -165,29 +164,42 @@ class HensonPluginFunctionalTest extends Specification {
 
         then:
         result.output.contains("navigationApiCompileJava")
-        result.output.contains("navigationApiCompileJavaRed")
-        result.output.contains("navigationApiCompileJavaBlue")
-        result.output.contains("navigationApiCompileJavaRelease")
-        result.output.contains("navigationApiCompileJavaDebug")
         result.output.contains("navigationApiCompileJavaBlueRelease")
         result.output.contains("navigationApiCompileJavaBlueDebug")
         result.output.contains("navigationApiCompileJavaRedRelease")
         result.output.contains("navigationApiCompileJavaRedDebug")
 
         result.output.contains("navigationApiJar")
-        result.output.contains("navigationApiJarRed")
-        result.output.contains("navigationApiJarBlue")
-        result.output.contains("navigationApiJarRelease")
-        result.output.contains("navigationApiJarDebug")
         result.output.contains("navigationApiJarBlueRelease")
         result.output.contains("navigationApiJarBlueDebug")
         result.output.contains("navigationApiJarRedRelease")
         result.output.contains("navigationApiJarRedDebug")
 
         when:
+        result = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('--no-build-cache', 'dependencies', '-d', '-s')
+                .withPluginClasspath()
+                .build()
+
+        then:
+        result.output.contains("navigationApi")
+        result.output.contains("navigationImplementation")
+        result.output.contains("navigationAnnotationProcessor")
+        result.output.contains("navigationCompileOnly")
+        result.output.contains("blueNavigation")
+        result.output.contains("redNavigation")
+        result.output.contains("debugNavigation")
+        result.output.contains("releaseNavigation")
+        result.output.contains("blueDebugNavigation")
+        result.output.contains("blueReleaseNavigation")
+        result.output.contains("redDebugNavigation")
+        result.output.contains("redReleaseNavigation")
+
+        when:
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'clean', 'assemble', 'navigationApiJar', 'navigationApiJarRed', 'navigationApiJarRelease', 'navigationApiJarBlueDebug', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', 'assemble', 'navigationApiJarBlueDebug', 'navigationApiJarRedRelease', '-d', '-s')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir
@@ -196,13 +208,12 @@ class HensonPluginFunctionalTest extends Specification {
         then:
         println result.output
         result.task(":assemble").outcome != FAILED
-        //result.task(":tasks").outcome == SUCCESS
-        result.task(":navigationApiJar").outcome != FAILED
-        result.task(":navigationApiJarRed").outcome != FAILED
-        result.task(":navigationApiJarRelease").outcome != FAILED
         result.task(":navigationApiJarBlueDebug").outcome != FAILED
 
         testJarsContent(projectDir)
+
+        new File(testProjectDir.root, 'src/blueDebug/java/test/HensonNavigator.java').exists()
+        new File(testProjectDir.root, 'src/redRelease/java/test/HensonNavigator.java').exists()
     }
 
     boolean testJarsContent(projectDir) {
@@ -210,6 +221,7 @@ class HensonPluginFunctionalTest extends Specification {
             if (file.name.endsWith('.jar')) {
                 println "Testing jar: ${file.name}"
                 def content = getJarContent(file)
+                println "Jar content: ${content}"
                 assert content.contains("META-INF/")
                 assert content.contains("META-INF/MANIFEST.MF")
                 assert content.contains("test/")
