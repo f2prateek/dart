@@ -17,6 +17,7 @@
 
 package dart.henson.plugin;
 
+import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.api.BaseVariant;
 import com.android.builder.model.BuildType;
 import com.android.builder.model.ProductFlavor;
@@ -36,6 +37,7 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.compile.JavaCompile;
 
 public class HensonManager {
   private final Project project;
@@ -118,14 +120,13 @@ public class HensonManager {
     createSourceSetAndConfigurations(navigationVariant, dartVersionName);
     taskManager.createNavigationCompilerAndJarTasks(navigationVariant);
     String artifactName = addArtifact(navigationVariant);
-    //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-    dependencyManager.addNavigationArtifactToVariantConfiguration(artifactName, variant);
 
-    Configuration internalConfiguration =
-        configurationManager.maybeCreateClientInternalConfiguration(variant);
+    Configuration internalConfiguration = configurationManager.maybeCreateClientInternalConfiguration(variant);
     navigationVariant.clientInternalConfiguration = internalConfiguration;
+    //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
     attributeManager.applyAttributes(variant, internalConfiguration);
-    project.getDependencies().add(variant.getName() + "Implementation", internalConfiguration);
+    dependencyManager.addNavigationArtifactToVariantConfiguration(artifactName, variant);
+    ((JavaCompile) variant.getJavaCompiler()).getClasspath().add(internalConfiguration);
 
     //create the task for generating the henson navigator
     //create hensonExtension

@@ -117,6 +117,7 @@ public class TaskManager {
                     try {
                       logger.debug(
                           "Generating Henson navigator in " + generatedFile.getAbsolutePath());
+                      logger.debug(hensonNavigator);
                       Files.write(generatedFile.toPath(), singletonList(hensonNavigator));
                     } catch (IOException e) {
                       throw new RuntimeException(e);

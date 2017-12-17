@@ -7,7 +7,7 @@ targetCompatibility = JavaVersion.VERSION_1_8
 dependencies {
     implementation project(':dart-annotations')
     implementation project(':dart-common')
-    api deps.android.runtime
+    compileOnly deps.android.runtime
 
     testImplementation deps.junit
     testImplementation deps.fest
