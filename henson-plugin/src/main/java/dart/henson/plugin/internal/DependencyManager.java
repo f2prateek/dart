@@ -23,6 +23,7 @@ import com.android.build.gradle.api.BaseVariant;
 import java.util.HashMap;
 import java.util.Map;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.logging.Logger;
 
@@ -59,9 +60,9 @@ public class DependencyManager {
   }
 
   public void addNavigationArtifactToVariantConfiguration(
-      String artifactName, BaseVariant variant) {
+      String artifactName, Configuration internalConfiguration) {
     //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-    String configurationName = "__" + variant.getName() + "Navigation";
+    String configurationName = internalConfiguration.getName();
     Map<String, Object> map = new HashMap(2);
     map.put("path", project.getPath());
     map.put("configuration", artifactName);

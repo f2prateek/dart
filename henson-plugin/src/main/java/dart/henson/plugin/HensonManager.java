@@ -125,7 +125,7 @@ public class HensonManager {
     navigationVariant.clientInternalConfiguration = internalConfiguration;
     //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
     attributeManager.applyAttributes(variant, internalConfiguration);
-    dependencyManager.addNavigationArtifactToVariantConfiguration(artifactName, variant);
+    dependencyManager.addNavigationArtifactToVariantConfiguration(artifactName, internalConfiguration);
     ((JavaCompile) variant.getJavaCompiler()).getClasspath().add(internalConfiguration);
 
     //create the task for generating the henson navigator
