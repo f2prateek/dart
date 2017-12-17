@@ -235,7 +235,7 @@ class HensonPluginFunctionalTest extends Specification {
                 assert content.contains("test/Henson\$WithContextSetState.class")
                 assert content.contains("test/Henson.class")
                 assert content.contains("test/FooActivityNavigationModel__IntentBuilder\$AllSet.class")
-                assert content.contains("test/TestActivity__IntentBuilder.class")
+                assert content.contains("test/FooActivityNavigationModel__IntentBuilder.class")
             }
         }
         true

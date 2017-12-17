@@ -17,10 +17,22 @@
 
 package dart.henson.plugin;
 
-import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.api.BaseVariant;
 import com.android.builder.model.BuildType;
 import com.android.builder.model.ProductFlavor;
+import com.google.common.collect.Streams;
+
+import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.compile.JavaCompile;
+
+import java.security.InvalidParameterException;
+import java.util.List;
+import java.util.Map;
+
 import dart.henson.plugin.attributes.AttributeManager;
 import dart.henson.plugin.internal.ArtifactManager;
 import dart.henson.plugin.internal.ConfigurationManager;
@@ -29,15 +41,6 @@ import dart.henson.plugin.internal.SourceSetManager;
 import dart.henson.plugin.internal.TaskManager;
 import dart.henson.plugin.variant.NavigationVariant;
 import dart.henson.plugin.variant.VariantManager;
-import java.security.InvalidParameterException;
-import java.util.List;
-import java.util.Map;
-import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.compile.JavaCompile;
 
 public class HensonManager {
   private final Project project;
@@ -127,6 +130,7 @@ public class HensonManager {
     attributeManager.applyAttributes(variant, internalConfiguration);
     dependencyManager.addNavigationArtifactToVariantConfiguration(artifactName, internalConfiguration);
     ((JavaCompile) variant.getJavaCompiler()).getClasspath().add(internalConfiguration);
+    //variant.getCompileClasspath(null).add(internalConfiguration);
 
     //create the task for generating the henson navigator
     //create hensonExtension
