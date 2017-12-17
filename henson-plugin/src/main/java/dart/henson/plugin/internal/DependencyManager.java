@@ -19,7 +19,6 @@ package dart.henson.plugin.internal;
 
 import static java.lang.String.format;
 
-import com.android.build.gradle.api.BaseVariant;
 import java.util.HashMap;
 import java.util.Map;
 import org.gradle.api.Project;
@@ -57,6 +56,11 @@ public class DependencyManager {
     dependencies.add(processors, hensonProcessor);
     dependencies.add(processors, dartProcessor);
     dependencies.add(apiRuntime, dartAnnotations);
+  }
+
+  public void addDartAndHensonDependenciesToVariantConfigurations(String dartVersionName) {
+    DependencyHandler dependencies = project.getDependencies();
+    dependencies.add("implementation", format("com.f2prateek.dart:henson:%s", dartVersionName));
   }
 
   public void addNavigationArtifactToVariantConfiguration(
