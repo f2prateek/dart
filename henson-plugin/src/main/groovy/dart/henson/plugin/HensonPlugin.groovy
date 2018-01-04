@@ -9,6 +9,7 @@ import dart.henson.plugin.internal.ArtifactManager
 import dart.henson.plugin.internal.ConfigurationManager
 import dart.henson.plugin.internal.DependencyManager
 import dart.henson.plugin.internal.TaskManager
+import dart.henson.plugin.variant.NavigationVariant
 import dart.henson.plugin.variant.VariantManager
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
@@ -36,7 +37,6 @@ class HensonPlugin implements Plugin<Project> {
         //the extension is created but will be read only during execution time
         //(it's not available before)
         project.extensions.create('henson', HensonPluginExtension)
-        def hensonExtension = project.extensions.getByName('henson')
 
         hensonManager = new HensonManager(project)
         logger = hensonManager.logger
@@ -58,8 +58,8 @@ class HensonPlugin implements Plugin<Project> {
         def dartVersionName = getVersionName()
 
 
-        hensonManager.createClientPseudoConfiguration()
-        hensonManager.applyNavigationAttributeMatchingStrategy()
+        //hensonManager.createClientPseudoConfiguration()
+        //hensonManager.applyNavigationAttributeMatchingStrategy()
 
         //we do the following for all sourcesets, of all build types, of all flavors, and all variants
         //  create source sets
@@ -72,9 +72,12 @@ class HensonPlugin implements Plugin<Project> {
         //to be able to use them before the creation of variants
 
         //the main configuration (navigation{Api, Implementation, etc.}
-        hensonManager.createMainNavigationConfigurationsAndSourceSet()
+        NavigationVariant navigationVariant = hensonManager.createMainNavigationConfigurationsAndSourceSet()
+
+        hensonManager.createConsumableNavigationConfigurationAndArtifact(navigationVariant, dartVersionName)
 
         //one for each build type
+        /*
         project.android.buildTypes.all { buildType ->
             hensonManager.process(buildType)
         }
@@ -84,10 +87,11 @@ class HensonPlugin implements Plugin<Project> {
             hensonManager.process(productFlavor)
         }
 
-
+*/
         final DomainObjectSet<? extends BaseVariant> variants = getAndroidVariants(project)
         variants.all { variant ->
-            hensonManager.process(variant, dartVersionName)
+            navigationVariant.variant = variant
+            hensonManager.createHensonNavigatorCreationTasks(navigationVariant)
         }
 
         project.afterEvaluate {

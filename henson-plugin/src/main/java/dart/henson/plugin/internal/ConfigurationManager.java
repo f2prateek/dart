@@ -131,6 +131,18 @@ public class ConfigurationManager {
     return result;
   }
 
+  public Configuration maybeCreateConsumableNavigationConfiguration() {
+    Configuration consumableConfiguration =
+            project.getConfigurations().findByName(NAVIGATION_CONFIGURATION);
+    if (consumableConfiguration != null) {
+      return consumableConfiguration;
+    }
+    consumableConfiguration = project.getConfigurations().create(NAVIGATION_CONFIGURATION);
+    consumableConfiguration.setCanBeConsumed(true);
+    //consumableConfiguration.setCanBeResolved(false);
+    return consumableConfiguration;
+  }
+
   private String getConfigurationName(String prefix, String suffix) {
     String configurationName;
     if (prefix.isEmpty()) {

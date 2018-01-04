@@ -17,11 +17,27 @@
 
 package dart.henson.plugin;
 
-import com.android.build.gradle.BaseExtension;
+import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.BaseVariant;
-import com.android.build.gradle.internal.publishing.AndroidArtifacts;
+import com.android.build.gradle.api.BaseVariantOutput;
+import com.android.build.gradle.api.JavaCompileOptions;
+import com.android.build.gradle.api.SourceKind;
+import com.android.build.gradle.api.TestVariant;
+import com.android.build.gradle.api.UnitTestVariant;
+import com.android.build.gradle.internal.api.ApplicationVariantImpl;
+import com.android.build.gradle.tasks.AidlCompile;
+import com.android.build.gradle.tasks.ExternalNativeBuildTask;
+import com.android.build.gradle.tasks.GenerateBuildConfig;
+import com.android.build.gradle.tasks.MergeResources;
+import com.android.build.gradle.tasks.MergeSourceSetFolders;
+import com.android.build.gradle.tasks.NdkCompile;
+import com.android.build.gradle.tasks.PackageAndroidArtifact;
+import com.android.build.gradle.tasks.RenderscriptCompile;
 import com.android.builder.model.BuildType;
 import com.android.builder.model.ProductFlavor;
+import com.android.builder.model.SigningConfig;
+import com.android.builder.model.SourceProvider;
+
 import dart.henson.plugin.attributes.AttributeManager;
 import dart.henson.plugin.attributes.NavigationTypeAttr;
 import dart.henson.plugin.internal.ArtifactManager;
@@ -31,22 +47,32 @@ import dart.henson.plugin.internal.SourceSetManager;
 import dart.henson.plugin.internal.TaskManager;
 import dart.henson.plugin.variant.NavigationVariant;
 import dart.henson.plugin.variant.VariantManager;
+
+import java.io.File;
 import java.security.InvalidParameterException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.gradle.api.Action;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.DomainObjectCollection;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.ArtifactCollection;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.attributes.AttributeContainer;
+import org.gradle.api.file.ConfigurableFileTree;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.tasks.AbstractCopyTask;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.JavaCompile;
 
-import static com.android.build.gradle.internal.publishing.AndroidArtifacts.ARTIFACT_TYPE;
+import static java.util.Collections.singletonList;
 
 public class HensonManager {
   private final Project project;
@@ -102,9 +128,34 @@ public class HensonManager {
   }
 
   /** the main configuration (navigation{Api, Implementation, etc.} */
-  public void createMainNavigationConfigurationsAndSourceSet() {
-    configurationManager.maybeCreateNavigationConfigurations("");
-    sourceSetManager.maybeCreateNavigationSourceSet();
+  public NavigationVariant createMainNavigationConfigurationsAndSourceSet() {
+    Map<String, Configuration> mapSuffixToConfiguration = configurationManager.maybeCreateNavigationConfigurations("");
+    SourceSet sourceSet = sourceSetManager.maybeCreateNavigationSourceSet();
+
+    NavigationVariant navigationVariant = new NavigationVariant();
+    navigationVariant.name = "";
+    navigationVariant.sourceSets = singletonList(sourceSet);
+    variantManager.addNavigationConfigurationsToNavigationVariant(navigationVariant, mapSuffixToConfiguration);
+    return navigationVariant;
+  }
+
+  public void createConsumableNavigationConfigurationAndArtifact(NavigationVariant navigationVariant, String dartVersionName) {
+    configurationManager.maybeCreateConsumableNavigationConfiguration();
+    taskManager.createNavigationCompilerAndJarTasks(navigationVariant);
+    dependencyManager.addDartAndHensonDependenciesToNavigationConfigurations("", dartVersionName);
+    project.getArtifacts().add("navigation", navigationVariant.jarTask);
+  }
+
+  public void createHensonNavigatorCreationTasks(NavigationVariant navigationVariant) {
+    if (hensonExtension == null || hensonExtension.getNavigatorPackageName() == null) {
+      throw new InvalidParameterException(
+              "The property 'henson.navigatorPackageName' must be defined in your build.gradle");
+    }
+    String hensonNavigatorPackageName = hensonExtension.getNavigatorPackageName();
+
+    taskManager.createDetectNavigationApiDependenciesAndGenerateHensonNavigatorTask(
+            navigationVariant, hensonNavigatorPackageName);
+
   }
 
   public void process(BuildType buildType) {

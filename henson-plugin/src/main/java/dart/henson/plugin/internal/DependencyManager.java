@@ -39,9 +39,9 @@ public class DependencyManager {
   public void addDartAndHensonDependenciesToNavigationConfigurations(
       String prefix, String dartVersionName) {
     DependencyHandler dependencies = project.getDependencies();
-    String compileOnly = format("%sNavigationCompileOnly", prefix);
-    String processors = format("%sNavigationAnnotationProcessor", prefix);
-    String apiRuntime = format("%sNavigationApi", prefix);
+    String compileOnly = prefix.isEmpty() ? "navigationCompileOnly" : format("%sNavigationCompileOnly", prefix);
+    String processors = prefix.isEmpty() ? "navigationAnnotationProcessor" : format("%sNavigationAnnotationProcessor", prefix);
+    String apiRuntime = prefix.isEmpty() ? "navigationApi" : format("%sNavigationApi", prefix);
 
     String android = "com.google.android:android:4.1.1.4";
     String dartRuntime = format("com.f2prateek.dart:dart:%s", dartVersionName);

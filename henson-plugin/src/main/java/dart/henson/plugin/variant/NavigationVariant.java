@@ -28,6 +28,7 @@ import org.gradle.api.tasks.compile.JavaCompile;
 /** Represents an enriched variant for navigation purposes. */
 public class NavigationVariant {
   public BaseVariant variant;
+  public String name = "";
   public List<SourceSet> sourceSets = new ArrayList();
   public List<Configuration> apiConfigurations = new ArrayList();
   public List<Configuration> implementationConfigurations = new ArrayList();

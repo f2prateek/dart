@@ -77,7 +77,8 @@ public class TaskManager {
         project.getTasks().create("detectModule" + capitalize(variant.getName()));
     taskDetectModules.doFirst(
         task -> {
-          Configuration clientInternalConfiguration = navigationVariant.clientInternalConfiguration;
+          //Configuration clientInternalConfiguration = navigationVariant.clientInternalConfiguration;
+            Configuration clientInternalConfiguration = variant.getCompileConfiguration();
           logger.debug("Analyzing configuration: " + clientInternalConfiguration.getName());
           clientInternalConfiguration.resolve();
           Set<String> targetActivities = new HashSet<>();
@@ -127,7 +128,7 @@ public class TaskManager {
     //we put the task right before compilation so that all dependencies are resolved
     // when the task is executed
     Set<Object> dependsOn = new HashSet<>(variant.getJavaCompiler().getDependsOn());
-    dependsOn.add(navigationVariant.clientInternalConfiguration);
+    //dependsOn.add(navigationVariant.clientInternalConfiguration);
     taskDetectModules.setDependsOn(dependsOn);
     variant.getJavaCompiler().dependsOn(taskDetectModules);
   }
@@ -161,8 +162,8 @@ public class TaskManager {
   }
 
   private void createNavigationApiCompileTask(NavigationVariant navigationVariant) {
-    String taskSuffix = capitalize(navigationVariant.variant.getName());
-    String destinationPath = navigationVariant.variant.getName() + "/";
+    String taskSuffix = capitalize(navigationVariant.name);
+    String destinationPath = navigationVariant.name + "/";
     File newDestinationDir =
         new File(project.getBuildDir(), "/navigation/classes/java/" + destinationPath);
     File newGeneratedDir =
@@ -211,7 +212,7 @@ public class TaskManager {
 
   private void createNavigationApiJarTask(NavigationVariant navigationVariant) {
     JavaCompile navigationApiCompileTask = navigationVariant.compilerTask;
-    String taskSuffix = capitalize(navigationVariant.variant.getName());
+    String taskSuffix = capitalize(navigationVariant.name);
     String jarTaskName = NAVIGATION_API_JAR_TASK_PREFIX + taskSuffix;
     Jar jarTask = project.getTasks().create(jarTaskName, Jar.class);
     jarTask.setBaseName(project.getName() + "-navigationApi" + taskSuffix);
