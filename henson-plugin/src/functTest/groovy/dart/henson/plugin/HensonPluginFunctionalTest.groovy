@@ -27,7 +27,7 @@ class HensonPluginFunctionalTest extends Specification {
         testProjectDir.newFolder('src','main', 'java', 'test')
         srcMain = testProjectDir.newFile('src/main/java/test/FooActivity.java')
         testProjectDir.newFolder('src','navigation', 'main', 'java', 'test')
-        srcNavigationMain = testProjectDir.newFile('src/navigation/main/java/test/Foo.java')
+        srcNavigationMain = testProjectDir.newFile('src/navigation/main/java/test/FooActivityNavigationModel.java')
     }
 
     def "fails on non android projects"() {
@@ -72,8 +72,8 @@ class HensonPluginFunctionalTest extends Specification {
           @Override
           public void onCreate(Bundle bundle) {
             super.onCreate(bundle);
-            Foo foo = new Foo();
-            Intent intent = HensonNavigator.gotoTestActivity(this)
+            FooActivityNavigationModel foo = new FooActivityNavigationModel();
+            Intent intent = HensonNavigator.gotoFooActivityNavigationModel(this)
             .s("s")
             .build();
           }
@@ -85,8 +85,8 @@ class HensonPluginFunctionalTest extends Specification {
         import dart.BindExtra;
         import dart.DartModel;
         
-        @DartModel("test.TestActivity")
-        class Foo {
+        @DartModel()
+        class FooActivityNavigationModel {
           @BindExtra String s;
         }
         """
@@ -153,6 +153,10 @@ class HensonPluginFunctionalTest extends Specification {
             }
         }
         
+        dependencies {
+          implementation "com.f2prateek.dart:henson:3.0.0-RC2-SNAPSHOT"
+        }
+        
         """
 
         when:
@@ -199,7 +203,7 @@ class HensonPluginFunctionalTest extends Specification {
         when:
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'clean', 'assemble', 'navigationApiJarBlueDebug', 'navigationApiJarRedRelease', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', 'navigationApiJarBlueDebug', 'navigationApiJarRedRelease', 'assemble', '-d', '-s')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir
@@ -225,13 +229,13 @@ class HensonPluginFunctionalTest extends Specification {
                 assert content.contains("META-INF/")
                 assert content.contains("META-INF/MANIFEST.MF")
                 assert content.contains("test/")
-                assert content.contains("test/Foo.class")
-                assert content.contains("test/Foo__ExtraBinder.class")
+                assert content.contains("test/FooActivityNavigationModel.class")
+                assert content.contains("test/FooActivityNavigationModel__ExtraBinder.class")
                 assert content.contains("test/Henson\$1.class")
                 assert content.contains("test/Henson\$WithContextSetState.class")
                 assert content.contains("test/Henson.class")
-                assert content.contains("test/TestActivity__IntentBuilder\$AllSet.class")
-                assert content.contains("test/TestActivity__IntentBuilder.class")
+                assert content.contains("test/FooActivityNavigationModel__IntentBuilder\$AllSet.class")
+                assert content.contains("test/FooActivityNavigationModel__IntentBuilder.class")
             }
         }
         true

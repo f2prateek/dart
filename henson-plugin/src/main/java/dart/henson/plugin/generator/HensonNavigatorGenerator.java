@@ -32,6 +32,10 @@ public class HensonNavigatorGenerator {
         .forEach(
             targetActivity -> {
               importStatement.append(format("import %s__IntentBuilder;\n", targetActivity));
+              importStatement.append(
+                  format("import %s__IntentBuilder.RequiredSequence;\n", targetActivity));
+              importStatement.append(
+                  format("import %s__IntentBuilder.ResolvedAllSet;\n", targetActivity));
             });
 
     String classStartStatement = "public class HensonNavigator {\n";
@@ -47,11 +51,13 @@ public class HensonNavigatorGenerator {
                   dart.henson.plugin.util.StringUtil.capitalize(targetActivitySimpleName);
               methodStatement.append(
                   format(
-                      "  public static %s__IntentBuilder goto%s(Context context) {\n",
-                      targetActivityCapitalizedName, targetActivityCapitalizedName));
+                      "  public static %s__IntentBuilder.RequiredSequence<%s__IntentBuilder.ResolvedAllSet> goto%s(Context context) {\n",
+                      targetActivityCapitalizedName,
+                      targetActivityCapitalizedName,
+                      targetActivityCapitalizedName));
               methodStatement.append(
                   format(
-                      "    return new %s__IntentBuilder(context);\n",
+                      "    return %s__IntentBuilder.getInitialState(context);\n",
                       targetActivityCapitalizedName));
               methodStatement.append("  }\n");
             });

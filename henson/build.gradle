@@ -5,6 +5,6 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 
 dependencies {
-    api deps.android.runtime
+    compileOnly deps.android.runtime
 }
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

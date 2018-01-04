@@ -17,10 +17,13 @@
 
 package dart.henson.plugin;
 
+import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.api.BaseVariant;
+import com.android.build.gradle.internal.publishing.AndroidArtifacts;
 import com.android.builder.model.BuildType;
 import com.android.builder.model.ProductFlavor;
 import dart.henson.plugin.attributes.AttributeManager;
+import dart.henson.plugin.attributes.NavigationTypeAttr;
 import dart.henson.plugin.internal.ArtifactManager;
 import dart.henson.plugin.internal.ConfigurationManager;
 import dart.henson.plugin.internal.DependencyManager;
@@ -29,13 +32,21 @@ import dart.henson.plugin.internal.TaskManager;
 import dart.henson.plugin.variant.NavigationVariant;
 import dart.henson.plugin.variant.VariantManager;
 import java.security.InvalidParameterException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.gradle.api.Action;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.compile.JavaCompile;
+
+import static com.android.build.gradle.internal.publishing.AndroidArtifacts.ARTIFACT_TYPE;
 
 public class HensonManager {
   private final Project project;
@@ -118,14 +129,44 @@ public class HensonManager {
     createSourceSetAndConfigurations(navigationVariant, dartVersionName);
     taskManager.createNavigationCompilerAndJarTasks(navigationVariant);
     String artifactName = addArtifact(navigationVariant);
-    //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-    dependencyManager.addNavigationArtifactToVariantConfiguration(artifactName, variant);
 
     Configuration internalConfiguration =
         configurationManager.maybeCreateClientInternalConfiguration(variant);
     navigationVariant.clientInternalConfiguration = internalConfiguration;
+    //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
     attributeManager.applyAttributes(variant, internalConfiguration);
-    project.getDependencies().add(variant.getName() + "Implementation", internalConfiguration);
+    dependencyManager.addDartAndHensonDependenciesToVariantConfigurations(dartVersionName);
+    dependencyManager.addNavigationArtifactToVariantConfiguration(
+        artifactName, internalConfiguration);
+
+    //it works but this is not ideal as the IDE doesn't see the dependency.
+    //we loose the DSL
+    Action<AttributeContainer> attributes =
+            container ->
+                    container.attribute(
+                            NavigationTypeAttr.ATTRIBUTE, project.getObjects().named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION));
+
+    //work but invisible in IDE
+    //((JavaCompile) variant.getJavaCompiler()).getClasspath().add(internalConfiguration);
+
+    //generate sources triggers the dependency resolution but it's not enough for the IDE
+    variant.registerPreJavacGeneratedBytecode(internalConfiguration);
+    Task task = project.getTasks().create("Foo" + variantName);
+    task.dependsOn(internalConfiguration);
+    variant.registerJavaGeneratingTask(task, Collections.emptyList());
+
+    project.getDependencies()
+            .add(variantName + "CompileClasspath", internalConfiguration);
+
+    //variant.getCompileConfiguration().add(internalConfiguration);
+    //do not work
+    //variant.getCompileClasspath(null).add(internalConfiguration);
+//    variant.getCompileConfiguration()
+//            .getIncoming()
+//            .artifactView(config -> config.attributes(attributes))
+//            .getArtifacts()
+//            .getArtifactFiles();
+
 
     //create the task for generating the henson navigator
     //create hensonExtension

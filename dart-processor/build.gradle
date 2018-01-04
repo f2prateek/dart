@@ -10,7 +10,7 @@ dependencies {
     implementation project(':dart')
     implementation deps.javapoet
     implementation deps.parceler.runtime
-    api deps.android.runtime
+    implementation deps.android.runtime
 
     testImplementation files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
     testImplementation deps.junit
