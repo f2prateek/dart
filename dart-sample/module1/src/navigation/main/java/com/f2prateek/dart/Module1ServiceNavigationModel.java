@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart.model;
+package com.f2prateek.dart;
 
 import dart.DartModel;
 

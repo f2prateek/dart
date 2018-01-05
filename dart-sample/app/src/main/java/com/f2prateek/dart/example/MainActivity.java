@@ -26,7 +26,6 @@ import butterknife.OnClick;
 
 import com.f2prateek.dart.model.ComplexParcelable;
 import com.f2prateek.dart.model.StringParcel;
-import com.f2prateek.dart.model.Henson;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,8 +52,7 @@ public class MainActivity extends Activity {
     parcelSparseArray.put(0, parcel1);
     parcelSparseArray.put(2, parcel2);
 
-    Intent intent = com.f2prateek.dart.example.Henson.with(this)
-        .gotoSampleActivity()
+    Intent intent = HensonNavigator.gotoSampleActivityNavigationModel(this)
         .defaultKeyExtra("defaultKeyExtra")
         .extraInt(4)
         .extraListParcelable(parcelList)
@@ -81,8 +79,7 @@ public class MainActivity extends Activity {
     parcelSparseArray.put(0, parcel1);
     parcelSparseArray.put(2, parcel2);
 
-    Intent intent = Henson.with(this)
-        .gotoModule1Activity()
+    Intent intent = HensonNavigator.gotoModule1ActivityNavigationModel(this)
         .defaultKeyExtra("defaultKeyExtra")
         .extraInt(4)
         .extraListParcelable(parcelList)
@@ -98,8 +95,7 @@ public class MainActivity extends Activity {
   // Launch Navigation Service residing in the navigation module
   @OnClick(R.id.navigateToModule1Service)
   public void onNavigationServiceCTAClick() {
-    Intent intentService = Henson.with(this)
-        .gotoModule1Service()
+    Intent intentService = HensonNavigator.gotoModule1ServiceNavigationModel(this)
         .stringExtra("foo")
         .build();
 

@@ -22,20 +22,19 @@ import android.os.Bundle;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.f2prateek.dart.model.R2;
 import dart.Dart;
 
 public class SampleActivity extends Activity {
 
-  @BindView(R2.id.default_key_extra) TextView defaultKeyExtraTextView;
-  @BindView(R2.id.string_extra) TextView stringExtraTextView;
-  @BindView(R2.id.int_extra) TextView intExtraTextView;
-  @BindView(R2.id.parcelable_extra) TextView parcelableExtraTextView;
-  @BindView(R2.id.optional_extra) TextView optionalExtraTextView;
-  @BindView(R2.id.parcel_extra) TextView parcelExtraTextView;
-  @BindView(R2.id.list_parcel_extra) TextView listParcelExtraTextView;
-  @BindView(R2.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
-  @BindView(R2.id.default_extra) TextView defaultExtraTextView;
+  @BindView(R.id.default_key_extra) TextView defaultKeyExtraTextView;
+  @BindView(R.id.string_extra) TextView stringExtraTextView;
+  @BindView(R.id.int_extra) TextView intExtraTextView;
+  @BindView(R.id.parcelable_extra) TextView parcelableExtraTextView;
+  @BindView(R.id.optional_extra) TextView optionalExtraTextView;
+  @BindView(R.id.parcel_extra) TextView parcelExtraTextView;
+  @BindView(R.id.list_parcel_extra) TextView listParcelExtraTextView;
+  @BindView(R.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
+  @BindView(R.id.default_extra) TextView defaultExtraTextView;
 
   SampleActivityNavigationModel navigationModel = new SampleActivityNavigationModel();
 

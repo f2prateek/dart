@@ -15,13 +15,16 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart.model;
+package com.f2prateek.dart;
 
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import dart.BindExtra;
 import dart.DartModel;
 import java.util.List;
+import com.f2prateek.dart.model.ComplexParcelable;
+import com.f2prateek.dart.model.StringParcel;
+import com.f2prateek.dart.model.SimpleParcelable;
 
 @DartModel
 public class Module1ActivityNavigationModel {

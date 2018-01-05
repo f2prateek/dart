@@ -3,3 +3,5 @@ include 'app'
 include 'module1'
 
 rootProject.name = 'dart-sample'
+
+includeBuild '..'

@@ -10,13 +10,14 @@ buildscript {
             'androidTools': '26.0.0',
             'parceler' : '1.0.4',
             'butterknife' : '9.0.0-SNAPSHOT',
-            'release': '3.0.0',
+            'release': '3.0.0-RC2-SNAPSHOT',
     ]
 
     ext.deps = [
             android: [
                     'runtime': 'com.google.android:android:4.1.1.4',
                     'gradlePlugin': "com.android.tools.build:gradle:${versions.androidPlugin}",
+                    'annotations': "com.android.support:support-annotations:${versions.supportLibrary}",
                     'appCompat': "com.android.support:appcompat-v7:${versions.supportLibrary}"
             ],
             parceler: [
@@ -24,8 +25,10 @@ buildscript {
                     'compiler': "org.parceler:parceler:${versions.parceler}"
             ],
             dart: [
+                'annotations': "com.f2prateek.dart:dart-annotations:${versions.release}",
                 'runtime': "com.f2prateek.dart:dart:${versions.release}",
-                'compiler': "com.f2prateek.dart:dart-processor:${versions.release}"
+                'compiler': "com.f2prateek.dart:dart-processor:${versions.release}",
+                'gradlePlugin': "com.f2prateek.dart:henson-plugin:${versions.release}"
             ],
             henson:[
                 'runtime': "com.f2prateek.dart:henson:${versions.release}",
@@ -37,10 +40,6 @@ buildscript {
                 'annotations': "com.jakewharton:butterknife-annotations:${versions.butterknife}",
                 'gradlePlugin': "com.jakewharton:butterknife-gradle-plugin:${versions.butterknife}"
             ],
-
-            junit: 'junit:junit:4.12',
-            fest: 'com.squareup:fest-android:1.0.7',
-            robolectric: 'org.robolectric:robolectric:2.4',
     ]
 
     repositories {
@@ -75,4 +74,8 @@ allprojects {
     tasks.withType(JavaCompile) { task ->
         task.options.compilerArgs << "-Xlint:deprecation"
     }
+}
+
+task check {
+    dependsOn gradle.includedBuild('dart-parent').task(':install')
 }

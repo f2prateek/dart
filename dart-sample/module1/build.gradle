@@ -1,5 +1,18 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath deps.dart.gradlePlugin
+    }
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'dart.henson-plugin'
 
 
 android {
@@ -8,22 +21,26 @@ android {
     defaultConfig {
         minSdkVersion versions.minSdk
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
+    navigationApi deps.parceler.runtime
+    navigationApi deps.android.annotations
+    navigationAnnotationProcessor deps.parceler.compiler
+
     api deps.android.appCompat
+    api deps.dart.annotations
     api deps.dart.runtime
     api deps.henson.runtime
-    api deps.parceler.runtime
     api deps.butterknife.runtime
     api deps.butterknife.annotations
+    navigationApiOfSelf()
+}
 
-    annotationProcessor deps.parceler.compiler
-    annotationProcessor deps.dart.compiler
-    annotationProcessor deps.henson.compiler
-    annotationProcessor deps.butterknife.compiler
-
-    testImplementation deps.junit
-    testImplementation deps.robolectric
-    testImplementation deps.fest
+henson {
+    navigatorPackageName = 'com.f2prateek.dart.sample'
 }
