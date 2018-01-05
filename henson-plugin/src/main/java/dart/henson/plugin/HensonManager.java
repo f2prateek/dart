@@ -18,17 +18,6 @@
 package dart.henson.plugin;
 
 import com.android.build.gradle.api.BaseVariant;
-
-import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.tasks.SourceSet;
-
-import java.security.InvalidParameterException;
-import java.util.List;
-import java.util.Map;
-
 import dart.henson.plugin.internal.ArtifactManager;
 import dart.henson.plugin.internal.ConfigurationManager;
 import dart.henson.plugin.internal.DependencyManager;
@@ -36,6 +25,14 @@ import dart.henson.plugin.internal.SourceSetManager;
 import dart.henson.plugin.internal.TaskManager;
 import dart.henson.plugin.variant.NavigationVariant;
 import dart.henson.plugin.variant.VariantManager;
+import java.security.InvalidParameterException;
+import java.util.List;
+import java.util.Map;
+import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.tasks.SourceSet;
 
 public class HensonManager {
   private final Project project;
@@ -62,9 +59,7 @@ public class HensonManager {
     this.hensonExtension = (HensonPluginExtension) project.getExtensions().getByName("henson");
   }
 
-  /**
-   * Creates a task to list all navigation source sets.
-   */
+  /** Creates a task to list all navigation source sets. */
   public void createListNavigationSourceSetsTask() {
     List<SourceSet> allNavigationSourceSets = sourceSetManager.getAllNavigationSourceSets();
     taskManager.createListSourceSetTask(allNavigationSourceSets);
@@ -73,29 +68,34 @@ public class HensonManager {
   /**
    * Creates the navigation configurations (navigation{Api, Implementation, etc.} and the navigation
    * source set. The configurations and the source set are "used" by a producer module, to represent
-   * in gradle the navigation source tree containing the navigation models and its dependencies.
-   * The configurations will be used to configure the dependencies needed to compile the navigation
+   * in gradle the navigation source tree containing the navigation models and its dependencies. The
+   * configurations will be used to configure the dependencies needed to compile the navigation
    * source set.
    */
   public NavigationVariant createNavigationVariant(String dartVersionName) {
-    Map<String, Configuration> mapSuffixToConfiguration = configurationManager.maybeCreateNavigationConfigurations();
+    Map<String, Configuration> mapSuffixToConfiguration =
+        configurationManager.maybeCreateNavigationConfigurations();
     SourceSet sourceSet = sourceSetManager.maybeCreateNavigationSourceSet();
 
-    NavigationVariant navigationVariant = variantManager.createNavigationVariant(sourceSet, mapSuffixToConfiguration);
-    dependencyManager.addDartAndHensonDependenciesToNavigationConfigurations(navigationVariant, dartVersionName);
+    NavigationVariant navigationVariant =
+        variantManager.createNavigationVariant(sourceSet, mapSuffixToConfiguration);
+    dependencyManager.addDartAndHensonDependenciesToNavigationConfigurations(
+        navigationVariant, dartVersionName);
     taskManager.createNavigationCompilerAndJarTasks(navigationVariant);
     return navigationVariant;
   }
 
-  public void createConsumableNavigationConfigurationAndArtifact(NavigationVariant navigationVariant) {
-    Configuration navigationConfiguration = configurationManager.maybeCreateConsumableNavigationConfiguration();
+  public void createConsumableNavigationConfigurationAndArtifact(
+      NavigationVariant navigationVariant) {
+    Configuration navigationConfiguration =
+        configurationManager.maybeCreateConsumableNavigationConfiguration();
     project.getArtifacts().add(navigationConfiguration.getName(), navigationVariant.jarTask);
   }
 
   public void createHensonNavigatorGenerationTask(BaseVariant variant) {
     if (hensonExtension == null || hensonExtension.getNavigatorPackageName() == null) {
       throw new InvalidParameterException(
-              "The property 'henson.navigatorPackageName' must be defined in your build.gradle");
+          "The property 'henson.navigatorPackageName' must be defined in your build.gradle");
     }
     String hensonNavigatorPackageName = hensonExtension.getNavigatorPackageName();
 

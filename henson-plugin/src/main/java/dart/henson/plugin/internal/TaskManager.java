@@ -17,9 +17,25 @@
 
 package dart.henson.plugin.internal;
 
+import static dart.henson.plugin.util.StringUtil.capitalize;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.gradle.api.JavaVersion.VERSION_1_7;
+
 import com.android.build.gradle.api.BaseVariant;
 import com.google.common.collect.Streams;
-
+import dart.henson.plugin.generator.HensonNavigatorGenerator;
+import dart.henson.plugin.variant.NavigationVariant;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
@@ -31,25 +47,6 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import dart.henson.plugin.generator.HensonNavigatorGenerator;
-import dart.henson.plugin.variant.NavigationVariant;
-
-import static dart.henson.plugin.util.StringUtil.capitalize;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.gradle.api.JavaVersion.VERSION_1_7;
 
 public class TaskManager {
   public static final String NAVIGATION_API_COMPILE_TASK_PREFIX = "navigationApiCompileJava";
@@ -71,27 +68,29 @@ public class TaskManager {
     createNavigationApiJarTask(navigationVariant);
   }
 
-    /**
-     * A henson navigator is a class that helps a consumer to consume the navigation api that it
-     * declares in its dependencies. The henson navigator will wrap the intent builders.
-     * Thus, a henson navigator, is driven by consumption of intent builders, whereas the
-     * henson classes are driven by the production of an intent builder.
-     *
-     * This task is created per android variant:
-     * <ul>
-     *     <li>we scan the variant compile configuration for navigation api dependencies</li>
-     *     <li>we generate a henson navigator class for this variant that wraps the intent builders</li>
-     * </ul>
-     * @param variant the variant for which to create a builder.
-     * @param hensonNavigatorPackageName the package name in which we create the class.
-     */
-  public void createHensonNavigatorGenerationTask(BaseVariant variant,
-                                                  String hensonNavigatorPackageName) {
+  /**
+   * A henson navigator is a class that helps a consumer to consume the navigation api that it
+   * declares in its dependencies. The henson navigator will wrap the intent builders. Thus, a
+   * henson navigator, is driven by consumption of intent builders, whereas the henson classes are
+   * driven by the production of an intent builder.
+   *
+   * <p>This task is created per android variant:
+   *
+   * <ul>
+   *   <li>we scan the variant compile configuration for navigation api dependencies
+   *   <li>we generate a henson navigator class for this variant that wraps the intent builders
+   * </ul>
+   *
+   * @param variant the variant for which to create a builder.
+   * @param hensonNavigatorPackageName the package name in which we create the class.
+   */
+  public void createHensonNavigatorGenerationTask(
+      BaseVariant variant, String hensonNavigatorPackageName) {
     Task generateHensonNavigatorTask =
         project.getTasks().create("generate" + capitalize(variant.getName()) + "HensonNavigator");
     generateHensonNavigatorTask.doFirst(
         task -> {
-            Configuration clientInternalConfiguration = variant.getCompileConfiguration();
+          Configuration clientInternalConfiguration = variant.getCompileConfiguration();
           logger.debug("Analyzing configuration: " + clientInternalConfiguration.getName());
           clientInternalConfiguration.resolve();
           Set<String> targetActivities = new HashSet<>();
@@ -192,11 +191,7 @@ public class TaskManager {
     JavaCompile compileTask = (JavaCompile) project.getTasks().findByName(compileTaskName);
     if (compileTask == null) {
       compileTask = project.getTasks().create(compileTaskName, JavaCompile.class);
-      List<FileTree> sources = singletonList(
-          navigationVariant
-              .sourceSet
-                  .getJava()
-                  .getAsFileTree());
+      List<FileTree> sources = singletonList(navigationVariant.sourceSet.getJava().getAsFileTree());
       String javaVersion = VERSION_1_7.toString();
 
       compileTask.setSource(sources);

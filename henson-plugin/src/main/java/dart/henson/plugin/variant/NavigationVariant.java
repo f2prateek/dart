@@ -25,13 +25,13 @@ import org.gradle.api.tasks.compile.JavaCompile;
 /**
  * Ideally, our plugin would be variant aware and would let us define multiple navigation source
  * sets and configurations to match the build types, flavors and variants of the main source code.
- * However, there is a limitation in the current gradle android plugin and we can't do that.
- * We are falling back on a single source set that will contain all the navigation models, for all
+ * However, there is a limitation in the current gradle android plugin and we can't do that. We are
+ * falling back on a single source set that will contain all the navigation models, for all
  * activities of a module (the union of all variants of the module). This is sad but we can't do it
  * well.
  *
- * This class represents the navigation source set and its various configurations to compile
- * and jar it.
+ * <p>This class represents the navigation source set and its various configurations to compile and
+ * jar it.
  */
 public class NavigationVariant {
   public String name = "";

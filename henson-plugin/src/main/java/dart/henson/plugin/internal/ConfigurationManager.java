@@ -17,15 +17,14 @@
 
 package dart.henson.plugin.internal;
 
-import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.logging.Logger;
+import static java.util.Arrays.asList;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
+import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.logging.Logger;
 
 /**
  * The plugin offers multiple configurations to interact with:
@@ -101,7 +100,7 @@ public class ConfigurationManager {
 
   public Configuration maybeCreateConsumableNavigationConfiguration() {
     Configuration consumableConfiguration =
-            project.getConfigurations().findByName(NAVIGATION_CONFIGURATION);
+        project.getConfigurations().findByName(NAVIGATION_CONFIGURATION);
     if (consumableConfiguration != null) {
       return consumableConfiguration;
     }

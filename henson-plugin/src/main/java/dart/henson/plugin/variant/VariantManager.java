@@ -17,16 +17,15 @@
 
 package dart.henson.plugin.variant;
 
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.tasks.SourceSet;
-
-import java.util.Map;
-
 import static dart.henson.plugin.internal.ConfigurationManager.NAVIGATION_CONFIGURATION_SUFFIX_ANNOTATION_PROCESSOR;
 import static dart.henson.plugin.internal.ConfigurationManager.NAVIGATION_CONFIGURATION_SUFFIX_API;
 import static dart.henson.plugin.internal.ConfigurationManager.NAVIGATION_CONFIGURATION_SUFFIX_COMPILE_ONLY;
 import static dart.henson.plugin.internal.ConfigurationManager.NAVIGATION_CONFIGURATION_SUFFIX_IMPLEMENTATION;
+
+import java.util.Map;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.tasks.SourceSet;
 
 public class VariantManager {
 
@@ -36,8 +35,8 @@ public class VariantManager {
     this.logger = logger;
   }
 
-  public NavigationVariant createNavigationVariant(SourceSet sourceSet,
-                                                   Map<String, Configuration> mapSuffixToConfigurations) {
+  public NavigationVariant createNavigationVariant(
+      SourceSet sourceSet, Map<String, Configuration> mapSuffixToConfigurations) {
     NavigationVariant navigationVariant = new NavigationVariant();
     navigationVariant.sourceSet = sourceSet;
     addNavigationConfigurationsToNavigationVariant(navigationVariant, mapSuffixToConfigurations);
@@ -46,7 +45,8 @@ public class VariantManager {
 
   private void addNavigationConfigurationsToNavigationVariant(
       NavigationVariant navigationVariant, Map<String, Configuration> navigationConfigurations) {
-    navigationVariant.apiConfiguration = navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_API);
+    navigationVariant.apiConfiguration =
+        navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_API);
     navigationVariant.implementationConfiguration =
         navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_IMPLEMENTATION);
     navigationVariant.compileOnlyConfiguration =
