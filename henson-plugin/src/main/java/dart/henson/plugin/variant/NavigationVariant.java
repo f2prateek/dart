@@ -17,24 +17,32 @@
 
 package dart.henson.plugin.variant;
 
-import com.android.build.gradle.api.BaseVariant;
-import java.util.ArrayList;
-import java.util.List;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.JavaCompile;
 
-/** Represents an enriched variant for navigation purposes. */
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Ideally, our plugin would be variant aware and would let us define multiple navigation source
+ * sets and configurations to match the build types, flavors and variants of the main source code.
+ * However, there is a limitation in the current gradle android plugin and we can't do that.
+ * We are falling back on a single source set that will contain all the navigation models, for all
+ * activities of a module (the union of all variants of the module). This is sad but we can't do it
+ * well.
+ *
+ * This class represents the navigation source set and its various configurations to compile
+ * and jar it.
+ */
 public class NavigationVariant {
-  public BaseVariant variant;
   public String name = "";
-  public List<SourceSet> sourceSets = new ArrayList();
-  public List<Configuration> apiConfigurations = new ArrayList();
-  public List<Configuration> implementationConfigurations = new ArrayList();
-  public List<Configuration> compileOnlyConfigurations = new ArrayList();
-  public List<Configuration> annotationProcessorConfigurations = new ArrayList();
+  public SourceSet sourceSet;
+  public Configuration apiConfiguration;
+  public Configuration implementationConfiguration;
+  public Configuration compileOnlyConfiguration;
+  public Configuration annotationProcessorConfiguration;
   public JavaCompile compilerTask;
   public Jar jarTask;
-  public Configuration clientInternalConfiguration;
 }

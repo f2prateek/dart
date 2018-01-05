@@ -61,33 +61,8 @@ public class SourceSetManager {
     return maybeCreateNavigationSourceSet(newSourceSetName, newSourceSetPath);
   }
 
-  public SourceSet maybeCreateNavigationSourceSet(BuildType buildType) {
-    String name = buildType.getName();
-    String newSourceSetName = getSourceSetName(name);
-    String newSourceSetPath = getSourceSetPath(name);
-    return maybeCreateNavigationSourceSet(newSourceSetName, newSourceSetPath);
-  }
-
-  public SourceSet maybeCreateNavigationSourceSet(ProductFlavor productFlavor) {
-    String name = productFlavor.getName();
-    String newSourceSetName = getSourceSetName(name);
-    String newSourceSetPath = getSourceSetPath(name);
-    return maybeCreateNavigationSourceSet(newSourceSetName, newSourceSetPath);
-  }
-
-  public SourceSet maybeCreateNavigationSourceSet(BaseVariant variant) {
-    String name = variant.getName();
-    String newSourceSetName = getSourceSetName(name);
-    String newSourceSetPath = getSourceSetPath(name);
-    return maybeCreateNavigationSourceSet(newSourceSetName, newSourceSetPath);
-  }
-
   public List<SourceSet> getAllNavigationSourceSets() {
     return new ArrayList<>(getSourceSets());
-  }
-
-  private String getSourceSetName(String name) {
-    return name + NAVIGATION_SOURCESET_SUFFIX;
   }
 
   private String getSourceSetPath(String name) {
