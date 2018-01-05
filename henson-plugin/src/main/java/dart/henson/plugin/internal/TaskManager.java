@@ -17,17 +17,21 @@
 
 package dart.henson.plugin.internal;
 
-import static dart.henson.plugin.util.StringUtil.capitalize;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
-import static org.gradle.api.JavaVersion.VERSION_1_7;
-
 import com.android.build.gradle.api.BaseVariant;
-import com.android.builder.model.Variant;
 import com.google.common.collect.Streams;
-import dart.henson.plugin.generator.HensonNavigatorGenerator;
-import dart.henson.plugin.variant.NavigationVariant;
+
+import org.gradle.api.Project;
+import org.gradle.api.Task;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.file.FileCollection;
+import org.gradle.api.file.FileTree;
+import org.gradle.api.internal.file.UnionFileCollection;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.bundling.Jar;
+import org.gradle.api.tasks.compile.CompileOptions;
+import org.gradle.api.tasks.compile.JavaCompile;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,18 +42,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import org.gradle.api.Project;
-import org.gradle.api.Task;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.file.FileCollection;
-import org.gradle.api.file.FileTree;
-import org.gradle.api.file.SourceDirectorySet;
-import org.gradle.api.internal.file.UnionFileCollection;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.bundling.Jar;
-import org.gradle.api.tasks.compile.CompileOptions;
-import org.gradle.api.tasks.compile.JavaCompile;
+
+import dart.henson.plugin.generator.HensonNavigatorGenerator;
+import dart.henson.plugin.variant.NavigationVariant;
+
+import static dart.henson.plugin.util.StringUtil.capitalize;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.gradle.api.JavaVersion.VERSION_1_7;
 
 public class TaskManager {
   public static final String NAVIGATION_API_COMPILE_TASK_PREFIX = "navigationApiCompileJava";

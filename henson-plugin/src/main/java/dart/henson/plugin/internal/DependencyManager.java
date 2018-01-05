@@ -17,16 +17,17 @@
 
 package dart.henson.plugin.internal;
 
-import static java.lang.String.format;
-
-import java.util.HashMap;
-import java.util.Map;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.logging.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import dart.henson.plugin.variant.NavigationVariant;
+
+import static java.lang.String.format;
 
 public class DependencyManager {
 

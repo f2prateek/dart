@@ -17,15 +17,15 @@
 
 package dart.henson.plugin.internal;
 
-import static java.util.Arrays.asList;
-
-import com.android.build.gradle.api.BaseVariant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  * The plugin offers multiple configurations to interact with:

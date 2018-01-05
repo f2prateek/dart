@@ -17,18 +17,16 @@
 
 package dart.henson.plugin.internal;
 
-import static java.util.Collections.singletonList;
-
-import com.android.build.gradle.api.BaseVariant;
-import com.android.builder.model.BuildType;
-import com.android.builder.model.ProductFlavor;
-import java.util.ArrayList;
-import java.util.List;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Collections.singletonList;
 
 /**
  * We create multiple sourceset in the project:

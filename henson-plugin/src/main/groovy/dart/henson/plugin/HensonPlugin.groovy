@@ -53,8 +53,21 @@ class HensonPlugin implements Plugin<Project> {
         project.ext.navigationApiOfSelf = helper.&navigationApiOfSelf
     }
 
+    /**
+     * A simple wrapper that helps to declare dependencies towards navigation apis.
+     * Usage:
+     * <pre>
+     client.dependencies {
+       navigationApiOf(":module1")
+     }
+
+     producer.dependencies {
+       navigationApiOfSelf()
+     }
+     * </pre>
+     */
     public static class HensonHelper {
-        private Project project;
+        private Project project
 
         HensonHelper(Project project) {
             this.project = project

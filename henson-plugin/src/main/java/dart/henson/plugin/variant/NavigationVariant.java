@@ -22,9 +22,6 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.compile.JavaCompile;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Ideally, our plugin would be variant aware and would let us define multiple navigation source
  * sets and configurations to match the build types, flavors and variants of the main source code.
