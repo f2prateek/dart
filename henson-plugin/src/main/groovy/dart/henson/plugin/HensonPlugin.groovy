@@ -31,6 +31,8 @@ class HensonPlugin implements Plugin<Project> {
         //the dart & henson version to use. This avoids all problems related to using version x.y.+
         def dartVersionName = getVersionName()
 
+        hensonManager.addDartAndHensonDependenciesToVariantConfigurations(dartVersionName)
+
         //the navigation configurations & source sets (to produce a navigation API)
         NavigationVariant navigationVariant = hensonManager.createNavigationVariant(dartVersionName)
 

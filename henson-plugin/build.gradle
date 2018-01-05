@@ -1,6 +1,7 @@
 apply plugin: 'groovy'
 apply plugin: 'java-library'
 apply plugin: 'java-gradle-plugin'
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -65,6 +66,3 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 }
-
-//TODO : Does the release work ?
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

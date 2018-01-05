@@ -20,10 +20,7 @@ package dart.henson.plugin.internal;
 import static java.lang.String.format;
 
 import dart.henson.plugin.variant.NavigationVariant;
-import java.util.HashMap;
-import java.util.Map;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.logging.Logger;
 
@@ -62,15 +59,5 @@ public class DependencyManager {
   public void addDartAndHensonDependenciesToVariantConfigurations(String dartVersionName) {
     DependencyHandler dependencies = project.getDependencies();
     dependencies.add("implementation", format("com.f2prateek.dart:henson:%s", dartVersionName));
-  }
-
-  public void addNavigationArtifactToVariantConfiguration(
-      String artifactName, Configuration internalConfiguration) {
-    //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-    String configurationName = internalConfiguration.getName();
-    Map<String, Object> map = new HashMap(2);
-    map.put("path", project.getPath());
-    map.put("configuration", artifactName);
-    project.getDependencies().add(configurationName, project.getDependencies().project(map));
   }
 }

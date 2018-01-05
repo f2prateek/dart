@@ -1,4 +1,5 @@
 apply plugin: 'java-library'
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -7,4 +8,3 @@ targetCompatibility = JavaVersion.VERSION_1_8
 dependencies {
     implementation project(':dart-annotations')
 }
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

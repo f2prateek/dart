@@ -154,7 +154,7 @@ class HensonPluginFunctionalTest extends Specification {
         }
         
         dependencies {
-          implementation "com.f2prateek.dart:henson:3.0.0-RC2-SNAPSHOT"
+          navigationApiOfSelf()
         }
         
         """
@@ -168,16 +168,7 @@ class HensonPluginFunctionalTest extends Specification {
 
         then:
         result.output.contains("navigationApiCompileJava")
-        result.output.contains("navigationApiCompileJavaBlueRelease")
-        result.output.contains("navigationApiCompileJavaBlueDebug")
-        result.output.contains("navigationApiCompileJavaRedRelease")
-        result.output.contains("navigationApiCompileJavaRedDebug")
-
         result.output.contains("navigationApiJar")
-        result.output.contains("navigationApiJarBlueRelease")
-        result.output.contains("navigationApiJarBlueDebug")
-        result.output.contains("navigationApiJarRedRelease")
-        result.output.contains("navigationApiJarRedDebug")
 
         when:
         result = GradleRunner.create()
@@ -191,19 +182,11 @@ class HensonPluginFunctionalTest extends Specification {
         result.output.contains("navigationImplementation")
         result.output.contains("navigationAnnotationProcessor")
         result.output.contains("navigationCompileOnly")
-        result.output.contains("blueNavigation")
-        result.output.contains("redNavigation")
-        result.output.contains("debugNavigation")
-        result.output.contains("releaseNavigation")
-        result.output.contains("blueDebugNavigation")
-        result.output.contains("blueReleaseNavigation")
-        result.output.contains("redDebugNavigation")
-        result.output.contains("redReleaseNavigation")
 
         when:
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'clean', 'navigationApiJarBlueDebug', 'navigationApiJarRedRelease', 'assemble', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', 'navigationApiJar', 'assemble', '-d', '-s')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir
@@ -212,7 +195,7 @@ class HensonPluginFunctionalTest extends Specification {
         then:
         println result.output
         result.task(":assemble").outcome != FAILED
-        result.task(":navigationApiJarBlueDebug").outcome != FAILED
+        result.task(":navigationApiJar").outcome != FAILED
 
         testJarsContent(projectDir)
 

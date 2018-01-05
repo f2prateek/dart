@@ -101,4 +101,8 @@ public class HensonManager {
 
     taskManager.createHensonNavigatorGenerationTask(variant, hensonNavigatorPackageName);
   }
+
+  public void addDartAndHensonDependenciesToVariantConfigurations(String dartVersionName) {
+    dependencyManager.addDartAndHensonDependenciesToVariantConfigurations(dartVersionName);
+  }
 }
