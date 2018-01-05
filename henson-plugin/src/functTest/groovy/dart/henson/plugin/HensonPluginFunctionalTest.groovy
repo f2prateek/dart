@@ -101,6 +101,7 @@ class HensonPluginFunctionalTest extends Specification {
                 google()
                 jcenter()
                 mavenLocal()
+                mavenCentral()
                 maven {
                   url 'https://oss.sonatype.org/content/repositories/snapshots'
                 }
@@ -148,6 +149,7 @@ class HensonPluginFunctionalTest extends Specification {
             google()
             jcenter()
             mavenLocal()
+            mavenCentral()
             maven {
               url 'https://oss.sonatype.org/content/repositories/snapshots'
             }
