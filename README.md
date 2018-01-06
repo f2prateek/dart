@@ -5,162 +5,76 @@ Dart [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.f2pr
 
 **** This page is under construction until version 3 is released. ****
 
+## Summary 
 Extra "binding" library & intent builders for Android. Dart & Henson (DH) uses annotation processing to bind intent's extras to pojo fields, and to generate intent builders via a fluent API.
 
+## Description of DH 3
+Dart and Henson is a an Android Library that structures the navigation layer of your apps. It helps to create intents and consume them in a structured way. We believe it's the best way to organize your navigation layer, and make it less error-prone and easier to maintain.
 
+It is composed of 2 components: Dart and Henson. Both of them use annotated classes that describe the parameters (extras of the intent) of a target activity. DH3 is not easy to setup manually, and we strongly encourage to use the gradle henson-plugin that we provide to use it. See the [samples](https://github.com/f2prateek/dart/tree/master/dart-sample) for more details.
 
-Dart
-------
+## Navigation models
 
+A navigation model class is a simple pojo with annotated non private fields. The fields describe an extra passed to the target of an intent:
 ```java
-class ExampleActivity extends Activity {
-  @InjectExtra String extra1;
-  @InjectExtra int extra2;
-  @InjectExtra User extra3; // User implements Parcelable
-
-  @Override public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.simple_activity);
-    Dart.bind(this);
-    // TODO Use "bound" extras...
-  }
+@DartModel
+public class MyActivityNavigationModel {
+  //a simple requested field, it's name is used as the extra key
+  public String extra1;
+  //a named field using an annotation
+  public @BindExtra(MY_CONSTANT_NAME) String extra2;
+  //an optional field
+  public @Nullable MyParcelableOrSerializable extra3;
 }
 ```
 
-Simply call one of the `bind()` methods, which will delegate to generated code.
-You can bind from an Activity (which uses its intent extras), Fragment (which uses its arguments)
-or directly from a Bundle.
+Note that in DH3, navigation models:
+* are mandatory, it's not possible to annotate activities directly.
+* must follow a naming convention: they should have the same fully qualified name as the activity or service they describe the navigation of, plus the suffix: `NavigationModel`. (e.g.: `com.foo.wooper.app.MyActivityNavigationModel`).
+* must be placed in the navigation source set: in `src/navigation/main/java`.
 
-The key used for the extra will be the field name by default. However, it can be set manually as a parameter in the annotation: `@InjectExtra("key")`
+## Dart
 
-Optional Injection
-------------------
-By default all `@InjectExtra` fields are required. An exception will be thrown if the target extra cannot be found.
-
-To suppress this behavior and create an optional binding, add the `@Nullable` annotation to the field or method.
-Any annotation with the class name `Nullable` is respected, including ones from the support library annotations and ButterKnife.
-
+The historical first component of the library is used to map intents to Pojos (navigation models). Typically, a target activity will define a navigation model class, a pojo with annotated fields and will map the intents it receives to an instance of its model: 
 ```java
-@Nullable @InjectExtra String title;
-```
-
-Default Values
---------------
-You can assign any values to your fields to be used as default values, just as you would in regular "binding"-free code.
-```java
-@InjectExtra String title = "Default Title";
-```
-This value will be overridden after you call `bind()`. Remember to use the `@Nullable` annotation, if this binding is optional.
-
-Bonus
------
-
-Also included is a `get()` method that simplifies code to retrieve extras from a Bundle.
-It uses generics to infer return type and automatically perform the cast.
-
-```java
-Bundle bundle = getIntent().getExtras(); // getArguments() for a Fragment
-User user = Dart.get(bundle, "key"); // User implements Parcelable
-```
-
-Henson
-------
-In Dart 2.0, we added an annotation processor that helps you to navigate between activities.
-The new module is called Henson (after [Matthew Henson](https://en.wikipedia.org/wiki/Matthew_Henson), the African-American Arctic explorer that first reached the North Pole) :
-
-For the sample activity mentioned above, Henson will offer a DSL to navigate to it easily :
-```java
-Intent intent = Henson.with(this)
-        .gotoExampleActivity()
-        .extra1("defaultKeyExtra")
-        .extra2(2)
-        .extra3(new User())
-        .build();
-
-startActivity(intent);
-```
-
-Of course, you can add any additional extra to the intent before using it.
-
-The DSL will be generated for all classes which contain `@InjectExtra` fields. If you want to extend it to other classes, use the `@HensonNavigable` annotation.
-
-```java
-@HensonNavigable
-class AnotherActivity extends Activity {
-  @Override public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    ...
-  }
+public void onCreate(Bundle savedInstanceState) {
+  Dart.bind(this, myNavigationModel)
 }
 ```
 
-The Henson annotation processor will generate the `Henson` navigator class (used above) in a package that is :
-* either the package specified by the `dart.henson.package` annotation processor option
-* or if no such option is used, in the common package of all annotated activities. See the Javadoc of `HensonExtraProcessor` for more details.
+An activity (or a service) can map the extras of the intent it receives, or a bundle like `savedInstanceState`.
 
-If your activites and fragment are in *different packages*, you will need to specify a package via the `dart.henson.package` annotation processor option.
-If you're using gradle, simply add this to your `build.gradle`
-```groovy
-apt {
-    arguments {
-        "dart.henson.package" "your.package.name"
-    }
-}
-```
+## Henson
 
-If you're using the newest version of Android gradle plugin, it's now possible to use a built-in annotationProcessor scope instead of apt. In this case, you can pass arguments to the annotation processors using :
+The second component of the library is used to create intents. Based on the navigation model, henson will create an intent builder for the described class (remember the name of the activity / service can be dedudced from the FQN of the model). It creates also some useful wrapper around them, see below.
 
-```groovy
-defaultConfig {
-    javaCompileOptions {
-        annotationProcessorOptions {
-            arguments = [ 'dart.henson.package' : 'your.package.name' ]
-        }
-    }
-}
-```
+Generally speaking, Intent Builders generated by Henson are not used directly, but via the `HensonNavigator` class that is generated for each module.
 
-Bonus
------
-As you can see from the examples above, using both Dart & Henson not only provides a very structured generated navigation layer and convenient DSLs; it also allows to wrap/unwrap parcelables automatically.
+#### The HensonNavigator Class
 
-Parceler
--------------------------
-Dart 2.0 offers a built-in support for [Parceler](https://github.com/johncarl81/parceler). Using Parceler with Dart 2 is optional.
-
-If you use Parceler, Dart will automatically detect @Parcel annotated beans (pojos), or collections of them, and wrap them using the Henson DSL and unwrap them when they are bound via Dart.
-
+The `HensonNavigator` is generated on a usage basis: it wraps all the intent builder that a module can use.
 ```java
-@Parcel
-public class ParcelExample {
-    ...
-}
+Intent intent = HensonNavigator.gotoMyActivity(context)
+ .extra1("foo")
+ .extra2(42)
+ .extra3(myObj) //optional
+ .build();
 ```
 
-```java
-class OneMoreActivityActivity extends Activity {
-  @InjectExtra ParcelExample extra;
+The intent builders used by a module are detected automatically during the build, based on the dependencies a module uses, and the `HensonNavigator` is generated accordingly.
 
-  @Override public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.simple_activity);
-    Dart.bind(this);
-    // TODO Use "bound" extras...
-  }
-}
-```
 
-```java
-Intent intent = Henson.with(this)
-        .gotoOneMoreActivityActivity()
-        .extra(new ParcelExample())
-        .build();
+## What's new in DH3 ?
 
-startActivity(intent);
-```
-Parceler usage is optional and will take place only when Parceler is present in the classpath.
+Briefly:
+* DH3 fully supports modularization. It was the main motivation for the version 3, and it requested quite a few changes. We don't have a migration guide yet.
+* navigation models have changed and are mandatory, they need a single annotation: `@DartModel`.
+* navigation models must follow a naming convention
+* they must be placed in a different source set in: `src/navigation/main/java`
+* DH3 offers a gradle plugin. DH3 uses a lot of annotation processing internally, configurations, source sets, artifacts, custom tasks. Do not set it up manually unless you know gradle well.
+* annotations have changed, the new model is simpler.
+* DH3 classes have been repackaged. Though, unfortunately, we couldn't rename the groupId of the library, and gradle doesn't let you use DH2 and DH3 simultaneously.
 
-When available, Parceler will be used to parcelize collections instead of serializing them, in order to gain speed.
 
 ProGuard
 --------
@@ -168,15 +82,14 @@ ProGuard
 If ProGuard is enabled be sure to add these rules to your configuration:
 
 ```
--dontwarn com.f2prateek.dart.internal.**
+-dontwarn dart.internal.**
 -keep class **__ExtraBinder { *; }
 -keepclasseswithmembernames class * {
-    @com.f2prateek.dart.* <fields>;
+    @dart.* <fields>;
 }
-#for dart 2.0 only
 -keep class **Henson { *; }
 -keep class **__IntentBuilder { *; }
-
+-keep class **HensonNavigator { *; }
 
 #if you use it
 #see Parceler's github page
@@ -186,63 +99,15 @@ If ProGuard is enabled be sure to add these rules to your configuration:
 Download
 --------
 
-For Dart 2.x :
-Gradle:
+Dart:
 ```groovy
-compile 'com.f2prateek.dart:dart:(insert latest version)'
-provided 'com.f2prateek.dart:dart-processor:(insert latest version)'
+implementation 'com.f2prateek.dart:dart:(insert latest version)'
+annotationProcessor 'com.f2prateek.dart:dart-processor:(insert latest version)'
 ```
-or maven
-```xml
-<dependency>
-  <groupId>com.f2prateek.dart</groupId>
-  <artifactId>dart</artifactId>
-  <version>(insert latest version)</version>
-</dependency>
-<dependency>
-  <groupId>com.f2prateek.dart</groupId>
-  <artifactId>dart-processor</artifactId>
-  <version>(insert latest version)</version>
-  <scope>provided</scope>
-</dependency>
-```
-
-And for using Henson :
-Gradle:
+Henson :
 ```groovy
-compile 'com.f2prateek.dart:henson:(insert latest version)'
-provided 'com.f2prateek.dart:henson-processor:(insert latest version)'
-```
-When using Henson, as Android Studio doesn't call live annotation processors when editing a file, you might prefer using the [apt Android Studio plugin](https://bitbucket.org/hvisser/android-apt). It will allow you to use the Henson generated DSL right away when you edit your code.
-
-The Henson annotation processor dependency would then have to be declared within the apt scope instead of provided.
-
-or maven
-```xml
-<dependency>
-  <groupId>com.f2prateek.dart</groupId>
-  <artifactId>henson</artifactId>
-  <version>(insert latest version)</version>
-</dependency>
-<dependency>
-  <groupId>com.f2prateek.dart</groupId>
-  <artifactId>henson-processor</artifactId>
-  <version>(insert latest version)</version>
-  <scope>provided</scope>
-</dependency>
-```
-For Dart 1.x :
-Gradle:
-```groovy
-compile 'com.f2prateek.dart:dart:(insert latest version)'
-```
-Maven:
-```xml
-<dependency>
-  <groupId>com.f2prateek.dart</groupId>
-  <artifactId>dart</artifactId>
-  <version>(insert latest version)</version>
-</dependency>
+implementation 'com.f2prateek.dart:henson:(insert latest version)'
+annotationProcessor 'com.f2prateek.dart:henson-processor:(insert latest version)'
 ```
 
 Kotlin
