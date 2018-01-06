@@ -1,10 +1,16 @@
 Dart [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Dart-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1444)[![Build Status](https://travis-ci.org/f2prateek/dart.svg?branch=master)](https://travis-ci.org/f2prateek/dart)
 ============
 
-Extra "binding" library for Android which uses annotation processing to
-generate code that does direct field assignment of your extras.
+**** Version 3 of Dart & Henson is gonna be released soon in January 2018. If you are looking for the README page of Dart & Henson 2, please visit [this wiki page](https://github.com/f2prateek/dart/wiki/Dart-&-Henson-v2-).****
 
-Dart is inspired by [ButterKnife][1].
+**** This page is under construction until version 3 is released. ****
+
+Extra "binding" library & intent builders for Android. Dart & Henson (DH) uses annotation processing to bind intent's extras to pojo fields, and to generate intent builders via a fluent API.
+
+
+
+Dart
+------
 
 ```java
 class ExampleActivity extends Activity {
@@ -328,5 +334,4 @@ License
     limitations under the License.
 
 
- [1]: http://jakewharton.github.io/butterknife/
- [2]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.f2prateek.dart&a=dart&v=LATEST
+ [1]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.f2prateek.dart&a=dart&v=LATEST
