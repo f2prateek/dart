@@ -19,10 +19,8 @@ package dart.henson.plugin.internal;
 
 import static java.lang.String.format;
 
-import java.util.HashMap;
-import java.util.Map;
+import dart.henson.plugin.variant.NavigationVariant;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.logging.Logger;
 
@@ -37,11 +35,11 @@ public class DependencyManager {
   }
 
   public void addDartAndHensonDependenciesToNavigationConfigurations(
-      String prefix, String dartVersionName) {
+      NavigationVariant navigationVariant, String dartVersionName) {
     DependencyHandler dependencies = project.getDependencies();
-    String compileOnly = format("%sNavigationCompileOnly", prefix);
-    String processors = format("%sNavigationAnnotationProcessor", prefix);
-    String apiRuntime = format("%sNavigationApi", prefix);
+    String compileOnly = navigationVariant.compileOnlyConfiguration.getName();
+    String processors = navigationVariant.annotationProcessorConfiguration.getName();
+    String apiRuntime = navigationVariant.apiConfiguration.getName();
 
     String android = "com.google.android:android:4.1.1.4";
     String dartRuntime = format("com.f2prateek.dart:dart:%s", dartVersionName);
@@ -61,15 +59,5 @@ public class DependencyManager {
   public void addDartAndHensonDependenciesToVariantConfigurations(String dartVersionName) {
     DependencyHandler dependencies = project.getDependencies();
     dependencies.add("implementation", format("com.f2prateek.dart:henson:%s", dartVersionName));
-  }
-
-  public void addNavigationArtifactToVariantConfiguration(
-      String artifactName, Configuration internalConfiguration) {
-    //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-    String configurationName = internalConfiguration.getName();
-    Map<String, Object> map = new HashMap(2);
-    map.put("path", project.getPath());
-    map.put("configuration", artifactName);
-    project.getDependencies().add(configurationName, project.getDependencies().project(map));
   }
 }

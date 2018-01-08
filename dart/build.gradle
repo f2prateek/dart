@@ -1,4 +1,5 @@
 apply plugin: 'java-library'
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -9,8 +10,8 @@ dependencies {
     implementation project(':dart-common')
     compileOnly deps.android.runtime
 
+    testImplementation deps.android.runtime
     testImplementation deps.junit
     testImplementation deps.fest
     testImplementation deps.robolectric
 }
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

@@ -48,6 +48,15 @@ subprojects {
 
     apply plugin: "com.diffplug.gradle.spotless"
 
+    def checkSubTask = project.tasks.findByName('check')
+    if(checkSubTask) {
+        tasks['check'].dependsOn checkSubTask
+    }
+    def installSubTask = project.tasks.findByName('install')
+    if(installSubTask) {
+        tasks['install'].dependsOn installSubTask
+    }
+
     spotless {
         java {
             licenseHeaderFile rootProject.file('spotless.license.java.txt')
@@ -58,3 +67,6 @@ subprojects {
         task.options.compilerArgs << "-Xlint:deprecation"
     }
 }
+
+task check {}
+task install {}

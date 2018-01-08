@@ -1,4 +1,18 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath deps.dart.gradlePlugin
+    }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'dart.henson-plugin'
+
 
 android {
     compileSdkVersion versions.compileSdk
@@ -19,6 +33,7 @@ android {
     lintOptions {
         textReport true
         textOutput 'stdout'
+        abortOnError false
     }
 
     buildTypes {
@@ -30,16 +45,17 @@ android {
 }
 
 dependencies {
-    implementation(project(':module1')) {
-        exclude module: 'com.f2prateek.dart'
-    }
+    navigationApi deps.parceler.runtime
+    navigationApi deps.android.annotations
+    navigationApi project(path: ':module1', configuration: 'navigation')
 
     api deps.butterknife.runtime
-    annotationProcessor deps.dart.compiler
-    annotationProcessor deps.henson.compiler
-    annotationProcessor deps.butterknife.compiler
+    api deps.dart.runtime
+    api deps.henson.runtime
+    navigationApiOf(':module1')
+    navigationApiOfSelf()
 
-    testImplementation deps.junit
-    testImplementation deps.robolectric
-    testImplementation deps.fest
+    annotationProcessor deps.butterknife.compiler
 }
+
+henson.navigatorPackageName = 'com.f2prateek.dart.example'

@@ -17,13 +17,7 @@
 
 package dart.henson.plugin;
 
-import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.api.BaseVariant;
-import com.android.build.gradle.internal.publishing.AndroidArtifacts;
-import com.android.builder.model.BuildType;
-import com.android.builder.model.ProductFlavor;
-import dart.henson.plugin.attributes.AttributeManager;
-import dart.henson.plugin.attributes.NavigationTypeAttr;
 import dart.henson.plugin.internal.ArtifactManager;
 import dart.henson.plugin.internal.ConfigurationManager;
 import dart.henson.plugin.internal.DependencyManager;
@@ -32,21 +26,13 @@ import dart.henson.plugin.internal.TaskManager;
 import dart.henson.plugin.variant.NavigationVariant;
 import dart.henson.plugin.variant.VariantManager;
 import java.security.InvalidParameterException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.gradle.api.Action;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.compile.JavaCompile;
-
-import static com.android.build.gradle.internal.publishing.AndroidArtifacts.ARTIFACT_TYPE;
 
 public class HensonManager {
   private final Project project;
@@ -56,7 +42,6 @@ public class HensonManager {
   public final TaskManager taskManager;
   public final ArtifactManager artifactManager;
   public final ConfigurationManager configurationManager;
-  public final AttributeManager attributeManager;
   public final DependencyManager dependencyManager;
   public final SourceSetManager sourceSetManager;
   public final HensonPluginExtension hensonExtension;
@@ -70,172 +55,54 @@ public class HensonManager {
     this.configurationManager = new ConfigurationManager(project, logger);
     this.sourceSetManager = new SourceSetManager(project, logger);
     this.taskManager = new TaskManager(project, logger);
-    this.attributeManager = new AttributeManager(project, logger);
     this.dependencyManager = new DependencyManager(project, logger);
     this.hensonExtension = (HensonPluginExtension) project.getExtensions().getByName("henson");
   }
 
-  /**
-   * Used to communicate the artifact between project this configuration is used from the client
-   * project to consume the navigation dependency of a different consummer project the artifact that
-   * will be consumed for real will be variant aware. This configuration is only used for the client
-   * to declare dependencies, it will not be consumed or resolved directly. We will extend it with a
-   * variant aware configuration on the client side.
-   */
-  public void createClientPseudoConfiguration() {
-    configurationManager.maybeCreateClientPseudoConfiguration();
-  }
-
-  /**
-   * custom matching strategy to take into account the new navigation attribute type we want to
-   * match client requests and producer artifacts. For this we introduce a new navigation attribute
-   * and define a matching strategy for it.
-   */
-  public void applyNavigationAttributeMatchingStrategy() {
-    attributeManager.applyNavigationAttributeMatchingStrategy();
-  }
-
-  /** the main configuration (navigation{Api, Implementation, etc.} */
+  /** Creates a task to list all navigation source sets. */
   public void createListNavigationSourceSetsTask() {
     List<SourceSet> allNavigationSourceSets = sourceSetManager.getAllNavigationSourceSets();
     taskManager.createListSourceSetTask(allNavigationSourceSets);
   }
 
-  /** the main configuration (navigation{Api, Implementation, etc.} */
-  public void createMainNavigationConfigurationsAndSourceSet() {
-    configurationManager.maybeCreateNavigationConfigurations("");
-    sourceSetManager.maybeCreateNavigationSourceSet();
-  }
+  /**
+   * Creates the navigation configurations (navigation{Api, Implementation, etc.} and the navigation
+   * source set. The configurations and the source set are "used" by a producer module, to represent
+   * in gradle the navigation source tree containing the navigation models and its dependencies. The
+   * configurations will be used to configure the dependencies needed to compile the navigation
+   * source set.
+   */
+  public NavigationVariant createNavigationVariant(String dartVersionName) {
+    Map<String, Configuration> mapSuffixToConfiguration =
+        configurationManager.maybeCreateNavigationConfigurations();
+    SourceSet sourceSet = sourceSetManager.maybeCreateNavigationSourceSet();
 
-  public void process(BuildType buildType) {
-    String buildTypeName = buildType.getName();
-    logger.debug("Processing buildType: %s", buildTypeName);
-    configurationManager.maybeCreateNavigationConfigurations(buildTypeName);
-    sourceSetManager.maybeCreateNavigationSourceSet(buildType);
-  }
-
-  public void process(ProductFlavor productFlavor) {
-    String productFlavorName = productFlavor.getName();
-    logger.debug("Processing productFlavor: %s", productFlavorName);
-    configurationManager.maybeCreateNavigationConfigurations(productFlavorName);
-    sourceSetManager.maybeCreateNavigationSourceSet(productFlavor);
-  }
-
-  public void process(BaseVariant variant, String dartVersionName) {
-    String variantName = variant.getName();
-    logger.debug("Processing variant: %s", variantName);
-
-    NavigationVariant navigationVariant = variantManager.createNavigationVariant(variant);
-    createSourceSetAndConfigurations(navigationVariant, dartVersionName);
+    NavigationVariant navigationVariant =
+        variantManager.createNavigationVariant(sourceSet, mapSuffixToConfiguration);
+    dependencyManager.addDartAndHensonDependenciesToNavigationConfigurations(
+        navigationVariant, dartVersionName);
     taskManager.createNavigationCompilerAndJarTasks(navigationVariant);
-    String artifactName = addArtifact(navigationVariant);
+    return navigationVariant;
+  }
 
-    Configuration internalConfiguration =
-        configurationManager.maybeCreateClientInternalConfiguration(variant);
-    navigationVariant.clientInternalConfiguration = internalConfiguration;
-    //we use the api configuration to make sure the resulting apk will contain the classes of the navigation jar.
-    attributeManager.applyAttributes(variant, internalConfiguration);
-    dependencyManager.addDartAndHensonDependenciesToVariantConfigurations(dartVersionName);
-    dependencyManager.addNavigationArtifactToVariantConfiguration(
-        artifactName, internalConfiguration);
+  public void createConsumableNavigationConfigurationAndArtifact(
+      NavigationVariant navigationVariant) {
+    Configuration navigationConfiguration =
+        configurationManager.maybeCreateConsumableNavigationConfiguration();
+    project.getArtifacts().add(navigationConfiguration.getName(), navigationVariant.jarTask);
+  }
 
-    //it works but this is not ideal as the IDE doesn't see the dependency.
-    //we loose the DSL
-    Action<AttributeContainer> attributes =
-            container ->
-                    container.attribute(
-                            NavigationTypeAttr.ATTRIBUTE, project.getObjects().named(NavigationTypeAttr.class, NavigationTypeAttr.NAVIGATION));
-
-    //work but invisible in IDE
-    //((JavaCompile) variant.getJavaCompiler()).getClasspath().add(internalConfiguration);
-
-    //generate sources triggers the dependency resolution but it's not enough for the IDE
-    variant.registerPreJavacGeneratedBytecode(internalConfiguration);
-    Task task = project.getTasks().create("Foo" + variantName);
-    task.dependsOn(internalConfiguration);
-    variant.registerJavaGeneratingTask(task, Collections.emptyList());
-
-    project.getDependencies()
-            .add(variantName + "CompileClasspath", internalConfiguration);
-
-    //variant.getCompileConfiguration().add(internalConfiguration);
-    //do not work
-    //variant.getCompileClasspath(null).add(internalConfiguration);
-//    variant.getCompileConfiguration()
-//            .getIncoming()
-//            .artifactView(config -> config.attributes(attributes))
-//            .getArtifacts()
-//            .getArtifactFiles();
-
-
-    //create the task for generating the henson navigator
-    //create hensonExtension
+  public void createHensonNavigatorGenerationTask(BaseVariant variant) {
     if (hensonExtension == null || hensonExtension.getNavigatorPackageName() == null) {
       throw new InvalidParameterException(
           "The property 'henson.navigatorPackageName' must be defined in your build.gradle");
     }
     String hensonNavigatorPackageName = hensonExtension.getNavigatorPackageName();
 
-    taskManager.createDetectNavigationApiDependenciesAndGenerateHensonNavigatorTask(
-        navigationVariant, hensonNavigatorPackageName);
+    taskManager.createHensonNavigatorGenerationTask(variant, hensonNavigatorPackageName);
   }
 
-  private void createSourceSetAndConfigurations(
-      NavigationVariant navigationVariant, String dartVersionName) {
-    BaseVariant variant = navigationVariant.variant;
-    sourceSetManager.maybeCreateNavigationSourceSet(variant);
-    navigationVariant.sourceSets.add(sourceSetManager.maybeCreateNavigationSourceSet());
-    navigationVariant.sourceSets.add(
-        sourceSetManager.maybeCreateNavigationSourceSet(variant.getBuildType()));
-    variant
-        .getProductFlavors()
-        .stream()
-        .forEach(
-            productFlavor -> {
-              navigationVariant.sourceSets.add(
-                  sourceSetManager.maybeCreateNavigationSourceSet(productFlavor));
-            });
-
-    String variantName = variant.getName();
-    Map<String, Configuration> navigationConfigurations =
-        configurationManager.maybeCreateNavigationConfigurations(variantName);
-    dependencyManager.addDartAndHensonDependenciesToNavigationConfigurations(
-        variantName, dartVersionName);
-
-    variantManager.addNavigationConfigurationsToNavigationVariant(
-        navigationVariant, navigationConfigurations);
-
-    Map<String, Configuration> navigationConfigurationsBuildType =
-        configurationManager.maybeCreateNavigationConfigurations(variant.getBuildType().getName());
-    variantManager.addNavigationConfigurationsToNavigationVariant(
-        navigationVariant, navigationConfigurationsBuildType);
-
-    variant
-        .getProductFlavors()
-        .stream()
-        .forEach(
-            productFlavor -> {
-              Map<String, Configuration> navigationConfigurationsProductFlavor =
-                  configurationManager.maybeCreateNavigationConfigurations(productFlavor.getName());
-              variantManager.addNavigationConfigurationsToNavigationVariant(
-                  navigationVariant, navigationConfigurationsProductFlavor);
-            });
-
-    Map<String, Configuration> navigationConfigurationsMain =
-        configurationManager.maybeCreateNavigationConfigurations("");
-    variantManager.addNavigationConfigurationsToNavigationVariant(
-        navigationVariant, navigationConfigurationsMain);
-  }
-
-  private String addArtifact(NavigationVariant navigationVariant) {
-    BaseVariant variant = navigationVariant.variant;
-    //get the attributes from the compile configuration and apply them to
-    //the new artifact configuration
-    String artifactName = artifactManager.getNavigationArtifactName(variant);
-    Configuration artifactConfiguration =
-        configurationManager.createArtifactConfiguration(artifactName);
-    attributeManager.applyAttributes(variant, artifactConfiguration);
-    project.getArtifacts().add(artifactName, navigationVariant.jarTask);
-    return artifactName;
+  public void addDartAndHensonDependenciesToVariantConfigurations(String dartVersionName) {
+    dependencyManager.addDartAndHensonDependenciesToVariantConfigurations(dartVersionName);
   }
 }

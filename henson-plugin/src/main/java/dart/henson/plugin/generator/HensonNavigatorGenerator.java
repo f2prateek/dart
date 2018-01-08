@@ -32,10 +32,6 @@ public class HensonNavigatorGenerator {
         .forEach(
             targetActivity -> {
               importStatement.append(format("import %s__IntentBuilder;\n", targetActivity));
-              importStatement.append(
-                  format("import %s__IntentBuilder.RequiredSequence;\n", targetActivity));
-              importStatement.append(
-                  format("import %s__IntentBuilder.ResolvedAllSet;\n", targetActivity));
             });
 
     String classStartStatement = "public class HensonNavigator {\n";

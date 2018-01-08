@@ -21,14 +21,11 @@ import static dart.henson.plugin.internal.ConfigurationManager.NAVIGATION_CONFIG
 import static dart.henson.plugin.internal.ConfigurationManager.NAVIGATION_CONFIGURATION_SUFFIX_API;
 import static dart.henson.plugin.internal.ConfigurationManager.NAVIGATION_CONFIGURATION_SUFFIX_COMPILE_ONLY;
 import static dart.henson.plugin.internal.ConfigurationManager.NAVIGATION_CONFIGURATION_SUFFIX_IMPLEMENTATION;
-import static java.util.stream.Collectors.toList;
 
-import com.android.build.gradle.api.BaseVariant;
-import com.android.builder.model.ProductFlavor;
-import java.util.List;
 import java.util.Map;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.tasks.SourceSet;
 
 public class VariantManager {
 
@@ -38,28 +35,23 @@ public class VariantManager {
     this.logger = logger;
   }
 
-  public NavigationVariant createNavigationVariant(BaseVariant variant) {
+  public NavigationVariant createNavigationVariant(
+      SourceSet sourceSet, Map<String, Configuration> mapSuffixToConfigurations) {
     NavigationVariant navigationVariant = new NavigationVariant();
-    navigationVariant.variant = variant;
-    List<String> flavorNamesAndBuildType =
-        variant.getProductFlavors().stream().map(ProductFlavor::getName).collect(toList());
-    flavorNamesAndBuildType.add(variant.getBuildType().getName());
-    logger.debug("FlavorNamesAndBuildType: %s", flavorNamesAndBuildType);
+    navigationVariant.sourceSet = sourceSet;
+    addNavigationConfigurationsToNavigationVariant(navigationVariant, mapSuffixToConfigurations);
     return navigationVariant;
   }
 
-  public void addNavigationConfigurationsToNavigationVariant(
+  private void addNavigationConfigurationsToNavigationVariant(
       NavigationVariant navigationVariant, Map<String, Configuration> navigationConfigurations) {
-    Configuration api = navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_API);
-    Configuration implementation =
+    navigationVariant.apiConfiguration =
+        navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_API);
+    navigationVariant.implementationConfiguration =
         navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_IMPLEMENTATION);
-    Configuration compileOnly =
+    navigationVariant.compileOnlyConfiguration =
         navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_COMPILE_ONLY);
-    Configuration annotationProcessors =
+    navigationVariant.annotationProcessorConfiguration =
         navigationConfigurations.get(NAVIGATION_CONFIGURATION_SUFFIX_ANNOTATION_PROCESSOR);
-    navigationVariant.apiConfigurations.add(api);
-    navigationVariant.implementationConfigurations.add(implementation);
-    navigationVariant.compileOnlyConfigurations.add(compileOnly);
-    navigationVariant.annotationProcessorConfigurations.add(annotationProcessors);
   }
 }

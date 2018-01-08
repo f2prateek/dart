@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.f2prateek.dart.model">
+    package="com.f2prateek.dart">
 
 <application
     android:allowBackup="true"
@@ -9,7 +9,7 @@
       android:label="@string/navigationActivityTitle" >
   </activity>
   <service
-      android:name="com.f2prateek.dart.model.Module1Service" />
+      android:name=".Module1Service" />
 
 </application>
 

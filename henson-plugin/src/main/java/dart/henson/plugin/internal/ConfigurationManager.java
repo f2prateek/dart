@@ -19,7 +19,6 @@ package dart.henson.plugin.internal;
 
 import static java.util.Arrays.asList;
 
-import com.android.build.gradle.api.BaseVariant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,43 +85,11 @@ public class ConfigurationManager {
     return artifactConfiguration;
   }
 
-  public Configuration maybeCreateClientInternalConfiguration(BaseVariant variant) {
-    Configuration internalConfiguration =
-        project
-            .getConfigurations()
-            .findByName("__" + variant.getName() + NAVIGATION_CONFIGURATION_RADIX);
-    if (internalConfiguration != null) {
-      return internalConfiguration;
-    }
-
-    internalConfiguration =
-        project
-            .getConfigurations()
-            .maybeCreate("__" + variant.getName() + NAVIGATION_CONFIGURATION_RADIX);
-    Configuration pseudoConfiguration = maybeCreateClientPseudoConfiguration();
-    internalConfiguration.extendsFrom(pseudoConfiguration);
-    internalConfiguration.setCanBeConsumed(false);
-    internalConfiguration.setCanBeResolved(true);
-    return internalConfiguration;
-  }
-
-  public Configuration maybeCreateClientPseudoConfiguration() {
-    Configuration clientPseudoConfiguration =
-        project.getConfigurations().findByName(NAVIGATION_CONFIGURATION);
-    if (clientPseudoConfiguration != null) {
-      return clientPseudoConfiguration;
-    }
-    clientPseudoConfiguration = project.getConfigurations().create(NAVIGATION_CONFIGURATION);
-    clientPseudoConfiguration.setCanBeConsumed(false);
-    clientPseudoConfiguration.setCanBeResolved(false);
-    return clientPseudoConfiguration;
-  }
-
-  public Map<String, Configuration> maybeCreateNavigationConfigurations(String prefix) {
+  public Map<String, Configuration> maybeCreateNavigationConfigurations() {
     Map<String, Configuration> result = new HashMap<>(CONFIGURATION_SUFFIXES.size());
     CONFIGURATION_SUFFIXES.forEach(
         suffix -> {
-          String configurationName = getConfigurationName(prefix, suffix);
+          String configurationName = getConfigurationName(suffix);
           Configuration configuration = project.getConfigurations().maybeCreate(configurationName);
           configuration.setCanBeResolved(true);
           configuration.setCanBeConsumed(false);
@@ -131,13 +98,19 @@ public class ConfigurationManager {
     return result;
   }
 
-  private String getConfigurationName(String prefix, String suffix) {
-    String configurationName;
-    if (prefix.isEmpty()) {
-      configurationName = NAVIGATION_CONFIGURATION + suffix;
-    } else {
-      configurationName = prefix + NAVIGATION_CONFIGURATION_RADIX + suffix;
+  public Configuration maybeCreateConsumableNavigationConfiguration() {
+    Configuration consumableConfiguration =
+        project.getConfigurations().findByName(NAVIGATION_CONFIGURATION);
+    if (consumableConfiguration != null) {
+      return consumableConfiguration;
     }
-    return configurationName;
+    consumableConfiguration = project.getConfigurations().create(NAVIGATION_CONFIGURATION);
+    consumableConfiguration.setCanBeConsumed(true);
+    //consumableConfiguration.setCanBeResolved(false);
+    return consumableConfiguration;
+  }
+
+  private String getConfigurationName(String suffix) {
+    return NAVIGATION_CONFIGURATION + suffix;
   }
 }

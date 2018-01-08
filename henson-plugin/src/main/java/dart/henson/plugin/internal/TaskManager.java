@@ -20,7 +20,6 @@ package dart.henson.plugin.internal;
 import static dart.henson.plugin.util.StringUtil.capitalize;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
 import static org.gradle.api.JavaVersion.VERSION_1_7;
 
 import com.android.build.gradle.api.BaseVariant;
@@ -42,7 +41,6 @@ import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileTree;
-import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.internal.file.UnionFileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.SourceSet;
@@ -70,14 +68,29 @@ public class TaskManager {
     createNavigationApiJarTask(navigationVariant);
   }
 
-  public void createDetectNavigationApiDependenciesAndGenerateHensonNavigatorTask(
-      NavigationVariant navigationVariant, String hensonNavigatorPackageName) {
-    BaseVariant variant = navigationVariant.variant;
-    Task taskDetectModules =
-        project.getTasks().create("detectModule" + capitalize(variant.getName()));
-    taskDetectModules.doFirst(
+  /**
+   * A henson navigator is a class that helps a consumer to consume the navigation api that it
+   * declares in its dependencies. The henson navigator will wrap the intent builders. Thus, a
+   * henson navigator, is driven by consumption of intent builders, whereas the henson classes are
+   * driven by the production of an intent builder.
+   *
+   * <p>This task is created per android variant:
+   *
+   * <ul>
+   *   <li>we scan the variant compile configuration for navigation api dependencies
+   *   <li>we generate a henson navigator class for this variant that wraps the intent builders
+   * </ul>
+   *
+   * @param variant the variant for which to create a builder.
+   * @param hensonNavigatorPackageName the package name in which we create the class.
+   */
+  public void createHensonNavigatorGenerationTask(
+      BaseVariant variant, String hensonNavigatorPackageName) {
+    Task generateHensonNavigatorTask =
+        project.getTasks().create("generate" + capitalize(variant.getName()) + "HensonNavigator");
+    generateHensonNavigatorTask.doFirst(
         task -> {
-          Configuration clientInternalConfiguration = navigationVariant.clientInternalConfiguration;
+          Configuration clientInternalConfiguration = variant.getCompileConfiguration();
           logger.debug("Analyzing configuration: " + clientInternalConfiguration.getName());
           clientInternalConfiguration.resolve();
           Set<String> targetActivities = new HashSet<>();
@@ -126,10 +139,8 @@ public class TaskManager {
         });
     //we put the task right before compilation so that all dependencies are resolved
     // when the task is executed
-    Set<Object> dependsOn = new HashSet<>(variant.getJavaCompiler().getDependsOn());
-    dependsOn.add(navigationVariant.clientInternalConfiguration);
-    taskDetectModules.setDependsOn(dependsOn);
-    variant.getJavaCompiler().dependsOn(taskDetectModules);
+    generateHensonNavigatorTask.setDependsOn(variant.getJavaCompiler().getDependsOn());
+    variant.getJavaCompiler().dependsOn(generateHensonNavigatorTask);
   }
 
   public void createListSourceSetTask(List<SourceSet> javaSourceSets) {
@@ -152,7 +163,7 @@ public class TaskManager {
                         }
                         logger.lifecycle(builder.toString());
 
-                        logger.lifecycle("build.gradle name: project.sourceSets" + sourceSetName);
+                        logger.lifecycle("build.gradle name: project.sourceSet" + sourceSetName);
                         logger.lifecycle("java sources: " + sourceSet.getJava().getSrcDirs());
 
                         logger.lifecycle("\n");
@@ -161,35 +172,26 @@ public class TaskManager {
   }
 
   private void createNavigationApiCompileTask(NavigationVariant navigationVariant) {
-    String taskSuffix = capitalize(navigationVariant.variant.getName());
-    String destinationPath = navigationVariant.variant.getName() + "/";
+    String taskSuffix = capitalize(navigationVariant.name);
+    String destinationPath = navigationVariant.name + "/";
     File newDestinationDir =
         new File(project.getBuildDir(), "/navigation/classes/java/" + destinationPath);
     File newGeneratedDir =
         new File(project.getBuildDir(), "/generated/source/apt/navigation/" + destinationPath);
 
     FileCollection effectiveClasspath = new UnionFileCollection();
-    Streams.concat(
-            navigationVariant.apiConfigurations.stream(),
-            navigationVariant.implementationConfigurations.stream(),
-            navigationVariant.compileOnlyConfigurations.stream())
-        .forEach(effectiveClasspath::add);
+    effectiveClasspath.add(navigationVariant.apiConfiguration);
+    effectiveClasspath.add(navigationVariant.implementationConfiguration);
+    effectiveClasspath.add(navigationVariant.compileOnlyConfiguration);
 
     FileCollection effectiveAnnotationProcessorPath = new UnionFileCollection();
-    navigationVariant.annotationProcessorConfigurations.forEach(
-        effectiveAnnotationProcessorPath::add);
+    effectiveAnnotationProcessorPath.add(navigationVariant.annotationProcessorConfiguration);
 
     String compileTaskName = NAVIGATION_API_COMPILE_TASK_PREFIX + taskSuffix;
     JavaCompile compileTask = (JavaCompile) project.getTasks().findByName(compileTaskName);
     if (compileTask == null) {
       compileTask = project.getTasks().create(compileTaskName, JavaCompile.class);
-      List<FileTree> sources =
-          navigationVariant
-              .sourceSets
-              .stream()
-              .map(SourceSet::getJava)
-              .map(SourceDirectorySet::getAsFileTree)
-              .collect(toList());
+      List<FileTree> sources = singletonList(navigationVariant.sourceSet.getJava().getAsFileTree());
       String javaVersion = VERSION_1_7.toString();
 
       compileTask.setSource(sources);
@@ -211,7 +213,7 @@ public class TaskManager {
 
   private void createNavigationApiJarTask(NavigationVariant navigationVariant) {
     JavaCompile navigationApiCompileTask = navigationVariant.compilerTask;
-    String taskSuffix = capitalize(navigationVariant.variant.getName());
+    String taskSuffix = capitalize(navigationVariant.name);
     String jarTaskName = NAVIGATION_API_JAR_TASK_PREFIX + taskSuffix;
     Jar jarTask = project.getTasks().create(jarTaskName, Jar.class);
     jarTask.setBaseName(project.getName() + "-navigationApi" + taskSuffix);

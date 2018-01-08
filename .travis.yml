@@ -24,7 +24,9 @@ before_install:
   #- sdkmanager "android-26"
 
 script:
+  - ./gradlew install -x :henson-plugin:functionalTest -x :henson-plugin:spotlessJava
   - ./gradlew check -s
+  - ./gradlew -b dart-sample/build.gradle check -s
 
 
 after_success:
