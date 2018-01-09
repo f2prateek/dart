@@ -17,9 +17,9 @@
 
 package dart.henson.plugin.generator;
 
-import static java.lang.String.format;
-
 import java.util.Set;
+
+import static java.lang.String.format;
 
 public class HensonNavigatorGenerator {
 
