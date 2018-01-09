@@ -90,11 +90,10 @@ public class TaskManager {
         project.getTasks().create("generate" + capitalize(variant.getName()) + "HensonNavigator");
     generateHensonNavigatorTask.doFirst(
         task -> {
-          Configuration clientInternalConfiguration = variant.getCompileConfiguration();
-          logger.debug("Analyzing configuration: " + clientInternalConfiguration.getName());
-          clientInternalConfiguration.resolve();
+          FileCollection variantCompileClasspath = ((JavaCompile) variant.getJavaCompiler()).getClasspath();
+          logger.debug("Analyzing configuration: " + variantCompileClasspath.getFiles());
           Set<String> targetActivities = new HashSet<>();
-          Streams.stream(clientInternalConfiguration)
+          Streams.stream(variantCompileClasspath)
               .forEach(
                   dependency -> {
                     logger.debug("Detected dependency: %s", dependency.getName());
