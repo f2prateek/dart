@@ -25,10 +25,13 @@ import dart.henson.plugin.internal.SourceSetManager;
 import dart.henson.plugin.internal.TaskManager;
 import dart.henson.plugin.variant.NavigationVariant;
 import dart.henson.plugin.variant.VariantManager;
+
+import java.io.File;
 import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.model.ObjectFactory;
@@ -98,8 +101,9 @@ public class HensonManager {
           "The property 'henson.navigatorPackageName' must be defined in your build.gradle");
     }
     String hensonNavigatorPackageName = hensonExtension.getNavigatorPackageName();
-
-    taskManager.createHensonNavigatorGenerationTask(variant, hensonNavigatorPackageName);
+    File destinationFolder = project.file(new File(project.getBuildDir(), "generated/source/navigator/" + variant.getName()));
+    taskManager.createHensonNavigatorGenerationTask(variant, hensonNavigatorPackageName, destinationFolder);
+    variant.addJavaSourceFoldersToModel(destinationFolder);
   }
 
   public void addDartAndHensonDependenciesToVariantConfigurations(String dartVersionName) {

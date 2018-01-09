@@ -84,8 +84,8 @@ public class TaskManager {
    * @param variant the variant for which to create a builder.
    * @param hensonNavigatorPackageName the package name in which we create the class.
    */
-  public void createHensonNavigatorGenerationTask(
-      BaseVariant variant, String hensonNavigatorPackageName) {
+  public Task createHensonNavigatorGenerationTask(
+      BaseVariant variant, String hensonNavigatorPackageName, File destinationFolder) {
     Task generateHensonNavigatorTask =
         project.getTasks().create("generate" + capitalize(variant.getName()) + "HensonNavigator");
     generateHensonNavigatorTask.doFirst(
@@ -115,15 +115,13 @@ public class TaskManager {
                           });
                     }
 
-                    File variantSrcFolder =
-                        new File(project.getProjectDir(), "src/" + variant.getName() + "/java/");
-                    String hensonNavigator =
+                      String hensonNavigator =
                         hensonNavigatorGenerator.generateHensonNavigatorClass(
                             targetActivities, hensonNavigatorPackageName);
-                    variantSrcFolder.mkdirs();
+                    destinationFolder.mkdirs();
                     String generatedFolderName =
                         hensonNavigatorPackageName.replace('.', '/').concat("/");
-                    File generatedFolder = new File(variantSrcFolder, generatedFolderName);
+                    File generatedFolder = new File(destinationFolder, generatedFolderName);
                     generatedFolder.mkdirs();
                     File generatedFile = new File(generatedFolder, "HensonNavigator.java");
                     try {
@@ -140,6 +138,7 @@ public class TaskManager {
     // when the task is executed
     generateHensonNavigatorTask.setDependsOn(variant.getJavaCompiler().getDependsOn());
     variant.getJavaCompiler().dependsOn(generateHensonNavigatorTask);
+    return generateHensonNavigatorTask;
   }
 
   public void createListSourceSetTask(List<SourceSet> javaSourceSets) {
