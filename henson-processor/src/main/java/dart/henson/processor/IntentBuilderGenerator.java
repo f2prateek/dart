@@ -20,7 +20,6 @@ package dart.henson.processor;
 import static com.squareup.javapoet.ClassName.get;
 import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
 import static dart.common.util.BindingTargetUtil.INITIAL_STATE_METHOD;
-import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
 
 import android.content.Intent;
 import com.squareup.javapoet.ClassName;
@@ -99,12 +98,11 @@ public class IntentBuilderGenerator extends BaseGenerator {
             .addParameter(get("android.content", "Context"), "context")
             .returns(getInitialStateType(getInitialStateGeneric(true)));
 
-    final String targetFqcn = target.getFQN();
     initialStateGetterForHensonBuilder.addStatement(
         "final $T intent = new $T(context, getClassDynamically($S))",
         Intent.class,
         Intent.class,
-        targetFqcn.substring(0, targetFqcn.indexOf(DART_MODEL_SUFFIX)));
+        target.getFQN());
     initialStateGetterForHensonBuilder.addStatement(
         "final $T bundler = $T.create()", Bundler.class, Bundler.class);
 

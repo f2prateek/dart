@@ -17,6 +17,8 @@
 
 package dart.processor;
 
+import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
+
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -64,7 +66,7 @@ public class ExtraInjectorGenerator extends BaseGenerator {
   }
 
   private String binderClassName() {
-    return target.className + Dart.BINDER_SUFFIX;
+    return target.className + DART_MODEL_SUFFIX + Dart.BINDER_SUFFIX;
   }
 
   private void emitBind(TypeSpec.Builder builder) {
@@ -72,14 +74,14 @@ public class ExtraInjectorGenerator extends BaseGenerator {
         MethodSpec.methodBuilder("bind")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addParameter(ClassName.get(Dart.Finder.class), "finder")
-            .addParameter(ClassName.bestGuess(target.getFQN()), "target")
+            .addParameter(ClassName.bestGuess(target.getFQN() + DART_MODEL_SUFFIX), "target")
             .addParameter(ClassName.get(Object.class), "source");
 
     if (target.parentPackage != null) {
       // Emit a call to the superclass binder, if any.
       bindBuilder.addStatement(
           "$T.bind(finder, target, source)",
-          ClassName.bestGuess(target.getParentFQN() + Dart.BINDER_SUFFIX));
+          ClassName.bestGuess(target.getParentFQN() + DART_MODEL_SUFFIX + Dart.BINDER_SUFFIX));
     }
 
     // Local variable in which all extras will be temporarily stored.

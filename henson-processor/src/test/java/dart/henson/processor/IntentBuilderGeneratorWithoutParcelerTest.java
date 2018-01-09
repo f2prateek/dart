@@ -46,7 +46,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.TestNavigationModel__IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
@@ -58,7 +58,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "import java.util.ArrayList;",
-                    "public class TestNavigationModel__IntentBuilder {",
+                    "public class Test__IntentBuilder {",
                     "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
@@ -95,7 +95,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -200,7 +200,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.TestNavigationModel__IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
@@ -210,7 +210,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "import dart.henson.AllRequiredSetState;",
                     "import dart.henson.Bundler;",
                     "import dart.henson.RequiredStateSequence;",
-                    "public class TestNavigationModel__IntentBuilder {",
+                    "public class Test__IntentBuilder {",
                     "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
@@ -247,7 +247,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -284,7 +284,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.TestNavigationModel__IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
@@ -294,7 +294,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "import dart.henson.AllRequiredSetState;",
                     "import dart.henson.Bundler;",
                     "import dart.henson.RequiredStateSequence;",
-                    "public class TestNavigationModel__IntentBuilder {",
+                    "public class Test__IntentBuilder {",
                     "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
@@ -331,7 +331,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 }

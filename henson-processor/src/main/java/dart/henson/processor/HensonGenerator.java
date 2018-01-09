@@ -19,7 +19,6 @@ package dart.henson.processor;
 
 import static com.squareup.javapoet.ClassName.get;
 import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
-import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
 import static dart.henson.processor.IntentBuilderGenerator.REQUIRED_SEQUENCE_CLASS;
 import static dart.henson.processor.IntentBuilderGenerator.RESOLVED_OPTIONAL_SEQUENCE_CLASS;
 
@@ -113,12 +112,9 @@ public class HensonGenerator extends BaseGenerator {
   }
 
   private void emitNavigationMethod(TypeSpec.Builder builder, BindingTarget target) {
-    TypeName intentBuilderClassName =
-        ClassName.bestGuess(target.classPackage + "." + target.className + BUNDLE_BUILDER_SUFFIX);
-    String simpleTargetComponent =
-        target.className.substring(0, target.className.indexOf(DART_MODEL_SUFFIX));
+    TypeName intentBuilderClassName = ClassName.bestGuess(target.getFQN() + BUNDLE_BUILDER_SUFFIX);
     MethodSpec.Builder gotoMethodBuilder =
-        MethodSpec.methodBuilder("goto" + simpleTargetComponent)
+        MethodSpec.methodBuilder("goto" + target.className)
             .addModifiers(Modifier.PUBLIC)
             .returns(getInitialStateType(target))
             .addStatement("return $L.getInitialState(context)", intentBuilderClassName);

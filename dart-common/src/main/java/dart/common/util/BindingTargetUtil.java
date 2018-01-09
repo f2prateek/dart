@@ -17,6 +17,7 @@
 
 package dart.common.util;
 
+import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.STATIC;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
@@ -81,9 +82,10 @@ public class BindingTargetUtil {
       TypeElement parentTypeElement = compilerUtil.findParent(typeElement, targetTypeElements);
       if (parentTypeElement != null) {
         final BindingTarget target = targetClassMap.get(typeElement);
-        target.parentPackage = compilerUtil.getPackageName(parentTypeElement);
-        target.parentClass = compilerUtil.getClassName(parentTypeElement, target.parentPackage);
-        targetClassMap.get(parentTypeElement).addChild(typeElement);
+        final BindingTarget parentTarget = targetClassMap.get(parentTypeElement);
+        target.parentPackage = parentTarget.classPackage;
+        target.parentClass = parentTarget.className;
+        parentTarget.addChild(typeElement);
       }
     }
     checkForParentsOutside(targetClassMap);
@@ -127,8 +129,9 @@ public class BindingTargetUtil {
             return;
           }
           bindingTarget.parentPackage = compilerUtil.getPackageName(superTypeElement);
-          bindingTarget.parentClass =
+          final String nmClass =
               compilerUtil.getClassName(superTypeElement, bindingTarget.parentPackage);
+          bindingTarget.parentClass = nmClass.substring(0, nmClass.indexOf(DART_MODEL_SUFFIX));
         }
       }
     }
