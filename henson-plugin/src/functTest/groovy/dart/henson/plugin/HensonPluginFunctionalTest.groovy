@@ -73,7 +73,7 @@ class HensonPluginFunctionalTest extends Specification {
           public void onCreate(Bundle bundle) {
             super.onCreate(bundle);
             FooActivityNavigationModel foo = new FooActivityNavigationModel();
-            Intent intent = HensonNavigator.gotoFooActivityNavigationModel(this)
+            Intent intent = HensonNavigator.gotoFooActivity(this)
             .s("s")
             .build();
           }
@@ -219,8 +219,8 @@ class HensonPluginFunctionalTest extends Specification {
                 assert content.contains("test/Henson\$1.class")
                 assert content.contains("test/Henson\$WithContextSetState.class")
                 assert content.contains("test/Henson.class")
-                assert content.contains("test/FooActivityNavigationModel__IntentBuilder\$AllSet.class")
-                assert content.contains("test/FooActivityNavigationModel__IntentBuilder.class")
+                assert content.contains("test/FooActivity__IntentBuilder\$AllSet.class")
+                assert content.contains("test/FooActivity__IntentBuilder.class")
             }
         }
         true

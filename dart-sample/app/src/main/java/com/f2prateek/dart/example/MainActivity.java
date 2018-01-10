@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
     parcelSparseArray.put(0, parcel1);
     parcelSparseArray.put(2, parcel2);
 
-    Intent intent = HensonNavigator.gotoSampleActivityNavigationModel(this)
+    Intent intent = HensonNavigator.gotoSampleActivity(this)
         .defaultKeyExtra("defaultKeyExtra")
         .extraInt(4)
         .extraListParcelable(parcelList)
@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
     parcelSparseArray.put(0, parcel1);
     parcelSparseArray.put(2, parcel2);
 
-    Intent intent = HensonNavigator.gotoModule1ActivityNavigationModel(this)
+    Intent intent = HensonNavigator.gotoModule1Activity(this)
         .defaultKeyExtra("defaultKeyExtra")
         .extraInt(4)
         .extraListParcelable(parcelList)
@@ -95,7 +95,7 @@ public class MainActivity extends Activity {
   // Launch Navigation Service residing in the navigation module
   @OnClick(R.id.navigateToModule1Service)
   public void onNavigationServiceCTAClick() {
-    Intent intentService = HensonNavigator.gotoModule1ServiceNavigationModel(this)
+    Intent intentService = HensonNavigator.gotoModule1Service(this)
         .stringExtra("foo")
         .build();
 

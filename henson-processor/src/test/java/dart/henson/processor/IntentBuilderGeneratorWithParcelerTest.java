@@ -46,7 +46,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.TestNavigationModel__IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
@@ -58,14 +58,13 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "import java.util.ArrayList;",
-                    "public class TestNavigationModel__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "public class Test__IntentBuilder {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -88,12 +87,17 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -114,7 +118,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.TestNavigationModel__IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
@@ -126,14 +130,13 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "import java.util.List;",
-                    "public class TestNavigationModel__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "public class Test__IntentBuilder {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -156,12 +159,17 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -184,7 +192,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.TestNavigationModel__IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
@@ -194,14 +202,13 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import dart.henson.AllRequiredSetState;",
                     "import dart.henson.Bundler;",
                     "import dart.henson.RequiredStateSequence;",
-                    "public class TestNavigationModel__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "public class Test__IntentBuilder {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -224,12 +231,17 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -253,7 +265,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.TestNavigationModel__IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
@@ -264,14 +276,13 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import dart.henson.Bundler;",
                     "import dart.henson.RequiredStateSequence;",
                     "import java.util.List;",
-                    "public class TestNavigationModel__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "public class Test__IntentBuilder {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -294,11 +305,16 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -337,7 +353,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.TestNavigationModel__IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
@@ -350,14 +366,13 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import java.lang.String;",
                     "import java.util.List;",
                     "import java.util.Map;",
-                    "public class TestNavigationModel__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "public class Test__IntentBuilder {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -392,12 +407,17 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -434,7 +454,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.TestNavigationModel__IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
@@ -444,16 +464,15 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import dart.henson.AllRequiredSetState;",
                     "import dart.henson.Bundler;",
                     "import dart.henson.RequiredStateSequence;",
-                    "public class TestNavigationModel__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
-                    "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
-                    "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "public class Test__IntentBuilder {",
+                    "  public static InitialState getInitialState(Context context) {",
+                    "  final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
+                    "  final Bundler bundler = Bundler.create();",
+                    "  return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
-                    "    return new RequiredSequence<>(bundler, allSetState);",
+                    "  return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
                     "  public static class RequiredSequence<ALL_SET extends AllSet> extends RequiredStateSequence<ALL_SET> {",
                     "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
@@ -474,12 +493,17 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -510,7 +534,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
 
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.TestNavigationModel__IntentBuilder",
+            "test.navigation.Test__IntentBuilder",
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
@@ -520,14 +544,13 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "import dart.henson.AllRequiredSetState;",
                     "import dart.henson.Bundler;",
                     "import dart.henson.RequiredStateSequence;",
-                    "public class TestNavigationModel__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "public class Test__IntentBuilder {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -550,12 +573,17 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.TestNavigationModel__IntentBuilder")
+        .generatedSourceFile("test.navigation.Test__IntentBuilder")
         .hasSourceEquivalentTo(builderSource);
   }
 }

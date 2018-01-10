@@ -31,7 +31,7 @@ public class ExtraInjectorGeneratorTest {
 
   @Before
   public void setup() {
-    final BindingTarget bindingTarget = new BindingTarget("foo", "bar");
+    final BindingTarget bindingTarget = new BindingTarget("foo", "barNavigationModel");
     extraInjectorGenerator = new dart.processor.ExtraInjectorGenerator(bindingTarget);
   }
 

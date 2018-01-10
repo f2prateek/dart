@@ -17,6 +17,8 @@
 
 package dart.common;
 
+import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,7 +47,7 @@ public class BindingTarget {
 
   public BindingTarget(String classPackage, String className) {
     this.classPackage = classPackage;
-    this.className = className;
+    this.className = className.substring(0, className.indexOf(DART_MODEL_SUFFIX));
     this.childClasses = new ArrayList<>();
     this.topLevel = false;
   }
