@@ -96,13 +96,23 @@ public class BindExtraUtil {
     // Verify @BindExtra annotation if present.
     final BindExtra annotation = element.getAnnotation(BindExtra.class);
     if (annotation != null) {
-      final String annotationValue = annotation.value();
-      if (!StringUtil.isNullOrEmpty(annotationValue)
-          && !StringUtil.isValidJavaIdentifier(annotationValue)) {
+      final String annotationValue;
+      try {
+        annotationValue = annotation.value();
+        if (!StringUtil.isNullOrEmpty(annotationValue)
+            && !StringUtil.isValidJavaIdentifier(annotationValue)) {
+          loggingUtil.error(
+              element,
+              "@BindExtra key has to be a valid java variable identifier (%s#%s).\n"
+                  + "See https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html",
+              enclosingElement.getQualifiedName(),
+              element.getSimpleName());
+          valid = false;
+        }
+      } catch (Exception e) {
         loggingUtil.error(
             element,
-            "@BindExtra key has to be valid java variable identifiers (%s, %s).\n"
-                + "See https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html",
+            "@BindExtra has an invalid value (%s#%s).",
             enclosingElement.getQualifiedName(),
             element.getSimpleName());
         valid = false;

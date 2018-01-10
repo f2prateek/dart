@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.f2prateek.dart">
+    package="com.f2prateek.dart.module1">
 
 <application
     android:allowBackup="true"

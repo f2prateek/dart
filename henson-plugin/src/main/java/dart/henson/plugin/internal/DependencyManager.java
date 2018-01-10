@@ -19,7 +19,6 @@ package dart.henson.plugin.internal;
 
 import static java.lang.String.format;
 
-import dart.henson.plugin.variant.NavigationVariant;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.logging.Logger;
@@ -32,28 +31,6 @@ public class DependencyManager {
   public DependencyManager(Project project, Logger logger) {
     this.project = project;
     this.logger = logger;
-  }
-
-  public void addDartAndHensonDependenciesToNavigationConfigurations(
-      NavigationVariant navigationVariant, String dartVersionName) {
-    DependencyHandler dependencies = project.getDependencies();
-    String compileOnly = navigationVariant.compileOnlyConfiguration.getName();
-    String processors = navigationVariant.annotationProcessorConfiguration.getName();
-    String apiRuntime = navigationVariant.apiConfiguration.getName();
-
-    String android = "com.google.android:android:4.1.1.4";
-    String dartRuntime = format("com.f2prateek.dart:dart:%s", dartVersionName);
-    String hensonRuntime = format("com.f2prateek.dart:henson:%s", dartVersionName);
-    String hensonProcessor = format("com.f2prateek.dart:henson-processor:%s", dartVersionName);
-    String dartProcessor = format("com.f2prateek.dart:dart-processor:%s", dartVersionName);
-    String dartAnnotations = format("com.f2prateek.dart:dart-annotations:%s", dartVersionName);
-
-    dependencies.add(compileOnly, android);
-    dependencies.add(compileOnly, dartRuntime);
-    dependencies.add(compileOnly, hensonRuntime);
-    dependencies.add(processors, hensonProcessor);
-    dependencies.add(processors, dartProcessor);
-    dependencies.add(apiRuntime, dartAnnotations);
   }
 
   public void addDartAndHensonDependenciesToVariantConfigurations(String dartVersionName) {

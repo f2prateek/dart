@@ -10,9 +10,7 @@ buildscript {
     }
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'dart.henson-plugin'
-
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion versions.compileSdk
@@ -23,7 +21,6 @@ android {
     }
 
     defaultConfig {
-        applicationId 'com.f2prateek.dart.example'
         minSdkVersion versions.minSdk
         targetSdkVersion versions.compileSdk
         versionCode 1
@@ -45,13 +42,13 @@ android {
 }
 
 dependencies {
-    implementation deps.butterknife.runtime
+    implementation deps.android.annotations
+    implementation deps.dart.annotations
     implementation deps.dart.runtime
     implementation deps.henson.runtime
-    implementation project(':app-navigation')
+    implementation deps.parceler.runtime
     implementation project(':module1-navigation')
 
-    annotationProcessor deps.butterknife.compiler
+    annotationProcessor deps.henson.compiler
+    annotationProcessor deps.dart.compiler
 }
-
-henson.navigatorPackageName = 'com.f2prateek.dart.example'

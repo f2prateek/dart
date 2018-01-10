@@ -18,78 +18,26 @@
 package dart.henson.plugin;
 
 import com.android.build.gradle.api.BaseVariant;
-import dart.henson.plugin.internal.ArtifactManager;
-import dart.henson.plugin.internal.ConfigurationManager;
 import dart.henson.plugin.internal.DependencyManager;
-import dart.henson.plugin.internal.SourceSetManager;
 import dart.henson.plugin.internal.TaskManager;
-import dart.henson.plugin.variant.NavigationVariant;
-import dart.henson.plugin.variant.VariantManager;
+import java.io.File;
 import java.security.InvalidParameterException;
-import java.util.List;
-import java.util.Map;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
-import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.tasks.SourceSet;
 
 public class HensonManager {
   private final Project project;
-  public final Logger logger;
-  public final ObjectFactory factory;
-  public final VariantManager variantManager;
-  public final TaskManager taskManager;
-  public final ArtifactManager artifactManager;
-  public final ConfigurationManager configurationManager;
-  public final DependencyManager dependencyManager;
-  public final SourceSetManager sourceSetManager;
-  public final HensonPluginExtension hensonExtension;
+  private final Logger logger;
+  private final TaskManager taskManager;
+  private final DependencyManager dependencyManager;
+  private final HensonPluginExtension hensonExtension;
 
   public HensonManager(Project project) {
     this.project = project;
     this.logger = project.getLogger();
-    this.factory = project.getObjects();
-    this.variantManager = new VariantManager(logger);
-    this.artifactManager = new ArtifactManager(logger);
-    this.configurationManager = new ConfigurationManager(project, logger);
-    this.sourceSetManager = new SourceSetManager(project, logger);
     this.taskManager = new TaskManager(project, logger);
     this.dependencyManager = new DependencyManager(project, logger);
     this.hensonExtension = (HensonPluginExtension) project.getExtensions().getByName("henson");
-  }
-
-  /** Creates a task to list all navigation source sets. */
-  public void createListNavigationSourceSetsTask() {
-    List<SourceSet> allNavigationSourceSets = sourceSetManager.getAllNavigationSourceSets();
-    taskManager.createListSourceSetTask(allNavigationSourceSets);
-  }
-
-  /**
-   * Creates the navigation configurations (navigation{Api, Implementation, etc.} and the navigation
-   * source set. The configurations and the source set are "used" by a producer module, to represent
-   * in gradle the navigation source tree containing the navigation models and its dependencies. The
-   * configurations will be used to configure the dependencies needed to compile the navigation
-   * source set.
-   */
-  public NavigationVariant createNavigationVariant(String dartVersionName) {
-    Map<String, Configuration> mapSuffixToConfiguration =
-        configurationManager.maybeCreateNavigationConfigurations();
-    SourceSet sourceSet = sourceSetManager.maybeCreateNavigationSourceSet();
-
-    NavigationVariant navigationVariant =
-        variantManager.createNavigationVariant(sourceSet, mapSuffixToConfiguration);
-    dependencyManager.addDartAndHensonDependenciesToNavigationConfigurations(
-        navigationVariant, dartVersionName);
-    taskManager.createNavigationCompilerAndJarTasks(navigationVariant);
-    return navigationVariant;
-  }
-
-  public void createConsumableNavigationConfigurationAndArtifact(
-      NavigationVariant navigationVariant) {
-    Configuration navigationConfiguration =
-        configurationManager.maybeCreateConsumableNavigationConfiguration();
-    project.getArtifacts().add(navigationConfiguration.getName(), navigationVariant.jarTask);
   }
 
   public void createHensonNavigatorGenerationTask(BaseVariant variant) {
@@ -98,8 +46,12 @@ public class HensonManager {
           "The property 'henson.navigatorPackageName' must be defined in your build.gradle");
     }
     String hensonNavigatorPackageName = hensonExtension.getNavigatorPackageName();
-
-    taskManager.createHensonNavigatorGenerationTask(variant, hensonNavigatorPackageName);
+    File destinationFolder =
+        project.file(
+            new File(project.getBuildDir(), "generated/source/navigator/" + variant.getName()));
+    taskManager.createHensonNavigatorGenerationTask(
+        variant, hensonNavigatorPackageName, destinationFolder);
+    variant.addJavaSourceFoldersToModel(destinationFolder);
   }
 
   public void addDartAndHensonDependenciesToVariantConfigurations(String dartVersionName) {

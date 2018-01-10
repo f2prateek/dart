@@ -15,19 +15,28 @@ class HensonPluginFunctionalTest extends Specification {
     @Rule TemporaryFolder testProjectDir = new TemporaryFolder()
     File settingsFile
     File buildFile
-    File manifestFile
-    File srcMain
-    File srcNavigationMain
+    File buildFileModule1
+    File module1ManifestFile
+    File testClass1
+    File buildFileModuleNavigation1
+    File module1NavigationManifestFile
+    File testNavigationModel1
 
     def setup() {
         settingsFile = testProjectDir.newFile('settings.gradle')
         buildFile = testProjectDir.newFile('build.gradle')
-        testProjectDir.newFolder('src','main')
-        manifestFile = testProjectDir.newFile('src/main/AndroidManifest.xml')
-        testProjectDir.newFolder('src','main', 'java', 'test')
-        srcMain = testProjectDir.newFile('src/main/java/test/FooActivity.java')
-        testProjectDir.newFolder('src','navigation', 'main', 'java', 'test')
-        srcNavigationMain = testProjectDir.newFile('src/navigation/main/java/test/FooActivityNavigationModel.java')
+
+        testProjectDir.newFolder('module1')
+        testProjectDir.newFolder('module1-navigation')
+        buildFileModule1 = testProjectDir.newFile('module1/build.gradle')
+        buildFileModuleNavigation1 = testProjectDir.newFile('module1-navigation/build.gradle')
+
+        testProjectDir.newFolder('module1', 'src','main', 'java', 'module1')
+        module1ManifestFile = testProjectDir.newFile('module1/src/main/AndroidManifest.xml')
+        testClass1 = testProjectDir.newFile('module1/src/main/java/module1/FooActivity.java')
+        testProjectDir.newFolder('module1-navigation', 'src','main', 'java', 'module1')
+        module1NavigationManifestFile = testProjectDir.newFile('module1-navigation/src/main/AndroidManifest.xml')
+        testNavigationModel1 = testProjectDir.newFile('module1-navigation/src/main/java/module1/FooActivityNavigationModel.java')
     }
 
     def "fails on non android projects"() {
@@ -51,51 +60,12 @@ class HensonPluginFunctionalTest extends Specification {
     }
 
     def "applies to android projects"() {
-        manifestFile << """
-        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-            package="test">
-        
-          <application
-              android:label="Test"
-              android:name=".Test"/>
-        </manifest>
-        """
-        srcMain << """
-        package test;
-        
-        import android.app.Activity;
-        import android.os.Bundle;
-        import android.content.Intent;
-        
-        class FooActivity extends Activity {
-          
-          @Override
-          public void onCreate(Bundle bundle) {
-            super.onCreate(bundle);
-            FooActivityNavigationModel foo = new FooActivityNavigationModel();
-            Intent intent = HensonNavigator.gotoFooActivity(this)
-            .s("s")
-            .build();
-          }
-        }
-        """
-        srcNavigationMain << """
-        package test;
-        
-        import dart.BindExtra;
-        import dart.DartModel;
-        
-        @DartModel()
-        class FooActivityNavigationModel {
-          @BindExtra String s;
-        }
-        """
-
         settingsFile << """
-        rootProject.name = "test-project"
+        include(':module1')
+        include(':module1-navigation')
         """
 
-        buildFile << """
+        buildFileModule1 << """
         buildscript {
             repositories {
                 google()
@@ -119,7 +89,7 @@ class HensonPluginFunctionalTest extends Specification {
         }
         
         henson {
-            navigatorPackageName = "test"
+            navigatorPackageName = "module1"
         }
 
         android {
@@ -130,18 +100,6 @@ class HensonPluginFunctionalTest extends Specification {
                 targetSdkVersion 26
                 versionCode 1
                 versionName '1.0.0'
-            }
-            flavorDimensions "color"
-
-            productFlavors {
-                red {
-                    applicationId "com.blue"
-                    dimension "color"
-                }
-                blue {
-                    applicationId "com.red"
-                    dimension "color"
-                }
             }
         }
         
@@ -156,71 +114,143 @@ class HensonPluginFunctionalTest extends Specification {
         }
         
         dependencies {
-          navigationApiOfSelf()
+          implementation project(':module1-navigation')
         }
         
         """
 
-        when:
-        def result = GradleRunner.create()
-                .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'tasks', '--all', '-d', '-s')
-                .withPluginClasspath()
-                .build()
+        module1ManifestFile << """
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            package="module1">
+        
+          <application
+              android:label="Module1"
+              android:name="Test"/>
+        </manifest>
+        """
 
-        then:
-        result.output.contains("navigationApiCompileJava")
-        result.output.contains("navigationApiJar")
+        testClass1 << """
+        package module1;
+        
+        import android.app.Activity;
+        import android.os.Bundle;
+        import android.content.Intent;
+        
+        class FooActivity extends Activity {
+          
+          @Override
+          public void onCreate(Bundle bundle) {
+            super.onCreate(bundle);
+            FooActivityNavigationModel foo = new FooActivityNavigationModel();
+            Intent intent = HensonNavigator.gotoFooActivity(this)
+              .s("s")
+              .build();
+          }
+        }
+        """
 
-        when:
-        result = GradleRunner.create()
-                .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'dependencies', '-d', '-s')
-                .withPluginClasspath()
-                .build()
+        buildFileModuleNavigation1 << """
+        buildscript {
+            repositories {
+                google()
+                jcenter()
+                mavenLocal()
+                mavenCentral()
+                maven {
+                    url 'https://oss.sonatype.org/content/repositories/snapshots'
+                }
+            }
 
-        then:
-        result.output.contains("navigationApi")
-        result.output.contains("navigationImplementation")
-        result.output.contains("navigationAnnotationProcessor")
-        result.output.contains("navigationCompileOnly")
+            dependencies {
+                classpath 'com.android.tools.build:gradle:3.0.1'
+            }
+        }
+
+        plugins {
+            //the order matters here
+            id 'com.android.library'
+        }
+
+        android {
+            compileSdkVersion 26
+            defaultConfig {
+                minSdkVersion 26
+                targetSdkVersion 26
+                versionCode 1
+                versionName '1.0.0'
+            }
+        }
+
+        repositories {
+            google()
+            jcenter()
+            mavenLocal()
+            mavenCentral()
+            maven {
+                url 'https://oss.sonatype.org/content/repositories/snapshots'
+            }
+        }
+        
+        dependencies {
+            implementation 'com.f2prateek.dart:dart-annotations:3.0.0-RC3-SNAPSHOT'
+            implementation 'com.f2prateek.dart:dart:3.0.0-RC3-SNAPSHOT'
+            implementation 'com.f2prateek.dart:henson:3.0.0-RC3-SNAPSHOT'
+            annotationProcessor 'com.f2prateek.dart:dart-processor:3.0.0-RC3-SNAPSHOT'
+            annotationProcessor 'com.f2prateek.dart:henson-processor:3.0.0-RC3-SNAPSHOT'
+        }
+
+        """
+        module1NavigationManifestFile << """
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            package="module1_navigation">        
+        </manifest>
+        """
+
+        testNavigationModel1 << """
+        package module1;
+        
+        import dart.BindExtra;
+        import dart.DartModel;
+        
+        @DartModel()
+        class FooActivityNavigationModel {
+          @BindExtra String s;
+        }
+        """
 
         when:
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'clean', 'navigationApiJar', 'assemble', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', ':module1:assemble', '-d', '-s')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir
-        result = runner.build()
+        def result = runner.build()
 
         then:
         println result.output
-        result.task(":assemble").outcome != FAILED
-        result.task(":navigationApiJar").outcome != FAILED
+        result.task(":module1:assemble").outcome != FAILED
 
         testJarsContent(projectDir)
-
-        new File(testProjectDir.root, 'src/blueDebug/java/test/HensonNavigator.java').exists()
-        new File(testProjectDir.root, 'src/redRelease/java/test/HensonNavigator.java').exists()
     }
 
     boolean testJarsContent(projectDir) {
-        new File(projectDir, "/build/libs").eachFileRecurse(FILES) { file ->
+        new File(projectDir, "module1-navigation/build/intermediates/bundles/debug").eachFileRecurse(FILES) { file ->
             if (file.name.endsWith('.jar')) {
                 println "Testing jar: ${file.name}"
                 def content = getJarContent(file)
                 println "Jar content: ${content}"
                 assert content.contains("META-INF/")
                 assert content.contains("META-INF/MANIFEST.MF")
-                assert content.contains("test/")
-                assert content.contains("test/FooActivityNavigationModel.class")
-                assert content.contains("test/FooActivityNavigationModel__ExtraBinder.class")
-                assert content.contains("test/Henson\$1.class")
-                assert content.contains("test/Henson\$WithContextSetState.class")
-                assert content.contains("test/Henson.class")
-                assert content.contains("test/FooActivity__IntentBuilder\$AllSet.class")
-                assert content.contains("test/FooActivity__IntentBuilder.class")
+                assert content.contains("module1/")
+                assert content.contains("module1/FooActivityNavigationModel.class")
+                assert content.contains("module1/FooActivityNavigationModel__ExtraBinder.class")
+                assert content.contains("module1/Henson\$1.class")
+                assert content.contains("module1/Henson\$WithContextSetState.class")
+                assert content.contains("module1/Henson.class")
+                assert content.contains("module1/FooActivityNavigationModel__IntentBuilder\$AllSet.class")
+                assert content.contains("module1/FooActivityNavigationModel__IntentBuilder\$InitialState.class")
+                assert content.contains("module1/FooActivityNavigationModel__IntentBuilder.class")
             }
         }
         true

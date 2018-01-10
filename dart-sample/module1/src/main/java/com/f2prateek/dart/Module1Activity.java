@@ -23,6 +23,8 @@ import android.widget.TextView;
 import butterknife.ButterKnife;
 import butterknife.BindView;
 import dart.Dart;
+import com.f2prateek.dart.module1.R2;
+import com.f2prateek.dart.module1.R;
 
 public class Module1Activity extends Activity {
 
