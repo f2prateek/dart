@@ -17,20 +17,20 @@
 
 package dart.henson.processor;
 
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
-
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
+
 public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsExtras() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -86,6 +86,11 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
@@ -97,7 +102,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_doesNotContainExtras() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_doesNotContainExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -151,7 +156,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test(expected = AssertionError.class)
   public void
-      intentBuilderGenerator_should_notGenerateIntentBuilder_when_navigationModelIsNotDefined_and_containsExtras() {
+  intentBuilderGenerator_should_notGenerateIntentBuilder_when_navigationModelIsNotDefined_and_containsExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -170,7 +175,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsOptionalExtras() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsOptionalExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -231,7 +236,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsOptionalAndRequiredExtras() {
+  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsOptionalAndRequiredExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -829,13 +834,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.Bundler;",
                     "import dart.henson.RequiredStateSequence;",
                     "public class Test__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -900,6 +904,11 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
@@ -910,8 +919,7 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test
-  public void
-      intentBuilderGenerator_should_useParcelable_when_extraIsSerializableAndParcelableExtra() {
+  public void intentBuilderGenerator_should_useParcelable_when_extraIsSerializableAndParcelableExtra() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -1056,7 +1064,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasRequiredAndOptionals_and_parentHasRequiredAndOptionals() {
+  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasRequiredAndOptionals_and_parentHasRequiredAndOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -1185,7 +1193,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasRequiredAndOptionals_and_parentHasOptionals() {
+  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasRequiredAndOptionals_and_parentHasOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -1302,7 +1310,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasRequiredAndOptionals() {
+  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasRequiredAndOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -1420,7 +1428,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasOptionals() {
+  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -1548,7 +1556,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasNoExtras_and_grandParentHasRequiredAndOptionals() {
+  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasNoExtras_and_grandParentHasRequiredAndOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -1705,7 +1713,7 @@ public class IntentBuilderGeneratorTest {
 
   @Test
   public void
-      intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasRequiredAndOptionals_and_parentHasNoExtras_and_grandParentHasRequiredAndOptionals() {
+  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasRequiredAndOptionals_and_parentHasNoExtras_and_grandParentHasRequiredAndOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",

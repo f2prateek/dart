@@ -17,12 +17,6 @@
 
 package dart.common.util;
 
-import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
-import static javax.lang.model.element.Modifier.FINAL;
-import static javax.lang.model.element.Modifier.STATIC;
-import static javax.lang.model.util.ElementFilter.fieldsIn;
-import static javax.lang.model.util.ElementFilter.methodsIn;
-
 import dart.common.BindingTarget;
 import java.util.Map;
 import java.util.Set;
@@ -37,9 +31,15 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
+import static javax.lang.model.element.Modifier.FINAL;
+import static javax.lang.model.element.Modifier.STATIC;
+import static javax.lang.model.util.ElementFilter.fieldsIn;
+import static javax.lang.model.util.ElementFilter.methodsIn;
+
 public class BindingTargetUtil {
 
-  public static final String INITIAL_STATE_METHOD = "getInitialState";
+  public static final String NEXT_STATE_METHOD = "getNextState";
   public static final String BUNDLE_BUILDER_SUFFIX = "__IntentBuilder";
 
   private final CompilerUtil compilerUtil;
@@ -140,7 +140,7 @@ public class BindingTargetUtil {
   private void setClosestRequiredAncestor(
       BindingTarget bindingTarget, TypeElement superIntentBuilder) {
     for (ExecutableElement method : methodsIn(superIntentBuilder.getEnclosedElements())) {
-      if (method.getSimpleName().contentEquals(INITIAL_STATE_METHOD)) {
+      if (method.getSimpleName().contentEquals(NEXT_STATE_METHOD)) {
         final TypeMirror returnTypeMirror = method.getReturnType();
         if (compilerUtil.isAssignable(returnTypeMirror, "dart.henson.AllRequiredSetState")) {
           return;

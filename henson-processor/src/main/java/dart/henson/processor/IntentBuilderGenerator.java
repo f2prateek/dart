@@ -17,10 +17,6 @@
 
 package dart.henson.processor;
 
-import static com.squareup.javapoet.ClassName.get;
-import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
-import static dart.common.util.BindingTargetUtil.INITIAL_STATE_METHOD;
-
 import android.content.Intent;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -47,10 +43,16 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
+import static com.squareup.javapoet.ClassName.get;
+import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
+import static dart.common.util.BindingTargetUtil.NEXT_STATE_METHOD;
+
 public class IntentBuilderGenerator extends BaseGenerator {
 
+  static final String INITIAL_STATE_CLASS = "InitialState";
   static final String REQUIRED_SEQUENCE_CLASS = "RequiredSequence";
   static final String RESOLVED_OPTIONAL_SEQUENCE_CLASS = "ResolvedAllSet";
+  private static final String INITIAL_STATE_METHOD = "getInitialState";
   private static final String OPTIONAL_SEQUENCE_CLASS = "AllSet";
   private static final String OPTIONAL_SEQUENCE_GENERIC = "ALL_SET";
   private static final String OPTIONAL_SEQUENCE_SUBCLASS_GENERIC = "SELF";
@@ -67,10 +69,11 @@ public class IntentBuilderGenerator extends BaseGenerator {
     TypeSpec.Builder intentBuilderTypeBuilder =
         TypeSpec.classBuilder(builderClassName()).addModifiers(Modifier.PUBLIC);
 
-    emitInitialStateGetterForHenson(intentBuilderTypeBuilder);
-    emitInitialStateGetterForSubBuilders(intentBuilderTypeBuilder);
+    emitInitialStateGetter(intentBuilderTypeBuilder);
+    emitNextStateGetter(intentBuilderTypeBuilder);
     emitExtraDSLStateMachine(intentBuilderTypeBuilder);
     emitResolvedOptionalSequence(intentBuilderTypeBuilder);
+    emitInitialState(intentBuilderTypeBuilder);
 
     //build
     JavaFile javaFile =
@@ -90,13 +93,13 @@ public class IntentBuilderGenerator extends BaseGenerator {
     return target.className + BUNDLE_BUILDER_SUFFIX;
   }
 
-  private void emitInitialStateGetterForHenson(TypeSpec.Builder intentBuilderTypeBuilder) {
+  private void emitInitialStateGetter(TypeSpec.Builder intentBuilderTypeBuilder) {
     MethodSpec.Builder initialStateGetterForHensonBuilder =
         MethodSpec.methodBuilder(INITIAL_STATE_METHOD)
             .addModifiers(Modifier.PUBLIC)
             .addModifiers(Modifier.STATIC)
             .addParameter(get("android.content", "Context"), "context")
-            .returns(getInitialStateType(getInitialStateGeneric(true)));
+            .returns(get(target.classPackage, builderClassName(), INITIAL_STATE_CLASS));
 
     initialStateGetterForHensonBuilder.addStatement(
         "final $T intent = new $T(context, getClassDynamically($S))",
@@ -105,37 +108,16 @@ public class IntentBuilderGenerator extends BaseGenerator {
         target.getFQN());
     initialStateGetterForHensonBuilder.addStatement(
         "final $T bundler = $T.create()", Bundler.class, Bundler.class);
-
-    if (!target.hasRequiredFields && target.closestRequiredAncestorPackage == null) {
-      initialStateGetterForHensonBuilder.addStatement(
-          "return new $L(bundler, intent)", RESOLVED_OPTIONAL_SEQUENCE_CLASS);
-      intentBuilderTypeBuilder.addMethod(initialStateGetterForHensonBuilder.build());
-      return;
-    }
-
     initialStateGetterForHensonBuilder.addStatement(
-        "final $L resolvedAllSet = new $L(bundler, intent)",
-        RESOLVED_OPTIONAL_SEQUENCE_CLASS,
-        RESOLVED_OPTIONAL_SEQUENCE_CLASS);
+        "return new $L(bundler, intent)", INITIAL_STATE_CLASS);
 
-    if (target.hasRequiredFields) {
-      initialStateGetterForHensonBuilder.addStatement(
-          "return new $L<>(bundler, resolvedAllSet)", REQUIRED_SEQUENCE_CLASS);
-      intentBuilderTypeBuilder.addMethod(initialStateGetterForHensonBuilder.build());
-      return;
-    }
-
-    final String parentIntentBuilderClass = target.parentClass + BUNDLE_BUILDER_SUFFIX;
-    initialStateGetterForHensonBuilder.addStatement(
-        "return $T.getInitialState(bundler, resolvedAllSet)",
-        get(target.parentPackage, parentIntentBuilderClass));
     intentBuilderTypeBuilder.addMethod(initialStateGetterForHensonBuilder.build());
   }
 
-  private void emitInitialStateGetterForSubBuilders(TypeSpec.Builder intentBuilderTypeBuilder) {
+  private void emitNextStateGetter(TypeSpec.Builder intentBuilderTypeBuilder) {
     final TypeName initialStateGeneric = getInitialStateGeneric(false);
     MethodSpec.Builder initialStateGetterForSubBuilder =
-        MethodSpec.methodBuilder(INITIAL_STATE_METHOD)
+        MethodSpec.methodBuilder(NEXT_STATE_METHOD)
             .addModifiers(Modifier.PUBLIC)
             .addModifiers(Modifier.STATIC)
             .addTypeVariable((TypeVariableName) initialStateGeneric)
@@ -153,7 +135,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
     if (target.parentPackage != null) {
       final String parentIntentBuilderClass = target.parentClass + BUNDLE_BUILDER_SUFFIX;
       initialStateGetterForSubBuilder.addStatement(
-          "return $T.getInitialState(bundler, allSetState)",
+          "return $T.getNextState(bundler, allSetState)",
           get(target.parentPackage, parentIntentBuilderClass));
       intentBuilderTypeBuilder.addMethod(initialStateGetterForSubBuilder.build());
       return;
@@ -288,6 +270,30 @@ public class IntentBuilderGenerator extends BaseGenerator {
     intentBuilderTypeBuilder.addType(resolvedOptionalSequenceBuilder.build());
   }
 
+  public void emitInitialState(TypeSpec.Builder intentBuilderTypeBuilder) {
+    TypeSpec.Builder initialStateBuilder =
+        TypeSpec.classBuilder(INITIAL_STATE_CLASS)
+            .superclass(getInitialStateType(getInitialStateGeneric(true)))
+            .addModifiers(Modifier.PUBLIC)
+            .addModifiers(Modifier.STATIC);
+
+    MethodSpec.Builder constructorBuilder =
+        MethodSpec.constructorBuilder()
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(Bundler.class, "bundler")
+            .addParameter(get("android.content", "Intent"), "intent");
+
+    if (!target.hasRequiredFields && target.closestRequiredAncestorPackage == null) {
+      constructorBuilder.addStatement("super(bundler, intent)");
+    } else {
+      constructorBuilder.addStatement("super(bundler, new $L(bundler, intent))",
+          RESOLVED_OPTIONAL_SEQUENCE_CLASS);
+    }
+
+    initialStateBuilder.addMethod(constructorBuilder.build());
+    intentBuilderTypeBuilder.addType(initialStateBuilder.build());
+  }
+
   /**
    * @param builder the intent builder in which to emit.
    * @param binding the binding to emit.
@@ -344,7 +350,7 @@ public class IntentBuilderGenerator extends BaseGenerator {
       if (target.parentPackage != null) {
         final String parentIntentBuilderClass = target.parentClass + BUNDLE_BUILDER_SUFFIX;
         setterBuilder.addStatement(
-            "return $T.getInitialState(bundler, allRequiredSetState)",
+            "return $T.getNextState(bundler, allRequiredSetState)",
             get(target.parentPackage, parentIntentBuilderClass));
       } else {
         setterBuilder.addStatement("return allRequiredSetState");
