@@ -17,6 +17,12 @@
 
 package dart.common.util;
 
+import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
+import static javax.lang.model.element.Modifier.FINAL;
+import static javax.lang.model.element.Modifier.STATIC;
+import static javax.lang.model.util.ElementFilter.fieldsIn;
+import static javax.lang.model.util.ElementFilter.methodsIn;
+
 import dart.common.BindingTarget;
 import java.util.Map;
 import java.util.Set;
@@ -30,12 +36,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-
-import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
-import static javax.lang.model.element.Modifier.FINAL;
-import static javax.lang.model.element.Modifier.STATIC;
-import static javax.lang.model.util.ElementFilter.fieldsIn;
-import static javax.lang.model.util.ElementFilter.methodsIn;
 
 public class BindingTargetUtil {
 

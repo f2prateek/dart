@@ -17,6 +17,10 @@
 
 package dart.henson.processor;
 
+import static com.squareup.javapoet.ClassName.get;
+import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
+import static dart.common.util.BindingTargetUtil.NEXT_STATE_METHOD;
+
 import android.content.Intent;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -42,10 +46,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-
-import static com.squareup.javapoet.ClassName.get;
-import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
-import static dart.common.util.BindingTargetUtil.NEXT_STATE_METHOD;
 
 public class IntentBuilderGenerator extends BaseGenerator {
 
@@ -286,8 +286,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
     if (!target.hasRequiredFields && target.closestRequiredAncestorPackage == null) {
       constructorBuilder.addStatement("super(bundler, intent)");
     } else {
-      constructorBuilder.addStatement("super(bundler, new $L(bundler, intent))",
-          RESOLVED_OPTIONAL_SEQUENCE_CLASS);
+      constructorBuilder.addStatement(
+          "super(bundler, new $L(bundler, intent))", RESOLVED_OPTIONAL_SEQUENCE_CLASS);
     }
 
     initialStateBuilder.addMethod(constructorBuilder.build());

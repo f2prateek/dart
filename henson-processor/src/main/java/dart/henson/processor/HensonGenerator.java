@@ -17,6 +17,10 @@
 
 package dart.henson.processor;
 
+import static com.squareup.javapoet.ClassName.get;
+import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
+import static dart.henson.processor.IntentBuilderGenerator.INITIAL_STATE_CLASS;
+
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -27,10 +31,6 @@ import dart.common.BindingTarget;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.lang.model.element.Modifier;
-
-import static com.squareup.javapoet.ClassName.get;
-import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
-import static dart.henson.processor.IntentBuilderGenerator.INITIAL_STATE_CLASS;
 
 public class HensonGenerator extends BaseGenerator {
 
