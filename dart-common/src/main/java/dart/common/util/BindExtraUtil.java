@@ -111,10 +111,10 @@ public class BindExtraUtil {
         }
       } catch (Exception e) {
         loggingUtil.error(
-                element,
-                "@BindExtra has an invalid value (%s#%s).",
-                enclosingElement.getQualifiedName(),
-                element.getSimpleName());
+            element,
+            "@BindExtra has an invalid value (%s#%s).",
+            enclosingElement.getQualifiedName(),
+            element.getSimpleName());
         valid = false;
       }
     }

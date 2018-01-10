@@ -17,16 +17,12 @@
 
 package dart.henson.plugin.internal;
 
+import static dart.henson.plugin.util.StringUtil.capitalize;
+import static java.util.Collections.singletonList;
+
 import com.android.build.gradle.api.BaseVariant;
 import com.google.common.collect.Streams;
-
-import org.gradle.api.Project;
-import org.gradle.api.Task;
-import org.gradle.api.file.FileCollection;
-import org.gradle.api.internal.file.UnionFileCollection;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.tasks.compile.JavaCompile;
-
+import dart.henson.plugin.generator.HensonNavigatorGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,11 +33,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import dart.henson.plugin.generator.HensonNavigatorGenerator;
-
-import static dart.henson.plugin.util.StringUtil.capitalize;
-import static java.util.Collections.singletonList;
+import org.gradle.api.Project;
+import org.gradle.api.Task;
+import org.gradle.api.file.FileCollection;
+import org.gradle.api.internal.file.UnionFileCollection;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.tasks.compile.JavaCompile;
 
 public class TaskManager {
 
@@ -77,10 +74,12 @@ public class TaskManager {
         project.getTasks().create("generate" + capitalize(variant.getName()) + "HensonNavigator");
     generateHensonNavigatorTask.doFirst(
         task -> {
-            JavaCompile javaCompiler = (JavaCompile) variant.getJavaCompiler();
-            FileCollection variantCompileClasspath = javaCompiler.getClasspath();
-            FileCollection uft = new UnionFileCollection(javaCompiler.getSource(), project.fileTree(destinationFolder));
-            javaCompiler.setSource(uft);
+          JavaCompile javaCompiler = (JavaCompile) variant.getJavaCompiler();
+          FileCollection variantCompileClasspath = javaCompiler.getClasspath();
+          FileCollection uft =
+              new UnionFileCollection(
+                  javaCompiler.getSource(), project.fileTree(destinationFolder));
+          javaCompiler.setSource(uft);
           logger.debug("Analyzing configuration: " + variantCompileClasspath.getFiles());
           Set<String> targetActivities = new HashSet<>();
           Streams.stream(variantCompileClasspath)
@@ -105,7 +104,7 @@ public class TaskManager {
                           });
                     }
 
-                      String hensonNavigator =
+                    String hensonNavigator =
                         hensonNavigatorGenerator.generateHensonNavigatorClass(
                             targetActivities, hensonNavigatorPackageName);
                     destinationFolder.mkdirs();

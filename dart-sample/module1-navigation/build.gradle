@@ -1,0 +1,26 @@
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion versions.compileSdk
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    api deps.parceler.runtime
+    api deps.android.annotations
+    annotationProcessor deps.parceler.compiler
+}

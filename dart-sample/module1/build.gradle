@@ -28,17 +28,13 @@ android {
 }
 
 dependencies {
-    navigationApi deps.parceler.runtime
-    navigationApi deps.android.annotations
-    navigationAnnotationProcessor deps.parceler.compiler
-
+    api project(':module1-navigation')
     api deps.android.appCompat
     api deps.dart.annotations
     api deps.dart.runtime
     api deps.henson.runtime
     api deps.butterknife.runtime
     api deps.butterknife.annotations
-    navigationApiOfSelf()
 }
 
 henson {

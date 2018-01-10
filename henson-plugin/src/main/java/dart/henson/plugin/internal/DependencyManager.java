@@ -17,11 +17,11 @@
 
 package dart.henson.plugin.internal;
 
+import static java.lang.String.format;
+
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.logging.Logger;
-
-import static java.lang.String.format;
 
 public class DependencyManager {
 
