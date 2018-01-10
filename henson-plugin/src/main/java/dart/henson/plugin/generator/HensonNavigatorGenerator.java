@@ -47,7 +47,7 @@ public class HensonNavigatorGenerator {
                   dart.henson.plugin.util.StringUtil.capitalize(targetActivitySimpleName);
               methodStatement.append(
                   format(
-                      "  public static %s__IntentBuilder.RequiredSequence<%s__IntentBuilder.ResolvedAllSet> goto%s(Context context) {\n",
+                      "  public static %s__IntentBuilder.InitialState goto%s(Context context) {\n",
                       targetActivityCapitalizedName,
                       targetActivityCapitalizedName,
                       targetActivityCapitalizedName));

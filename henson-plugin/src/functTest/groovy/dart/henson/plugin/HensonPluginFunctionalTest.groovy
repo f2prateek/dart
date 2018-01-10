@@ -143,8 +143,8 @@ class HensonPluginFunctionalTest extends Specification {
             super.onCreate(bundle);
             FooActivityNavigationModel foo = new FooActivityNavigationModel();
             Intent intent = HensonNavigator.gotoFooActivity(this)
-            .s("s")
-            .build();
+              .s("s")
+              .build();
           }
         }
         """
@@ -249,6 +249,7 @@ class HensonPluginFunctionalTest extends Specification {
                 assert content.contains("module1/Henson\$WithContextSetState.class")
                 assert content.contains("module1/Henson.class")
                 assert content.contains("module1/FooActivityNavigationModel__IntentBuilder\$AllSet.class")
+                assert content.contains("module1/FooActivityNavigationModel__IntentBuilder\$InitialState.class")
                 assert content.contains("module1/FooActivityNavigationModel__IntentBuilder.class")
             }
         }
