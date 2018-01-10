@@ -103,7 +103,7 @@ public class BindExtraUtil {
             && !StringUtil.isValidJavaIdentifier(annotationValue)) {
           loggingUtil.error(
               element,
-              "@BindExtra key has to be valid java variable identifiers (%s#%s).\n"
+              "@BindExtra key has to be a valid java variable identifier (%s#%s).\n"
                   + "See https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html",
               enclosingElement.getQualifiedName(),
               element.getSimpleName());

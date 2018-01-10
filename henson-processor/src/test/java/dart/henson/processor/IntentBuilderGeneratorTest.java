@@ -826,7 +826,7 @@ public class IntentBuilderGeneratorTest {
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
-            "@BindExtra key has to be valid java variable identifiers (test.navigation.TestNavigationModel, extra).");
+            "@BindExtra key has to be a valid java variable identifier (test.navigation.TestNavigationModel#extra).");
   }
 
   @Test
