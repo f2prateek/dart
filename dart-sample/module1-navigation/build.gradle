@@ -20,7 +20,13 @@ android {
 }
 
 dependencies {
-    api deps.parceler.runtime
-    api deps.android.annotations
+    implementation deps.android.annotations
+    implementation deps.parceler.runtime
+    implementation deps.dart.runtime
+    implementation deps.dart.annotations
+    implementation deps.henson.runtime
+
     annotationProcessor deps.parceler.compiler
+    annotationProcessor deps.henson.compiler
+    annotationProcessor deps.dart.compiler
 }

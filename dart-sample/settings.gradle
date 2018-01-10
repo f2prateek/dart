@@ -1,6 +1,8 @@
 // Dart sample with two modules
 include 'app'
+include 'app-navigation'
 include 'module1'
+include 'module1-navigation'
 
 rootProject.name = 'dart-sample'
 
