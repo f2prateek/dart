@@ -29,8 +29,7 @@ import static com.google.testing.compile.Compiler.javac;
 public class IntentBuilderGeneratorTest {
 
   @Test
-  public void
-  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsExtras() {
+  public void intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -57,13 +56,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -86,7 +84,7 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
-                    "public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
                     "    public InitialState(Bundler bundler, Intent intent) {",
                     "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
@@ -101,8 +99,7 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test
-  public void
-  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_doesNotContainExtras() {
+  public void intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_doesNotContainExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -126,12 +123,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.AllRequiredSetState;",
                     "import dart.henson.Bundler;",
                     "public class Test__IntentBuilder {",
-                    "  public static ResolvedAllSet getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    return new ResolvedAllSet(bundler, intent);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> ALL_SET getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> ALL_SET getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return allSetState;",
                     "  }",
@@ -145,6 +142,11 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends ResolvedAllSet {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
@@ -155,8 +157,7 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test(expected = AssertionError.class)
-  public void
-  intentBuilderGenerator_should_notGenerateIntentBuilder_when_navigationModelIsNotDefined_and_containsExtras() {
+  public void intentBuilderGenerator_should_notGenerateIntentBuilder_when_navigationModelIsNotDefined_and_containsExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -174,8 +175,7 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test
-  public void
-  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsOptionalExtras() {
+  public void intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsOptionalExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -202,12 +202,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.Bundler;",
                     "import java.lang.String;",
                     "public class Test__IntentBuilder {",
-                    "  public static ResolvedAllSet getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    return new ResolvedAllSet(bundler, intent);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> ALL_SET getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> ALL_SET getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return allSetState;",
                     "  }",
@@ -225,6 +225,11 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends ResolvedAllSet {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
@@ -235,8 +240,7 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test
-  public void
-  intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsOptionalAndRequiredExtras() {
+  public void intentBuilderGenerator_should_generateIntentBuilder_when_navigationModelIsDefined_and_containsOptionalAndRequiredExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -265,13 +269,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -296,6 +299,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -338,13 +346,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -369,6 +376,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -411,13 +423,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -442,6 +453,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -484,13 +500,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -511,6 +526,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -677,13 +697,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -704,6 +723,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -904,7 +928,7 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
-                    "public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
                     "    public InitialState(Bundler bundler, Intent intent) {",
                     "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
@@ -954,13 +978,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.Bundler;",
                     "import dart.henson.RequiredStateSequence;",
                     "public class Test__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -981,6 +1004,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -1022,13 +1050,12 @@ public class IntentBuilderGeneratorTest {
                     "import java.lang.String;",
                     "import java.util.ArrayList;",
                     "public class Test__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -1051,6 +1078,11 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
@@ -1063,8 +1095,7 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test
-  public void
-  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasRequiredAndOptionals_and_parentHasRequiredAndOptionals() {
+  public void intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasRequiredAndOptionals_and_parentHasRequiredAndOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -1097,13 +1128,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test1__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test1\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -1113,7 +1143,7 @@ public class IntentBuilderGeneratorTest {
                     "    }",
                     "    public Test2__IntentBuilder.RequiredSequence<ALL_SET> extra1(String extra1) {",
                     "      bundler.put(\"extra1\", extra1);",
-                    "      return Test2__IntentBuilder.getInitialState(bundler, allRequiredSetState);",
+                    "      return Test2__IntentBuilder.getNextState(bundler, allRequiredSetState);",
                     "    }",
                     "  }",
                     "  public static class AllSet<SELF extends AllSet<SELF>> extends Test2__IntentBuilder.AllSet<SELF> {",
@@ -1128,6 +1158,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -1146,13 +1181,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test2__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test2\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -1177,6 +1211,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -1225,13 +1264,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test1__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test1\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -1241,7 +1279,7 @@ public class IntentBuilderGeneratorTest {
                     "    }",
                     "    public ALL_SET extra1(String extra1) {",
                     "      bundler.put(\"extra1\", extra1);",
-                    "      return Test2__IntentBuilder.getInitialState(bundler, allRequiredSetState);",
+                    "      return Test2__IntentBuilder.getNextState(bundler, allRequiredSetState);",
                     "    }",
                     "  }",
                     "  public static class AllSet<SELF extends AllSet<SELF>> extends Test2__IntentBuilder.AllSet<SELF> {",
@@ -1256,6 +1294,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -1273,12 +1316,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.Bundler;",
                     "import java.lang.String;",
                     "public class Test2__IntentBuilder {",
-                    "  public static ResolvedAllSet getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test2\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    return new ResolvedAllSet(bundler, intent);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> ALL_SET getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> ALL_SET getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return allSetState;",
                     "  }",
@@ -1296,6 +1339,11 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends ResolvedAllSet {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
@@ -1309,8 +1357,7 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test
-  public void
-  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasRequiredAndOptionals() {
+  public void intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasRequiredAndOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -1341,15 +1388,14 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.Bundler;",
                     "import java.lang.String;",
                     "public class Test1__IntentBuilder {",
-                    "  public static Test2__IntentBuilder.RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test1\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return Test2__IntentBuilder.getInitialState(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> Test2__IntentBuilder.RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> Test2__IntentBuilder.RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
-                    "    return Test2__IntentBuilder.getInitialState(bundler, allSetState);",
+                    "    return Test2__IntentBuilder.getNextState(bundler, allSetState);",
                     "  }",
                     "  public static class AllSet<SELF extends AllSet<SELF>> extends Test2__IntentBuilder.AllSet<SELF> {",
                     "    public AllSet(Bundler bundler, Intent intent) {",
@@ -1363,6 +1409,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends Test2__IntentBuilder.RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -1381,13 +1432,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test2__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test2\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -1414,6 +1464,11 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> { ",
+                    "    public InitialState(Bundler bundler, Intent intent) { ",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent)); ",
+                    "    } ",
+                    "  } ",
                     "}"));
 
     Compilation compilation =
@@ -1427,8 +1482,7 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test
-  public void
-  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasOptionals() {
+  public void intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -1458,14 +1512,14 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.Bundler;",
                     "import java.lang.String;",
                     "public class Test1__IntentBuilder {",
-                    "  public static ResolvedAllSet getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test1\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    return new ResolvedAllSet(bundler, intent);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> ALL_SET getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> ALL_SET getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
-                    "    return Test2__IntentBuilder.getInitialState(bundler, allSetState);",
+                    "    return Test2__IntentBuilder.getNextState(bundler, allSetState);",
                     "  }",
                     "  public static class AllSet<SELF extends AllSet<SELF>> extends Test2__IntentBuilder.AllSet<SELF> {",
                     "    public AllSet(Bundler bundler, Intent intent) {",
@@ -1478,6 +1532,11 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends ResolvedAllSet {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
@@ -1496,12 +1555,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.Bundler;",
                     "import java.lang.String;",
                     "public class Test2__IntentBuilder {",
-                    "  public static ResolvedAllSet getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test2\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    return new ResolvedAllSet(bundler, intent);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> ALL_SET getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> ALL_SET getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return allSetState;",
                     "  }",
@@ -1516,6 +1575,11 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
+                    "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends ResolvedAllSet {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
@@ -1555,8 +1619,7 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test
-  public void
-  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasNoExtras_and_grandParentHasRequiredAndOptionals() {
+  public void intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasOptionals_and_parentHasNoExtras_and_grandParentHasRequiredAndOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -1590,15 +1653,14 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.Bundler;",
                     "import java.lang.String;",
                     "public class Test1__IntentBuilder {",
-                    "  public static Test3__IntentBuilder.RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test1\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return Test2__IntentBuilder.getInitialState(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> Test3__IntentBuilder.RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> Test3__IntentBuilder.RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
-                    "    return Test2__IntentBuilder.getInitialState(bundler, allSetState);",
+                    "    return Test2__IntentBuilder.getNextState(bundler, allSetState);",
                     "  }",
                     "  public static class AllSet<SELF extends AllSet<SELF>> extends Test2__IntentBuilder.AllSet<SELF> {",
                     "    public AllSet(Bundler bundler, Intent intent) {",
@@ -1614,6 +1676,11 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends Test3__IntentBuilder.RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     JavaFileObject builderSource2 =
@@ -1627,15 +1694,14 @@ public class IntentBuilderGeneratorTest {
                     "import android.content.Intent;",
                     "import dart.henson.Bundler;",
                     "public class Test2__IntentBuilder {",
-                    "  public static Test3__IntentBuilder.RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test2\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return Test3__IntentBuilder.getInitialState(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> Test3__IntentBuilder.RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> Test3__IntentBuilder.RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
-                    "    return Test3__IntentBuilder.getInitialState(bundler, allSetState);",
+                    "    return Test3__IntentBuilder.getNextState(bundler, allSetState);",
                     "  }",
                     "  public static class AllSet<SELF extends AllSet<SELF>> extends Test3__IntentBuilder.AllSet<SELF> {",
                     "    public AllSet(Bundler bundler, Intent intent) {",
@@ -1645,6 +1711,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends Test3__IntentBuilder.RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -1663,13 +1734,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test3__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test3\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -1696,6 +1766,11 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
@@ -1712,8 +1787,7 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test
-  public void
-  intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasRequiredAndOptionals_and_parentHasNoExtras_and_grandParentHasRequiredAndOptionals() {
+  public void intentBuilderGenerator_should_generateRightIntentBuilders_when_childHasRequiredAndOptionals_and_parentHasNoExtras_and_grandParentHasRequiredAndOptionals() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.Test1NavigationModel",
@@ -1749,13 +1823,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test1__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test1\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -1765,7 +1838,7 @@ public class IntentBuilderGeneratorTest {
                     "    }",
                     "    public Test3__IntentBuilder.RequiredSequence<ALL_SET> extra1(String extra1) {",
                     "      bundler.put(\"extra1\", extra1);",
-                    "      return Test2__IntentBuilder.getInitialState(bundler, allRequiredSetState);",
+                    "      return Test2__IntentBuilder.getNextState(bundler, allRequiredSetState);",
                     "    }",
                     "  }",
                     "  public static class AllSet<SELF extends AllSet<SELF>> extends Test2__IntentBuilder.AllSet<SELF> {",
@@ -1782,6 +1855,11 @@ public class IntentBuilderGeneratorTest {
                     "      super(bundler, intent);",
                     "    }",
                     "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
+                    "    }",
+                    "  }",
                     "}"));
 
     JavaFileObject builderSource2 =
@@ -1795,15 +1873,14 @@ public class IntentBuilderGeneratorTest {
                     "import android.content.Intent;",
                     "import dart.henson.Bundler;",
                     "public class Test2__IntentBuilder {",
-                    "  public static Test3__IntentBuilder.RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test2\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return Test3__IntentBuilder.getInitialState(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> Test3__IntentBuilder.RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> Test3__IntentBuilder.RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
-                    "    return Test3__IntentBuilder.getInitialState(bundler, allSetState);",
+                    "    return Test3__IntentBuilder.getNextState(bundler, allSetState);",
                     "  }",
                     "  public static class AllSet<SELF extends AllSet<SELF>> extends Test3__IntentBuilder.AllSet<SELF> {",
                     "    public AllSet(Bundler bundler, Intent intent) {",
@@ -1813,6 +1890,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends Test3__IntentBuilder.RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
@@ -1831,13 +1913,12 @@ public class IntentBuilderGeneratorTest {
                     "import dart.henson.RequiredStateSequence;",
                     "import java.lang.String;",
                     "public class Test3__IntentBuilder {",
-                    "  public static RequiredSequence<ResolvedAllSet> getInitialState(Context context) {",
+                    "  public static InitialState getInitialState(Context context) {",
                     "    final Intent intent = new Intent(context, getClassDynamically(\"test.navigation.Test3\"));",
                     "    final Bundler bundler = Bundler.create();",
-                    "    final ResolvedAllSet resolvedAllSet = new ResolvedAllSet(bundler, intent);",
-                    "    return new RequiredSequence<>(bundler, resolvedAllSet);",
+                    "    return new InitialState(bundler, intent);",
                     "  }",
-                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getInitialState(Bundler bundler,",
+                    "  public static <ALL_SET extends AllSet> RequiredSequence<ALL_SET> getNextState(Bundler bundler,",
                     "      ALL_SET allSetState) {",
                     "    return new RequiredSequence<>(bundler, allSetState);",
                     "  }",
@@ -1862,6 +1943,11 @@ public class IntentBuilderGeneratorTest {
                     "  public static class ResolvedAllSet extends AllSet<ResolvedAllSet> {",
                     "    public ResolvedAllSet(Bundler bundler, Intent intent) {",
                     "      super(bundler, intent);",
+                    "    }",
+                    "  }",
+                    "  public static class InitialState extends RequiredSequence<ResolvedAllSet> {",
+                    "    public InitialState(Bundler bundler, Intent intent) {",
+                    "      super(bundler, new ResolvedAllSet(bundler, intent));",
                     "    }",
                     "  }",
                     "}"));
