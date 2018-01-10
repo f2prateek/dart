@@ -237,7 +237,7 @@ public class HensonGeneratorTest {
                     "    private WithContextSetState(Context context) {",
                     "      this.context = context;",
                     "    }",
-                    "    public Test3__IntentBuilder.InitialState gotoTest1() {",
+                    "    public Test1__IntentBuilder.InitialState gotoTest1() {",
                     "      return test.navigation.Test1__IntentBuilder.getInitialState(context);",
                     "    }",
                     "    public Test2__IntentBuilder.InitialState gotoTest2() {",
