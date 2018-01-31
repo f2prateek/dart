@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.f2prateek.dart</groupId>
+    <groupId>com.github.stephanenicolas.dart.v2</groupId>
     <artifactId>dart-parent</artifactId>
     <version>2.0.3-SNAPSHOT</version>
   </parent>
@@ -15,24 +15,24 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.f2prateek.dart</groupId>
+      <groupId>com.github.stephanenicolas.dart.v2</groupId>
       <artifactId>dart-processor</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.f2prateek.dart</groupId>
+      <groupId>com.github.stephanenicolas.dart.v2</groupId>
       <artifactId>dart</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.f2prateek.dart</groupId>
+      <groupId>com.github.stephanenicolas.dart.v2</groupId>
       <artifactId>henson-processor</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.f2prateek.dart</groupId>
+      <groupId>com.github.stephanenicolas.dart.v2</groupId>
       <artifactId>henson</artifactId>
       <version>${project.version}</version>
     </dependency>
