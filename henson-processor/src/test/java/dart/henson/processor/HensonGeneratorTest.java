@@ -38,9 +38,10 @@ public class HensonGeneratorTest {
                 .join( //
                     "package test.navigation;",
                     "import dart.DartModel;",
+                    "import dart.BindExtra;",
                     "@DartModel",
                     "public class TestNavigationModel {",
-                    "    String extra;",
+                    "    @BindExtra String extra;",
                     "}"));
 
     JavaFileObject builderSource =
@@ -119,9 +120,9 @@ public class HensonGeneratorTest {
         .hasSourceEquivalentTo(builderSource);
   }
 
-  @Test(expected = AssertionError.class)
+  @Test
   public void
-      hensonNavigatorGenerator_should_notGenerateHensonClass_when_navigationModelIsNotDefined_and_containExtras() {
+      hensonNavigatorGenerator_should_generateHensonClass_when_navigationModelIsNotDefined_and_containExtras() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
             "test.navigation.TestNavigationModel",
@@ -129,14 +130,39 @@ public class HensonGeneratorTest {
                 .join( //
                     "package test.navigation;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "public class TestNavigationModel {",
-                    "    @BindExtra(\"key\") String extra;",
+                    "    @BindExtra String extra;",
+                    "}"));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString(
+            "test.navigation.Henson",
+            Joiner.on('\n')
+                .join( //
+                    "package test.navigation;",
+                    "import android.content.Context;",
+                    "public class Henson {",
+                    "  private Henson() {",
+                    "  }",
+                    "  public static WithContextSetState with(Context context) {",
+                    "    return new test.navigation.Henson.WithContextSetState(context);",
+                    "  }",
+                    "  public static class WithContextSetState {",
+                    "    private Context context;",
+                    "    private WithContextSetState(Context context) {",
+                    "      this.context = context;",
+                    "    }",
+                    "    public Test__IntentBuilder.InitialState gotoTest() {",
+                    "      return test.navigation.Test__IntentBuilder.getInitialState(context);",
+                    "    }",
+                    "  }",
                     "}"));
 
     Compilation compilation =
         javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
-    assertThat(compilation).generatedSourceFile("test.navigation.Henson");
+    assertThat(compilation)
+        .generatedSourceFile("test.navigation.Henson")
+        .hasSourceEquivalentTo(builderSource);
   }
 
   @Test
@@ -149,12 +175,12 @@ public class HensonGeneratorTest {
                 .join( //
                     "package test.navigation;",
                     "import dart.DartModel;",
+                    "import dart.BindExtra;",
                     "@DartModel",
                     "public class Test1NavigationModel extends Test3NavigationModel {",
                     "}",
-                    "@DartModel",
                     "class Test2NavigationModel extends Test3NavigationModel {",
-                    "    String extra2;",
+                    "    @BindExtra String extra2;",
                     "}",
                     "@DartModel",
                     "class Test3NavigationModel {",
@@ -181,11 +207,11 @@ public class HensonGeneratorTest {
                     "    public Test1__IntentBuilder.InitialState gotoTest1() {",
                     "      return test.navigation.Test1__IntentBuilder.getInitialState(context);",
                     "    }",
-                    "    public Test2__IntentBuilder.InitialState gotoTest2() {",
-                    "      return test.navigation.Test2__IntentBuilder.getInitialState(context);",
-                    "    }",
                     "    public Test3__IntentBuilder.InitialState gotoTest3() {",
                     "      return test.navigation.Test3__IntentBuilder.getInitialState(context);",
+                    "    }",
+                    "    public Test2__IntentBuilder.InitialState gotoTest2() {",
+                    "      return test.navigation.Test2__IntentBuilder.getInitialState(context);",
                     "    }",
                     "  }",
                     "}"));
@@ -207,16 +233,16 @@ public class HensonGeneratorTest {
                 .join( //
                     "package test.navigation;",
                     "import dart.DartModel;",
+                    "import dart.BindExtra;",
                     "@DartModel",
                     "public class Test1NavigationModel extends Test3NavigationModel<String> {",
                     "}",
-                    "@DartModel",
                     "class Test2NavigationModel extends Test3NavigationModel<Object> {",
-                    "    String extra2;",
+                    "    @BindExtra String extra2;",
                     "}",
                     "@DartModel",
                     "class Test3NavigationModel<T> {",
-                    "    String extra3;",
+                    "    @BindExtra String extra3;",
                     "}"));
 
     JavaFileObject builderSource =
@@ -240,11 +266,11 @@ public class HensonGeneratorTest {
                     "    public Test1__IntentBuilder.InitialState gotoTest1() {",
                     "      return test.navigation.Test1__IntentBuilder.getInitialState(context);",
                     "    }",
-                    "    public Test2__IntentBuilder.InitialState gotoTest2() {",
-                    "      return test.navigation.Test2__IntentBuilder.getInitialState(context);",
-                    "    }",
                     "    public Test3__IntentBuilder.InitialState gotoTest3() {",
                     "      return test.navigation.Test3__IntentBuilder.getInitialState(context);",
+                    "    }",
+                    "    public Test2__IntentBuilder.InitialState gotoTest2() {",
+                    "      return test.navigation.Test2__IntentBuilder.getInitialState(context);",
                     "    }",
                     "  }",
                     "}"));

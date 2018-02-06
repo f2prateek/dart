@@ -36,15 +36,20 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
-@SupportedAnnotationTypes({InjectExtraProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME})
+@SupportedAnnotationTypes({
+  InjectExtraProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
+  InjectExtraProcessor.EXTRA_ANNOTATION_CLASS_NAME
+})
 public final class InjectExtraProcessor extends AbstractProcessor {
 
   static final String NAVIGATION_MODEL_ANNOTATION_CLASS_NAME = "dart.DartModel";
+  static final String EXTRA_ANNOTATION_CLASS_NAME = "dart.BindExtra";
 
   private LoggingUtil loggingUtil;
   private FileUtil fileUtil;
   private BindingTargetUtil bindingTargetUtil;
   private DartModelUtil dartModelUtil;
+  private BindExtraUtil bindExtraUtil;
 
   private boolean usesParcelerOption = true;
 
@@ -56,16 +61,18 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     final ParcelerUtil parcelerUtil =
         new ParcelerUtil(compilerUtil, processingEnv, usesParcelerOption);
     loggingUtil = new LoggingUtil(processingEnv);
-    BindExtraUtil bindExtraUtil = new BindExtraUtil(compilerUtil, parcelerUtil, loggingUtil);
     fileUtil = new FileUtil(processingEnv);
-    bindingTargetUtil =
-        new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil, bindExtraUtil);
+    bindingTargetUtil = new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil);
     dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil, compilerUtil);
+    bindExtraUtil =
+        new BindExtraUtil(
+            compilerUtil, parcelerUtil, loggingUtil, bindingTargetUtil, dartModelUtil);
   }
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     dartModelUtil.setRoundEnvironment(roundEnv);
+    bindExtraUtil.setRoundEnvironment(roundEnv);
 
     Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
     generateExtraInjectors(targetClassMap);
@@ -92,6 +99,7 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     Map<TypeElement, BindingTarget> targetClassMap = new LinkedHashMap<>();
 
     dartModelUtil.parseDartModelAnnotatedElements(targetClassMap);
+    bindExtraUtil.parseBindExtraAnnotatedElements(targetClassMap);
     bindingTargetUtil.createBindingTargetTrees(targetClassMap);
 
     return targetClassMap;

@@ -70,18 +70,7 @@ public class DartModelUtil {
     }
   }
 
-  private void parseDartModel(TypeElement element, Map<TypeElement, BindingTarget> targetClassMap) {
-    // Verify common generated code restrictions.
-    if (!isValidUsageOfDartModel(element)) {
-      return;
-    }
-
-    // Assemble information on the binding point.
-    BindingTarget navigationModelTarget = bindingTargetUtil.createTargetClass(element);
-    targetClassMap.put(element, navigationModelTarget);
-  }
-
-  private boolean isValidUsageOfDartModel(TypeElement element) {
+  boolean isValidUsageOfDartModel(TypeElement element) {
     boolean valid = true;
 
     // Verify modifiers.
@@ -89,15 +78,14 @@ public class DartModelUtil {
     if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC) || modifiers.contains(ABSTRACT)) {
       loggingUtil.error(
           element,
-          "@DartModel class %s must not be private, static or abstract.",
+          "DartModel class %s must not be private, static or abstract.",
           element.getSimpleName());
       valid = false;
     }
 
     // Verify type.
     if (element.getKind() != CLASS) {
-      loggingUtil.error(
-          element, "@DartModel annotated element %s must be a class.", element.getSimpleName());
+      loggingUtil.error(element, "DartModel element %s must be a class.", element.getSimpleName());
       valid = false;
     }
 
@@ -105,7 +93,7 @@ public class DartModelUtil {
     if (element.getEnclosingElement() == null
         || element.getEnclosingElement().getKind() != PACKAGE) {
       loggingUtil.error(
-          element, "@DartModel class %s must be a top level class.", element.getSimpleName());
+          element, "DartModel class %s must be a top level class.", element.getSimpleName());
       valid = false;
     }
 
@@ -115,11 +103,27 @@ public class DartModelUtil {
     if (!className.endsWith(DART_MODEL_SUFFIX)) {
       loggingUtil.error(
           element,
-          "@DartModel class %s does not follow the naming convention: my.package.TargetComponentNavigationModel.",
+          "DartModel class %s does not follow the naming convention: my.package.TargetComponentNavigationModel.",
           element.getSimpleName());
       valid = false;
     }
 
     return valid;
+  }
+
+  private void parseDartModel(TypeElement element, Map<TypeElement, BindingTarget> targetClassMap) {
+    // The BindingTarget was already created, @BindExtra processed first
+    if (targetClassMap.containsKey(element)) {
+      return;
+    }
+
+    // Verify common generated code restrictions.
+    if (!isValidUsageOfDartModel(element)) {
+      return;
+    }
+
+    // Assemble information on the binding point.
+    final BindingTarget navigationModelTarget = bindingTargetUtil.createTargetClass(element);
+    targetClassMap.put(element, navigationModelTarget);
   }
 }

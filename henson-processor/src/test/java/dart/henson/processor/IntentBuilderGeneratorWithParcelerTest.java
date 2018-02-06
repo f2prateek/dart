@@ -38,10 +38,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 .join( //
                     "package test.navigation;",
                     "import java.util.ArrayList;",
-                    "import dart.DartModel;",
-                    "@DartModel",
+                    "import dart.BindExtra;",
                     "public class TestNavigationModel {",
-                    "    ArrayList<String> extra;",
+                    "    @BindExtra ArrayList<String> extra;",
                     "}"));
 
     JavaFileObject builderSource =
@@ -110,10 +109,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 .join( //
                     "package test.navigation;",
                     "import java.util.List;",
-                    "import dart.DartModel;",
-                    "@DartModel",
+                    "import dart.BindExtra;",
                     "public class TestNavigationModel {",
-                    "    List<String> extra;",
+                    "    @BindExtra List<String> extra;",
                     "}"));
 
     JavaFileObject builderSource =
@@ -182,12 +180,11 @@ public class IntentBuilderGeneratorWithParcelerTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
-                    "import dart.DartModel;",
+                    "import dart.BindExtra;",
                     "import org.parceler.Parcel;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
-                    "    Foo extra;",
-                    "    @Parcel static class Foo {}",
+                    "    @BindExtra ClassWithRequiredAndOptionalExtrasNavigationModel extra;",
+                    "    @Parcel static class ClassWithRequiredAndOptionalExtrasNavigationModel {}",
                     "}"));
 
     JavaFileObject builderSource =
@@ -216,7 +213,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
                     "      super(bundler, allRequiredSetState);",
                     "    }",
-                    "    public ALL_SET extra(TestNavigationModel.Foo extra) {",
+                    "    public ALL_SET extra(TestNavigationModel.ClassWithRequiredAndOptionalExtrasNavigationModel extra) {",
                     "      bundler.put(\"extra\", org.parceler.Parcels.wrap(extra));",
                     "      return allRequiredSetState;",
                     "    }",
@@ -255,12 +252,11 @@ public class IntentBuilderGeneratorWithParcelerTest {
                 .join( //
                     "package test.navigation;",
                     "import java.util.List;",
-                    "import dart.DartModel;",
+                    "import dart.BindExtra;",
                     "import org.parceler.Parcel;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
-                    "    List<Foo> extra;",
-                    "    @Parcel static class Foo {}",
+                    "    @BindExtra List<ClassWithRequiredAndOptionalExtrasNavigationModel> extra;",
+                    "    @Parcel static class ClassWithRequiredAndOptionalExtrasNavigationModel {}",
                     "}"));
 
     JavaFileObject builderSource =
@@ -290,7 +286,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
                     "      super(bundler, allRequiredSetState);",
                     "    }",
-                    "    public ALL_SET extra(List<TestNavigationModel.Foo> extra) {",
+                    "    public ALL_SET extra(List<TestNavigationModel.ClassWithRequiredAndOptionalExtrasNavigationModel> extra) {",
                     "      bundler.put(\"extra\", org.parceler.Parcels.wrap(extra));",
                     "      return allRequiredSetState;",
                     "    }",
@@ -329,7 +325,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "package test.navigation;",
                     "import java.util.List;",
                     "import java.util.Map;",
-                    "import dart.DartModel;",
+                    "import dart.BindExtra;",
                     "import org.parceler.Parcel;",
                     "import org.parceler.ParcelConstructor;",
                     "@Parcel",
@@ -343,11 +339,10 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "    return name;",
                     "  }",
                     "}",
-                    "@DartModel",
                     "public class TestNavigationModel {",
-                    "    ExampleParcel extra;",
-                    "    List<ExampleParcel> listExtra;",
-                    "    Map<List<String>, List<ExampleParcel>> mapNestedExtra;",
+                    "    @BindExtra ExampleParcel extra;",
+                    "    @BindExtra List<ExampleParcel> listExtra;",
+                    "    @BindExtra Map<List<String>, List<ExampleParcel>> mapNestedExtra;",
                     //
                     "}"));
 
@@ -432,10 +427,9 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "package test.navigation;",
                     "import java.util.List;",
                     "import android.os.Parcelable;",
-                    "import dart.DartModel;",
-                    "@DartModel",
+                    "import dart.BindExtra;",
                     "public class TestNavigationModel {",
-                    "    Foo extra;",
+                    "    @BindExtra ClassWithRequiredAndOptionalExtrasNavigationModel extra;",
                     "    class FooParent implements Parcelable {",
                     "        public void writeToParcel(android.os.Parcel out, int flags) {",
                     "        }",
@@ -443,7 +437,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "            return 0;",
                     "        }",
                     "    }",
-                    "    class Foo extends FooParent implements Parcelable {",
+                    "    class ClassWithRequiredAndOptionalExtrasNavigationModel extends FooParent implements Parcelable {",
                     "        public void writeToParcel(android.os.Parcel out, int flags) {",
                     "        }",
                     "        public int describeContents() {",
@@ -478,7 +472,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
                     "      super(bundler, allRequiredSetState);",
                     "    }",
-                    "    public ALL_SET extra(TestNavigationModel.Foo extra) {",
+                    "    public ALL_SET extra(TestNavigationModel.ClassWithRequiredAndOptionalExtrasNavigationModel extra) {",
                     "      bundler.put(\"extra\",(android.os.Parcelable) extra);",
                     "      return allRequiredSetState;",
                     "    }",
@@ -517,11 +511,10 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "package test.navigation;",
                     "import java.util.List;",
                     "import android.os.Parcelable;",
-                    "import dart.DartModel;",
+                    "import dart.BindExtra;",
                     "import org.parceler.Parcel;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
-                    "    Foo extra;",
+                    "    @BindExtra ClassWithRequiredAndOptionalExtrasNavigationModel extra;",
                     "    class FooParent implements Parcelable {",
                     "        public void writeToParcel(android.os.Parcel out, int flags) {",
                     "        }",
@@ -529,7 +522,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "            return 0;",
                     "        }",
                     "    }",
-                    "    @Parcel class Foo extends FooParent {} ",
+                    "    @Parcel class ClassWithRequiredAndOptionalExtrasNavigationModel extends FooParent {} ",
                     "}"));
 
     JavaFileObject builderSource =
@@ -558,7 +551,7 @@ public class IntentBuilderGeneratorWithParcelerTest {
                     "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
                     "      super(bundler, allRequiredSetState);",
                     "    }",
-                    "    public ALL_SET extra(TestNavigationModel.Foo extra) {",
+                    "    public ALL_SET extra(TestNavigationModel.ClassWithRequiredAndOptionalExtrasNavigationModel extra) {",
                     "      bundler.put(\"extra\", org.parceler.Parcels.wrap(extra));",
                     "      return allRequiredSetState;",
                     "    }",

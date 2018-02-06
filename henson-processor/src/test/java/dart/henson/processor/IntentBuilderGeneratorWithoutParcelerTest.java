@@ -38,10 +38,9 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                 .join( //
                     "package test.navigation;",
                     "import java.util.ArrayList;",
-                    "import dart.DartModel;",
-                    "@DartModel",
+                    "import dart.BindExtra;",
                     "public class TestNavigationModel {",
-                    "    ArrayList<String> extra;",
+                    "    @BindExtra ArrayList<String> extra;",
                     "}"));
 
     JavaFileObject builderSource =
@@ -112,10 +111,9 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                 .join( //
                     "package test.navigation;",
                     "import java.util.List;",
-                    "import dart.DartModel;",
-                    "@DartModel",
+                    "import dart.BindExtra;",
                     "public class TestNavigationModel {",
-                    "    List<String> extra;",
+                    "    @BindExtra List<String> extra;",
                     "}"));
 
     Compilation compilation =
@@ -136,12 +134,11 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
             Joiner.on('\n')
                 .join( //
                     "package test.navigation;",
-                    "import dart.DartModel;",
+                    "import dart.BindExtra;",
                     "import org.parceler.Parcel;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
-                    "    Foo extra;",
-                    "    @Parcel static class Foo {}",
+                    "    @BindExtra ClassWithRequiredAndOptionalExtrasNavigationModel extra;",
+                    "    @Parcel static class ClassWithRequiredAndOptionalExtrasNavigationModel {}",
                     "}"));
 
     Compilation compilation =
@@ -163,11 +160,10 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                 .join( //
                     "package test.navigation;",
                     "import java.util.List;",
-                    "import dart.DartModel;",
-                    "@DartModel",
+                    "import dart.BindExtra;",
                     "public class TestNavigationModel {",
-                    "    List<Foo> extra;",
-                    "    @Parcel static class Foo {}",
+                    "    @BindExtra List<ClassWithRequiredAndOptionalExtrasNavigationModel> extra;",
+                    "    @Parcel static class ClassWithRequiredAndOptionalExtrasNavigationModel {}",
                     "}"));
 
     Compilation compilation =
@@ -189,11 +185,10 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "package test.navigation;",
                     "import java.util.List;",
                     "import android.os.Parcelable;",
-                    "import dart.DartModel;",
-                    "@DartModel",
+                    "import dart.BindExtra;",
                     "public class TestNavigationModel {",
-                    "    Foo extra;",
-                    "    class Foo implements Parcelable {",
+                    "    @BindExtra ClassWithRequiredAndOptionalExtrasNavigationModel extra;",
+                    "    class ClassWithRequiredAndOptionalExtrasNavigationModel implements Parcelable {",
                     "        public void writeToParcel(android.os.Parcel out, int flags) {",
                     "        }",
                     "        public int describeContents() {",
@@ -228,7 +223,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
                     "      super(bundler, allRequiredSetState);",
                     "    }",
-                    "    public ALL_SET extra(TestNavigationModel.Foo extra) {",
+                    "    public ALL_SET extra(TestNavigationModel.ClassWithRequiredAndOptionalExtrasNavigationModel extra) {",
                     "      bundler.put(\"extra\",(android.os.Parcelable) extra);",
                     "      return allRequiredSetState;",
                     "    }",
@@ -270,10 +265,9 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "package test.navigation;",
                     "import java.util.List;",
                     "import android.os.Parcelable;",
-                    "import dart.DartModel;",
-                    "@DartModel",
+                    "import dart.BindExtra;",
                     "public class TestNavigationModel {",
-                    "    Foo extra;",
+                    "    @BindExtra ClassWithRequiredAndOptionalExtrasNavigationModel extra;",
                     "    class FooParent implements Parcelable {",
                     "        public void writeToParcel(android.os.Parcel out, int flags) {",
                     "        }",
@@ -281,7 +275,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "            return 0;",
                     "        }",
                     "    }",
-                    "    class Foo extends FooParent implements Parcelable {",
+                    "    class ClassWithRequiredAndOptionalExtrasNavigationModel extends FooParent implements Parcelable {",
                     "        public void writeToParcel(android.os.Parcel out, int flags) {",
                     "        }",
                     "        public int describeContents() {",
@@ -317,7 +311,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "    public RequiredSequence(Bundler bundler, ALL_SET allRequiredSetState) {",
                     "      super(bundler, allRequiredSetState);",
                     "    }",
-                    "    public ALL_SET extra(TestNavigationModel.Foo extra) {",
+                    "    public ALL_SET extra(TestNavigationModel.ClassWithRequiredAndOptionalExtrasNavigationModel extra) {",
                     "      bundler.put(\"extra\",(android.os.Parcelable) extra);",
                     "      return allRequiredSetState;",
                     "    }",

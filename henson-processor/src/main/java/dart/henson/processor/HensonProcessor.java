@@ -38,14 +38,19 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
-@SupportedAnnotationTypes({HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME})
+@SupportedAnnotationTypes({
+  HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
+  HensonProcessor.EXTRA_ANNOTATION_CLASS_NAME
+})
 @SupportedOptions({HensonProcessor.OPTION_HENSON_PACKAGE})
 public class HensonProcessor extends AbstractProcessor {
 
   static final String NAVIGATION_MODEL_ANNOTATION_CLASS_NAME = "dart.DartModel";
+  static final String EXTRA_ANNOTATION_CLASS_NAME = "dart.BindExtra";
   static final String OPTION_HENSON_PACKAGE = "dart.henson.package";
 
   private LoggingUtil loggingUtil;
+  private BindExtraUtil bindExtraUtil;
   private FileUtil fileUtil;
   private DartModelUtil dartModelUtil;
   private BindingTargetUtil bindingTargetUtil;
@@ -60,11 +65,12 @@ public class HensonProcessor extends AbstractProcessor {
     final CompilerUtil compilerUtil = new CompilerUtil(processingEnv);
     final ParcelerUtil parcelerUtil = new ParcelerUtil(compilerUtil, processingEnv, usesParceler);
     loggingUtil = new LoggingUtil(processingEnv);
-    final BindExtraUtil bindExtraUtil = new BindExtraUtil(compilerUtil, parcelerUtil, loggingUtil);
     fileUtil = new FileUtil(processingEnv);
-    bindingTargetUtil =
-        new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil, bindExtraUtil);
+    bindingTargetUtil = new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil);
     dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil, compilerUtil);
+    bindExtraUtil =
+        new BindExtraUtil(
+            compilerUtil, parcelerUtil, loggingUtil, bindingTargetUtil, dartModelUtil);
 
     parseAnnotationProcessorOptions(processingEnv);
   }
@@ -77,6 +83,7 @@ public class HensonProcessor extends AbstractProcessor {
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     dartModelUtil.setRoundEnvironment(roundEnv);
+    bindExtraUtil.setRoundEnvironment(roundEnv);
 
     Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
     generateIntentBuilders(targetClassMap);
@@ -103,6 +110,7 @@ public class HensonProcessor extends AbstractProcessor {
     Map<TypeElement, BindingTarget> targetClassMap = new LinkedHashMap<>();
 
     dartModelUtil.parseDartModelAnnotatedElements(targetClassMap);
+    bindExtraUtil.parseBindExtraAnnotatedElements(targetClassMap);
     bindingTargetUtil.createBindingTargetTrees(targetClassMap);
     bindingTargetUtil.addClosestRequiredAncestorForTargets(targetClassMap);
 
