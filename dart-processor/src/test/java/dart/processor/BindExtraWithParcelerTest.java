@@ -41,11 +41,9 @@ public class BindExtraWithParcelerTest {
                 .join( //
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
                     "import android.util.SparseArray;",
-                    "@DartModel",
                     "public class TestSerializableCollectionNavigationModel {",
                     "  @BindExtra(\"key\") SparseArray<String> extra;",
                     "}"));
@@ -85,11 +83,9 @@ public class BindExtraWithParcelerTest {
                 .join( //
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
                     "import java.util.List;",
-                    "@DartModel",
                     "public class TestNonSerializableNonParcelableCollection_withoutParcelerNavigationModel {",
                     "  @BindExtra(\"key\") List<String> extra;",
                     "}"));
@@ -130,11 +126,9 @@ public class BindExtraWithParcelerTest {
                 .join( //
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
                     "import org.parceler.Parcel;",
-                    "@DartModel",
                     "public class TestParcelAnnotatedNavigationModel {",
                     "  @BindExtra(\"key\") Foo extra;",
                     "  @Parcel static class Foo {}",
@@ -175,15 +169,13 @@ public class BindExtraWithParcelerTest {
                 .join( //
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
                     "import java.util.List;",
                     "import org.parceler.Parcel;",
-                    "@DartModel",
                     "public class TestCollectionParcelNavigationModel {",
                     "  @BindExtra(\"key\") List<Foo> extra;",
-                    "@Parcel static class Foo {}",
+                    "  @Parcel static class Foo {}",
                     "}"));
 
     JavaFileObject expectedSource =
@@ -223,7 +215,6 @@ public class BindExtraWithParcelerTest {
                     "import android.os.Parcelable;",
                     "import org.parceler.Parcel;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "class ExtraParent implements Parcelable {",
                     "  public void writeToParcel(android.os.Parcel out, int flags) {",
                     "  }",
@@ -232,7 +223,6 @@ public class BindExtraWithParcelerTest {
                     "  }",
                     "}",
                     "@Parcel class Extra extends ExtraParent {}",
-                    "@DartModel",
                     "public class TestParcelExtendsParcelableNavigationModel {",
                     "    @BindExtra(\"key\") Extra extra;",
                     "}"));
@@ -273,7 +263,6 @@ public class BindExtraWithParcelerTest {
                     "package test;",
                     "import android.os.Parcelable;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "class ExtraParent implements Parcelable {",
                     "  public void writeToParcel(android.os.Parcel out, int flags) {",
                     "  }",
@@ -288,7 +277,6 @@ public class BindExtraWithParcelerTest {
                     "    return 0;",
                     "  }",
                     "}",
-                    "@DartModel",
                     "public class TestParcelableExtendsParcelableNavigationModel {",
                     "    @BindExtra(\"key\") Extra extra;",
                     "}"));

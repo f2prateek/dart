@@ -22,11 +22,14 @@ import static javax.lang.model.element.Modifier.STATIC;
 
 import dart.BindExtra;
 import dart.common.BindingTarget;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Map;
 import java.util.Set;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
 public class BindExtraUtil {
@@ -34,25 +37,61 @@ public class BindExtraUtil {
   private final CompilerUtil compilerUtil;
   private final ParcelerUtil parcelerUtil;
   private final LoggingUtil loggingUtil;
+  private final BindingTargetUtil bindingTargetUtil;
+  private final DartModelUtil dartModelUtil;
+
+  private RoundEnvironment roundEnv;
 
   public BindExtraUtil(
-      CompilerUtil compilerUtil, ParcelerUtil parcelerUtil, LoggingUtil loggingUtil) {
+      CompilerUtil compilerUtil,
+      ParcelerUtil parcelerUtil,
+      LoggingUtil loggingUtil,
+      BindingTargetUtil bindingTargetUtil,
+      DartModelUtil dartModelUtil) {
     this.compilerUtil = compilerUtil;
     this.parcelerUtil = parcelerUtil;
     this.loggingUtil = loggingUtil;
+    this.bindingTargetUtil = bindingTargetUtil;
+    this.dartModelUtil = dartModelUtil;
   }
 
-  public void parseInjectExtra(VariableElement element, BindingTarget bindingTarget) {
+  public void setRoundEnvironment(RoundEnvironment roundEnv) {
+    this.roundEnv = roundEnv;
+  }
+
+  public void parseBindExtraAnnotatedElements(Map<TypeElement, BindingTarget> targetClassMap) {
+    for (Element element : roundEnv.getElementsAnnotatedWith(BindExtra.class)) {
+      try {
+        parseInjectExtra(element, targetClassMap);
+      } catch (Exception e) {
+        StringWriter stackTrace = new StringWriter();
+        e.printStackTrace(new PrintWriter(stackTrace));
+        loggingUtil.error(
+            element,
+            "Unable to generate extra binder when parsing @BindExtra.\n\n%s",
+            stackTrace.toString());
+      }
+    }
+  }
+
+  public void parseInjectExtra(Element element, Map<TypeElement, BindingTarget> targetClassMap) {
     // Verify common generated code restrictions.
     if (!isValidUsageOfBindExtra(element)) {
       return;
     }
 
-    String annotationValue = null;
-    final BindExtra annotation = element.getAnnotation(BindExtra.class);
-    if (annotation != null) {
-      annotationValue = annotation.value();
+    final TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
+    BindingTarget bindingTarget = targetClassMap.get(enclosingElement);
+    if (bindingTarget == null) {
+      // The BindingTarget was already created, @DartModel processed first
+      if (!dartModelUtil.isValidUsageOfDartModel(enclosingElement)) {
+        return;
+      }
+      bindingTarget = bindingTargetUtil.createTargetClass(enclosingElement);
+      targetClassMap.put(enclosingElement, bindingTarget);
     }
+
+    final String annotationValue = element.getAnnotation(BindExtra.class).value();
 
     final String name = element.getSimpleName().toString();
     final String key = StringUtil.isNullOrEmpty(annotationValue) ? name : annotationValue;
@@ -72,7 +111,7 @@ public class BindExtraUtil {
     if (modifiers.contains(PRIVATE) || modifiers.contains(STATIC)) {
       loggingUtil.error(
           element,
-          "@DartModel field must not be private or static. (%s.%s)",
+          "@BindExtra field must not be private or static. (%s.%s)",
           enclosingElement.getQualifiedName(),
           element.getSimpleName());
       valid = false;
@@ -93,30 +132,26 @@ public class BindExtraUtil {
       valid = false;
     }
 
-    // Verify @BindExtra annotation if present.
-    final BindExtra annotation = element.getAnnotation(BindExtra.class);
-    if (annotation != null) {
-      final String annotationValue;
-      try {
-        annotationValue = annotation.value();
-        if (!StringUtil.isNullOrEmpty(annotationValue)
-            && !StringUtil.isValidJavaIdentifier(annotationValue)) {
-          loggingUtil.error(
-              element,
-              "@BindExtra key has to be a valid java variable identifier (%s#%s).\n"
-                  + "See https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html",
-              enclosingElement.getQualifiedName(),
-              element.getSimpleName());
-          valid = false;
-        }
-      } catch (Exception e) {
+    // Verify @BindExtra value.
+    try {
+      final String annotationValue = element.getAnnotation(BindExtra.class).value();
+      if (!StringUtil.isNullOrEmpty(annotationValue)
+          && !StringUtil.isValidJavaIdentifier(annotationValue)) {
         loggingUtil.error(
             element,
-            "@BindExtra has an invalid value (%s#%s).",
+            "@BindExtra key has to be a valid java variable identifier (%s#%s).\n"
+                + "See https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html",
             enclosingElement.getQualifiedName(),
             element.getSimpleName());
         valid = false;
       }
+    } catch (Exception e) {
+      loggingUtil.error(
+          element,
+          "@BindExtra has an invalid value (%s#%s).",
+          enclosingElement.getQualifiedName(),
+          element.getSimpleName());
+      valid = false;
     }
 
     return valid;

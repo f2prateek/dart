@@ -19,14 +19,11 @@ package com.f2prateek.dart;
 
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
-import dart.BindExtra;
-import dart.DartModel;
-import java.util.List;
 import com.f2prateek.dart.model.ComplexParcelable;
 import com.f2prateek.dart.model.StringParcel;
-import com.f2prateek.dart.model.SimpleParcelable;
+import dart.BindExtra;
+import java.util.List;
 
-@DartModel
 public class Module1ActivityNavigationModel {
 
   public static final String DEFAULT_EXTRA_VALUE = "a default value";
@@ -48,5 +45,5 @@ public class Module1ActivityNavigationModel {
   public @BindExtra(EXTRA_SPARSE_ARRAY_PARCELABLE) SparseArray<StringParcel> sparseArrayParcelExtra;
   public @BindExtra(EXTRA_OPTIONAL) @Nullable String optionalExtra;
   public @BindExtra(EXTRA_WITH_DEFAULT) @Nullable String defaultExtra = DEFAULT_EXTRA_VALUE;
-  public String defaultKeyExtra;
+  public @BindExtra String defaultKeyExtra;
 }

@@ -18,9 +18,6 @@
 package dart.common.util;
 
 import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
-import static javax.lang.model.element.Modifier.FINAL;
-import static javax.lang.model.element.Modifier.STATIC;
-import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static javax.lang.model.util.ElementFilter.methodsIn;
 
 import dart.common.BindingTarget;
@@ -29,9 +26,7 @@ import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
@@ -43,18 +38,13 @@ public class BindingTargetUtil {
   public static final String BUNDLE_BUILDER_SUFFIX = "__IntentBuilder";
 
   private final CompilerUtil compilerUtil;
-  private final BindExtraUtil bindExtraUtil;
   private final LoggingUtil loggingUtil;
   private final Elements elementUtils;
   private final Types typeUtils;
 
   public BindingTargetUtil(
-      CompilerUtil compilerUtil,
-      ProcessingEnvironment processingEnv,
-      LoggingUtil loggingUtil,
-      BindExtraUtil bindExtraUtil) {
+      CompilerUtil compilerUtil, ProcessingEnvironment processingEnv, LoggingUtil loggingUtil) {
     this.compilerUtil = compilerUtil;
-    this.bindExtraUtil = bindExtraUtil;
     this.loggingUtil = loggingUtil;
     elementUtils = processingEnv.getElementUtils();
     typeUtils = processingEnv.getTypeUtils();
@@ -63,17 +53,7 @@ public class BindingTargetUtil {
   public BindingTarget createTargetClass(TypeElement typeElement) {
     final String classPackage = compilerUtil.getPackageName(typeElement);
     final String className = compilerUtil.getClassName(typeElement, classPackage);
-    BindingTarget bindingTarget = new BindingTarget(classPackage, className);
-
-    for (VariableElement field : fieldsIn(typeElement.getEnclosedElements())) {
-      Set<Modifier> modifiers = field.getModifiers();
-      // We omit FINAL STATIC fields: constants that should not be taken into account
-      if (!modifiers.contains(FINAL) || !modifiers.contains(STATIC)) {
-        bindExtraUtil.parseInjectExtra(field, bindingTarget);
-      }
-    }
-
-    return bindingTarget;
+    return new BindingTarget(classPackage, className);
   }
 
   public void createBindingTargetTrees(Map<TypeElement, BindingTarget> targetClassMap) {
@@ -123,7 +103,8 @@ public class BindingTargetUtil {
           if (getIntentBuilder(superType) == null) {
             loggingUtil.error(
                 element,
-                "@DartModel %s parent does not have an IntentBuilder. Is %s a @DartModel?",
+                "DartModel %s parent does not have an IntentBuilder. Is %s "
+                    + "annotated with @DartModel or contains @BindExtra fields?",
                 element.getQualifiedName(),
                 superTypeElement.getQualifiedName());
             return;
@@ -175,7 +156,12 @@ public class BindingTargetUtil {
 
   private TypeElement getIntentBuilder(TypeMirror dartModelMirror) {
     final TypeElement dartModel = (TypeElement) ((DeclaredType) dartModelMirror).asElement();
-    final String intentBuilderFQN = dartModel.getQualifiedName().toString() + BUNDLE_BUILDER_SUFFIX;
-    return elementUtils.getTypeElement(intentBuilderFQN);
+    final String modelFQN = dartModel.getQualifiedName().toString();
+    final int indexOfSuffix = modelFQN.indexOf(DART_MODEL_SUFFIX);
+    if (indexOfSuffix == -1) {
+      return null;
+    }
+    final String targetComponentFQN = modelFQN.substring(0, indexOfSuffix);
+    return elementUtils.getTypeElement(targetComponentFQN + BUNDLE_BUILDER_SUFFIX);
   }
 }

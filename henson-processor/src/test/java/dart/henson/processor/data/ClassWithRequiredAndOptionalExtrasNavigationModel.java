@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package dart.henson.processor.data;
 
 import dart.BindExtra;
 
-public class Module1ServiceNavigationModel {
-
-  @BindExtra String stringExtra;
+public class ClassWithRequiredAndOptionalExtrasNavigationModel {
+  @BindExtra String requiredExtra;
+  @Nullable @BindExtra String optionalExtra;
 }

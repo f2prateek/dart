@@ -39,8 +39,6 @@ public class BindExtraTest {
                 .join(
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key\") String extra;",
                     "}"));
@@ -81,8 +79,6 @@ public class BindExtraTest {
                 .join(
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key_bool\") boolean aBool;",
                     "    @BindExtra(\"key_byte\") byte aByte;",
@@ -164,8 +160,6 @@ public class BindExtraTest {
                 .join(
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key\") String extra1;",
                     "    @BindExtra(\"key\") String extra2;",
@@ -210,10 +204,8 @@ public class BindExtraTest {
                 .join(
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra String key;",
                     "}"));
@@ -254,10 +246,8 @@ public class BindExtraTest {
                 .join(
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key_1\") String extra1;",
                     "    @BindExtra(\"key_2\") String extra2;",
@@ -278,14 +268,12 @@ public class BindExtraTest {
                 .join(
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "import java.lang.Object;",
                     "import java.lang.String;",
                     "import java.lang.annotation.Retention;",
                     "import java.lang.annotation.Target;",
                     "import static java.lang.annotation.ElementType.FIELD;",
                     "import static java.lang.annotation.RetentionPolicy.CLASS;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
                     "  @Nullable @BindExtra(\"key\") String extra;",
                     "}",
@@ -328,9 +316,7 @@ public class BindExtraTest {
                 .join(
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
                     "public class TestNavigationModel {",
-                    "@DartModel",
                     "  private static class Inner {",
                     "    @BindExtra(\"key\") String extra;",
                     "  }",
@@ -343,7 +329,7 @@ public class BindExtraTest {
     assertThat(compilation)
         .hadErrorContaining("DartModel class Inner must not be private, static or abstract.")
         .inFile(source)
-        .onLine(6);
+        .onLine(4);
   }
 
   @Test
@@ -355,8 +341,6 @@ public class BindExtraTest {
                 .join(
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key\") private String extra;",
                     "}"));
@@ -367,9 +351,9 @@ public class BindExtraTest {
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
-            "@DartModel field must not be private or static. (test.TestNavigationModel.extra)")
+            "@BindExtra field must not be private or static. (test.TestNavigationModel.extra)")
         .inFile(source)
-        .onLine(6);
+        .onLine(4);
   }
 
   @Test
@@ -381,8 +365,6 @@ public class BindExtraTest {
                 .join(
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key\") static String extra;",
                     "}"));
@@ -393,9 +375,9 @@ public class BindExtraTest {
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
-            "@DartModel field must not be private or static. (test.TestNavigationModel.extra)")
+            "@BindExtra field must not be private or static. (test.TestNavigationModel.extra)")
         .inFile(source)
-        .onLine(6);
+        .onLine(4);
   }
 
   @Test
@@ -407,8 +389,6 @@ public class BindExtraTest {
                 .join(
                     "package test;",
                     "import dart.BindExtra;",
-                    "import dart.DartModel;",
-                    "@DartModel",
                     "public interface TestNavigationModel {",
                     "    @BindExtra(\"key\") String extra = null;",
                     "}"));
@@ -419,9 +399,9 @@ public class BindExtraTest {
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
-            "@DartModel class TestNavigationModel must not be private, static or abstract.")
+            "@BindExtra field must not be private or static. (test.TestNavigationModel.extra)")
         .inFile(source)
-        .onLine(5);
+        .onLine(4);
   }
 
   @Test
@@ -434,11 +414,9 @@ public class BindExtraTest {
                     "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
-                    "@DartModel",
                     "public class TestNavigationModel {",
                     "    @BindExtra(\"key\") String extra;",
                     "}",
-                    "@DartModel",
                     "class TestOneNavigationModel extends TestNavigationModel {",
                     "    @BindExtra(\"key\") String extra1;",
                     "}",
@@ -509,11 +487,9 @@ public class BindExtraTest {
                     "package test;",
                     "import dart.BindExtra;",
                     "import dart.DartModel;",
-                    "@DartModel",
                     "public class TestNavigationModel<T> {",
                     "    @BindExtra(\"key\") String extra;",
                     "}",
-                    "@DartModel",
                     "class TestOneNavigationModel extends TestNavigationModel<String> {",
                     "    @BindExtra(\"key\") String extra1;",
                     "}",
