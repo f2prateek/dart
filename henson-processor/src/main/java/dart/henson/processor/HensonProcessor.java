@@ -35,7 +35,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 @SupportedAnnotationTypes({
@@ -87,7 +86,6 @@ public class HensonProcessor extends AbstractProcessor {
 
     Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
     generateIntentBuilders(targetClassMap);
-    generateHenson(targetClassMap);
 
     //return false here to let dart process the annotations too
     return false;
@@ -141,23 +139,6 @@ public class HensonProcessor extends AbstractProcessor {
 
     for (TypeElement child : bindingTarget.childClasses) {
       generateIntentBuildersForTree(targetClassMap, child);
-    }
-  }
-
-  private void generateHenson(Map<TypeElement, BindingTarget> targetClassMap) {
-    if (!targetClassMap.values().isEmpty()) {
-      Element[] allTypes = targetClassMap.keySet().toArray(new Element[targetClassMap.size()]);
-      try {
-        fileUtil.writeFile(new HensonGenerator(hensonPackage, targetClassMap.values()), allTypes);
-      } catch (IOException e) {
-        for (Element element : allTypes) {
-          loggingUtil.error(
-              element,
-              "Unable to write henson navigator for types %s: %s",
-              element,
-              e.getMessage());
-        }
-      }
     }
   }
 }
