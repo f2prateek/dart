@@ -481,6 +481,45 @@ public class InjectExtraTest {
         .generatesSources(expectedSource1, expectedSource2);
   }
 
+  //we used a precompiled class, to test what happens when the super class comes from a different module
+  @Test public void preCompiled_superclass() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.app.Activity;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "class TestOne extends TestPreCompiled {", //
+            "    @InjectExtra(\"key\") String extra1;", //
+            "}"
+    ));
+
+    JavaFileObject expectedSource =
+            JavaFileObjects.forSourceString("test/TestOne$$ExtraInjector", Joiner.on('\n').join( //
+                    "package test;", //
+                    "import com.f2prateek.dart.Dart;", //
+                    "import java.lang.Object;", //
+                    "import java.lang.String;", //
+                    "public class TestOne$$ExtraInjector {", //
+                    "  public static void inject(Dart.Finder finder, TestOne target, Object source) {", //
+                    "    TestPreCompiled$$ExtraInjector.inject(finder, target, source);", //
+                    "    Object object;", //
+                    "    object = finder.getExtra(source, \"key\");", //
+                    "    if (object == null) {", //
+                    "      throw new IllegalStateException(\"Required extra with key 'key' for field 'extra1' was not found. If this extra is optional add '@Nullable' annotation.\");",
+                    //
+                    "    }", //
+                    "    target.extra1 = (String) object;", //
+                    "  }", //
+                    "}" //
+            ));
+
+    assert_().about(javaSource())
+            .that(source)
+            .processedWith(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .compilesWithoutError()
+            .and()
+            .generatesSources(expectedSource);
+  }
+
   @Test public void genericSuperclass() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //

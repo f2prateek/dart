@@ -21,6 +21,7 @@ import com.f2prateek.dart.HensonNavigable;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.common.AbstractDartProcessor;
 import com.f2prateek.dart.common.InjectionTarget;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -30,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -171,7 +173,7 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
     Set<TypeMirror> erasedTargetTypes = new LinkedHashSet<>();
 
     // Process each @InjectExtra elements.
-    parseInjectExtraAnnotatedElements(env, targetClassMap, erasedTargetTypes);
+    parseInjectExtraAnnotatedElements(env, targetClassMap, erasedTargetTypes, true);
     // Try to find a parent injector for each injector. For targets using @InjectExtra
     findAllTargetParents(targetClassMap, erasedTargetTypes);
     // Process each @HensonNavigable elements.
@@ -237,6 +239,8 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
 
     // Assemble information on the injection point.
     InjectionTarget hensonNavigableTarget = getOrCreateTargetClass(targetClassMap, element);
+    findParentAndInheritInjectionMap(element, hensonNavigableTarget);
+
     //get the model class of Henson annotation
     AnnotationMirror hensonAnnotationMirror = getAnnotationMirror(element, HensonNavigable.class);
     TypeMirror modelTypeMirror = getHensonModelMirror(hensonAnnotationMirror);
@@ -244,12 +248,28 @@ public final class HensonExtraProcessor extends AbstractDartProcessor {
       TypeElement modelElement = (TypeElement) typeUtils.asElement(modelTypeMirror);
       if (!"Void".equals(modelElement.getSimpleName())) {
         if (isDebugEnabled) {
-          System.out.println(String.format("HensonNavigable class %s uses model class %s\n",
-              element.getSimpleName(), modelElement.getSimpleName()));
+          System.out.printf("HensonNavigable class %s uses model class %s\n",
+              element.getSimpleName(), modelElement.getSimpleName());
         }
-        //we simply copy all extra injections from the model and add them to the target
-        InjectionTarget modelInjectionTarget = getOrCreateTargetClass(targetClassMap, modelElement);
+        final InjectionTarget modelInjectionTarget;
+        //the model was processed already (it belongs to the same module and is annotated)
+        if (targetClassMap.containsKey(modelElement)) {
+          //we simply copy all extra injections from the model and add them to the target
+          modelInjectionTarget = getOrCreateTargetClass(targetClassMap, modelElement);
+        } else {
+          //otherwise, we process (again probably, this is unfortunate) the element
+          //and scan its InjectExtra annotations
+          //TODO can we avoid doing this processing again ?
+          modelInjectionTarget = scanTypeForInjectExtras(modelElement);
+          // Add the type-erased version to the valid injection targets set.
+          TypeMirror erasedTargetType = typeUtils.erasure(modelElement.asType());
+          erasedTargetTypes.add(erasedTargetType);
+        }
+
         modelInjectionTarget.isModel = true;
+        //scan the hierarchy of the model to find annotations.
+        //TODO this is redundant in some cases...the code of DH2 is quite messy..
+        findParentAndInheritInjectionMap(modelElement, modelInjectionTarget);
         hensonNavigableTarget.injectionMap.putAll(modelInjectionTarget.injectionMap);
         hensonNavigableTarget.parentTarget = modelInjectionTarget.parentTarget;
       }

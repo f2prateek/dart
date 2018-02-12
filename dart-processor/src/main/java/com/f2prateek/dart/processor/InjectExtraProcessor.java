@@ -74,13 +74,17 @@ public final class InjectExtraProcessor extends AbstractDartProcessor {
     Set<TypeMirror> erasedTargetTypes = new LinkedHashSet<>();
 
     // Process each @InjectExtra elements.
-    parseInjectExtraAnnotatedElements(env, targetClassMap, erasedTargetTypes);
+    parseInjectExtraAnnotatedElements(env, targetClassMap, erasedTargetTypes, false);
 
     // Try to find a parent injector for each injector.
     for (Map.Entry<TypeElement, InjectionTarget> entry : targetClassMap.entrySet()) {
-      String parentClassFqcn = findParentFqcn(entry.getKey(), erasedTargetTypes);
+      TypeElement typeElement = entry.getKey();
+      InjectionTarget injectionTarget = entry.getValue();
+      String parentClassFqcn = findParentFqcn(typeElement, erasedTargetTypes);
       if (parentClassFqcn != null) {
-        entry.getValue().setParentTarget(parentClassFqcn);
+        injectionTarget.setParentTarget(parentClassFqcn);
+      } else {
+        findParentInjectionTarget(typeElement, injectionTarget);
       }
     }
 
