@@ -76,6 +76,117 @@ public class IntentBuilderGeneratorTest {
         .generatesSources(builderSource);
   }
 
+  @Test
+  public void injectingExtra_withInheritance() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "public class Test extends TestOne {", //
+        "    @InjectExtra String extra;", //
+        "}", //
+        "class TestOne extends Activity {", //
+        "    @InjectExtra String extra2;", //
+        "}" //
+    ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import java.lang.String;", //
+            "public class Test$$IntentBuilder {", //
+            "  private Intent intent;", //
+            "  private Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Test$$IntentBuilder.AfterSettingExtra extra(String extra) {", //
+            "    bundler.put(\"extra\", extra);", //
+            "    return new Test$$IntentBuilder.AfterSettingExtra();", //
+            "  }", //
+            "  public class AfterSettingExtra {", //
+            "    public Test$$IntentBuilder.AllSet extra2(String extra2) {", //
+            "      bundler.put(\"extra2\", extra2);", //
+            "      return new Test$$IntentBuilder.AllSet();", //
+            "    }", //
+            "  }", //
+            "  public class AllSet {", //
+            "    public Intent build() {", //
+            "      intent.putExtras(bundler.get());", //
+            "      return intent;", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test
+  public void injectingExtra_withPreCompiledInheritance() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.InjectExtra;", //
+        "public class Test extends PreCompiledChildModel {", //
+        "    @InjectExtra String extra3;", //
+        "}"
+    ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import java.lang.String;", //
+            "public class Test$$IntentBuilder {", //
+            "  private Intent intent;", //
+            "  private Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Test$$IntentBuilder.AfterSettingExtra extra(String extra) {", //
+            "    bundler.put(\"extra\", extra);", //
+            "    return new Test$$IntentBuilder.AfterSettingExtra();", //
+            "  }", //
+            "  public class AfterSettingExtra {", //
+            "    public Test$$IntentBuilder.AfterSettingExtra2 extra2(String extra2) {", //
+            "      bundler.put(\"extra2\", extra2);", //
+            "      return new Test$$IntentBuilder.AfterSettingExtra2();", //
+            "    }", //
+            "  }", //
+            "  public class AfterSettingExtra2 {", //
+            "    public Test$$IntentBuilder.AllSet extra3(String extra3) {", //
+            "      bundler.put(\"extra3\", extra3);", //
+            "      return new Test$$IntentBuilder.AllSet();", //
+            "    }", //
+            "  }", //
+            "  public class AllSet {", //
+            "    public Intent build() {", //
+            "      intent.putExtras(bundler.get());", //
+            "      return intent;", //
+            "    }", //
+            "  }", //
+            "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
   @Test public void hensonNavigable() {
     JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
         "package test;", //
@@ -102,6 +213,49 @@ public class IntentBuilderGeneratorTest {
             "    return intent;", //
             "  }", //
             "}" //
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test public void hensonNavigable_withInheritance() {
+    JavaFileObject source = JavaFileObjects.forSourceString("test.Test", Joiner.on('\n').join( //
+        "package test;", //
+        "import android.app.Activity;", //
+        "import com.f2prateek.dart.HensonNavigable;", //
+        "@HensonNavigable public class Test extends PreCompiledModel {", //
+        "}" //
+    ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/Test$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;" +
+                "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import java.lang.String;", //
+            "public class Test$$IntentBuilder {", //
+            "  private Intent intent;", //
+            "  private Bundler bundler = Bundler.create();", //
+            "  public Test$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, Test.class);", //
+            "  }", //
+            "  public Test$$IntentBuilder.AllSet extra(String extra) {", //
+            "    bundler.put(\"extra\", extra);", //
+            "    return new Test$$IntentBuilder.AllSet();", //
+            "  }", //
+            "  public class AllSet {", //
+            "    public Intent build() {", //
+            "      intent.putExtras(bundler.get());", //
+            "      return intent;", //
+            "    }", //
+            "  }", //
+            "}"
         ));
 
     assert_().about(javaSource())
@@ -160,7 +314,56 @@ public class IntentBuilderGeneratorTest {
         .generatesSources(builderSource);
   }
 
- @Test public void hensonNavigable_withModel_withInheritance() {
+  //by testing with a pre compiled model, we mimick the fact that
+  //the model can be located in a different module
+  @Test public void hensonNavigable_withPrecompiledModel() {
+    JavaFileObject source =
+        JavaFileObjects.forSourceString("test.TestPrecompiledModel", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.app.Activity;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.HensonNavigable;", //
+            "@HensonNavigable(model = PreCompiledModel.class) public class TestPrecompiledModel extends Activity {",
+            //
+            "}"
+        ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/TestPrecompiledModel$$IntentBuilder",
+            Joiner.on('\n').join( //
+                "package test;", //
+                "import android.content.Context;", //
+                "import android.content.Intent;", //
+                "import com.f2prateek.dart.henson.Bundler;", //
+                "import java.lang.String;", //
+                "public class TestPrecompiledModel$$IntentBuilder {", //
+                "  private Intent intent;", //
+                "  private Bundler bundler = Bundler.create();", //
+                "  public TestPrecompiledModel$$IntentBuilder(Context context) {", //
+                "    intent = new Intent(context, TestPrecompiledModel.class);", //
+                "  }", //
+                "  public TestPrecompiledModel$$IntentBuilder.AllSet extra(String extra) {", //
+                "    bundler.put(\"extra\", extra);", //
+                "    return new TestPrecompiledModel$$IntentBuilder.AllSet();", //
+                "  }", //
+                "  public class AllSet {", //
+                "    public Intent build() {", //
+                "      intent.putExtras(bundler.get());", //
+                "      return intent;", //
+                "    }", //
+                "  }", //
+                "}"
+            ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test public void hensonNavigable_withModel_withInheritance() {
     JavaFileObject source =
         JavaFileObjects.forSourceString("test.TestModel", Joiner.on('\n').join( //
             "package test;", //
@@ -217,14 +420,122 @@ public class IntentBuilderGeneratorTest {
         .generatesSources(builderSource);
   }
 
- @Test public void hensonNavigable_withModel_withInheritance_and_superClassOfModel_usedAsModel() {
+  @Test public void hensonNavigable_withModel_withPrecompiledInheritance() {
+    JavaFileObject source =
+        JavaFileObjects.forSourceString("test.TestModel", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.app.Activity;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.HensonNavigable;", //
+            "@HensonNavigable(model = FooChild.class) public class TestModel extends Activity {", //
+            "}", //
+            "class FooChild extends PreCompiledModel {", //
+            "  @InjectExtra String extra2;", //
+            "}" //
+        ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/TestModel$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import java.lang.String;", //
+            "public class TestModel$$IntentBuilder {", //
+            "  private Intent intent;", //
+            "  private Bundler bundler = Bundler.create();", //
+            "  public TestModel$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, TestModel.class);", //
+            "  }", //
+            "public TestModel$$IntentBuilder.AfterSettingExtra extra(String extra) {", //
+            "    bundler.put(\"extra\", extra);", //
+            "    return new TestModel$$IntentBuilder.AfterSettingExtra();", //
+            "  }", //
+            "  public class AfterSettingExtra {", //
+            "    public TestModel$$IntentBuilder.AllSet extra2(String extra2) {", //
+            "      bundler.put(\"extra2\", extra2);", //
+            "      return new TestModel$$IntentBuilder.AllSet();", //
+            "    }", //
+            "  }", //
+            "  public class AllSet {", //
+            "    public Intent build() {", //
+            "      intent.putExtras(bundler.get());", //
+            "      return intent;", //
+            "    }", //
+            "  }", //
+            "}"
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test
+  public void hensonNavigable_withModel_with2LevelsPrecompiledInheritance() {
+    JavaFileObject source =
+        JavaFileObjects.forSourceString("test.TestModel", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.app.Activity;", //
+            "import com.f2prateek.dart.InjectExtra;", //
+            "import com.f2prateek.dart.HensonNavigable;", //
+            "@HensonNavigable(model = PreCompiledChildModel.class) public class TestModel extends Activity {",
+            //
+            "}"
+        ));
+
+    JavaFileObject builderSource =
+        JavaFileObjects.forSourceString("test/TestModel$$IntentBuilder", Joiner.on('\n').join( //
+            "package test;", //
+            "import android.content.Context;", //
+            "import android.content.Intent;", //
+            "import com.f2prateek.dart.henson.Bundler;", //
+            "import java.lang.String;", //
+            "public class TestModel$$IntentBuilder {", //
+            "  private Intent intent;", //
+            "  private Bundler bundler = Bundler.create();", //
+            "  public TestModel$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, TestModel.class);", //
+            "  }", //
+            "public TestModel$$IntentBuilder.AfterSettingExtra extra(String extra) {", //
+            "    bundler.put(\"extra\", extra);", //
+            "    return new TestModel$$IntentBuilder.AfterSettingExtra();", //
+            "  }", //
+            "  public class AfterSettingExtra {", //
+            "    public TestModel$$IntentBuilder.AllSet extra2(String extra2) {", //
+            "      bundler.put(\"extra2\", extra2);", //
+            "      return new TestModel$$IntentBuilder.AllSet();", //
+            "    }", //
+            "  }", //
+            "  public class AllSet {", //
+            "    public Intent build() {", //
+            "      intent.putExtras(bundler.get());", //
+            "      return intent;", //
+            "    }", //
+            "  }", //
+            "}"
+        ));
+
+    assert_().about(javaSource())
+        .that(source)
+        .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
+        .compilesWithoutError()
+        .and()
+        .generatesSources(builderSource);
+  }
+
+  @Test public void hensonNavigable_withModel_withInheritance_and_superClassOfModel_usedAsModel() {
     JavaFileObject source =
         JavaFileObjects.forSourceString("test.TestModelChild", Joiner.on('\n').join( //
             "package test;", //
             "import android.app.Activity;", //
             "import com.f2prateek.dart.InjectExtra;", //
             "import com.f2prateek.dart.HensonNavigable;", //
-            "@HensonNavigable(model = FooChild.class) public class TestModelChild extends Activity {", //
+            "@HensonNavigable(model = FooChild.class) public class TestModelChild extends Activity {",
+            //
             "}", //
             "@HensonNavigable(model = Foo.class) class TestModel extends Activity {", //
             "}", //
@@ -237,27 +548,54 @@ public class IntentBuilderGeneratorTest {
         ));
 
     JavaFileObject builderSourceTestModelChild =
-        JavaFileObjects.forSourceString("test/TestModelChild$$IntentBuilder", Joiner.on('\n').join( //
+        JavaFileObjects.forSourceString("test/TestModelChild$$IntentBuilder",
+            Joiner.on('\n').join( //
+                "package test;", //
+                "import android.content.Context;", //
+                "import android.content.Intent;", //
+                "import com.f2prateek.dart.henson.Bundler;", //
+                "import java.lang.String;", //
+                "public class TestModelChild$$IntentBuilder {", //
+                "  private Intent intent;", //
+                "  private Bundler bundler = Bundler.create();", //
+                "  public TestModelChild$$IntentBuilder(Context context) {", //
+                "    intent = new Intent(context, TestModelChild.class);", //
+                "  }", //
+                "public TestModelChild$$IntentBuilder.AfterSettingExtra extra(String extra) {", //
+                "    bundler.put(\"extra\", extra);", //
+                "    return new TestModelChild$$IntentBuilder.AfterSettingExtra();", //
+                "  }", //
+                "  public class AfterSettingExtra {", //
+                "    public TestModelChild$$IntentBuilder.AllSet extra2(String extra2) {", //
+                "      bundler.put(\"extra2\", extra2);", //
+                "      return new TestModelChild$$IntentBuilder.AllSet();", //
+                "    }", //
+                "  }", //
+                "  public class AllSet {", //
+                "    public Intent build() {", //
+                "      intent.putExtras(bundler.get());", //
+                "      return intent;", //
+                "    }", //
+                "  }", //
+                "}"
+            ));
+
+    JavaFileObject builderSourceTestModel =
+        JavaFileObjects.forSourceString("test/TestModel$$IntentBuilder", Joiner.on('\n').join( //
             "package test;", //
             "import android.content.Context;", //
             "import android.content.Intent;", //
             "import com.f2prateek.dart.henson.Bundler;", //
             "import java.lang.String;", //
-            "public class TestModelChild$$IntentBuilder {", //
+            "public class TestModel$$IntentBuilder {", //
             "  private Intent intent;", //
             "  private Bundler bundler = Bundler.create();", //
-            "  public TestModelChild$$IntentBuilder(Context context) {", //
-            "    intent = new Intent(context, TestModelChild.class);", //
+            "  public TestModel$$IntentBuilder(Context context) {", //
+            "    intent = new Intent(context, TestModel.class);", //
             "  }", //
-            "public TestModelChild$$IntentBuilder.AfterSettingExtra extra(String extra) {", //
+            "  public TestModel$$IntentBuilder.AllSet extra(String extra) {", //
             "    bundler.put(\"extra\", extra);", //
-            "    return new TestModelChild$$IntentBuilder.AfterSettingExtra();", //
-            "  }", //
-            "  public class AfterSettingExtra {", //
-            "    public TestModelChild$$IntentBuilder.AllSet extra2(String extra2) {", //
-            "      bundler.put(\"extra2\", extra2);", //
-            "      return new TestModelChild$$IntentBuilder.AllSet();", //
-            "    }", //
+            "    return new TestModel$$IntentBuilder.AllSet();", //
             "  }", //
             "  public class AllSet {", //
             "    public Intent build() {", //
@@ -268,38 +606,12 @@ public class IntentBuilderGeneratorTest {
             "}"
         ));
 
-     JavaFileObject builderSourceTestModel =
-         JavaFileObjects.forSourceString("test/TestModel$$IntentBuilder", Joiner.on('\n').join( //
-             "package test;", //
-             "import android.content.Context;", //
-             "import android.content.Intent;", //
-             "import com.f2prateek.dart.henson.Bundler;", //
-             "import java.lang.String;", //
-             "public class TestModel$$IntentBuilder {", //
-             "  private Intent intent;", //
-             "  private Bundler bundler = Bundler.create();", //
-             "  public TestModel$$IntentBuilder(Context context) {", //
-             "    intent = new Intent(context, TestModel.class);", //
-             "  }", //
-             "  public TestModel$$IntentBuilder.AllSet extra(String extra) {", //
-             "    bundler.put(\"extra\", extra);", //
-             "    return new TestModel$$IntentBuilder.AllSet();", //
-             "  }", //
-             "  public class AllSet {", //
-             "    public Intent build() {", //
-             "      intent.putExtras(bundler.get());", //
-             "      return intent;", //
-             "    }", //
-             "  }", //
-             "}"
-         ));
-
     assert_().about(javaSource())
         .that(source)
         .processedWith(ProcessorTestUtilities.hensonProcessorsWithoutParceler())
         .compilesWithoutError()
         .and()
-        .generatesSources(builderSourceTestModelChild,builderSourceTestModel);
+        .generatesSources(builderSourceTestModelChild, builderSourceTestModel);
   }
 
   @Test public void hensonNavigable_with_extras() {

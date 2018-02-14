@@ -18,6 +18,7 @@
 package com.f2prateek.dart.common;
 
 import com.f2prateek.dart.InjectExtra;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
@@ -29,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -38,9 +40,11 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
@@ -67,16 +71,16 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   //You must go to Preferences->Code Style->General->Formatter Control
   // and check Enable formatter markers in comments for this to work.
   private static final Set<String> JAVA_KEYWORDS = new HashSet<>(Arrays.asList(
-      "abstract",  "assert",       "boolean",    "break",      "byte",      "case",
-      "catch",     "char",         "class",      "const",     "continue",   "enum",
-      "default",   "do",           "double",     "else",      "extends",    "while",
-      "false",     "final",        "finally",    "float",     "for",
-      "goto",      "if",           "implements", "import",    "instanceof",
-      "int",       "interface",    "long",       "native",    "new",
-      "null",      "package",      "private",    "protected", "public",
-      "return",    "short",        "static",     "strictfp",  "super",
-      "switch",    "synchronized", "this",       "throw",     "throws",
-      "transient", "true",         "try",        "void",      "volatile"
+      "abstract", "assert", "boolean", "break", "byte", "case",
+      "catch", "char", "class", "const", "continue", "enum",
+      "default", "do", "double", "else", "extends", "while",
+      "false", "final", "finally", "float", "for",
+      "goto", "if", "implements", "import", "instanceof",
+      "int", "interface", "long", "native", "new",
+      "null", "package", "private", "protected", "public",
+      "return", "short", "static", "strictfp", "super",
+      "switch", "synchronized", "this", "throw", "throws",
+      "transient", "true", "try", "void", "volatile"
   ));
   // @formatter:on
 
@@ -163,6 +167,74 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     return injectionTarget;
   }
 
+  protected void findParentInjectionTarget(TypeElement typeElement,
+      InjectionTarget injectionTarget) {
+    findInjectionTargetForSuperTypeWithInjectExtra(typeElement,
+        injectionTarget,
+        false,
+        true);
+  }
+
+  protected void findParentAndInheritInjectionMap(TypeElement typeElement,
+      InjectionTarget injectionTarget) {
+    findInjectionTargetForSuperTypeWithInjectExtra(typeElement,
+        injectionTarget,
+        true,
+        false);
+  }
+
+  private void findInjectionTargetForSuperTypeWithInjectExtra(TypeElement typeElement,
+      InjectionTarget injectionTarget,
+      boolean shouldAddInjectionMaps,
+      boolean shouldStopAtFirstParent) {
+    while (true) {
+      TypeMirror superType = typeElement.getSuperclass();
+      if (superType.getKind() == TypeKind.NONE) {
+        return;
+      }
+      final TypeElement superTypeElement = (TypeElement) ((DeclaredType) superType).asElement();
+      final InjectionTarget superInjectionTarget = scanTypeForInjectExtras(superTypeElement);
+      if (!superInjectionTarget.injectionMap.isEmpty()) {
+        if (injectionTarget.parentTarget == null) {
+          final String packageName = getPackageName(superTypeElement);
+          injectionTarget.parentTarget =
+              packageName + "." + getClassName(superTypeElement, packageName);
+        }
+        if (shouldAddInjectionMaps) {
+          injectionTarget.injectionMap.putAll(superInjectionTarget.injectionMap);
+        }
+        if (shouldStopAtFirstParent) {
+          return;
+        }
+      }
+      typeElement = superTypeElement;
+    }
+  }
+
+  /**
+   * Scans a type for inject extras annotated fields.
+   *
+   * @param typeElement the type element to scan.
+   * @return a non null target.
+   */
+  protected InjectionTarget scanTypeForInjectExtras(TypeElement typeElement) {
+    final String targetType = typeElement.getQualifiedName().toString();
+    final String classPackage = getPackageName(typeElement);
+    final String className = getClassName(typeElement, classPackage);
+    final boolean isAbstractType = typeElement.getModifiers().contains(Modifier.ABSTRACT);
+
+    InjectionTarget injectionTarget = new InjectionTarget(classPackage, className, targetType,
+        isAbstractType);
+    List<VariableElement> fields = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
+    for (VariableElement fieldElement : fields) {
+      Annotation injectExtraAnnotation = fieldElement.getAnnotation(InjectExtra.class);
+      if (injectExtraAnnotation != null) {
+        addField(fieldElement, injectionTarget);
+      }
+    }
+    return injectionTarget;
+  }
+
   /** Finds the parent injector type in the supplied set, if any. */
   protected String findParentFqcn(TypeElement typeElement, Set<TypeMirror> parents) {
     TypeMirror type;
@@ -184,10 +256,11 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
   }
 
   protected void parseInjectExtraAnnotatedElements(RoundEnvironment env,
-      Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes) {
+      Map<TypeElement, InjectionTarget> targetClassMap, Set<TypeMirror> erasedTargetTypes,
+      boolean shouldAddParentInjectionMaps) {
     for (Element element : env.getElementsAnnotatedWith(InjectExtra.class)) {
       try {
-        parseInjectExtra(element, targetClassMap, erasedTargetTypes);
+        parseInjectExtra(element, targetClassMap, erasedTargetTypes, shouldAddParentInjectionMaps);
       } catch (Exception e) {
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
@@ -198,34 +271,41 @@ public abstract class AbstractDartProcessor extends AbstractProcessor {
     }
   }
 
-  private void parseInjectExtra(Element element, Map<TypeElement, InjectionTarget> targetClassMap,
-      Set<TypeMirror> erasedTargetTypes) {
-    TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
+  private void parseInjectExtra(Element fieldElement, Map<TypeElement, InjectionTarget>
+      targetClassMap, Set<TypeMirror> erasedTargetTypes, boolean shouldAddParentInjectionMaps) {
+    TypeElement typeElement = (TypeElement) fieldElement.getEnclosingElement();
 
     // Verify common generated code restrictions.
-    if (!isValidUsageOfInjectExtra(InjectExtra.class, element)) {
+    if (!isValidUsageOfInjectExtra(InjectExtra.class, fieldElement)) {
       return;
     }
 
-    String annotationValue = element.getAnnotation(InjectExtra.class).value();
+    InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, typeElement);
+    if (shouldAddParentInjectionMaps) {
+      findParentAndInheritInjectionMap(typeElement, injectionTarget);
+    }
+    addField(fieldElement, injectionTarget);
+
+    // Add the type-erased version to the valid injection targets set.
+    TypeMirror erasedTargetType = typeUtils.erasure(typeElement.asType());
+    erasedTargetTypes.add(erasedTargetType);
+  }
+
+  private void addField(Element fieldElement, InjectionTarget injectionTarget) {
+    String annotationValue = fieldElement.getAnnotation(InjectExtra.class).value();
     if (!isNullOrEmpty(annotationValue) && !isValidJavaIdentifier(annotationValue)) {
       throw new IllegalArgumentException("Keys have to be valid java variable identifiers. "
           + "https://docs.oracle.com/cd/E19798-01/821-1841/bnbuk/index.html");
     }
 
     // Assemble information on the injection point.
-    String name = element.getSimpleName().toString();
+    String name = fieldElement.getSimpleName().toString();
     String key = isNullOrEmpty(annotationValue) ? name : annotationValue;
-    TypeMirror type = element.asType();
-    boolean required = isRequiredInjection(element);
+    TypeMirror type = fieldElement.asType();
+    boolean required = isRequiredInjection(fieldElement);
     boolean parcel = isParcelerAvailable() && isValidExtraTypeForParceler(type);
 
-    InjectionTarget injectionTarget = getOrCreateTargetClass(targetClassMap, enclosingElement);
     injectionTarget.addField(key, name, type, required, parcel);
-
-    // Add the type-erased version to the valid injection targets set.
-    TypeMirror erasedTargetType = typeUtils.erasure(enclosingElement.asType());
-    erasedTargetTypes.add(erasedTargetType);
   }
 
   private boolean isValidUsageOfInjectExtra(Class<? extends Annotation> annotationClass,
