@@ -180,6 +180,15 @@ Talks & Slides
 * DroidCon Italy, Turin (2017):[video](https://www.youtube.com/watch?v=EVQewsJu0NA)
 * "Reducing Intent data passing ‘putExtra’, ‘putInt’, ‘putParcelable’ Boiler plate code" from Take Off Android:[Article](https://blog.f22labs.com/reducing-intent-data-passing-putextra-putint-putparcelable-boiler-plate-code-fd62b449dac3)
 
+Credits
+-------
+
+The original author of the library is [Prateek Srivastava](https://github.com/f2prateek) who got inspired by the work of [Jake Wharton](https://github.com/jakewharton) on [butter knife](http://jakewharton.github.io/butterknife/).
+
+Later, [Daniel Molinero Reguera](https://github.com/dlemures) and [Stephane NICOLAS](https://github.com/stephanenicolas) contributed Henson in Dart 2, and rewrote the library for Dart 3.
+
+All the effort on versions 2 and versions 3 have been actively supported by [Groupon](https://groupon.github.io/). Thanks for this awesome OSS commitment !
+
 License
 -------
 
