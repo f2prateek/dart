@@ -12,7 +12,9 @@ lib
 target
 pom.xml.*
 release.properties
+locale.properties
 
+.gradle/
 .idea
 *.iml
 classes
