@@ -44,16 +44,50 @@ public class BindingTarget {
   public boolean hasRequiredFields;
   public boolean topLevel;
   public List<TypeElement> childClasses;
+  public String dartModelFieldPackageName;
+  public String dartModelFieldClassName;
+  public String dartModelFieldName;
 
+  /**
+   * Creates a target for a type that is annotated with @DartModel.
+   * (i.e. a navigation model)
+   * @param classPackage the package name of the type.
+   * @param className the type name.
+   */
   public BindingTarget(String classPackage, String className) {
     this.classPackage = classPackage;
-    this.className = className.substring(0, className.indexOf(DART_MODEL_SUFFIX));
+    if(className.contains(DART_MODEL_SUFFIX)) {
+      this.className = className.substring(0, className.indexOf(DART_MODEL_SUFFIX));
+    } else {
+      this.className = className;
+    }
     this.childClasses = new ArrayList<>();
     this.topLevel = false;
   }
 
+  /**
+   * Creates a target for a type that contains a @DartModel annotated field.
+   * @param classPackage the package name of the type.
+   * @param className the type name.
+   * @param dartModelFieldPackageName the package name of the type of the field.
+   * @param dartModelFieldClassName the name of the type of the field.
+   * @param dartModelFieldName the package name of the field.
+   */
+  public BindingTarget(String classPackage, String className,
+                       String dartModelFieldPackageName, String dartModelFieldClassName,
+                       String dartModelFieldName) {
+    this(classPackage, className);
+    this.dartModelFieldPackageName = dartModelFieldPackageName;
+    this.dartModelFieldClassName = dartModelFieldClassName;
+    this.dartModelFieldName = dartModelFieldName;
+  }
+
   public String getFQN() {
     return classPackage + "." + className;
+  }
+
+  public String getFieldFQN() {
+    return dartModelFieldPackageName + "." + dartModelFieldClassName;
   }
 
   public String getParentFQN() {

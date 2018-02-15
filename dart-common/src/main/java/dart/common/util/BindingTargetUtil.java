@@ -50,10 +50,20 @@ public class BindingTargetUtil {
     typeUtils = processingEnv.getTypeUtils();
   }
 
-  public BindingTarget createTargetClass(TypeElement typeElement) {
+  public BindingTarget createTargetForType(TypeElement typeElement) {
     final String classPackage = compilerUtil.getPackageName(typeElement);
     final String className = compilerUtil.getClassName(typeElement, classPackage);
     return new BindingTarget(classPackage, className);
+  }
+
+  public BindingTarget createTargetForField(TypeElement typeElement, Element fieldElement) {
+    final String classPackage = compilerUtil.getPackageName(typeElement);
+    final String className = compilerUtil.getClassName(typeElement, classPackage);
+    final TypeElement fieldTypeElement = (TypeElement) typeUtils.asElement(fieldElement.asType());
+    final String fieldClassPackage = compilerUtil.getPackageName(fieldTypeElement);
+    final String fieldClassName = compilerUtil.getClassName(fieldTypeElement, fieldClassPackage);
+    return new BindingTarget(classPackage, className,
+            fieldClassPackage, fieldClassName, fieldElement.getSimpleName().toString());
   }
 
   public void createBindingTargetTrees(Map<TypeElement, BindingTarget> targetClassMap) {

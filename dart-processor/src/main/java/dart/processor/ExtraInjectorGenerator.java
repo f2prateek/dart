@@ -66,30 +66,57 @@ public class ExtraInjectorGenerator extends BaseGenerator {
   }
 
   private String binderClassName() {
-    return target.className + DART_MODEL_SUFFIX + Dart.BINDER_SUFFIX;
+    if (target.dartModelFieldPackageName != null) {
+      return target.className + Dart.BINDER_SUFFIX;
+    } else {
+      return target.className + DART_MODEL_SUFFIX + Dart.BINDER_SUFFIX;
+    }
   }
 
   private void emitBind(TypeSpec.Builder builder) {
+    boolean isFieldAnnotated = target.dartModelFieldPackageName != null;
+
+    String targetFQN;
+    if (isFieldAnnotated) {
+      targetFQN = target.getFQN();
+    } else {
+      targetFQN = target.getFQN() + DART_MODEL_SUFFIX;
+    }
     MethodSpec.Builder bindBuilder =
         MethodSpec.methodBuilder("bind")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .addParameter(ClassName.get(Dart.Finder.class), "finder")
-            .addParameter(ClassName.bestGuess(target.getFQN() + DART_MODEL_SUFFIX), "target")
+            .addParameter(ClassName.bestGuess(targetFQN), "target")
             .addParameter(ClassName.get(Object.class), "source");
 
+    String parentBinderFQN;
+
     if (target.parentPackage != null) {
+      if (isFieldAnnotated) {
+        parentBinderFQN = target.getParentFQN() + Dart.BINDER_SUFFIX;
+      } else {
+        parentBinderFQN = target.getParentFQN() + DART_MODEL_SUFFIX + Dart.BINDER_SUFFIX;
+      }
       // Emit a call to the superclass binder, if any.
       bindBuilder.addStatement(
-          "$T.bind(finder, target, source)",
-          ClassName.bestGuess(target.getParentFQN() + DART_MODEL_SUFFIX + Dart.BINDER_SUFFIX));
+          "$T.bind(finder, target, source)", ClassName.bestGuess(parentBinderFQN));
     }
 
-    // Local variable in which all extras will be temporarily stored.
-    bindBuilder.addStatement("Object object");
+    if (isFieldAnnotated) {
+      String fieldBinderFQN = target.getFieldFQN() + Dart.BINDER_SUFFIX;
+      bindBuilder.addStatement(
+          "new $T().bind(finder, target.$L, source)",
+          ClassName.bestGuess(fieldBinderFQN),
+          target.dartModelFieldName);
 
-    // Loop over each extras binding and emit it.
-    for (ExtraInjection binding : target.bindingMap.values()) {
-      emitExtraInjection(bindBuilder, binding);
+    } else {
+      // Local variable in which all extras will be temporarily stored.
+      bindBuilder.addStatement("Object object");
+
+      // Loop over each extras binding and emit it.
+      for (ExtraInjection binding : target.bindingMap.values()) {
+        emitExtraInjection(bindBuilder, binding);
+      }
     }
 
     builder.addMethod(bindBuilder.build());

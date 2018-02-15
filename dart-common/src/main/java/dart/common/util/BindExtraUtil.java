@@ -87,7 +87,7 @@ public class BindExtraUtil {
       if (!dartModelUtil.isValidUsageOfDartModel(enclosingElement)) {
         return;
       }
-      bindingTarget = bindingTargetUtil.createTargetClass(enclosingElement);
+      bindingTarget = bindingTargetUtil.createTargetForType(enclosingElement);
       targetClassMap.put(enclosingElement, bindingTarget);
     }
 

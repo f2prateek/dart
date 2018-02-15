@@ -98,7 +98,8 @@ public final class InjectExtraProcessor extends AbstractProcessor {
   private Map<TypeElement, BindingTarget> findAndParseTargets() {
     Map<TypeElement, BindingTarget> targetClassMap = new LinkedHashMap<>();
 
-    dartModelUtil.parseDartModelAnnotatedElements(targetClassMap);
+    dartModelUtil.parseDartModelAnnotatedTypes(targetClassMap);
+    dartModelUtil.parseDartModelAnnotatedFields(targetClassMap);
     bindExtraUtil.parseBindExtraAnnotatedElements(targetClassMap);
     bindingTargetUtil.createBindingTargetTrees(targetClassMap);
 

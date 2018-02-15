@@ -22,6 +22,8 @@ import static javax.lang.model.element.ElementKind.PACKAGE;
 import static javax.lang.model.element.Modifier.ABSTRACT;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
+import static javax.lang.model.util.ElementFilter.fieldsIn;
+import static javax.lang.model.util.ElementFilter.typesIn;
 
 import dart.DartModel;
 import dart.common.BindingTarget;
@@ -31,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
@@ -55,10 +58,10 @@ public class DartModelUtil {
     this.roundEnv = roundEnv;
   }
 
-  public void parseDartModelAnnotatedElements(Map<TypeElement, BindingTarget> targetClassMap) {
-    for (Element element : roundEnv.getElementsAnnotatedWith(DartModel.class)) {
+  public void parseDartModelAnnotatedTypes(Map<TypeElement, BindingTarget> targetClassMap) {
+    for (Element element : typesIn(roundEnv.getElementsAnnotatedWith(DartModel.class))) {
       try {
-        parseDartModel((TypeElement) element, targetClassMap);
+        parseTypesForDartModel((TypeElement) element, targetClassMap);
       } catch (Exception e) {
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
@@ -70,7 +73,22 @@ public class DartModelUtil {
     }
   }
 
-  boolean isValidUsageOfDartModel(TypeElement element) {
+  public void parseDartModelAnnotatedFields(Map<TypeElement, BindingTarget> targetClassMap) {
+    for (Element element : fieldsIn(roundEnv.getElementsAnnotatedWith(DartModel.class))) {
+      try {
+        parseFieldsForDartModel(element, targetClassMap);
+      } catch (Exception e) {
+        StringWriter stackTrace = new StringWriter();
+        e.printStackTrace(new PrintWriter(stackTrace));
+        loggingUtil.error(
+                element,
+                "Unable to generate extra binder when parsing @DartModel.\n\n%s",
+                stackTrace.toString());
+      }
+    }
+  }
+
+  boolean isValidUsageOfDartModel(Element element) {
     boolean valid = true;
 
     // Verify modifiers.
@@ -84,34 +102,36 @@ public class DartModelUtil {
     }
 
     // Verify type.
-    if (element.getKind() != CLASS) {
-      loggingUtil.error(element, "DartModel element %s must be a class.", element.getSimpleName());
+    if (element.getKind() == CLASS) {
+      // Verify containing type.
+      if (element.getEnclosingElement() == null
+          || element.getEnclosingElement().getKind() != PACKAGE) {
+        loggingUtil.error(
+            element, "DartModel class %s must be a top level class.", element.getSimpleName());
+        valid = false;
+      }
+
+      // Verify Dart Model suffix.
+      final String classPackage = compilerUtil.getPackageName((TypeElement) element);
+      final String className = compilerUtil.getClassName((TypeElement)element, classPackage);
+      if (!className.endsWith(DART_MODEL_SUFFIX)) {
+        loggingUtil.error(
+                element,
+                "DartModel class %s does not follow the naming convention: my.package.TargetComponentNavigationModel.",
+                element.getSimpleName());
+        valid = false;
+      }
+    } else if(element.getKind() != ElementKind.FIELD) {
+      loggingUtil.error(element, "Invalid usage of @DartModel on %s. It only apply to classes or fields.", element.getSimpleName());
       valid = false;
     }
 
-    // Verify containing type.
-    if (element.getEnclosingElement() == null
-        || element.getEnclosingElement().getKind() != PACKAGE) {
-      loggingUtil.error(
-          element, "DartModel class %s must be a top level class.", element.getSimpleName());
-      valid = false;
-    }
 
-    // Verify Dart Model suffix.
-    final String classPackage = compilerUtil.getPackageName(element);
-    final String className = compilerUtil.getClassName(element, classPackage);
-    if (!className.endsWith(DART_MODEL_SUFFIX)) {
-      loggingUtil.error(
-          element,
-          "DartModel class %s does not follow the naming convention: my.package.TargetComponentNavigationModel.",
-          element.getSimpleName());
-      valid = false;
-    }
 
     return valid;
   }
 
-  private void parseDartModel(TypeElement element, Map<TypeElement, BindingTarget> targetClassMap) {
+  private void parseTypesForDartModel(TypeElement element, Map<TypeElement, BindingTarget> targetClassMap) {
     // The BindingTarget was already created, @BindExtra processed first
     if (targetClassMap.containsKey(element)) {
       return;
@@ -123,7 +143,24 @@ public class DartModelUtil {
     }
 
     // Assemble information on the binding point.
-    final BindingTarget navigationModelTarget = bindingTargetUtil.createTargetClass(element);
+    final BindingTarget navigationModelTarget = bindingTargetUtil.createTargetForType(element);
+    targetClassMap.put(element, navigationModelTarget);
+  }
+
+  private void parseFieldsForDartModel(Element fieldElement, Map<TypeElement, BindingTarget> targetClassMap) {
+    TypeElement element = (TypeElement) fieldElement.getEnclosingElement();
+    // The BindingTarget was already created, @BindExtra processed first
+    if (targetClassMap.containsKey(element)) {
+      return;
+    }
+
+    // Verify common generated code restrictions.
+    if (!isValidUsageOfDartModel(fieldElement)) {
+      return;
+    }
+
+    // Assemble information on the binding point.
+    final BindingTarget navigationModelTarget = bindingTargetUtil.createTargetForField(element, fieldElement);
     targetClassMap.put(element, navigationModelTarget);
   }
 }
