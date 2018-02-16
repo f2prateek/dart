@@ -17,10 +17,12 @@
 
 package dart.henson.plugin.internal;
 
+import static com.android.build.gradle.internal.publishing.AndroidArtifacts.ARTIFACT_TYPE;
 import static dart.henson.plugin.util.StringUtil.capitalize;
 import static java.util.Collections.singletonList;
 
 import com.android.build.gradle.api.BaseVariant;
+import com.android.build.gradle.internal.publishing.AndroidArtifacts;
 import com.google.common.collect.Streams;
 import dart.henson.plugin.generator.HensonNavigatorGenerator;
 import java.io.File;
@@ -33,11 +35,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.gradle.api.Action;
+import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.file.UnionFileCollection;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.OutputDirectory;
+import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.compile.JavaCompile;
 
 public class TaskManager {
@@ -70,59 +79,19 @@ public class TaskManager {
    */
   public Task createHensonNavigatorGenerationTask(
       BaseVariant variant, String hensonNavigatorPackageName, File destinationFolder) {
-    Task generateHensonNavigatorTask =
-        project.getTasks().create("generate" + capitalize(variant.getName()) + "HensonNavigator");
-    generateHensonNavigatorTask.doFirst(
-        task -> {
-          JavaCompile javaCompiler = (JavaCompile) variant.getJavaCompiler();
-          FileCollection variantCompileClasspath = javaCompiler.getClasspath();
-          FileCollection uft =
-              new UnionFileCollection(
-                  javaCompiler.getSource(), project.fileTree(destinationFolder));
-          javaCompiler.setSource(uft);
-          logger.debug("Analyzing configuration: " + variantCompileClasspath.getFiles());
-          Set<String> targetActivities = new HashSet<>();
-          Streams.stream(variantCompileClasspath)
-              .forEach(
-                  dependency -> {
-                    logger.debug("Detected dependency: {}", dependency.getName());
-                    if (dependency.getName().matches("classes.jar")) {
-                      logger.debug("Detected navigation API dependency: {}", dependency.getName());
-                      File file = dependency.getAbsoluteFile();
-                      List<String> entries = getJarContent(file);
-                      entries.forEach(
-                          entry -> {
-                            if (entry.matches(".*__IntentBuilder.class")) {
-                              logger.debug("Detected intent builder: {}", entry);
-                              String targetActivityFQN =
-                                  entry
-                                      .substring(
-                                          0, entry.length() - "__IntentBuilder.class".length())
-                                      .replace('/', '.');
-                              targetActivities.add(targetActivityFQN);
-                            }
-                          });
-                    }
+    GenerateHensonNavigatorTask generateHensonNavigatorTask =
+        project
+            .getTasks()
+            .create(
+                "generate" + capitalize(variant.getName()) + "HensonNavigator",
+                GenerateHensonNavigatorTask.class);
+    generateHensonNavigatorTask.hensonNavigatorPackageName = hensonNavigatorPackageName;
+    generateHensonNavigatorTask.destinationFolder = destinationFolder;
+    generateHensonNavigatorTask.variant = variant;
+    generateHensonNavigatorTask.logger = logger;
+    generateHensonNavigatorTask.project = project;
+    generateHensonNavigatorTask.hensonNavigatorGenerator = hensonNavigatorGenerator;
 
-                    String hensonNavigator =
-                        hensonNavigatorGenerator.generateHensonNavigatorClass(
-                            targetActivities, hensonNavigatorPackageName);
-                    destinationFolder.mkdirs();
-                    String generatedFolderName =
-                        hensonNavigatorPackageName.replace('.', '/').concat("/");
-                    File generatedFolder = new File(destinationFolder, generatedFolderName);
-                    generatedFolder.mkdirs();
-                    File generatedFile = new File(generatedFolder, "HensonNavigator.java");
-                    try {
-                      logger.debug(
-                          "Generating Henson navigator in " + generatedFile.getAbsolutePath());
-                      logger.debug(hensonNavigator);
-                      Files.write(generatedFile.toPath(), singletonList(hensonNavigator));
-                    } catch (IOException e) {
-                      throw new RuntimeException(e);
-                    }
-                  });
-        });
     //we put the task right before compilation so that all dependencies are resolved
     // when the task is executed
     generateHensonNavigatorTask.setDependsOn(variant.getJavaCompiler().getDependsOn());
@@ -130,16 +99,96 @@ public class TaskManager {
     return generateHensonNavigatorTask;
   }
 
-  private List<String> getJarContent(File file) {
-    final List<String> result = new ArrayList<>();
-    try {
-      if (file.getName().endsWith(".jar")) {
-        ZipFile zip = new ZipFile(file);
-        Collections.list(zip.entries()).stream().map(ZipEntry::getName).forEach(result::add);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+  public static class GenerateHensonNavigatorTask extends DefaultTask {
+    @InputFiles
+    FileCollection getVariantCompileClasspath() {
+      //Thanks to Xavier Durcrohet for this
+      //https://android.googlesource.com/platform/tools/base/+/gradle_3.0.0/build-system/gradle-core/src/main/java/com/android/build/gradle/internal/scope/VariantScopeImpl.java#1037
+      Action<AttributeContainer> attributes =
+          container ->
+              container.attribute(ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.JAR.getType());
+      boolean lenientMode = false;
+      return variant
+          .getCompileConfiguration()
+          .getIncoming()
+          .artifactView(
+              config -> {
+                config.attributes(attributes);
+                config.lenient(lenientMode);
+              })
+          .getArtifacts()
+          .getArtifactFiles();
     }
-    return result;
+
+    @Input String hensonNavigatorPackageName;
+    @OutputDirectory File destinationFolder;
+    BaseVariant variant;
+    Project project;
+    Logger logger;
+    HensonNavigatorGenerator hensonNavigatorGenerator;
+
+    @TaskAction
+    public void generateHensonNavigator() {
+      JavaCompile javaCompiler = (JavaCompile) variant.getJavaCompiler();
+      FileCollection variantCompileClasspath = getVariantCompileClasspath();
+      FileCollection uft =
+          new UnionFileCollection(javaCompiler.getSource(), project.fileTree(destinationFolder));
+      javaCompiler.setSource(uft);
+      logger.debug("Analyzing configuration: " + variantCompileClasspath.getFiles());
+      Set<String> targetActivities = new HashSet<>();
+      Streams.stream(variantCompileClasspath)
+          .forEach(
+              dependency -> {
+                logger.debug("Detected dependency: {}", dependency.getAbsolutePath());
+                if (dependency.getName().endsWith(".jar")) {
+                  logger.debug("Detected navigation API dependency: {}", dependency.getName());
+                  if (!dependency.exists()) {
+                    logger.debug("Dependency jar doesn't exist {}", dependency.getAbsolutePath());
+                  } else {
+                    File file = dependency.getAbsoluteFile();
+                    List<String> entries = getJarContent(file);
+                    entries.forEach(
+                        entry -> {
+                          if (entry.matches(".*__IntentBuilder.class")) {
+                            logger.debug("Detected intent builder: {}", entry);
+                            String targetActivityFQN =
+                                entry
+                                    .substring(0, entry.length() - "__IntentBuilder.class".length())
+                                    .replace('/', '.');
+                            targetActivities.add(targetActivityFQN);
+                          }
+                        });
+                  }
+                }
+              });
+      String hensonNavigator =
+          hensonNavigatorGenerator.generateHensonNavigatorClass(
+              targetActivities, hensonNavigatorPackageName);
+      destinationFolder.mkdirs();
+      String generatedFolderName = hensonNavigatorPackageName.replace('.', '/').concat("/");
+      File generatedFolder = new File(destinationFolder, generatedFolderName);
+      generatedFolder.mkdirs();
+      File generatedFile = new File(generatedFolder, "HensonNavigator.java");
+      try {
+        logger.debug("Generating Henson navigator in " + generatedFile.getAbsolutePath());
+        logger.debug(hensonNavigator);
+        Files.write(generatedFile.toPath(), singletonList(hensonNavigator));
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    private List<String> getJarContent(File file) {
+      final List<String> result = new ArrayList<>();
+      try {
+        if (file.getName().endsWith(".jar")) {
+          ZipFile zip = new ZipFile(file);
+          Collections.list(zip.entries()).stream().map(ZipEntry::getName).forEach(result::add);
+        }
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      return result;
+    }
   }
 }
