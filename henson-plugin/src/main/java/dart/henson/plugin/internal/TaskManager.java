@@ -39,6 +39,7 @@ import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.file.UnionFileCollection;
@@ -100,16 +101,20 @@ public class TaskManager {
   }
 
   public static class GenerateHensonNavigatorTask extends DefaultTask {
+    @Input
+    Configuration getVariantCompileClasspath() {
+      return variant.getCompileConfiguration();
+    }
+
     @InputFiles
-    FileCollection getVariantCompileClasspath() {
+    FileCollection getJarDependencies() {
       //Thanks to Xavier Durcrohet for this
       //https://android.googlesource.com/platform/tools/base/+/gradle_3.0.0/build-system/gradle-core/src/main/java/com/android/build/gradle/internal/scope/VariantScopeImpl.java#1037
       Action<AttributeContainer> attributes =
           container ->
-              container.attribute(ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.JAR.getType());
+              container.attribute(ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.CLASSES.getType());
       boolean lenientMode = false;
-      return variant
-          .getCompileConfiguration()
+      return getVariantCompileClasspath()
           .getIncoming()
           .artifactView(
               config -> {
@@ -130,7 +135,7 @@ public class TaskManager {
     @TaskAction
     public void generateHensonNavigator() {
       JavaCompile javaCompiler = (JavaCompile) variant.getJavaCompiler();
-      FileCollection variantCompileClasspath = getVariantCompileClasspath();
+      FileCollection variantCompileClasspath = getJarDependencies();
       FileCollection uft =
           new UnionFileCollection(javaCompiler.getSource(), project.fileTree(destinationFolder));
       javaCompiler.setSource(uft);
