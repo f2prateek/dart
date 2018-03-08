@@ -4,7 +4,7 @@ Releasing
 1. Change the version in `gradle.properties` to a non-SNAPSHOT version.
 1. Update the `CHANGELOG.md` for the impending release.
 1. `git commit -am "Prepare for release X.Y.Z."` (where X.Y.Z is the new version)
-1. `./gradlew clean uploadArchives`
+1. `./gradlew clean build uploadArchives` (build is important here as we need the version number to be passed to a resource file)
 1. Visit [Sonatype Nexus](https://oss.sonatype.org/) and promote the artifact.
 1. `git tag -a X.Y.X -m "Version X.Y.Z"` (where X.Y.Z is the new version)
 1. Update the `gradle.properties` to the next SNAPSHOT version.
