@@ -19,7 +19,7 @@ package dart.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
-import static dart.processor.ProcessorTestUtilities.dartProcessorsWithoutParceler;
+import static dart.processor.ProcessorTestUtilities.extraBinderProcessorsWithoutParceler;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
@@ -27,7 +27,7 @@ import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
-/** Tests {@link dart.processor.InjectExtraProcessor}. For tests not related to Parceler. */
+/** Tests {@link ExtraBinderProcessor}. For tests not related to Parceler. */
 public class BindExtraTest {
 
   @Test
@@ -64,7 +64,7 @@ public class BindExtraTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
+        javac().withProcessors(extraBinderProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(binderSource);
@@ -145,7 +145,7 @@ public class BindExtraTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
+        javac().withProcessors(extraBinderProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(binderSource);
@@ -189,7 +189,7 @@ public class BindExtraTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
+        javac().withProcessors(extraBinderProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
@@ -231,7 +231,7 @@ public class BindExtraTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
+        javac().withProcessors(extraBinderProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
@@ -255,7 +255,7 @@ public class BindExtraTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(dartProcessorsWithoutParceler()).compile(source);
+        javac().withProcessors(extraBinderProcessorsWithoutParceler()).compile(source);
     assertThat(compilation).succeededWithoutWarnings();
   }
 
@@ -300,7 +300,7 @@ public class BindExtraTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestNavigationModel__ExtraBinder")
@@ -324,7 +324,7 @@ public class BindExtraTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining("DartModel class Inner must not be private, static or abstract.")
@@ -347,7 +347,7 @@ public class BindExtraTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
@@ -371,7 +371,7 @@ public class BindExtraTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
@@ -395,7 +395,7 @@ public class BindExtraTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
@@ -467,7 +467,7 @@ public class BindExtraTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestNavigationModel__ExtraBinder")
@@ -540,7 +540,7 @@ public class BindExtraTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestNavigationModel__ExtraBinder")

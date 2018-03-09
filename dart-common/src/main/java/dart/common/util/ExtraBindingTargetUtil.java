@@ -20,7 +20,7 @@ package dart.common.util;
 import static dart.common.util.DartModelUtil.DART_MODEL_SUFFIX;
 import static javax.lang.model.util.ElementFilter.methodsIn;
 
-import dart.common.BindingTarget;
+import dart.common.ExtraBindingTarget;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -32,7 +32,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-public class BindingTargetUtil {
+public class ExtraBindingTargetUtil {
 
   public static final String NEXT_STATE_METHOD = "getNextState";
   public static final String BUNDLE_BUILDER_SUFFIX = "__IntentBuilder";
@@ -42,7 +42,7 @@ public class BindingTargetUtil {
   private final Elements elementUtils;
   private final Types typeUtils;
 
-  public BindingTargetUtil(
+  public ExtraBindingTargetUtil(
       CompilerUtil compilerUtil, ProcessingEnvironment processingEnv, LoggingUtil loggingUtil) {
     this.compilerUtil = compilerUtil;
     this.loggingUtil = loggingUtil;
@@ -50,19 +50,19 @@ public class BindingTargetUtil {
     typeUtils = processingEnv.getTypeUtils();
   }
 
-  public BindingTarget createTargetClass(TypeElement typeElement) {
+  public ExtraBindingTarget createTargetClass(TypeElement typeElement) {
     final String classPackage = compilerUtil.getPackageName(typeElement);
     final String className = compilerUtil.getClassName(typeElement, classPackage);
-    return new BindingTarget(classPackage, className);
+    return new ExtraBindingTarget(classPackage, className);
   }
 
-  public void createBindingTargetTrees(Map<TypeElement, BindingTarget> targetClassMap) {
+  public void createBindingTargetTrees(Map<TypeElement, ExtraBindingTarget> targetClassMap) {
     final Set<TypeElement> targetTypeElements = targetClassMap.keySet();
     for (TypeElement typeElement : targetTypeElements) {
       TypeElement parentTypeElement = compilerUtil.findParent(typeElement, targetTypeElements);
       if (parentTypeElement != null) {
-        final BindingTarget target = targetClassMap.get(typeElement);
-        final BindingTarget parentTarget = targetClassMap.get(parentTypeElement);
+        final ExtraBindingTarget target = targetClassMap.get(typeElement);
+        final ExtraBindingTarget parentTarget = targetClassMap.get(parentTypeElement);
         target.parentPackage = parentTarget.classPackage;
         target.parentClass = parentTarget.className;
         parentTarget.addChild(typeElement);
@@ -71,27 +71,28 @@ public class BindingTargetUtil {
     checkForParentsOutside(targetClassMap);
   }
 
-  public void addClosestRequiredAncestorForTargets(Map<TypeElement, BindingTarget> targetClassMap) {
-    for (Map.Entry<TypeElement, BindingTarget> target : targetClassMap.entrySet()) {
+  public void addClosestRequiredAncestorForTargets(
+      Map<TypeElement, ExtraBindingTarget> targetClassMap) {
+    for (Map.Entry<TypeElement, ExtraBindingTarget> target : targetClassMap.entrySet()) {
       final TypeElement element = target.getKey();
-      final BindingTarget bindingTarget = target.getValue();
-      if (bindingTarget.topLevel) {
+      final ExtraBindingTarget extraBindingTarget = target.getValue();
+      if (extraBindingTarget.topLevel) {
         // check if parent is outside the current module
-        if (bindingTarget.parentPackage != null) {
-          setClosestRequiredAncestor(bindingTarget, getIntentBuilder(element.getSuperclass()));
+        if (extraBindingTarget.parentPackage != null) {
+          setClosestRequiredAncestor(extraBindingTarget, getIntentBuilder(element.getSuperclass()));
         }
-        spreadClosestRequiredAncestorToChildren(targetClassMap, bindingTarget);
+        spreadClosestRequiredAncestorToChildren(targetClassMap, extraBindingTarget);
       }
     }
   }
 
-  private void checkForParentsOutside(Map<TypeElement, BindingTarget> targetClassMap) {
-    for (Map.Entry<TypeElement, BindingTarget> target : targetClassMap.entrySet()) {
+  private void checkForParentsOutside(Map<TypeElement, ExtraBindingTarget> targetClassMap) {
+    for (Map.Entry<TypeElement, ExtraBindingTarget> target : targetClassMap.entrySet()) {
       final TypeElement element = target.getKey();
-      final BindingTarget bindingTarget = target.getValue();
+      final ExtraBindingTarget extraBindingTarget = target.getValue();
       // root inside module
-      if (bindingTarget.parentPackage == null) {
-        bindingTarget.topLevel = true;
+      if (extraBindingTarget.parentPackage == null) {
+        extraBindingTarget.topLevel = true;
         final TypeMirror superType = element.getSuperclass();
         // has superclass
         if (!typeUtils.isSameType(
@@ -109,17 +110,17 @@ public class BindingTargetUtil {
                 superTypeElement.getQualifiedName());
             return;
           }
-          bindingTarget.parentPackage = compilerUtil.getPackageName(superTypeElement);
+          extraBindingTarget.parentPackage = compilerUtil.getPackageName(superTypeElement);
           final String nmClass =
-              compilerUtil.getClassName(superTypeElement, bindingTarget.parentPackage);
-          bindingTarget.parentClass = nmClass.substring(0, nmClass.indexOf(DART_MODEL_SUFFIX));
+              compilerUtil.getClassName(superTypeElement, extraBindingTarget.parentPackage);
+          extraBindingTarget.parentClass = nmClass.substring(0, nmClass.indexOf(DART_MODEL_SUFFIX));
         }
       }
     }
   }
 
   private void setClosestRequiredAncestor(
-      BindingTarget bindingTarget, TypeElement superIntentBuilder) {
+      ExtraBindingTarget extraBindingTarget, TypeElement superIntentBuilder) {
     for (ExecutableElement method : methodsIn(superIntentBuilder.getEnclosedElements())) {
       if (method.getSimpleName().contentEquals(NEXT_STATE_METHOD)) {
         final TypeMirror returnTypeMirror = method.getReturnType();
@@ -128,27 +129,28 @@ public class BindingTargetUtil {
         }
         final Element reqElement = ((DeclaredType) typeUtils.erasure(returnTypeMirror)).asElement();
         final TypeElement intentBuilderTypeElement = (TypeElement) reqElement.getEnclosingElement();
-        bindingTarget.closestRequiredAncestorPackage =
+        extraBindingTarget.closestRequiredAncestorPackage =
             compilerUtil.getPackageName(intentBuilderTypeElement);
         final String intentBuilderClass =
             compilerUtil.getClassName(
-                intentBuilderTypeElement, bindingTarget.closestRequiredAncestorPackage);
-        bindingTarget.closestRequiredAncestorClass =
+                intentBuilderTypeElement, extraBindingTarget.closestRequiredAncestorPackage);
+        extraBindingTarget.closestRequiredAncestorClass =
             intentBuilderClass.substring(0, intentBuilderClass.indexOf(BUNDLE_BUILDER_SUFFIX));
       }
     }
   }
 
   private void spreadClosestRequiredAncestorToChildren(
-      Map<TypeElement, BindingTarget> targetClassMap, BindingTarget bindingTarget) {
-    for (TypeElement child : bindingTarget.childClasses) {
-      final BindingTarget childTarget = targetClassMap.get(child);
-      if (bindingTarget.hasRequiredFields) {
-        childTarget.closestRequiredAncestorPackage = bindingTarget.classPackage;
-        childTarget.closestRequiredAncestorClass = bindingTarget.className;
+      Map<TypeElement, ExtraBindingTarget> targetClassMap, ExtraBindingTarget extraBindingTarget) {
+    for (TypeElement child : extraBindingTarget.childClasses) {
+      final ExtraBindingTarget childTarget = targetClassMap.get(child);
+      if (extraBindingTarget.hasRequiredFields) {
+        childTarget.closestRequiredAncestorPackage = extraBindingTarget.classPackage;
+        childTarget.closestRequiredAncestorClass = extraBindingTarget.className;
       } else {
-        childTarget.closestRequiredAncestorPackage = bindingTarget.closestRequiredAncestorPackage;
-        childTarget.closestRequiredAncestorClass = bindingTarget.closestRequiredAncestorClass;
+        childTarget.closestRequiredAncestorPackage =
+            extraBindingTarget.closestRequiredAncestorPackage;
+        childTarget.closestRequiredAncestorClass = extraBindingTarget.closestRequiredAncestorClass;
       }
       spreadClosestRequiredAncestorToChildren(targetClassMap, childTarget);
     }

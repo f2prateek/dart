@@ -17,6 +17,8 @@
 
 package dart;
 
+import static dart.common.util.NavigationModelBindingTargetUtil.NAVIGATION_MODEL_BINDER_SUFFIX;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
@@ -43,7 +45,8 @@ import java.util.Map;
  * </code></pre>
  *
  * You can bind an {@link #bind(Activity) activity directly}, {@link #bind(android.app.Fragment)
- * fragment directly}, or bind an {@link #bind(Object, Bundle) bundle into another object}.
+ * fragment directly}, or bind an {@link #bindNavigationModel(Object, Bundle) bundle into another
+ * object}.
  *
  * <p>Be default, extras are required to be present in the bundle for field bindings. If an extra is
  * optional add the {@code Nullable @Nullable} annotation.
@@ -60,9 +63,10 @@ import java.util.Map;
  * </code></pre>
  */
 public class Dart {
-  public static final String BINDER_SUFFIX = "__ExtraBinder";
+  public static final String EXTRA_BINDER_SUFFIX = "__ExtraBinder";
 
-  static final Map<Class<?>, Method> BINDERS = new LinkedHashMap<Class<?>, Method>();
+  static final Map<Class<?>, Method> EXTRA_BINDERS = new LinkedHashMap<>();
+  static final Map<Class<?>, Method> NAVIGATION_MODEL_BINDERS = new LinkedHashMap<>();
   static final Method NO_OP = null;
   private static final String TAG = "Dart";
   private static boolean debug = false;
@@ -77,31 +81,6 @@ public class Dart {
   }
 
   /**
-   * Inject fields annotated with {@link BindExtra} in the specified {@link android.app.Activity}.
-   * The intent that called this activity will be used as the source of the extras bundle.
-   *
-   * @param target Target activity for field binding.
-   * @throws Dart.UnableToInjectException if binding could not be performed.
-   * @see android.content.Intent#getExtras()
-   */
-  public static void bind(Activity target) {
-    bind(target, target, Finder.ACTIVITY);
-  }
-
-  /**
-   * Inject fields annotated with {@link BindExtra} in the specified {@link android.app.Fragment}.
-   * The arguments that this fragment was called with will be used as the source of the extras
-   * bundle.
-   *
-   * @param target Target fragment for field binding.
-   * @throws Dart.UnableToInjectException if binding could not be performed.
-   * @see android.app.Fragment#getArguments()
-   */
-  public static void bind(Fragment target) {
-    bind(target, target, Finder.FRAGMENT);
-  }
-
-  /**
    * Inject fields annotated with {@link BindExtra} in the specified {@code target} using the {@code
    * source} {@link android.app.Activity}.
    *
@@ -110,8 +89,21 @@ public class Dart {
    * @throws Dart.UnableToInjectException if binding could not be performed.
    * @see android.content.Intent#getExtras()
    */
-  public static void bind(Object target, Activity source) {
-    bind(target, source, Finder.ACTIVITY);
+  public static void bindNavigationModel(Object target, Activity source) {
+    bindNavigationModel(target, source, Finder.ACTIVITY);
+  }
+
+  /**
+   * Inject fields annotated with {@link BindExtra} in the specified {@code target} using the {@code
+   * source} {@link android.app.Fragment}.
+   *
+   * @param target Target class for field binding.
+   * @param source Activity on which IDs will be looked up.
+   * @throws Dart.UnableToInjectException if binding could not be performed.
+   * @see android.content.Intent#getExtras()
+   */
+  public static void bindNavigationModel(Object target, Fragment source) {
+    bindNavigationModel(target, source, Finder.FRAGMENT);
   }
 
   /**
@@ -122,15 +114,41 @@ public class Dart {
    * @param source Bundle source on which extras will be looked up.
    * @throws Dart.UnableToInjectException if binding could not be performed.
    */
-  public static void bind(Object target, Bundle source) {
-    bind(target, source, Finder.BUNDLE);
+  public static void bindNavigationModel(Object target, Bundle source) {
+    bindNavigationModel(target, source, Finder.BUNDLE);
   }
 
-  static void bind(Object target, Object source, Finder finder) {
+  /**
+   * Inject fields annotated with {@link BindExtra} in the NavigationModel annotated with {@link
+   * DartModel} inside the target {@link android.app.Activity}. The intent that called this activity
+   * will be used as the source of the extras bundle.
+   *
+   * @param target Target activity for field binding.
+   * @throws Dart.UnableToInjectException if binding could not be performed.
+   * @see android.content.Intent#getExtras()
+   */
+  public static void bind(Activity target) {
+    bind(target, Finder.ACTIVITY);
+  }
+
+  /**
+   * Inject fields annotated with {@link BindExtra} in the NavigationModel annotated with {@link
+   * DartModel} inside the target {@link android.app.Fragment}. The arguments that this fragment was
+   * called with will be used as the source of the extras bundle.
+   *
+   * @param target Target fragment for field binding.
+   * @throws Dart.UnableToInjectException if binding could not be performed.
+   * @see android.app.Fragment#getArguments()
+   */
+  public static void bind(Fragment target) {
+    bind(target, Finder.FRAGMENT);
+  }
+
+  static void bindNavigationModel(Object target, Object source, Finder finder) {
     Class<?> targetClass = target.getClass();
     try {
       if (debug) Log.d(TAG, "Looking up extra binder for " + targetClass.getName());
-      Method bind = findBinderForClass(targetClass);
+      Method bind = findExtraBinderForClass(targetClass);
       if (bind != null) {
         bind.invoke(null, finder, target, source);
       }
@@ -141,8 +159,8 @@ public class Dart {
     }
   }
 
-  private static Method findBinderForClass(Class<?> cls) throws NoSuchMethodException {
-    Method bind = BINDERS.get(cls);
+  private static Method findExtraBinderForClass(Class<?> cls) throws NoSuchMethodException {
+    Method bind = EXTRA_BINDERS.get(cls);
     if (bind != null) {
       if (debug) Log.d(TAG, "HIT: Cached in binder map.");
       return bind;
@@ -153,14 +171,53 @@ public class Dart {
       return NO_OP;
     }
     try {
-      Class<?> binder = Class.forName(clsName + BINDER_SUFFIX);
+      Class<?> binder = Class.forName(clsName + EXTRA_BINDER_SUFFIX);
       bind = binder.getMethod("bind", Finder.class, cls, Object.class);
       if (debug) Log.d(TAG, "HIT: Class loaded binding class.");
     } catch (ClassNotFoundException e) {
       if (debug) Log.d(TAG, "Not found. Trying superclass " + cls.getSuperclass().getName());
-      bind = findBinderForClass(cls.getSuperclass());
+      bind = findExtraBinderForClass(cls.getSuperclass());
     }
-    BINDERS.put(cls, bind);
+    EXTRA_BINDERS.put(cls, bind);
+    return bind;
+  }
+
+  static void bind(Object target, Finder finder) {
+    Class<?> targetClass = target.getClass();
+    try {
+      if (debug) Log.d(TAG, "Looking up NavigationModel binder for " + targetClass.getName());
+      Method bind = findNavigationModelBinderForClass(targetClass);
+      if (bind != null) {
+        bind.invoke(null, finder, target);
+      }
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new UnableToInjectException("Unable to bind NavigationModel for " + target, e);
+    }
+  }
+
+  private static Method findNavigationModelBinderForClass(Class<?> cls)
+      throws NoSuchMethodException {
+    Method bind = NAVIGATION_MODEL_BINDERS.get(cls);
+    if (bind != null) {
+      if (debug) Log.d(TAG, "HIT: Cached in binder map.");
+      return bind;
+    }
+    String clsName = cls.getName();
+    if (clsName.startsWith("android.") || clsName.startsWith("java.")) {
+      if (debug) Log.d(TAG, "MISS: Reached framework class. Abandoning search.");
+      return NO_OP;
+    }
+    try {
+      Class<?> binder = Class.forName(clsName + NAVIGATION_MODEL_BINDER_SUFFIX);
+      bind = binder.getMethod("bind", Finder.class, cls);
+      if (debug) Log.d(TAG, "HIT: Class loaded binding class.");
+    } catch (ClassNotFoundException e) {
+      if (debug) Log.d(TAG, "Not found. Trying superclass " + cls.getSuperclass().getName());
+      bind = findNavigationModelBinderForClass(cls.getSuperclass());
+    }
+    NAVIGATION_MODEL_BINDERS.put(cls, bind);
     return bind;
   }
 

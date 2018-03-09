@@ -15,4 +15,4 @@
 # limitations under the License.
 #
 
-dart.henson.processor.HensonProcessor
+dart.henson.processor.IntentBuilderProcessor

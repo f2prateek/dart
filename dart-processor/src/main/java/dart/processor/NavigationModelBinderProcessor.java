@@ -17,14 +17,12 @@
 
 package dart.processor;
 
-import dart.common.BindingTarget;
-import dart.common.util.BindExtraUtil;
-import dart.common.util.BindingTargetUtil;
+import dart.common.NavigationModelBindingTarget;
 import dart.common.util.CompilerUtil;
-import dart.common.util.DartModelUtil;
 import dart.common.util.FileUtil;
 import dart.common.util.LoggingUtil;
-import dart.common.util.ParcelerUtil;
+import dart.common.util.NavigationModelBindingTargetUtil;
+import dart.common.util.NavigationModelFieldUtil;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,45 +35,36 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
 @SupportedAnnotationTypes({
-  InjectExtraProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
-  InjectExtraProcessor.EXTRA_ANNOTATION_CLASS_NAME
+  NavigationModelBinderProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
 })
-public final class InjectExtraProcessor extends AbstractProcessor {
+public final class NavigationModelBinderProcessor extends AbstractProcessor {
 
   static final String NAVIGATION_MODEL_ANNOTATION_CLASS_NAME = "dart.DartModel";
-  static final String EXTRA_ANNOTATION_CLASS_NAME = "dart.BindExtra";
 
   private LoggingUtil loggingUtil;
   private FileUtil fileUtil;
-  private BindingTargetUtil bindingTargetUtil;
-  private DartModelUtil dartModelUtil;
-  private BindExtraUtil bindExtraUtil;
-
-  private boolean usesParcelerOption = true;
+  private NavigationModelBindingTargetUtil navigationModelBindingTargetUtil;
+  private NavigationModelFieldUtil navigationModelFieldUtil;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
 
     final CompilerUtil compilerUtil = new CompilerUtil(processingEnv);
-    final ParcelerUtil parcelerUtil =
-        new ParcelerUtil(compilerUtil, processingEnv, usesParcelerOption);
     loggingUtil = new LoggingUtil(processingEnv);
     fileUtil = new FileUtil(processingEnv);
-    bindingTargetUtil = new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil);
-    dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil, compilerUtil);
-    bindExtraUtil =
-        new BindExtraUtil(
-            compilerUtil, parcelerUtil, loggingUtil, bindingTargetUtil, dartModelUtil);
+    navigationModelBindingTargetUtil =
+        new NavigationModelBindingTargetUtil(compilerUtil, processingEnv);
+    navigationModelFieldUtil =
+        new NavigationModelFieldUtil(loggingUtil, navigationModelBindingTargetUtil);
   }
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-    dartModelUtil.setRoundEnvironment(roundEnv);
-    bindExtraUtil.setRoundEnvironment(roundEnv);
+    navigationModelFieldUtil.setRoundEnvironment(roundEnv);
 
-    Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
-    generateExtraInjectors(targetClassMap);
+    Map<TypeElement, NavigationModelBindingTarget> targetClassMap = findAndParseTargets();
+    generateNavigationModelBinder(targetClassMap);
 
     //return false here to let henson process the annotations too
     return false;
@@ -86,33 +75,25 @@ public final class InjectExtraProcessor extends AbstractProcessor {
     return SourceVersion.latestSupported();
   }
 
-  /**
-   * Flag to force enabling/disabling Parceler. Used for testing.
-   *
-   * @param enable whether Parceler should be enable
-   */
-  public void enableParceler(boolean enable) {
-    usesParcelerOption = enable;
-  }
+  private Map<TypeElement, NavigationModelBindingTarget> findAndParseTargets() {
+    Map<TypeElement, NavigationModelBindingTarget> targetClassMap = new LinkedHashMap<>();
 
-  private Map<TypeElement, BindingTarget> findAndParseTargets() {
-    Map<TypeElement, BindingTarget> targetClassMap = new LinkedHashMap<>();
-
-    dartModelUtil.parseDartModelAnnotatedElements(targetClassMap);
-    bindExtraUtil.parseBindExtraAnnotatedElements(targetClassMap);
-    bindingTargetUtil.createBindingTargetTrees(targetClassMap);
+    navigationModelFieldUtil.parseDartModelAnnotatedFields(targetClassMap);
+    navigationModelBindingTargetUtil.createBindingTargetTrees(targetClassMap);
 
     return targetClassMap;
   }
 
-  private void generateExtraInjectors(Map<TypeElement, BindingTarget> targetClassMap) {
-    for (Map.Entry<TypeElement, BindingTarget> entry : targetClassMap.entrySet()) {
+  private void generateNavigationModelBinder(
+      Map<TypeElement, NavigationModelBindingTarget> targetClassMap) {
+    for (Map.Entry<TypeElement, NavigationModelBindingTarget> entry : targetClassMap.entrySet()) {
       TypeElement typeElement = entry.getKey();
-      BindingTarget bindingTarget = entry.getValue();
+      NavigationModelBindingTarget navigationModelBindingTarget = entry.getValue();
 
       //we unfortunately can't test that nothing is generated in a TRUTH based test
       try {
-        fileUtil.writeFile(new ExtraInjectorGenerator(bindingTarget), typeElement);
+        fileUtil.writeFile(
+            new NavigationModelBinderGenerator(navigationModelBindingTarget), typeElement);
       } catch (IOException e) {
         loggingUtil.error(
             typeElement,

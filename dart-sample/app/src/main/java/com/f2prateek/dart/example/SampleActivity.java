@@ -23,6 +23,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dart.Dart;
+import dart.DartModel;
 
 public class SampleActivity extends Activity {
 
@@ -36,14 +37,14 @@ public class SampleActivity extends Activity {
   @BindView(R.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
   @BindView(R.id.default_extra) TextView defaultExtraTextView;
 
-  SampleActivityNavigationModel navigationModel = new SampleActivityNavigationModel();
+  @DartModel SampleActivityNavigationModel navigationModel = new SampleActivityNavigationModel();
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_sample);
 
     ButterKnife.bind(this);
-    Dart.bind(navigationModel, this);
+    Dart.bind(this);
 
     // Contrived code to use the "bound" extras.
     stringExtraTextView.setText(navigationModel.stringExtra);

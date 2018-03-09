@@ -26,7 +26,7 @@ import java.util.Map;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
-public class BindingTarget {
+public class ExtraBindingTarget {
   public final Map<String, ExtraInjection> bindingMap = new LinkedHashMap<>();
   public final String classPackage;
   public final String className;
@@ -45,7 +45,7 @@ public class BindingTarget {
   public boolean topLevel;
   public List<TypeElement> childClasses;
 
-  public BindingTarget(String classPackage, String className) {
+  public ExtraBindingTarget(String classPackage, String className) {
     this.classPackage = classPackage;
     this.className = className.substring(0, className.indexOf(DART_MODEL_SUFFIX));
     this.childClasses = new ArrayList<>();

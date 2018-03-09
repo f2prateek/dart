@@ -17,6 +17,11 @@
 
 package dart;
 
+import static dart.Dart.EXTRA_BINDERS;
+import static dart.Dart.NAVIGATION_MODEL_BINDERS;
+import static dart.Dart.NO_OP;
+import static dart.Dart.bind;
+import static dart.Dart.bindNavigationModel;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.entry;
 
@@ -34,7 +39,8 @@ public class DartTest {
   @Before
   @After // Clear out cache of biners  before and after each test.
   public void resetExtrasCache() {
-    dart.Dart.BINDERS.clear();
+    EXTRA_BINDERS.clear();
+    NAVIGATION_MODEL_BINDERS.clear();
   }
 
   @Test
@@ -42,15 +48,17 @@ public class DartTest {
     class Example {}
 
     Example example = new Example();
-    dart.Dart.bind(example, null, null);
-    assertThat(dart.Dart.BINDERS).contains(entry(Example.class, dart.Dart.NO_OP));
+    bindNavigationModel(example, null, null);
+    bind(example, null);
+    assertThat(EXTRA_BINDERS).contains(entry(Example.class, NO_OP));
+    assertThat(NAVIGATION_MODEL_BINDERS).contains(entry(Example.class, NO_OP));
   }
 
   @Test
   public void bindingKnownPackagesIsNoOp() {
-    dart.Dart.bind(new Activity());
-    assertThat(dart.Dart.BINDERS).isEmpty();
-    dart.Dart.bind(new Object(), new Activity());
-    assertThat(dart.Dart.BINDERS).isEmpty();
+    bind(new Activity());
+    assertThat(EXTRA_BINDERS).isEmpty();
+    bindNavigationModel(new Object(), new Activity());
+    assertThat(EXTRA_BINDERS).isEmpty();
   }
 }

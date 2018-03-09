@@ -21,18 +21,19 @@ import static java.util.Arrays.asList;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import dart.common.Binding;
-import dart.common.BindingTarget;
+import dart.common.ExtraBindingTarget;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ExtraInjectorGeneratorTest {
+public class ExtraBinderGeneratorTest {
 
-  dart.processor.ExtraInjectorGenerator extraInjectorGenerator;
+  ExtraBinderGenerator extraBinderGenerator;
 
   @Before
   public void setup() {
-    final BindingTarget bindingTarget = new BindingTarget("foo", "barNavigationModel");
-    extraInjectorGenerator = new dart.processor.ExtraInjectorGenerator(bindingTarget);
+    final ExtraBindingTarget extraBindingTarget =
+        new ExtraBindingTarget("foo", "barNavigationModel");
+    extraBinderGenerator = new ExtraBinderGenerator(extraBindingTarget);
   }
 
   @Test
@@ -41,13 +42,13 @@ public class ExtraInjectorGeneratorTest {
     Binding two = new TestBinding("two");
     Binding three = new TestBinding("three");
 
-    String actual1 = extraInjectorGenerator.emitHumanDescription(asList(one));
+    String actual1 = extraBinderGenerator.emitHumanDescription(asList(one));
     assertThat(actual1).isEqualTo("one");
 
-    String actual2 = extraInjectorGenerator.emitHumanDescription(asList(one, two));
+    String actual2 = extraBinderGenerator.emitHumanDescription(asList(one, two));
     assertThat(actual2).isEqualTo("one and two");
 
-    String actual3 = extraInjectorGenerator.emitHumanDescription(asList(one, two, three));
+    String actual3 = extraBinderGenerator.emitHumanDescription(asList(one, two, three));
     assertThat(actual3).isEqualTo("one, two, and three");
   }
 

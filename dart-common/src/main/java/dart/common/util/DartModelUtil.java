@@ -24,30 +24,32 @@ import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 
 import dart.DartModel;
-import dart.common.BindingTarget;
+import dart.common.ExtraBindingTarget;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.ElementFilter;
 
 public class DartModelUtil {
 
   public static final String DART_MODEL_SUFFIX = "NavigationModel";
 
   private final LoggingUtil loggingUtil;
-  private final BindingTargetUtil bindingTargetUtil;
+  private final ExtraBindingTargetUtil extraBindingTargetUtil;
   private final CompilerUtil compilerUtil;
 
   private RoundEnvironment roundEnv;
 
   public DartModelUtil(
-      LoggingUtil loggingUtil, BindingTargetUtil bindingTargetUtil, CompilerUtil compilerUtil) {
+      LoggingUtil loggingUtil,
+      ExtraBindingTargetUtil extraBindingTargetUtil,
+      CompilerUtil compilerUtil) {
     this.loggingUtil = loggingUtil;
-    this.bindingTargetUtil = bindingTargetUtil;
+    this.extraBindingTargetUtil = extraBindingTargetUtil;
     this.compilerUtil = compilerUtil;
   }
 
@@ -55,10 +57,11 @@ public class DartModelUtil {
     this.roundEnv = roundEnv;
   }
 
-  public void parseDartModelAnnotatedElements(Map<TypeElement, BindingTarget> targetClassMap) {
-    for (Element element : roundEnv.getElementsAnnotatedWith(DartModel.class)) {
+  public void parseDartModelAnnotatedTypes(Map<TypeElement, ExtraBindingTarget> targetClassMap) {
+    for (TypeElement element :
+        ElementFilter.typesIn(roundEnv.getElementsAnnotatedWith(DartModel.class))) {
       try {
-        parseDartModel((TypeElement) element, targetClassMap);
+        parseDartModel(element, targetClassMap);
       } catch (Exception e) {
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
@@ -111,8 +114,9 @@ public class DartModelUtil {
     return valid;
   }
 
-  private void parseDartModel(TypeElement element, Map<TypeElement, BindingTarget> targetClassMap) {
-    // The BindingTarget was already created, @BindExtra processed first
+  private void parseDartModel(
+      TypeElement element, Map<TypeElement, ExtraBindingTarget> targetClassMap) {
+    // The ExtraBindingTarget was already created, @BindExtra processed first
     if (targetClassMap.containsKey(element)) {
       return;
     }
@@ -123,7 +127,8 @@ public class DartModelUtil {
     }
 
     // Assemble information on the binding point.
-    final BindingTarget navigationModelTarget = bindingTargetUtil.createTargetClass(element);
+    final ExtraBindingTarget navigationModelTarget =
+        extraBindingTargetUtil.createTargetClass(element);
     targetClassMap.put(element, navigationModelTarget);
   }
 }

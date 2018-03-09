@@ -27,8 +27,7 @@ import javax.tools.JavaFileObject;
 import org.junit.Test;
 
 /**
- * Tests {@link dart.processor.InjectExtraProcessor}. For tests related to Parceler, but Parceler is
- * not available.
+ * Tests {@link ExtraBinderProcessor}. For tests related to Parceler, but Parceler is not available.
  */
 public class BindExtraWithoutParcelerTest {
 
@@ -71,7 +70,7 @@ public class BindExtraWithoutParcelerTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestSerializableCollectionNavigationModel__ExtraBinder")
@@ -97,7 +96,7 @@ public class BindExtraWithoutParcelerTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
@@ -123,7 +122,7 @@ public class BindExtraWithoutParcelerTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
@@ -150,7 +149,7 @@ public class BindExtraWithoutParcelerTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
@@ -206,7 +205,7 @@ public class BindExtraWithoutParcelerTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.dartProcessorsWithoutParceler())
+            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestParcelableExtendsParcelableNavigationModel__ExtraBinder")

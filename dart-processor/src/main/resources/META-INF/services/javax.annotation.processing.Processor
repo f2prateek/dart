@@ -15,4 +15,4 @@
 # limitations under the License.
 #
 
-dart.processor.InjectExtraProcessor
+dart.processor.ExtraBinderProcessor

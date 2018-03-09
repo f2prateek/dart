@@ -21,14 +21,17 @@ import java.util.Arrays;
 import javax.annotation.processing.Processor;
 
 final class ProcessorTestUtilities {
-  static Iterable<? extends Processor> dartProcessors() {
-    return Arrays.asList(new dart.processor.InjectExtraProcessor());
+  static Iterable<? extends Processor> extraBinderProcessors() {
+    return Arrays.asList(new ExtraBinderProcessor());
   }
 
-  static Iterable<? extends Processor> dartProcessorsWithoutParceler() {
-    dart.processor.InjectExtraProcessor bindExtraProcessor =
-        new dart.processor.InjectExtraProcessor();
+  static Iterable<? extends Processor> extraBinderProcessorsWithoutParceler() {
+    ExtraBinderProcessor bindExtraProcessor = new ExtraBinderProcessor();
     bindExtraProcessor.enableParceler(false);
     return Arrays.asList(bindExtraProcessor);
+  }
+
+  static Iterable<? extends Processor> navigationModelBinderProcessors() {
+    return Arrays.asList(new NavigationModelBinderProcessor());
   }
 }

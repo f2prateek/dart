@@ -26,10 +26,7 @@ import com.google.testing.compile.JavaFileObjects;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
-/**
- * Tests {@link dart.processor.InjectExtraProcessor}. For tests related to Parceler and Parceler is
- * available.
- */
+/** Tests {@link ExtraBinderProcessor}. For tests related to Parceler and Parceler is available. */
 public class BindExtraWithParcelerTest {
 
   @Test
@@ -68,7 +65,7 @@ public class BindExtraWithParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
+        javac().withProcessors(ProcessorTestUtilities.extraBinderProcessors()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestSerializableCollectionNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
@@ -110,7 +107,7 @@ public class BindExtraWithParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
+        javac().withProcessors(ProcessorTestUtilities.extraBinderProcessors()).compile(source);
     assertThat(compilation)
         .generatedSourceFile(
             "test/TestNonSerializableNonParcelableCollection_withoutParcelerNavigationModel__ExtraBinder")
@@ -154,7 +151,7 @@ public class BindExtraWithParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
+        javac().withProcessors(ProcessorTestUtilities.extraBinderProcessors()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestParcelAnnotatedNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
@@ -198,7 +195,7 @@ public class BindExtraWithParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
+        javac().withProcessors(ProcessorTestUtilities.extraBinderProcessors()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestCollectionParcelNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(expectedSource);
@@ -247,7 +244,7 @@ public class BindExtraWithParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
+        javac().withProcessors(ProcessorTestUtilities.extraBinderProcessors()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestParcelExtendsParcelableNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(builderSource);
@@ -301,7 +298,7 @@ public class BindExtraWithParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.dartProcessors()).compile(source);
+        javac().withProcessors(ProcessorTestUtilities.extraBinderProcessors()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test/TestParcelableExtendsParcelableNavigationModel__ExtraBinder")
         .hasSourceEquivalentTo(builderSource);

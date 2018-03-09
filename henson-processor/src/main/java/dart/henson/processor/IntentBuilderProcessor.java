@@ -17,11 +17,11 @@
 
 package dart.henson.processor;
 
-import dart.common.BindingTarget;
+import dart.common.ExtraBindingTarget;
 import dart.common.util.BindExtraUtil;
-import dart.common.util.BindingTargetUtil;
 import dart.common.util.CompilerUtil;
 import dart.common.util.DartModelUtil;
+import dart.common.util.ExtraBindingTargetUtil;
 import dart.common.util.FileUtil;
 import dart.common.util.LoggingUtil;
 import dart.common.util.ParcelerUtil;
@@ -38,11 +38,11 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
 @SupportedAnnotationTypes({
-  HensonProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
-  HensonProcessor.EXTRA_ANNOTATION_CLASS_NAME
+  IntentBuilderProcessor.NAVIGATION_MODEL_ANNOTATION_CLASS_NAME,
+  IntentBuilderProcessor.EXTRA_ANNOTATION_CLASS_NAME
 })
-@SupportedOptions({HensonProcessor.OPTION_HENSON_PACKAGE})
-public class HensonProcessor extends AbstractProcessor {
+@SupportedOptions({IntentBuilderProcessor.OPTION_HENSON_PACKAGE})
+public class IntentBuilderProcessor extends AbstractProcessor {
 
   static final String NAVIGATION_MODEL_ANNOTATION_CLASS_NAME = "dart.DartModel";
   static final String EXTRA_ANNOTATION_CLASS_NAME = "dart.BindExtra";
@@ -52,7 +52,7 @@ public class HensonProcessor extends AbstractProcessor {
   private BindExtraUtil bindExtraUtil;
   private FileUtil fileUtil;
   private DartModelUtil dartModelUtil;
-  private BindingTargetUtil bindingTargetUtil;
+  private ExtraBindingTargetUtil extraBindingTargetUtil;
 
   private String hensonPackage;
   private boolean usesParceler = true;
@@ -65,11 +65,11 @@ public class HensonProcessor extends AbstractProcessor {
     final ParcelerUtil parcelerUtil = new ParcelerUtil(compilerUtil, processingEnv, usesParceler);
     loggingUtil = new LoggingUtil(processingEnv);
     fileUtil = new FileUtil(processingEnv);
-    bindingTargetUtil = new BindingTargetUtil(compilerUtil, processingEnv, loggingUtil);
-    dartModelUtil = new DartModelUtil(loggingUtil, bindingTargetUtil, compilerUtil);
+    extraBindingTargetUtil = new ExtraBindingTargetUtil(compilerUtil, processingEnv, loggingUtil);
+    dartModelUtil = new DartModelUtil(loggingUtil, extraBindingTargetUtil, compilerUtil);
     bindExtraUtil =
         new BindExtraUtil(
-            compilerUtil, parcelerUtil, loggingUtil, bindingTargetUtil, dartModelUtil);
+            compilerUtil, parcelerUtil, loggingUtil, extraBindingTargetUtil, dartModelUtil);
 
     parseAnnotationProcessorOptions(processingEnv);
   }
@@ -84,7 +84,7 @@ public class HensonProcessor extends AbstractProcessor {
     dartModelUtil.setRoundEnvironment(roundEnv);
     bindExtraUtil.setRoundEnvironment(roundEnv);
 
-    Map<TypeElement, BindingTarget> targetClassMap = findAndParseTargets();
+    Map<TypeElement, ExtraBindingTarget> targetClassMap = findAndParseTargets();
     generateIntentBuilders(targetClassMap);
 
     //return false here to let dart process the annotations too
@@ -104,19 +104,19 @@ public class HensonProcessor extends AbstractProcessor {
     hensonPackage = processingEnv.getOptions().get(OPTION_HENSON_PACKAGE);
   }
 
-  private Map<TypeElement, BindingTarget> findAndParseTargets() {
-    Map<TypeElement, BindingTarget> targetClassMap = new LinkedHashMap<>();
+  private Map<TypeElement, ExtraBindingTarget> findAndParseTargets() {
+    Map<TypeElement, ExtraBindingTarget> targetClassMap = new LinkedHashMap<>();
 
-    dartModelUtil.parseDartModelAnnotatedElements(targetClassMap);
+    dartModelUtil.parseDartModelAnnotatedTypes(targetClassMap);
     bindExtraUtil.parseBindExtraAnnotatedElements(targetClassMap);
-    bindingTargetUtil.createBindingTargetTrees(targetClassMap);
-    bindingTargetUtil.addClosestRequiredAncestorForTargets(targetClassMap);
+    extraBindingTargetUtil.createBindingTargetTrees(targetClassMap);
+    extraBindingTargetUtil.addClosestRequiredAncestorForTargets(targetClassMap);
 
     return targetClassMap;
   }
 
-  private void generateIntentBuilders(Map<TypeElement, BindingTarget> targetClassMap) {
-    for (Map.Entry<TypeElement, BindingTarget> entry : targetClassMap.entrySet()) {
+  private void generateIntentBuilders(Map<TypeElement, ExtraBindingTarget> targetClassMap) {
+    for (Map.Entry<TypeElement, ExtraBindingTarget> entry : targetClassMap.entrySet()) {
       if (entry.getValue().topLevel) {
         generateIntentBuildersForTree(targetClassMap, entry.getKey());
       }
@@ -124,11 +124,11 @@ public class HensonProcessor extends AbstractProcessor {
   }
 
   private void generateIntentBuildersForTree(
-      Map<TypeElement, BindingTarget> targetClassMap, TypeElement typeElement) {
+      Map<TypeElement, ExtraBindingTarget> targetClassMap, TypeElement typeElement) {
     //we unfortunately can't test that nothing is generated in a TRUTH based test
-    final BindingTarget bindingTarget = targetClassMap.get(typeElement);
+    final ExtraBindingTarget extraBindingTarget = targetClassMap.get(typeElement);
     try {
-      fileUtil.writeFile(new IntentBuilderGenerator(bindingTarget), typeElement);
+      fileUtil.writeFile(new IntentBuilderGenerator(extraBindingTarget), typeElement);
     } catch (IOException e) {
       loggingUtil.error(
           typeElement,
@@ -137,7 +137,7 @@ public class HensonProcessor extends AbstractProcessor {
           e.getMessage());
     }
 
-    for (TypeElement child : bindingTarget.childClasses) {
+    for (TypeElement child : extraBindingTarget.childClasses) {
       generateIntentBuildersForTree(targetClassMap, child);
     }
   }

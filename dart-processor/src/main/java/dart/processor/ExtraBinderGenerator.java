@@ -27,7 +27,7 @@ import com.squareup.javapoet.TypeSpec;
 import dart.Dart;
 import dart.common.BaseGenerator;
 import dart.common.Binding;
-import dart.common.BindingTarget;
+import dart.common.ExtraBindingTarget;
 import dart.common.ExtraInjection;
 import dart.common.FieldBinding;
 import java.util.Collection;
@@ -40,11 +40,11 @@ import javax.lang.model.type.TypeMirror;
  *
  * <p>{@link Dart} to use this code at runtime.
  */
-public class ExtraInjectorGenerator extends BaseGenerator {
+public class ExtraBinderGenerator extends BaseGenerator {
 
-  private final BindingTarget target;
+  private final ExtraBindingTarget target;
 
-  public ExtraInjectorGenerator(BindingTarget target) {
+  public ExtraBinderGenerator(ExtraBindingTarget target) {
     this.target = target;
   }
 
@@ -66,7 +66,7 @@ public class ExtraInjectorGenerator extends BaseGenerator {
   }
 
   private String binderClassName() {
-    return target.className + DART_MODEL_SUFFIX + Dart.BINDER_SUFFIX;
+    return target.className + DART_MODEL_SUFFIX + Dart.EXTRA_BINDER_SUFFIX;
   }
 
   private void emitBind(TypeSpec.Builder builder) {
@@ -81,7 +81,8 @@ public class ExtraInjectorGenerator extends BaseGenerator {
       // Emit a call to the superclass binder, if any.
       bindBuilder.addStatement(
           "$T.bind(finder, target, source)",
-          ClassName.bestGuess(target.getParentFQN() + DART_MODEL_SUFFIX + Dart.BINDER_SUFFIX));
+          ClassName.bestGuess(
+              target.getParentFQN() + DART_MODEL_SUFFIX + Dart.EXTRA_BINDER_SUFFIX));
     }
 
     // Local variable in which all extras will be temporarily stored.
