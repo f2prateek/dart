@@ -1,7 +1,7 @@
 Dart [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Dart-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1444)[![Build Status](https://travis-ci.org/f2prateek/dart.svg?branch=master)](https://travis-ci.org/f2prateek/dart)
 ============
 
-**** Version 3 of Dart & Henson is gonna be released soon in January 2018. If you are looking for the README page of Dart & Henson 2, please visit [this wiki page](https://github.com/f2prateek/dart/wiki/Dart-&-Henson-v2-).****
+**** Version 3 of Dart & Henson is gonna be released soon in 2018. If you are looking for the README page of Dart & Henson 2, please visit [this wiki page](https://github.com/f2prateek/dart/wiki/Dart-&-Henson-v2-).****
 
 **** This page is under construction until version 3 is released. ****
 
@@ -11,48 +11,97 @@ Extra "binding" library & intent builders for Android. Dart & Henson (DH) uses a
 ## Description of DH 3
 Dart and Henson is a an Android Library that structures the navigation layer of your apps. It helps to create intents and consume them in a structured way. We believe it's the best way to organize your navigation layer, and make it less error-prone and easier to maintain.
 
-It is composed of 2 components: Dart and Henson. Both of them use annotated classes that describe the parameters (extras of the intent) of a target activity. DH3 is not easy to setup manually, and we strongly encourage to use the gradle henson-plugin that we provide to use it. See the [samples](https://github.com/f2prateek/dart/tree/master/dart-sample) for more details.
+It is made of 2 components: Dart and Henson. Both of them use annotated classes (navigation models) that describe the parameters (extras of the intent) of a target activity. DH3 provides a gradle plugin to generate henson navigator clas, and we strongly encourage to use the plugin. See the [samples](https://github.com/f2prateek/dart/tree/master/dart-sample) for more details.
 
 ## Navigation models
 
 A navigation model class is a simple pojo with annotated non private fields. The fields describe an extra passed to the target of an intent:
 ```java
-@DartModel
+@DartModel //use this annotation on all your models
 public class MyActivityNavigationModel {
   //a simple requested field, it's name is used as the extra key
-  public String extra1;
+  @BindExtra String extra1;
   //a named field using an annotation
-  public @BindExtra(MY_CONSTANT_NAME) String extra2;
+  @BindExtra(MY_CONSTANT_NAME) String extra2;
   //an optional field
-  public @Nullable MyParcelableOrSerializable extra3;
+  @BindExtra @Nullable MyParcelableOrSerializable extra3;
+}
+```
+
+To setup a navigation model module:
+```groovy
+dependencies {
+  implementation 'com.f2prateek.dart:dart-annotations:X.Y.Z'
+  implementation 'com.f2prateek.dart:dart:X.Y.Z'
+  implementation 'com.f2prateek.dart:henson:X.Y.Z'
+  annotationProcessor 'com.f2prateek.dart:dart-processor:X.Y.Z'
+  annotationProcessor 'com.f2prateek.dart:henson-processor:X.Y.Z'
 }
 ```
 
 Note that in DH3, navigation models:
 * are mandatory, it's not possible to annotate activities directly.
 * must follow a naming convention: they should have the same fully qualified name as the activity or service they describe the navigation of, plus the suffix: `NavigationModel`. (e.g.: `com.foo.wooper.app.MyActivityNavigationModel`).
-* must be placed in the navigation source set: in `src/navigation/main/java`.
+* must be placed in their own module. If `MyActivity` lives in the module `module-foo`, then you should place your navigation models inside a module named `module-foo-navigation`. There is no constraint enforcement on the name of this module, but we strongly encourage you to stick to this convention for naming the navigation model.
+* the `@DartModel` annotation is actually optional if there is at least one field annotated with `@BindExtra`, but, as a good practice, we recommend to always add it.
 
 ## Dart
 
 The historical first component of the library is used to map intents to Pojos (navigation models). Typically, a target activity will define a navigation model class, a pojo with annotated fields and will map the intents it receives to an instance of its model: 
+
 ```java
-public void onCreate(Bundle savedInstanceState) {
-  Dart.bind(this, myNavigationModel)
+public class MyActivity extends Activity {
+
+  //the navigation model field must be annotated
+  //it's up to developers to initialize it
+  @DartModel MyNavigationModel navigationModel = ...;
+  
+  public void onCreate(Bundle savedInstanceState) {
+    Dart.bind(this);
+  }
 }
 ```
 
-An activity (or a service) can map the extras of the intent it receives, or a bundle like `savedInstanceState`.
+Note that in DH3:
+* an activity (or a service) can map the extras of the intent it receives, or a bundle like `savedInstanceState`. For fragments the bundle of `getArguments()` will be used;
+* you can also use `Dart.bind(this, this)` or `Dart.bind(this, bundle)`;
+* the iniatialization of the navigation model is left to developers. You can use new or DI, up to you. Dart ***won't*** initialize the navigation model and expects it to be non-null;
+* you can use the code above in a super class and forget not call `bind` in subclasses. But subclasses will need to annotate their own navigation model field.
+* in the case of inheritance, the navigation model of the subclasses must extend the navigation model of the super class.
+* in the case of inheritance, `bind()` will replace the instance of the navigation model of the super classes by an instance of the navigation model of the subclasses. The initialization performed in super classes will be erased. That's a side effect of Dart, it allows for better performances (as it doesn't rebind the model in all classes).
 
 ## Henson
 
 The second component of the library is used to create intents. Based on the navigation model, henson will create an intent builder for the described class (remember the name of the activity / service can be dedudced from the FQN of the model). It creates also some useful wrapper around them, see below.
 
-Generally speaking, Intent Builders generated by Henson are not used directly, but via the `HensonNavigator` class that is generated for each module.
+Generally speaking, Intent Builders generated by Henson are not used directly, but via the `HensonNavigator` class that is generated for each module. When you want a module `M0` to use other module navigation APIs, `M0` must use the gradle henson-plugin.
 
 #### The HensonNavigator Class
 
-The `HensonNavigator` is generated on a usage basis: it wraps all the intent builder that a module can use.
+Setup of a module using other modules navigation API via `HensonNavigator`:
+```groovy
+apply plugin: 'dart.henson-plugin'
+
+buildscript {
+  repostories {
+     jcenter()
+  }
+  dependencies {
+    classpath "com.f2prateek.dart:henson-plugin:X.Y.Z"
+  }
+}
+
+dependencies {
+  implementation project(':module1-navigation')
+}
+
+henson {
+  navigatorPackageName = "com.foo.module0"
+}
+```
+
+The plugin scans your dependencies and wraps all the intent builders that are found in the classpath.
+The `HensonNavigator` is then generated:
 ```java
 Intent intent = HensonNavigator.gotoMyActivity(context)
  .extra1("foo")
@@ -63,18 +112,14 @@ Intent intent = HensonNavigator.gotoMyActivity(context)
 
 The intent builders used by a module are detected automatically during the build, based on the dependencies a module uses, and the `HensonNavigator` is generated accordingly.
 
-
 ## What's new in DH3 ?
 
 Briefly:
-* DH3 fully supports modularization. It was the main motivation for the version 3, and it requested quite a few changes. We don't have a migration guide yet.
-* navigation models have changed and are mandatory, they need a single annotation: `@DartModel`.
-* navigation models must follow a naming convention
-* they must be placed in a different source set in: `src/navigation/main/java`
-* DH3 offers a gradle plugin. DH3 uses a lot of annotation processing internally, configurations, source sets, artifacts, custom tasks. Do not set it up manually unless you know gradle well.
-* annotations have changed, the new model is simpler.
-* DH3 classes have been repackaged. Though, unfortunately, we couldn't rename the groupId of the library, and gradle doesn't let you use DH2 and DH3 simultaneously.
-
+* DH2.1 is available to help you migrate to DH3. We will detail this in our migration guide.
+* DH3 classes have been repackaged to allow a smoother migration.
+* DH3 fully supports modularization. It was the main motivation for the version 3, and it requested quite a few changes. 
+* DH3 supports navigation cycles between modules. As modules expose their navigation APIs in a different module, we avoid compile time cycles.
+* DH3 offers a gradle plugin. DH3 uses a lot of annotation processing internally, configurations, artifacts, custom tasks. Do not set it up manually unless you know gradle well. Use the plugin.
 
 ProGuard
 --------
@@ -84,6 +129,7 @@ If ProGuard is enabled be sure to add these rules to your configuration:
 ```
 -dontwarn dart.internal.**
 -keep class **__ExtraBinder { *; }
+-keep class **__NavigationModelBinder { *; }
 -keepclasseswithmembernames class * {
     @dart.* <fields>;
 }
@@ -104,10 +150,17 @@ Dart:
 implementation 'com.f2prateek.dart:dart:(insert latest version)'
 annotationProcessor 'com.f2prateek.dart:dart-processor:(insert latest version)'
 ```
+
 Henson :
 ```groovy
 implementation 'com.f2prateek.dart:henson:(insert latest version)'
 annotationProcessor 'com.f2prateek.dart:henson-processor:(insert latest version)'
+```
+
+Henson-plugin :
+```groovy
+classpath 'com.f2prateek.dart:henson-plugin:(insert latest version)'
+apply plugin: 'dart.henson-plugin'
 ```
 
 Kotlin
@@ -125,41 +178,26 @@ dependencies {
 }
 ```
 
-Now you can use `@InjectExtra` annotation to generate either non-null or nullables properties :
+Please note that DH3 annotation processors will support incremental annotation processing via the new gradle API. They are also deterministic and kapt tasks can be safely cached.
+
+Now you can use `@BindExtra` annotation to generate either non-null or nullables properties :
 
 ```kotlin
-class ExampleActivity : Activity() {
-  @InjectExtra
+class MyExampleActivityNavigationModel {
+  @BindExtra
   lateinit var title: String
 
-  @InjectExtra
+  @BindExtra
   var titleDefaultValue: String = "Default Title"
 
   @Nullable
   @JvmField
-  @InjectExtra
+  @BindExtra
   var titleNullable: String? = null
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-      super.onCreate(savedInstanceState)
-      setContentView(R.layout.simple_activity)
-      Dart.inject(this)
-      // TODO Use "injected" extras...
-  }
 }
 ```
 
 Note that you still need to use the Java `@Nullable` annotation otherwise Henson won't interpret your property as nullable and will generate a builder with a mandatory field (even though you declared your property as nullable with the "?" Kotlin marker). Finally, you have to add the `@JvmField` annotation or your compiler will complain about not having a backing field.
-
-You may need to add an argument to your `build.gradle` file if your activities and fragments are located in different packages as mentioned above. The Kotlin syntax with **kapt** is :
-
-```groovy
-kapt {
-    arguments {
-        arg("dart.henson.package", "your.package.name")
-    }
-}
-```
 
 Finally, if you are using Parceler that comes built-in with this library, the syntax does not change from Java, except when dealing with **data** classes. Because Parceler requires a default constructor with no argument, here is how you need to declare your **data** class :
 
