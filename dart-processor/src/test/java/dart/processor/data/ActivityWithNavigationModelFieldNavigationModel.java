@@ -15,21 +15,7 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package dart.processor.data;
 
-import android.app.IntentService;
-import android.content.Intent;
-import dart.Dart;
-
-public class Module1Service extends IntentService {
-
-  private Module1ServiceNavigationModel navigationModel = new Module1ServiceNavigationModel();
-
-  public Module1Service() {
-    super("Module1Service");
-  }
-
-  @Override protected void onHandleIntent(Intent intent) {
-    Dart.bindNavigationModel(navigationModel, intent.getExtras());
-  }
-}
+/** Created by dmolinero on 3/10/18. */
+public class ActivityWithNavigationModelFieldNavigationModel {}

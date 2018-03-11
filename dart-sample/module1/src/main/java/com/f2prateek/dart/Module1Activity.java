@@ -25,6 +25,7 @@ import butterknife.BindView;
 import dart.Dart;
 import com.f2prateek.dart.module1.R2;
 import com.f2prateek.dart.module1.R;
+import dart.DartModel;
 
 public class Module1Activity extends Activity {
 
@@ -38,14 +39,14 @@ public class Module1Activity extends Activity {
   @BindView(R2.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
   @BindView(R2.id.default_extra) TextView defaultExtraTextView;
 
-  Module1ActivityNavigationModel navigationModel = new Module1ActivityNavigationModel();
+  @DartModel Module1ActivityNavigationModel navigationModel = new Module1ActivityNavigationModel();
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_navigation);
 
     ButterKnife.bind(this);
-    Dart.bind(navigationModel, this);
+    Dart.bind(this);
 
     // Contrived code to use the "bound" extras.
     stringExtraTextView.setText(navigationModel.stringExtra);

@@ -21,7 +21,7 @@ import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 
 import dart.BindExtra;
-import dart.common.BindingTarget;
+import dart.common.ExtraBindingTarget;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class BindExtraUtil {
   private final CompilerUtil compilerUtil;
   private final ParcelerUtil parcelerUtil;
   private final LoggingUtil loggingUtil;
-  private final BindingTargetUtil bindingTargetUtil;
+  private final ExtraBindingTargetUtil extraBindingTargetUtil;
   private final DartModelUtil dartModelUtil;
 
   private RoundEnvironment roundEnv;
@@ -46,12 +46,12 @@ public class BindExtraUtil {
       CompilerUtil compilerUtil,
       ParcelerUtil parcelerUtil,
       LoggingUtil loggingUtil,
-      BindingTargetUtil bindingTargetUtil,
+      ExtraBindingTargetUtil extraBindingTargetUtil,
       DartModelUtil dartModelUtil) {
     this.compilerUtil = compilerUtil;
     this.parcelerUtil = parcelerUtil;
     this.loggingUtil = loggingUtil;
-    this.bindingTargetUtil = bindingTargetUtil;
+    this.extraBindingTargetUtil = extraBindingTargetUtil;
     this.dartModelUtil = dartModelUtil;
   }
 
@@ -59,7 +59,7 @@ public class BindExtraUtil {
     this.roundEnv = roundEnv;
   }
 
-  public void parseBindExtraAnnotatedElements(Map<TypeElement, BindingTarget> targetClassMap) {
+  public void parseBindExtraAnnotatedElements(Map<TypeElement, ExtraBindingTarget> targetClassMap) {
     for (Element element : roundEnv.getElementsAnnotatedWith(BindExtra.class)) {
       try {
         parseInjectExtra(element, targetClassMap);
@@ -74,21 +74,22 @@ public class BindExtraUtil {
     }
   }
 
-  public void parseInjectExtra(Element element, Map<TypeElement, BindingTarget> targetClassMap) {
+  public void parseInjectExtra(
+      Element element, Map<TypeElement, ExtraBindingTarget> targetClassMap) {
     // Verify common generated code restrictions.
     if (!isValidUsageOfBindExtra(element)) {
       return;
     }
 
     final TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-    BindingTarget bindingTarget = targetClassMap.get(enclosingElement);
-    if (bindingTarget == null) {
-      // The BindingTarget was already created, @DartModel processed first
+    ExtraBindingTarget extraBindingTarget = targetClassMap.get(enclosingElement);
+    if (extraBindingTarget == null) {
+      // The ExtraBindingTarget was already created, @DartModel processed first
       if (!dartModelUtil.isValidUsageOfDartModel(enclosingElement)) {
         return;
       }
-      bindingTarget = bindingTargetUtil.createTargetClass(enclosingElement);
-      targetClassMap.put(enclosingElement, bindingTarget);
+      extraBindingTarget = extraBindingTargetUtil.createTargetClass(enclosingElement);
+      targetClassMap.put(enclosingElement, extraBindingTarget);
     }
 
     final String annotationValue = element.getAnnotation(BindExtra.class).value();
@@ -99,7 +100,7 @@ public class BindExtraUtil {
     final boolean required = isRequiredInjection(element);
     final boolean parcel =
         parcelerUtil.isParcelerAvailable() && parcelerUtil.isValidExtraTypeForParceler(type);
-    bindingTarget.addField(key, name, type, required, parcel);
+    extraBindingTarget.addField(key, name, type, required, parcel);
   }
 
   private boolean isValidUsageOfBindExtra(Element element) {

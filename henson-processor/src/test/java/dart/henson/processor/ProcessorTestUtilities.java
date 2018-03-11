@@ -22,12 +22,12 @@ import javax.annotation.processing.Processor;
 
 public class ProcessorTestUtilities {
   static Iterable<? extends Processor> hensonProcessors() {
-    return Arrays.asList(new HensonProcessor());
+    return Arrays.asList(new IntentBuilderProcessor());
   }
 
   static Iterable<? extends Processor> hensonProcessorWithoutParceler() {
-    HensonProcessor hensonProcessor = new HensonProcessor();
-    hensonProcessor.enableParceler(false);
-    return Arrays.asList(hensonProcessor);
+    IntentBuilderProcessor intentBuilderProcessor = new IntentBuilderProcessor();
+    intentBuilderProcessor.enableParceler(false);
+    return Arrays.asList(intentBuilderProcessor);
   }
 }

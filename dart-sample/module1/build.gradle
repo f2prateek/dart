@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        //this is used for development of the plugin
         mavenLocal()
         jcenter()
         google()
@@ -7,6 +8,11 @@ buildscript {
 
     dependencies {
         classpath deps.dart.gradlePlugin
+    }
+
+    //this is used for development of the plugin
+    configurations.classpath {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     }
 }
 

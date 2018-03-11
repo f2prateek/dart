@@ -18,8 +18,8 @@
 package dart.henson.processor;
 
 import static com.squareup.javapoet.ClassName.get;
-import static dart.common.util.BindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
-import static dart.common.util.BindingTargetUtil.NEXT_STATE_METHOD;
+import static dart.common.util.ExtraBindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
+import static dart.common.util.ExtraBindingTargetUtil.NEXT_STATE_METHOD;
 
 import android.content.Intent;
 import com.squareup.javapoet.ClassName;
@@ -30,7 +30,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import dart.common.BaseGenerator;
-import dart.common.BindingTarget;
+import dart.common.ExtraBindingTarget;
 import dart.common.ExtraInjection;
 import dart.common.FieldBinding;
 import dart.henson.ActivityClassFinder;
@@ -58,9 +58,9 @@ public class IntentBuilderGenerator extends BaseGenerator {
   private static final String OPTIONAL_SEQUENCE_SUBCLASS_GENERIC = "SELF";
   private static final String REQUIRED_SEQUENCE_INTERMEDIARY_CLASS_PREFIX = "AfterSetting";
 
-  private final BindingTarget target;
+  private final ExtraBindingTarget target;
 
-  public IntentBuilderGenerator(BindingTarget target) {
+  public IntentBuilderGenerator(ExtraBindingTarget target) {
     this.target = target;
   }
 
