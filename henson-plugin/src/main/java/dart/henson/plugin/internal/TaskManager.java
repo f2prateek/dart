@@ -23,7 +23,6 @@ import com.android.build.gradle.api.BaseVariant;
 import dart.henson.plugin.generator.HensonNavigatorGenerator;
 import java.io.File;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.logging.Logger;
 
 public class TaskManager {
@@ -54,7 +53,7 @@ public class TaskManager {
    * @param variant the variant for which to create a builder.
    * @param hensonNavigatorPackageName the package name in which we create the class.
    */
-  public Task createHensonNavigatorGenerationTask(
+  public GenerateHensonNavigatorTask createHensonNavigatorGenerationTask(
       BaseVariant variant, String hensonNavigatorPackageName, File destinationFolder) {
     GenerateHensonNavigatorTask generateHensonNavigatorTask =
         project
@@ -69,10 +68,6 @@ public class TaskManager {
     generateHensonNavigatorTask.project = project;
     generateHensonNavigatorTask.hensonNavigatorGenerator = hensonNavigatorGenerator;
 
-    //we put the task right before compilation so that all dependencies are resolved
-    // when the task is executed
-    generateHensonNavigatorTask.setDependsOn(variant.getJavaCompiler().getDependsOn());
-    variant.getJavaCompiler().dependsOn(generateHensonNavigatorTask);
     return generateHensonNavigatorTask;
   }
 }

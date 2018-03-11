@@ -3,7 +3,7 @@ package dart.henson.plugin
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
-import dart.henson.plugin.variant.NavigationVariant
+import dart.henson.plugin.internal.GenerateHensonNavigatorTask
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -36,7 +36,15 @@ class HensonPlugin implements Plugin<Project> {
         //for all android variants, we create a task to generate a henson navigator.
         final DomainObjectSet<? extends BaseVariant> variants = getAndroidVariants(project)
         variants.all { variant ->
-            hensonManager.createHensonNavigatorGenerationTask(variant)
+            GenerateHensonNavigatorTask navigatorTask = hensonManager
+                    .createHensonNavigatorGenerationTask(variant)
+            File destinationFolder = navigatorTask.getHensonNavigatorSourceFile().parentFile
+            variant.addJavaSourceFoldersToModel(destinationFolder)
+            variant.javaCompiler.source(destinationFolder)
+            //we put the task right before compilation so that all dependencies are resolved
+            // when the task is executed
+            navigatorTask.dependsOn = variant.javaCompiler.dependsOn
+            variant.javaCompiler.dependsOn << navigatorTask
         }
     }
 
