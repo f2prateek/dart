@@ -19,5 +19,6 @@ package dart.processor.data;
 
 import dart.DartModel;
 
-@DartModel
-public class ActivityWithNavigationModelFieldNavigationModel {}
+public class SubActivityWithNavigationModelField extends ActivityWithNavigationModelField {
+  @DartModel SubActivityWithNavigationModelFieldNavigationModel subNavigationModel;
+}

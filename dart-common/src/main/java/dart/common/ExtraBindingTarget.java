@@ -47,7 +47,7 @@ public class ExtraBindingTarget {
 
   public ExtraBindingTarget(String classPackage, String className) {
     this.classPackage = classPackage;
-    this.className = className.substring(0, className.indexOf(DART_MODEL_SUFFIX));
+    this.className = className.substring(0, className.lastIndexOf(DART_MODEL_SUFFIX));
     this.childClasses = new ArrayList<>();
     this.topLevel = false;
   }

@@ -18,5 +18,4 @@ dependencies {
     testImplementation deps.compiletesting
     testImplementation deps.truth
     testImplementation deps.fest
-    testImplementation deps.robolectric
 }

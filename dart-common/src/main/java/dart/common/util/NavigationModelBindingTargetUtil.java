@@ -97,6 +97,7 @@ public class NavigationModelBindingTargetUtil {
             navigationModelBindingTarget.parentClass =
                 compilerUtil.getClassName(
                     ancestorElement, navigationModelBindingTarget.parentPackage);
+            return;
           }
         }
       }

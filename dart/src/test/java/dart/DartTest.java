@@ -48,8 +48,8 @@ public class DartTest {
     class Example {}
 
     Example example = new Example();
-    bindNavigationModel(example, null, null);
     bind(example, null);
+    bindNavigationModel(example, null, null);
     assertThat(EXTRA_BINDERS).contains(entry(Example.class, NO_OP));
     assertThat(NAVIGATION_MODEL_BINDERS).contains(entry(Example.class, NO_OP));
   }
@@ -57,8 +57,8 @@ public class DartTest {
   @Test
   public void bindingKnownPackagesIsNoOp() {
     bind(new Activity());
-    assertThat(EXTRA_BINDERS).isEmpty();
     bindNavigationModel(new Object(), new Activity());
     assertThat(EXTRA_BINDERS).isEmpty();
+    assertThat(NAVIGATION_MODEL_BINDERS).isEmpty();
   }
 }
