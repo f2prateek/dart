@@ -16,3 +16,4 @@
 #
 
 dart.processor.ExtraBinderProcessor
+dart.processor.NavigationModelBinderProcessor
