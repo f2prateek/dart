@@ -17,12 +17,8 @@
 
 package dart.processor.data;
 
-import dart.Dart;
+import dart.DartModel;
 
-public class ActivityWithNavigationModelField__NavigationModelBinder {
-  public static void bind(Dart.Finder finder, ActivityWithNavigationModelField target) {}
-
-  public static void assign(
-      ActivityWithNavigationModelField target,
-      ActivityWithNavigationModelFieldNavigationModel navigationModel) {}
-}
+@DartModel
+public class SubActivityWithNavigationModelFieldNavigationModel
+    extends ActivityWithNavigationModelFieldNavigationModel {}

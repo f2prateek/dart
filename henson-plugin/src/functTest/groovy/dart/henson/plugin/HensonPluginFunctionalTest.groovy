@@ -192,11 +192,11 @@ class HensonPluginFunctionalTest extends Specification {
         }
         
         dependencies {
-            implementation 'com.f2prateek.dart:dart-annotations:3.0.0-RC3-SNAPSHOT'
-            implementation 'com.f2prateek.dart:dart:3.0.0-RC3-SNAPSHOT'
-            implementation 'com.f2prateek.dart:henson:3.0.0-RC3-SNAPSHOT'
-            annotationProcessor 'com.f2prateek.dart:dart-processor:3.0.0-RC3-SNAPSHOT'
-            annotationProcessor 'com.f2prateek.dart:henson-processor:3.0.0-RC3-SNAPSHOT'
+            implementation 'com.f2prateek.dart:dart-annotations:3.0.0-RC6-SNAPSHOT'
+            implementation 'com.f2prateek.dart:dart:3.0.0-RC6-SNAPSHOT'
+            implementation 'com.f2prateek.dart:henson:3.0.0-RC6-SNAPSHOT'
+            annotationProcessor 'com.f2prateek.dart:dart-processor:3.0.0-RC6-SNAPSHOT'
+            annotationProcessor 'com.f2prateek.dart:henson-processor:3.0.0-RC6-SNAPSHOT'
         }
 
         """

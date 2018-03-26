@@ -236,6 +236,110 @@ public class BindNavigationModelTest {
   }
 
   @Test
+  public void bindingNavigationModelForChildAndParentClassAndGrandParentClass() {
+    JavaFileObject source =
+        JavaFileObjects.forSourceString(
+            "test.TestActivity",
+            Joiner.on('\n')
+                .join(
+                    "package test;",
+                    "import dart.DartModel;",
+                    "import dart.Dart;",
+                    "import java.lang.Object;",
+                    "public class TestActivity extends TestParentActivity {",
+                    "  @DartModel TestActivityNavigationModel navigationModel;",
+                    "}",
+                    "class TestParentActivity extends TestGrandParentActivity {",
+                    "  @DartModel TestParentActivityNavigationModel parentNavigationModel;",
+                    "}",
+                    "class TestGrandParentActivity {",
+                    "  @DartModel TestGrandParentActivityNavigationModel grandParentNavigationModel;",
+                    "}",
+                    "class TestActivityNavigationModel extends TestParentActivityNavigationModel {",
+                    "}",
+                    "class TestParentActivityNavigationModel extends TestGrandParentActivityNavigationModel {",
+                    "}",
+                    "class TestGrandParentActivityNavigationModel {",
+                    "}",
+                    "class TestActivityNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestActivityNavigationModel navigationModel, Object source) {",
+                    "  }",
+                    "}",
+                    "class TestParentActivityNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestParentActivityNavigationModel navigationModel, Object source) {",
+                    "  }",
+                    "}",
+                    "class TestGrandParentActivityNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestGrandParentActivityNavigationModel navigationModel, Object source) {",
+                    "  }",
+                    "}"));
+
+    JavaFileObject binderSource1 =
+        JavaFileObjects.forSourceString(
+            "test/TestActivity__NavigationModelBinder",
+            Joiner.on('\n')
+                .join(
+                    "package test;",
+                    "import dart.Dart;",
+                    "public class TestActivity__NavigationModelBinder {",
+                    "  public static void bind(Dart.Finder finder, TestActivity target) {",
+                    "    TestActivityNavigationModel__ExtraBinder.bind(finder, target.navigationModel, target);",
+                    "    TestParentActivity__NavigationModelBinder.assign(target, target.navigationModel);",
+                    "  }",
+                    "  public static void assign(TestActivity target, TestActivityNavigationModel navigationModel) {",
+                    "    target.navigationModel = navigationModel;",
+                    "    TestParentActivity__NavigationModelBinder.assign(target, navigationModel);",
+                    "  }",
+                    "}"));
+
+    JavaFileObject binderSource2 =
+        JavaFileObjects.forSourceString(
+            "test/TestParentActivity__NavigationModelBinder",
+            Joiner.on('\n')
+                .join(
+                    "package test;",
+                    "import dart.Dart;",
+                    "public class TestParentActivity__NavigationModelBinder {",
+                    "  public static void bind(Dart.Finder finder, TestParentActivity target) {",
+                    "    TestParentActivityNavigationModel__ExtraBinder.bind(finder, target.parentNavigationModel, target);",
+                    "    TestGrandParentActivity__NavigationModelBinder.assign(target, target.parentNavigationModel);",
+                    "  }",
+                    "  public static void assign(TestParentActivity target, TestParentActivityNavigationModel navigationModel) {",
+                    "    target.parentNavigationModel = navigationModel;",
+                    "    TestGrandParentActivity__NavigationModelBinder.assign(target, navigationModel);",
+                    "  }",
+                    "}"));
+
+    JavaFileObject binderSource3 =
+        JavaFileObjects.forSourceString(
+            "test/TestGrandParentActivity__NavigationModelBinder",
+            Joiner.on('\n')
+                .join(
+                    "package test;",
+                    "import dart.Dart;",
+                    "public class TestGrandParentActivity__NavigationModelBinder {",
+                    "  public static void bind(Dart.Finder finder, TestGrandParentActivity target) {",
+                    "    TestGrandParentActivityNavigationModel__ExtraBinder.bind(finder, target.grandParentNavigationModel, target);",
+                    "  }",
+                    "  public static void assign(TestGrandParentActivity target, TestGrandParentActivityNavigationModel navigationModel) {",
+                    "    target.grandParentNavigationModel = navigationModel;",
+                    "  }",
+                    "}"));
+
+    Compilation compilation =
+        javac().withProcessors(navigationModelBinderProcessors()).compile(source);
+    assertThat(compilation)
+        .generatedSourceFile("test/TestActivity__NavigationModelBinder")
+        .hasSourceEquivalentTo(binderSource1);
+    assertThat(compilation)
+        .generatedSourceFile("test/TestParentActivity__NavigationModelBinder")
+        .hasSourceEquivalentTo(binderSource2);
+    assertThat(compilation)
+        .generatedSourceFile("test/TestGrandParentActivity__NavigationModelBinder")
+        .hasSourceEquivalentTo(binderSource3);
+  }
+
+  @Test
   public void bindingNavigationModelForChildAndGrandParentClass() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
@@ -350,6 +454,104 @@ public class BindNavigationModelTest {
                     "  public static void assign(TestActivity target, TestActivityNavigationModel navigationModel) {",
                     "    target.navigationModel = navigationModel;",
                     "    ActivityWithNavigationModelField__NavigationModelBinder.assign(target, navigationModel);",
+                    "  }",
+                    "}"));
+
+    Compilation compilation =
+        javac().withProcessors(navigationModelBinderProcessors()).compile(source);
+    assertThat(compilation)
+        .generatedSourceFile("test/TestActivity__NavigationModelBinder")
+        .hasSourceEquivalentTo(binderSource1);
+  }
+
+  @Test
+  public void bindingNavigationModelForChildWithGrandParentOutside() {
+    JavaFileObject source =
+        JavaFileObjects.forSourceString(
+            "test.TestActivity",
+            Joiner.on('\n')
+                .join(
+                    "package test;",
+                    "import dart.DartModel;",
+                    "import dart.Dart;",
+                    "import java.lang.Object;",
+                    "import dart.processor.data.SubActivityWithNoNavigationModelField;",
+                    "import dart.processor.data.ActivityWithNavigationModelFieldNavigationModel;",
+                    "public class TestActivity extends SubActivityWithNoNavigationModelField {",
+                    "  @DartModel TestActivityNavigationModel navigationModel;",
+                    "}",
+                    "class TestActivityNavigationModel extends ActivityWithNavigationModelFieldNavigationModel {",
+                    "}",
+                    "class TestActivityNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestActivityNavigationModel navigationModel, Object source) {",
+                    "  }",
+                    "}"));
+
+    JavaFileObject binderSource1 =
+        JavaFileObjects.forSourceString(
+            "test/TestActivity__NavigationModelBinder",
+            Joiner.on('\n')
+                .join(
+                    "package test;",
+                    "import dart.Dart;",
+                    "import dart.processor.data.ActivityWithNavigationModelField__NavigationModelBinder;",
+                    "public class TestActivity__NavigationModelBinder {",
+                    "  public static void bind(Dart.Finder finder, TestActivity target) {",
+                    "    TestActivityNavigationModel__ExtraBinder.bind(finder, target.navigationModel, target);",
+                    "    ActivityWithNavigationModelField__NavigationModelBinder.assign(target, target.navigationModel);",
+                    "  }",
+                    "  public static void assign(TestActivity target, TestActivityNavigationModel navigationModel) {",
+                    "    target.navigationModel = navigationModel;",
+                    "    ActivityWithNavigationModelField__NavigationModelBinder.assign(target, navigationModel);",
+                    "  }",
+                    "}"));
+
+    Compilation compilation =
+        javac().withProcessors(navigationModelBinderProcessors()).compile(source);
+    assertThat(compilation)
+        .generatedSourceFile("test/TestActivity__NavigationModelBinder")
+        .hasSourceEquivalentTo(binderSource1);
+  }
+
+  @Test
+  public void bindingNavigationModelForChildWithParentAndGrandParentOutside() {
+    JavaFileObject source =
+        JavaFileObjects.forSourceString(
+            "test.TestActivity",
+            Joiner.on('\n')
+                .join(
+                    "package test;",
+                    "import dart.DartModel;",
+                    "import dart.Dart;",
+                    "import java.lang.Object;",
+                    "import dart.processor.data.SubActivityWithNavigationModelField;",
+                    "import dart.processor.data.SubActivityWithNavigationModelFieldNavigationModel;",
+                    "public class TestActivity extends SubActivityWithNavigationModelField {",
+                    "  @DartModel TestActivityNavigationModel navigationModel;",
+                    "}",
+                    "class TestActivityNavigationModel extends SubActivityWithNavigationModelFieldNavigationModel {",
+                    "}",
+                    "class TestActivityNavigationModel__ExtraBinder {",
+                    "  public static void bind(Dart.Finder finder, TestActivityNavigationModel navigationModel, Object source) {",
+                    "  }",
+                    "}"));
+
+    JavaFileObject binderSource1 =
+        JavaFileObjects.forSourceString(
+            "test/TestActivity__NavigationModelBinder",
+            Joiner.on('\n')
+                .join(
+                    "package test;",
+                    "import dart.Dart;",
+                    "import dart.processor.data.SubActivityWithNavigationModelField__NavigationModelBinder;",
+                    "public class TestActivity__NavigationModelBinder {",
+                    "  public static void bind(Dart.Finder finder, TestActivity target) {",
+                    "    TestActivityNavigationModel__ExtraBinder.bind(finder, target.navigationModel, target);",
+                    "    SubActivityWithNavigationModelField__NavigationModelBinder.assign(target, target.navigationModel);",
+                    "  }",
+                    "  public static void assign(TestActivity target, TestActivityNavigationModel navigationModel) {",
+                    "    target.navigationModel = navigationModel;",
+                    "    SubActivityWithNavigationModelField__NavigationModelBinder.assign(target, navigationModel);",
                     "  }",
                     "}"));
 

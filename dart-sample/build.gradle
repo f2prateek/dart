@@ -10,7 +10,7 @@ buildscript {
             'androidTools': '27.0.3',
             'parceler' : '1.0.4',
             'butterknife' : '9.0.0-SNAPSHOT',
-            'release': '3.0.0-RC5-SNAPSHOT',
+            'release': '3.0.0-RC6-SNAPSHOT',
     ]
 
     ext.deps = [
