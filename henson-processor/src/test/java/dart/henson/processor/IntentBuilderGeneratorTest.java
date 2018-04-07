@@ -622,6 +622,48 @@ public class IntentBuilderGeneratorTest {
   }
 
   @Test
+  public void intentBuilderGenerator_should_fail_when_navigationModelDefaultConstructorIsPrivate() {
+    JavaFileObject source =
+        JavaFileObjects.forSourceString(
+            "test.navigation.TestNavigationModel",
+            Joiner.on('\n')
+                .join(
+                    "package test.navigation;",
+                    "import dart.DartModel;",
+                    "@DartModel",
+                    "public class TestNavigationModel {",
+                    "  private TestNavigationModel() {}",
+                    "}"));
+
+    Compilation compilation =
+        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    assertThat(compilation)
+        .hadErrorContaining(
+            "DartModel class TestNavigationModel default constructor must not be private.");
+  }
+
+  @Test
+  public void
+      intentBuilderGenerator_should_fail_when_navigationModelDoesNotHaveDefaultConstructor() {
+    JavaFileObject source =
+        JavaFileObjects.forSourceString(
+            "test.navigation.TestNavigationModel",
+            Joiner.on('\n')
+                .join(
+                    "package test.navigation;",
+                    "import dart.DartModel;",
+                    "@DartModel",
+                    "public class TestNavigationModel {",
+                    "  public TestNavigationModel(String parameter) {}",
+                    "}"));
+
+    Compilation compilation =
+        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    assertThat(compilation)
+        .hadErrorContaining("DartModel class TestNavigationModel must have a default constructor.");
+  }
+
+  @Test
   public void intentBuilderGenerator_should_fail_when_navigationModelSuffixIsWrong() {
     JavaFileObject source =
         JavaFileObjects.forSourceString(
