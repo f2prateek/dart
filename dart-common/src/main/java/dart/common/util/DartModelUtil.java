@@ -27,9 +27,11 @@ import dart.DartModel;
 import dart.common.ExtraBindingTarget;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
@@ -100,6 +102,23 @@ public class DartModelUtil {
       valid = false;
     }
 
+    // Verify default constructor.
+    final ExecutableElement defaultConstructor = findDefaultConstructor(element);
+    if (defaultConstructor == null) {
+      loggingUtil.error(
+          element, "DartModel class %s must have a default constructor.", element.getSimpleName());
+      valid = false;
+    }
+
+    // Verify default constructor visibility.
+    if (defaultConstructor.getModifiers().contains(Modifier.PRIVATE)) {
+      loggingUtil.error(
+          element,
+          "DartModel class %s default constructor must not be private.",
+          element.getSimpleName());
+      valid = false;
+    }
+
     // Verify Dart Model suffix.
     final String classPackage = compilerUtil.getPackageName(element);
     final String className = compilerUtil.getClassName(element, classPackage);
@@ -130,5 +149,16 @@ public class DartModelUtil {
     final ExtraBindingTarget navigationModelTarget =
         extraBindingTargetUtil.createTargetClass(element);
     targetClassMap.put(element, navigationModelTarget);
+  }
+
+  private ExecutableElement findDefaultConstructor(TypeElement element) {
+    final List<ExecutableElement> constructors =
+        ElementFilter.constructorsIn(element.getEnclosedElements());
+    for (ExecutableElement constructor : constructors) {
+      if (constructor.getParameters().isEmpty()) {
+        return constructor;
+      }
+    }
+    return null;
   }
 }

@@ -74,6 +74,11 @@ public class NavigationModelBinderGenerator extends BaseGenerator {
             .addParameter(bestGuess(target.getFQN()), "target");
 
     bindBuilder.addStatement(
+        "target.$L = new $T()",
+        target.navigationModelFieldName,
+        get(target.navigationModelPackage, target.navigationModelClass));
+
+    bindBuilder.addStatement(
         "$T.bind(finder, target.$L, target)",
         get(target.navigationModelPackage, target.navigationModelClass + Dart.EXTRA_BINDER_SUFFIX),
         target.navigationModelFieldName);
