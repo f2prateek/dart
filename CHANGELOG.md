@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 3.0.0 *(2018-05-22)*
+----------------------------
+* Version 3.X is not compatible with previous versions, please refer to the official documentation on Github (readme and wiki) to learn about the new API.
+
 Version 2.0.2 *(2017-02-15)*
 ----------------------------
 * Issue #132 resolved. Models can now use inheritance.
