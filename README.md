@@ -229,6 +229,8 @@ The original author of the library is [Prateek Srivastava](https://github.com/f2
 
 Later, [Daniel Molinero Reguera](https://github.com/dlemures) and [Stephane NICOLAS](https://github.com/stephanenicolas) contributed Henson in Dart 2, and rewrote the library for Dart 3.
 
+Logo was designed by [Jibbie R. Eguna(jbeguna04)](https://github.com/jbeguna04)
+
 All the effort on versions 2 and versions 3 have been actively supported by [Groupon](https://groupon.github.io/). Thanks for this awesome OSS commitment !
 
 License
