@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.module1;
 
 import android.support.annotation.Nullable;
 import android.util.SparseArray;

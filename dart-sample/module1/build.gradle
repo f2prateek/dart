@@ -41,6 +41,9 @@ dependencies {
     api deps.henson.runtime
     api deps.butterknife.runtime
     api deps.butterknife.annotations
+
+    annotationProcessor deps.butterknife.compiler
+    annotationProcessor deps.dart.compiler
 }
 
 henson {
