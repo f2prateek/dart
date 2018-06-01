@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.f2prateek.dart;
+package com.f2prateek.dart.module1;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -23,8 +23,6 @@ import android.widget.TextView;
 import butterknife.ButterKnife;
 import butterknife.BindView;
 import dart.Dart;
-import com.f2prateek.dart.module1.R2;
-import com.f2prateek.dart.module1.R;
 import dart.DartModel;
 
 public class Module1Activity extends Activity {
@@ -39,7 +37,7 @@ public class Module1Activity extends Activity {
   @BindView(R2.id.sparse_array_parcel_extra) TextView sparseArrayParcelExtraTextView;
   @BindView(R2.id.default_extra) TextView defaultExtraTextView;
 
-  @DartModel Module1ActivityNavigationModel navigationModel = new Module1ActivityNavigationModel();
+  @DartModel Module1ActivityNavigationModel navigationModel;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

@@ -56,9 +56,11 @@ dependencies {
     implementation deps.dart.runtime
     implementation deps.henson.runtime
     implementation project(':app-navigation')
+    implementation project(':module1')
     implementation project(':module1-navigation')
 
     annotationProcessor deps.butterknife.compiler
+    annotationProcessor deps.dart.compiler
 }
 
 henson.navigatorPackageName = 'com.f2prateek.dart.example'

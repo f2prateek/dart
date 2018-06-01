@@ -6,11 +6,11 @@ buildscript {
             'compileSdk': 26,
 
             'supportLibrary': '26.0.0',
-            'androidPlugin': '3.0.1',
+            'androidPlugin': '3.2.0-alpha16',
             'androidTools': '27.0.3',
             'parceler' : '1.0.4',
             'butterknife' : '9.0.0-SNAPSHOT',
-            'release': '3.0.0-RC6-SNAPSHOT',
+            'release': '3.0.0',
     ]
 
     ext.deps = [
