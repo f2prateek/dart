@@ -41,7 +41,8 @@ public class HensonManager {
     this.hensonExtension = (HensonPluginExtension) project.getExtensions().getByName("henson");
   }
 
-  public GenerateHensonNavigatorTask createHensonNavigatorGenerationTask(BaseVariant variant, File destinationFolder) {
+  public GenerateHensonNavigatorTask createHensonNavigatorGenerationTask(
+      BaseVariant variant, File destinationFolder) {
     if (hensonExtension == null || hensonExtension.getNavigatorPackageName() == null) {
       throw new InvalidParameterException(
           "The property 'henson.navigatorPackageName' must be defined in your build.gradle");

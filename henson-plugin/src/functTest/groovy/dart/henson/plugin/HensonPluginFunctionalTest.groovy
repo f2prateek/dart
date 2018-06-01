@@ -8,6 +8,7 @@ import spock.lang.Specification
 
 import java.util.zip.ZipFile
 
+import static groovy.io.FileType.DIRECTORIES
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static groovy.io.FileType.FILES
 
@@ -95,7 +96,7 @@ class HensonPluginFunctionalTest extends Specification {
         android {
             compileSdkVersion 26
             defaultConfig {
-                applicationId 'test'
+                applicationId 'dart.test'
                 minSdkVersion 26
                 targetSdkVersion 26
                 versionCode 1
@@ -235,22 +236,19 @@ class HensonPluginFunctionalTest extends Specification {
     }
 
     boolean testJarsContent(projectDir) {
-        new File(projectDir, "module1-navigation/build/intermediates/bundles/debug").eachFileRecurse(FILES) { file ->
-            if (file.name.endsWith('.jar')) {
+        new File(projectDir, "module1-navigation/build/").eachFileRecurse(FILES) { file ->
+            println file.absolutePath
+        }
+        new File(projectDir, "module1-navigation/build/intermediates/intermediate-jars/debug").eachFileRecurse(FILES) { file ->
+            if (file.name.endsWith('classes.jar')) {
                 println "Testing jar: ${file.name}"
                 def content = getJarContent(file)
-                println "Jar content: ${content}"
-                assert content.contains("META-INF/")
-                assert content.contains("META-INF/MANIFEST.MF")
-                assert content.contains("module1/")
-                assert content.contains("module1/FooActivityNavigationModel.class")
-                assert content.contains("module1/FooActivityNavigationModel__ExtraBinder.class")
-                assert content.contains("module1/Henson\$1.class")
-                assert content.contains("module1/Henson\$WithContextSetState.class")
-                assert content.contains("module1/Henson.class")
-                assert content.contains("module1/FooActivityNavigationModel__IntentBuilder\$AllSet.class")
-                assert content.contains("module1/FooActivityNavigationModel__IntentBuilder\$InitialState.class")
-                assert content.contains("module1/FooActivityNavigationModel__IntentBuilder.class")
+                println "Jar content: $content"
+                assert content.contains('module1/FooActivityNavigationModel.class'.toString())
+                assert content.contains('module1/FooActivityNavigationModel__ExtraBinder.class'.toString())
+                assert content.contains('module1/FooActivity__IntentBuilder$AllSet.class'.toString())
+                assert content.contains('module1/FooActivity__IntentBuilder$InitialState.class'.toString())
+                assert content.contains('module1/FooActivity__IntentBuilder.class'.toString())
             }
         }
         true
