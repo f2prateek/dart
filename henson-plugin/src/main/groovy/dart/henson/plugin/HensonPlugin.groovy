@@ -36,15 +36,13 @@ class HensonPlugin implements Plugin<Project> {
         //for all android variants, we create a task to generate a henson navigator.
         final DomainObjectSet<? extends BaseVariant> variants = getAndroidVariants(project)
         variants.all { variant ->
+            File destinationFolder =
+                    project.file(
+                            new File(project.getBuildDir(), "generated/source/navigator/" + variant.getName()))
             GenerateHensonNavigatorTask navigatorTask = hensonManager
-                    .createHensonNavigatorGenerationTask(variant)
-            File destinationFolder = navigatorTask.getHensonNavigatorSourceFile().parentFile
-            variant.addJavaSourceFoldersToModel(destinationFolder)
-            variant.javaCompiler.source(destinationFolder)
-            //we put the task right before compilation so that all dependencies are resolved
-            // when the task is executed
-            navigatorTask.dependsOn = variant.javaCompiler.dependsOn
-            variant.javaCompiler.dependsOn << navigatorTask
+                    .createHensonNavigatorGenerationTask(variant, destinationFolder)
+
+            variant.registerJavaGeneratingTask(navigatorTask, destinationFolder)
         }
     }
 
