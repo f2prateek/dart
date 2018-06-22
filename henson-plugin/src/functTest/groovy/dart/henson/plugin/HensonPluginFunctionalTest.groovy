@@ -253,6 +253,7 @@ class HensonPluginFunctionalTest extends Specification {
             repositories {
                 google()
                 jcenter()
+                mavenLocal()
                 mavenCentral()
                 maven {
                   url "https://plugins.gradle.org/m2/"
@@ -339,6 +340,7 @@ class HensonPluginFunctionalTest extends Specification {
             repositories {
                 google()
                 jcenter()
+                mavenLocal()
                 mavenCentral()
                 maven {
                   url "https://plugins.gradle.org/m2/"
