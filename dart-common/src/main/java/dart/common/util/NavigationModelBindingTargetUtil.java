@@ -80,26 +80,30 @@ public class NavigationModelBindingTargetUtil {
     for (Map.Entry<TypeElement, NavigationModelBindingTarget> target : targetClassMap.entrySet()) {
       final TypeElement element = target.getKey();
       final NavigationModelBindingTarget navigationModelBindingTarget = target.getValue();
-      // root inside module
+      // if it does not have a parent already, inside the module, look outside
       if (navigationModelBindingTarget.parentPackage == null) {
-        TypeElement ancestorElement = element;
-        while (true) {
-          final TypeMirror superType = ancestorElement.getSuperclass();
-          if (superType.getKind() == TypeKind.NONE) {
-            // Got to the oldest ancestor and none contains NavigationModel field
-            return;
-          }
-          ancestorElement = (TypeElement) ((DeclaredType) superType).asElement();
-          // ancestor contains a NavigationModel field
-          if (getNavigationModelBinder(ancestorElement) != null) {
-            navigationModelBindingTarget.parentPackage =
-                compilerUtil.getPackageName(ancestorElement);
-            navigationModelBindingTarget.parentClass =
-                compilerUtil.getClassName(
-                    ancestorElement, navigationModelBindingTarget.parentPackage);
-            return;
-          }
+        TypeElement ancestorElement = findClosestAncestorWithNavigationModelBinder(element);
+        if (ancestorElement != null) {
+          navigationModelBindingTarget.parentPackage = compilerUtil.getPackageName(ancestorElement);
+          navigationModelBindingTarget.parentClass =
+              compilerUtil.getClassName(
+                  ancestorElement, navigationModelBindingTarget.parentPackage);
         }
+      }
+    }
+  }
+
+  private TypeElement findClosestAncestorWithNavigationModelBinder(TypeElement element) {
+    while (true) {
+      final TypeMirror superType = element.getSuperclass();
+      if (superType.getKind() == TypeKind.NONE) {
+        // Got to the oldest ancestor and none contains NavigationModelModelBinder
+        return null;
+      }
+      element = (TypeElement) ((DeclaredType) superType).asElement();
+      // ancestor contains a NavigationModel field
+      if (getNavigationModelBinder(element) != null) {
+        return element;
       }
     }
   }
