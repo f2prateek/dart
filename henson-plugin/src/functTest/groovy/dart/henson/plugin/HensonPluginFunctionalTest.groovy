@@ -8,6 +8,7 @@ import spock.lang.Specification
 
 import java.util.zip.ZipFile
 
+import static groovy.io.FileType.DIRECTORIES
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static groovy.io.FileType.FILES
 
@@ -21,6 +22,8 @@ class HensonPluginFunctionalTest extends Specification {
     File buildFileModuleNavigation1
     File module1NavigationManifestFile
     File testNavigationModel1
+    File testKotlinClass1
+    File testKotlinNavigationModel1
 
     def setup() {
         settingsFile = testProjectDir.newFile('settings.gradle')
@@ -37,6 +40,11 @@ class HensonPluginFunctionalTest extends Specification {
         testProjectDir.newFolder('module1-navigation', 'src','main', 'java', 'module1')
         module1NavigationManifestFile = testProjectDir.newFile('module1-navigation/src/main/AndroidManifest.xml')
         testNavigationModel1 = testProjectDir.newFile('module1-navigation/src/main/java/module1/FooActivityNavigationModel.java')
+
+        testProjectDir.newFolder('module1', 'src','main', 'kotlin', 'module1')
+        testKotlinClass1 = testProjectDir.newFile('module1/src/main/kotlin/module1/FooActivity.kt')
+        testProjectDir.newFolder('module1-navigation', 'src','main', 'kotlin', 'module1')
+        testKotlinNavigationModel1 = testProjectDir.newFile('module1-navigation/src/main/kotlin/module1/FooActivityNavigationModel.kt')
     }
 
     def "fails on non android projects"() {
@@ -59,7 +67,7 @@ class HensonPluginFunctionalTest extends Specification {
         ex.message.contains("'android' or 'android-library' plugin required.")
     }
 
-    def "applies to android projects"() {
+    def "applies to android java projects"() {
         settingsFile << """
         include(':module1')
         include(':module1-navigation')
@@ -95,7 +103,7 @@ class HensonPluginFunctionalTest extends Specification {
         android {
             compileSdkVersion 26
             defaultConfig {
-                applicationId 'test'
+                applicationId 'dart.test'
                 minSdkVersion 26
                 targetSdkVersion 26
                 versionCode 1
@@ -192,11 +200,11 @@ class HensonPluginFunctionalTest extends Specification {
         }
         
         dependencies {
-            implementation 'com.f2prateek.dart:dart-annotations:3.0.0-RC6-SNAPSHOT'
-            implementation 'com.f2prateek.dart:dart:3.0.0-RC6-SNAPSHOT'
-            implementation 'com.f2prateek.dart:henson:3.0.0-RC6-SNAPSHOT'
-            annotationProcessor 'com.f2prateek.dart:dart-processor:3.0.0-RC6-SNAPSHOT'
-            annotationProcessor 'com.f2prateek.dart:henson-processor:3.0.0-RC6-SNAPSHOT'
+            implementation 'com.f2prateek.dart:dart-annotations:3.0.1-SNAPSHOT'
+            implementation 'com.f2prateek.dart:dart:3.0.1-SNAPSHOT'
+            implementation 'com.f2prateek.dart:henson:3.0.1-SNAPSHOT'
+            annotationProcessor 'com.f2prateek.dart:dart-processor:3.0.1-SNAPSHOT'
+            annotationProcessor 'com.f2prateek.dart:henson-processor:3.0.1-SNAPSHOT'
         }
 
         """
@@ -231,33 +239,205 @@ class HensonPluginFunctionalTest extends Specification {
         println result.output
         result.task(":module1:assemble").outcome != FAILED
 
-        testJarsContent(projectDir)
+        testJarsContent(projectDir, "module1-navigation/build/intermediates/")
     }
 
-    boolean testJarsContent(projectDir) {
-        new File(projectDir, "module1-navigation/build/intermediates/bundles/debug").eachFileRecurse(FILES) { file ->
-            if (file.name.endsWith('.jar')) {
+    def "applies to android kotlin projects"() {
+        settingsFile << """
+        include(':module1')
+        include(':module1-navigation')
+        """
+
+        buildFileModule1 << """
+        buildscript {
+            repositories {
+                google()
+                jcenter()
+                mavenCentral()
+                maven {
+                  url "https://plugins.gradle.org/m2/"
+                }
+                maven {
+                  url 'https://oss.sonatype.org/content/repositories/snapshots'
+                }
+            }
+        
+            dependencies {
+                classpath 'com.android.tools.build:gradle:3.1.0'
+                classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.50"
+                classpath "com.f2prateek.dart:henson-plugin:3.0.1-SNAPSHOT"
+            }
+        }
+
+        apply plugin: 'com.android.application'
+        apply plugin: 'dart.henson-plugin'
+        apply plugin: 'kotlin-android'
+        apply plugin: 'kotlin-kapt'
+        
+        henson {
+            navigatorPackageName = "module1"
+        }
+
+        android {
+            compileSdkVersion 26
+            defaultConfig {
+                applicationId 'dart.test'
+                minSdkVersion 26
+                targetSdkVersion 26
+                versionCode 1
+                versionName '1.0.0'
+            }
+        }
+        
+        repositories {
+            google()
+            jcenter()
+            mavenLocal()
+            mavenCentral()
+            maven {
+              url 'https://oss.sonatype.org/content/repositories/snapshots'
+            }
+        }
+        
+        dependencies {
+          implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50"
+          implementation project(':module1-navigation')
+        }
+        
+        """
+
+        module1ManifestFile << """
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            package="module1">
+        
+          <application
+              android:label="Module1"
+              android:name="Test"/>
+        </manifest>
+        """
+
+        testKotlinClass1 << """
+        package module1
+        
+        import android.app.Activity
+        import android.os.Bundle
+        import android.content.Intent
+        class FooActivity : Activity() {
+        
+            override fun onCreate(bundle :Bundle?) {
+                super.onCreate(bundle)
+                val foo = FooActivityNavigationModel()
+                val intent = HensonNavigator.gotoFooActivity(this)
+                        .s("s")
+                        .build()
+            }
+        }
+        """
+
+        buildFileModuleNavigation1 << """
+        buildscript {
+            repositories {
+                google()
+                jcenter()
+                mavenCentral()
+                maven {
+                  url "https://plugins.gradle.org/m2/"
+                }
+                maven {
+                    url 'https://oss.sonatype.org/content/repositories/snapshots'
+                }
+            }
+
+            dependencies {
+                classpath 'com.android.tools.build:gradle:3.1.0'
+                classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.50"
+            }
+        }
+
+        apply plugin: 'com.android.library'
+        apply plugin: 'kotlin-android'
+        apply plugin: 'kotlin-kapt'
+        
+        android {
+            compileSdkVersion 26
+            defaultConfig {
+                minSdkVersion 26
+                targetSdkVersion 26
+                versionCode 1
+                versionName '1.0.0'
+            }
+        }
+
+        repositories {
+            google()
+            jcenter()
+            mavenCentral()
+            maven {
+                url 'https://oss.sonatype.org/content/repositories/snapshots'
+            }
+        }
+        
+        dependencies {
+            implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50"
+            implementation 'com.f2prateek.dart:dart-annotations:3.0.1-SNAPSHOT'
+            implementation 'com.f2prateek.dart:dart:3.0.1-SNAPSHOT'
+            implementation 'com.f2prateek.dart:henson:3.0.1-SNAPSHOT'
+            kapt 'com.f2prateek.dart:dart-processor:3.0.1-SNAPSHOT'
+            kapt 'com.f2prateek.dart:henson-processor:3.0.1-SNAPSHOT'
+        }
+
+        """
+        module1NavigationManifestFile << """
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            package="module1_navigation">        
+        </manifest>
+        """
+
+        testKotlinNavigationModel1 << """
+        package module1
+        import dart.BindExtra
+        import dart.DartModel
+        @DartModel
+        class FooActivityNavigationModel {
+            @BindExtra
+            lateinit var s : String
+        }
+        """
+
+        when:
+        def runner = GradleRunner.create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments('--no-build-cache', 'clean', ':module1:assembleDebug', '-d', '-s')
+                .withPluginClasspath()
+
+        def projectDir = runner.projectDir
+        def result = runner.build()
+
+        then:
+        println result.output
+        result.task(":module1:assembleDebug").outcome != FAILED
+
+        testJarsContent(projectDir, "module1-navigation/build/tmp/kotlin-classes/debug")
+    }
+
+    boolean testJarsContent(projectDir, path) {
+        new File(projectDir, path).eachFileRecurse(FILES) { file ->
+            if (file.name.endsWith('classes.jar')) {
                 println "Testing jar: ${file.name}"
                 def content = getJarContent(file)
-                println "Jar content: ${content}"
-                assert content.contains("META-INF/")
-                assert content.contains("META-INF/MANIFEST.MF")
-                assert content.contains("module1/")
-                assert content.contains("module1/FooActivityNavigationModel.class")
-                assert content.contains("module1/FooActivityNavigationModel__ExtraBinder.class")
-                assert content.contains("module1/Henson\$1.class")
-                assert content.contains("module1/Henson\$WithContextSetState.class")
-                assert content.contains("module1/Henson.class")
-                assert content.contains("module1/FooActivityNavigationModel__IntentBuilder\$AllSet.class")
-                assert content.contains("module1/FooActivityNavigationModel__IntentBuilder\$InitialState.class")
-                assert content.contains("module1/FooActivityNavigationModel__IntentBuilder.class")
+                println "Jar content: $content"
+                assert content.contains('module1/FooActivityNavigationModel.class'.toString())
+                assert content.contains('module1/FooActivityNavigationModel__ExtraBinder.class'.toString())
+                assert content.contains('module1/FooActivity__IntentBuilder$AllSet.class'.toString())
+                assert content.contains('module1/FooActivity__IntentBuilder$InitialState.class'.toString())
+                assert content.contains('module1/FooActivity__IntentBuilder.class'.toString())
             }
         }
         true
     }
 
     List<String> getJarContent(file) {
-        def List<String> result
+        List<String> result
         if(file.name.endsWith('.jar')) {
             result = new ArrayList<>()
             def zip = new ZipFile(file)
