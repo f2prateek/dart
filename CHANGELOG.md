@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 3.0.1 *(2018-06-22)*
+----------------------------
+* Fixed bug where parent activities using Dart outside the module couldn't be found all the time.
+* Issue #217 resolved. The Henson Navigator works with Kotlin! Thanks to WenChao Kong (@cooperkong) for helping us to support kotlin!
+
 Version 3.0.0 *(2018-05-22)*
 ----------------------------
 * Version 3.X is not compatible with previous versions, please refer to the official documentation on Github (readme and wiki) to learn about the new API.
