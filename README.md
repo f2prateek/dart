@@ -10,12 +10,12 @@ Dart [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.f2pr
 **** This page is under construction until version 3 is released. ****
 
 ## Summary 
-Extra "binding" library & intent builders for Android. Dart & Henson (DH) uses annotation processing to bind intent's extras to pojo fields, and to generate intent builders via a fluent API.
+Extra "binding" & intent builders library for Android. Dart & Henson (DH) uses annotation processing to bind intent's extras to pojo fields, and to generate intent builders via a fluent API.
 
 ## Description of DH 3
 Dart and Henson is a an Android Library that structures the navigation layer of your apps. It helps to create intents and consume them in a structured way. We believe it's the best way to organize your navigation layer, and make it less error-prone and easier to maintain.
 
-It is made of 2 components: Dart and Henson. Both of them use annotated classes (navigation models) that describe the parameters (extras of the intent) of a target activity. DH3 provides a gradle plugin to generate henson navigator clas, and we strongly encourage to use the plugin. See the [samples](https://github.com/f2prateek/dart/tree/master/dart-sample) for more details.
+It is made of 2 components: Dart and Henson. Both of them use annotated classes (navigation models) that describe the parameters (extras of the intent) of a target activity. DH3 provides a gradle plugin to generate the henson navigator class, and we strongly encourage to use the plugin. See the [samples](https://github.com/f2prateek/dart/tree/master/dart-sample) for more details.
 
 ## Navigation models
 
@@ -58,7 +58,7 @@ public class MyActivity extends Activity {
 
   //the navigation model field must be annotated
   //it's up to developers to initialize it
-  @DartModel MyNavigationModel navigationModel = ...;
+  @DartModel MyNavigationModel navigationModel;
   
   public void onCreate(Bundle savedInstanceState) {
     Dart.bind(this);
@@ -69,10 +69,10 @@ public class MyActivity extends Activity {
 Note that in DH3:
 * an activity (or a service) can map the extras of the intent it receives, or a bundle like `savedInstanceState`. For fragments the bundle of `getArguments()` will be used;
 * you can also use `Dart.bind(this, this)` or `Dart.bind(this, bundle)`;
-* the iniatialization of the navigation model is left to developers. You can use new or DI, up to you. Dart ***won't*** initialize the navigation model and expects it to be non-null;
+* the initialization of the navigation model is performed by Dart.
 * you can use the code above in a super class and forget not call `bind` in subclasses. But subclasses will need to annotate their own navigation model field.
 * in the case of inheritance, the navigation model of the subclasses must extend the navigation model of the super class.
-* in the case of inheritance, `bind()` will replace the instance of the navigation model of the super classes by an instance of the navigation model of the subclasses. The initialization performed in super classes will be erased. That's a side effect of Dart, it allows for better performances (as it doesn't rebind the model in all classes).
+* in the case of inheritance, `bind()` will replace the instance of the navigation model of the super classes by an instance of the navigation model of the subclasses. That's a side effect of Dart, it allows for better performances (as it doesn't rebind the model in all classes).
 
 ## Henson
 
