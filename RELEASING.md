@@ -9,6 +9,7 @@ Releasing
 1. Visit [Sonatype Nexus](https://oss.sonatype.org/) and promote the artifact.
 1. `git tag -a X.Y.X -m "Version X.Y.Z"` (where X.Y.Z is the new version)
 1. Update the `gradle.properties` to the next SNAPSHOT version.
+1. `./gradlew clean build --no-build-cache -x :henson-plugin:functionalTest` to update the dependency versions installed by the plugin
 1. `git commit -am "Prepare next development version."`
 1. `git push && git push --tags`
 
