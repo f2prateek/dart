@@ -101,7 +101,7 @@ class HensonPluginFunctionalTest extends Specification {
         }
 
         android {
-            compileSdkVersion 26
+            compileSdkVersion 28
             defaultConfig {
                 applicationId 'dart.test'
                 minSdkVersion 26
@@ -180,7 +180,7 @@ class HensonPluginFunctionalTest extends Specification {
         }
 
         android {
-            compileSdkVersion 26
+            compileSdkVersion 28
             defaultConfig {
                 minSdkVersion 26
                 targetSdkVersion 26
@@ -200,11 +200,11 @@ class HensonPluginFunctionalTest extends Specification {
         }
         
         dependencies {
-            implementation 'com.f2prateek.dart:dart-annotations:3.0.1-SNAPSHOT'
-            implementation 'com.f2prateek.dart:dart:3.0.1-SNAPSHOT'
-            implementation 'com.f2prateek.dart:henson:3.0.1-SNAPSHOT'
-            annotationProcessor 'com.f2prateek.dart:dart-processor:3.0.1-SNAPSHOT'
-            annotationProcessor 'com.f2prateek.dart:henson-processor:3.0.1-SNAPSHOT'
+            implementation 'com.f2prateek.dart:dart-annotations:3.0.2-SNAPSHOT'
+            implementation 'com.f2prateek.dart:dart:3.0.2-SNAPSHOT'
+            implementation 'com.f2prateek.dart:henson:3.0.2-SNAPSHOT'
+            annotationProcessor 'com.f2prateek.dart:dart-processor:3.0.2-SNAPSHOT'
+            annotationProcessor 'com.f2prateek.dart:henson-processor:3.0.2-SNAPSHOT'
         }
 
         """
@@ -229,7 +229,8 @@ class HensonPluginFunctionalTest extends Specification {
         when:
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'clean', ':module1:assemble', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', ':module1:assemble')
+                //.withArguments('--no-build-cache', 'clean', ':module1:assemble', '-d', '-s')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir
@@ -266,7 +267,7 @@ class HensonPluginFunctionalTest extends Specification {
             dependencies {
                 classpath 'com.android.tools.build:gradle:3.1.0'
                 classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.50"
-                classpath "com.f2prateek.dart:henson-plugin:3.0.1-SNAPSHOT"
+                classpath "com.f2prateek.dart:henson-plugin:3.0.2-SNAPSHOT"
             }
         }
 
@@ -280,7 +281,7 @@ class HensonPluginFunctionalTest extends Specification {
         }
 
         android {
-            compileSdkVersion 26
+            compileSdkVersion 28
             defaultConfig {
                 applicationId 'dart.test'
                 minSdkVersion 26
@@ -361,7 +362,7 @@ class HensonPluginFunctionalTest extends Specification {
         apply plugin: 'kotlin-kapt'
         
         android {
-            compileSdkVersion 26
+            compileSdkVersion 28
             defaultConfig {
                 minSdkVersion 26
                 targetSdkVersion 26
@@ -381,11 +382,11 @@ class HensonPluginFunctionalTest extends Specification {
         
         dependencies {
             implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50"
-            implementation 'com.f2prateek.dart:dart-annotations:3.0.1-SNAPSHOT'
-            implementation 'com.f2prateek.dart:dart:3.0.1-SNAPSHOT'
-            implementation 'com.f2prateek.dart:henson:3.0.1-SNAPSHOT'
-            kapt 'com.f2prateek.dart:dart-processor:3.0.1-SNAPSHOT'
-            kapt 'com.f2prateek.dart:henson-processor:3.0.1-SNAPSHOT'
+            implementation 'com.f2prateek.dart:dart-annotations:3.0.2-SNAPSHOT'
+            implementation 'com.f2prateek.dart:dart:3.0.2-SNAPSHOT'
+            implementation 'com.f2prateek.dart:henson:3.0.2-SNAPSHOT'
+            kapt 'com.f2prateek.dart:dart-processor:3.0.2-SNAPSHOT'
+            kapt 'com.f2prateek.dart:henson-processor:3.0.2-SNAPSHOT'
         }
 
         """
@@ -409,7 +410,8 @@ class HensonPluginFunctionalTest extends Specification {
         when:
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'clean', ':module1:assembleDebug', '-d', '-s')
+                //.withArguments('--no-build-cache', 'clean', ':module1:assembleDebug', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', ':module1:assembleDebug')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir

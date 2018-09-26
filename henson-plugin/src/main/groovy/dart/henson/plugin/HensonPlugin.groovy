@@ -43,7 +43,7 @@ class HensonPlugin implements Plugin<Project> {
                     .createHensonNavigatorGenerationTask(variant, destinationFolder)
 
             variant.registerJavaGeneratingTask(navigatorTask, destinationFolder)
-            project.logger.lifecycle("${navigatorTask.name} registered as Java Generating task")
+            project.logger.debug("${navigatorTask.name} registered as Java Generating task")
         }
     }
 
