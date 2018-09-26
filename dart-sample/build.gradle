@@ -6,7 +6,7 @@ buildscript {
             'compileSdk': 26,
 
             'supportLibrary': '26.0.0',
-            'androidPlugin': '3.2.0-alpha16',
+            'androidPlugin': '3.2.0',
             'androidTools': '27.0.3',
             'parceler' : '1.0.4',
             'butterknife' : '9.0.0-SNAPSHOT',
