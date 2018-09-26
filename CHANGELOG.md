@@ -1,6 +1,9 @@
 Change Log
 ==========
 
+Version 3.0.2 *(2018-09-25)*
+* fixed issue https://github.com/f2prateek/dart/pull/228 make builds more quiet
+
 Version 3.0.1 *(2018-06-22)*
 ----------------------------
 * Fixed bug where parent activities using Dart outside the module couldn't be found all the time.
