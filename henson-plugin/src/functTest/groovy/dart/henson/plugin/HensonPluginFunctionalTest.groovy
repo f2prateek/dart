@@ -101,7 +101,7 @@ class HensonPluginFunctionalTest extends Specification {
         }
 
         android {
-            compileSdkVersion 26
+            compileSdkVersion 28
             defaultConfig {
                 applicationId 'dart.test'
                 minSdkVersion 26
@@ -180,7 +180,7 @@ class HensonPluginFunctionalTest extends Specification {
         }
 
         android {
-            compileSdkVersion 26
+            compileSdkVersion 28
             defaultConfig {
                 minSdkVersion 26
                 targetSdkVersion 26
@@ -281,7 +281,7 @@ class HensonPluginFunctionalTest extends Specification {
         }
 
         android {
-            compileSdkVersion 26
+            compileSdkVersion 28
             defaultConfig {
                 applicationId 'dart.test'
                 minSdkVersion 26
@@ -362,7 +362,7 @@ class HensonPluginFunctionalTest extends Specification {
         apply plugin: 'kotlin-kapt'
         
         android {
-            compileSdkVersion 26
+            compileSdkVersion 28
             defaultConfig {
                 minSdkVersion 26
                 targetSdkVersion 26

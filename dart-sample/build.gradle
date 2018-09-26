@@ -3,7 +3,7 @@ apply plugin: 'com.jakewharton.butterknife'
 buildscript {
     ext.versions = [
             'minSdk': 14,
-            'compileSdk': 26,
+            'compileSdk': 28,
 
             'supportLibrary': '26.0.0',
             'androidPlugin': '3.2.0',
