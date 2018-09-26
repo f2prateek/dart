@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 3.0.3 *(2018-09-26)*
+* release version 3.0.2 henson plugin installed a SNAPSHOT version of DH dependency
+this is fixed in 3.0.3
+
 Version 3.0.2 *(2018-09-25)*
 * fixed issue https://github.com/f2prateek/dart/pull/228 make builds more quiet
 
