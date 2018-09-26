@@ -229,7 +229,8 @@ class HensonPluginFunctionalTest extends Specification {
         when:
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'clean', ':module1:assemble', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', ':module1:assemble')
+                //.withArguments('--no-build-cache', 'clean', ':module1:assemble', '-d', '-s')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir
@@ -409,7 +410,8 @@ class HensonPluginFunctionalTest extends Specification {
         when:
         def runner = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments('--no-build-cache', 'clean', ':module1:assembleDebug', '-d', '-s')
+                //.withArguments('--no-build-cache', 'clean', ':module1:assembleDebug', '-d', '-s')
+                .withArguments('--no-build-cache', 'clean', ':module1:assembleDebug')
                 .withPluginClasspath()
 
         def projectDir = runner.projectDir
