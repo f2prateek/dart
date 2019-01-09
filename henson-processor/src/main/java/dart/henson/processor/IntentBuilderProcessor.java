@@ -26,6 +26,7 @@ import dart.common.util.FileUtil;
 import dart.common.util.LoggingUtil;
 import dart.common.util.ParcelerUtil;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -56,6 +57,8 @@ public class IntentBuilderProcessor extends AbstractProcessor {
 
   private String hensonPackage;
   private boolean usesParceler = true;
+  private Map<TypeElement, ExtraBindingTarget> targetClassMap;
+  private Map<String, TypeElement> allRoundsGeneratedToTypeElement = new HashMap<>();
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -84,7 +87,7 @@ public class IntentBuilderProcessor extends AbstractProcessor {
     dartModelUtil.setRoundEnvironment(roundEnv);
     bindExtraUtil.setRoundEnvironment(roundEnv);
 
-    Map<TypeElement, ExtraBindingTarget> targetClassMap = findAndParseTargets();
+    targetClassMap = findAndParseTargets();
     generateIntentBuilders(targetClassMap);
 
     //return false here to let dart process the annotations too
@@ -128,7 +131,9 @@ public class IntentBuilderProcessor extends AbstractProcessor {
     //we unfortunately can't test that nothing is generated in a TRUTH based test
     final ExtraBindingTarget extraBindingTarget = targetClassMap.get(typeElement);
     try {
-      fileUtil.writeFile(new IntentBuilderGenerator(extraBindingTarget), typeElement);
+      IntentBuilderGenerator generator = new IntentBuilderGenerator(extraBindingTarget);
+      fileUtil.writeFile(generator, typeElement);
+      allRoundsGeneratedToTypeElement.put(generator.getFqcn(), typeElement);
     } catch (IOException e) {
       loggingUtil.error(
           typeElement,
@@ -140,5 +145,10 @@ public class IntentBuilderProcessor extends AbstractProcessor {
     for (TypeElement child : extraBindingTarget.childClasses) {
       generateIntentBuildersForTree(targetClassMap, child);
     }
+  }
+
+  /*visible for testing*/
+  TypeElement getOriginatingElement(String generatedQualifiedName) {
+    return allRoundsGeneratedToTypeElement.get(generatedQualifiedName);
   }
 }

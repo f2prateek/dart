@@ -1,0 +1,2 @@
+dart.processor.ExtraBinderProcessor,isolating
+dart.processor.NavigationModelBinderProcessor,isolating

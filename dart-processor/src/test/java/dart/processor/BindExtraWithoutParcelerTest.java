@@ -19,10 +19,13 @@ package dart.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
+import static dart.processor.ProcessorTestUtilities.*;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
+import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
@@ -47,9 +50,10 @@ public class BindExtraWithoutParcelerTest {
                     "  @BindExtra(\"key\") ArrayList<String> extra;",
                     "}"));
 
+    String extraBinderQualifiedName = "test.TestSerializableCollectionNavigationModel__ExtraBinder";
     JavaFileObject expectedSource =
         JavaFileObjects.forSourceString(
-            "test/TestSerializableCollectionNavigationModel__ExtraBinder",
+            extraBinderQualifiedName,
             Joiner.on('\n')
                 .join( //
                     "package test;",
@@ -68,13 +72,18 @@ public class BindExtraWithoutParcelerTest {
                     "  }",
                     "}"));
 
+    ExtraBinderProcessor processor = extraBinderProcessorsWithoutParceler();
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
+            .withProcessors(processor)
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/TestSerializableCollectionNavigationModel__ExtraBinder")
+        .generatedSourceFile(extraBinderQualifiedName)
         .hasSourceEquivalentTo(expectedSource);
+
+    TypeElement originatingElement = processor.getOriginatingElement(extraBinderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(mostEnclosingElement.getQualifiedName().contentEquals("test.TestSerializableCollectionNavigationModel"));
   }
 
   @Test
@@ -96,7 +105,7 @@ public class BindExtraWithoutParcelerTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
+            .withProcessors(extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
@@ -122,7 +131,7 @@ public class BindExtraWithoutParcelerTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
+            .withProcessors(extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
@@ -149,7 +158,7 @@ public class BindExtraWithoutParcelerTest {
 
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
+            .withProcessors(extraBinderProcessorsWithoutParceler())
             .compile(source);
     assertThat(compilation)
         .hadErrorContaining(
@@ -184,9 +193,10 @@ public class BindExtraWithoutParcelerTest {
                     "    @BindExtra(\"key\") Extra extra;",
                     "}"));
 
+    String extraBinderQualifiedName = "test.TestParcelableExtendsParcelableNavigationModel__ExtraBinder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test/TestParcelableExtendsParcelableNavigationModel__ExtraBinder",
+            extraBinderQualifiedName,
             Joiner.on('\n')
                 .join( //
                     "package test;",
@@ -203,12 +213,17 @@ public class BindExtraWithoutParcelerTest {
                     "  }",
                     "}"));
 
+    ExtraBinderProcessor processor = extraBinderProcessorsWithoutParceler();
     Compilation compilation =
         javac()
-            .withProcessors(ProcessorTestUtilities.extraBinderProcessorsWithoutParceler())
+            .withProcessors(processor)
             .compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/TestParcelableExtendsParcelableNavigationModel__ExtraBinder")
+        .generatedSourceFile(extraBinderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
+
+    TypeElement originatingElement = processor.getOriginatingElement(extraBinderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(mostEnclosingElement.getQualifiedName().contentEquals("test.TestParcelableExtendsParcelableNavigationModel"));
   }
 }
