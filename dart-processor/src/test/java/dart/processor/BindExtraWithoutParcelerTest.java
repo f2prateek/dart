@@ -73,17 +73,17 @@ public class BindExtraWithoutParcelerTest {
                     "}"));
 
     ExtraBinderProcessor processor = extraBinderProcessorsWithoutParceler();
-    Compilation compilation =
-        javac()
-            .withProcessors(processor)
-            .compile(source);
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
         .generatedSourceFile(extraBinderQualifiedName)
         .hasSourceEquivalentTo(expectedSource);
 
     TypeElement originatingElement = processor.getOriginatingElement(extraBinderQualifiedName);
     TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
-    assertTrue(mostEnclosingElement.getQualifiedName().contentEquals("test.TestSerializableCollectionNavigationModel"));
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.TestSerializableCollectionNavigationModel"));
   }
 
   @Test
@@ -104,9 +104,7 @@ public class BindExtraWithoutParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac()
-            .withProcessors(extraBinderProcessorsWithoutParceler())
-            .compile(source);
+        javac().withProcessors(extraBinderProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "The fields of class annotated with @DartModel must be primitive, Serializable or Parcelable (test.TestNonSerializableNonParcelableCollection_withoutParcelerNavigationModel.extra).");
@@ -130,9 +128,7 @@ public class BindExtraWithoutParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac()
-            .withProcessors(extraBinderProcessorsWithoutParceler())
-            .compile(source);
+        javac().withProcessors(extraBinderProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "The fields of class annotated with @DartModel must be primitive, Serializable or Parcelable (test.TestParcelAnnotatedNavigationModel.extra).");
@@ -157,9 +153,7 @@ public class BindExtraWithoutParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac()
-            .withProcessors(extraBinderProcessorsWithoutParceler())
-            .compile(source);
+        javac().withProcessors(extraBinderProcessorsWithoutParceler()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "The fields of class annotated with @DartModel must be primitive, Serializable or Parcelable (test.TestCollectionParcelNavigationModel.extra).");
@@ -193,7 +187,8 @@ public class BindExtraWithoutParcelerTest {
                     "    @BindExtra(\"key\") Extra extra;",
                     "}"));
 
-    String extraBinderQualifiedName = "test.TestParcelableExtendsParcelableNavigationModel__ExtraBinder";
+    String extraBinderQualifiedName =
+        "test.TestParcelableExtendsParcelableNavigationModel__ExtraBinder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
             extraBinderQualifiedName,
@@ -214,16 +209,16 @@ public class BindExtraWithoutParcelerTest {
                     "}"));
 
     ExtraBinderProcessor processor = extraBinderProcessorsWithoutParceler();
-    Compilation compilation =
-        javac()
-            .withProcessors(processor)
-            .compile(source);
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
         .generatedSourceFile(extraBinderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
 
     TypeElement originatingElement = processor.getOriginatingElement(extraBinderQualifiedName);
     TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
-    assertTrue(mostEnclosingElement.getQualifiedName().contentEquals("test.TestParcelableExtendsParcelableNavigationModel"));
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.TestParcelableExtendsParcelableNavigationModel"));
   }
 }

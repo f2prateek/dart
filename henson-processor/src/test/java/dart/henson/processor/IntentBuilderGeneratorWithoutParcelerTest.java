@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
-import javax.annotation.processing.Processor;
 import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
@@ -100,17 +99,17 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "}"));
 
     IntentBuilderProcessor processor = hensonProcessorWithoutParceler();
-    Compilation compilation =
-        javac()
-            .withProcessors(processor)
-            .compile(source);
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
         .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
 
     TypeElement originatingElement = processor.getOriginatingElement(intentBuilderQualifiedName);
     TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
-    assertTrue(mostEnclosingElement.getQualifiedName().contentEquals("test.navigation.TestNavigationModel"));
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.navigation.TestNavigationModel"));
   }
 
   @Test
@@ -128,9 +127,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac()
-            .withProcessors(hensonProcessorWithoutParceler())
-            .compile(source);
+        javac().withProcessors(hensonProcessorWithoutParceler()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "The fields of class annotated with @DartModel must be primitive, Serializable or Parcelable (test.navigation.TestNavigationModel.extra).");
@@ -153,9 +150,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac()
-            .withProcessors(hensonProcessorWithoutParceler())
-            .compile(source);
+        javac().withProcessors(hensonProcessorWithoutParceler()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "The fields of class annotated with @DartModel must be primitive, Serializable or Parcelable (test.navigation.TestNavigationModel.extra).");
@@ -178,9 +173,7 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "}"));
 
     Compilation compilation =
-        javac()
-            .withProcessors(hensonProcessorWithoutParceler())
-            .compile(source);
+        javac().withProcessors(hensonProcessorWithoutParceler()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "The fields of class annotated with @DartModel must be primitive, Serializable or Parcelable (test.navigation.TestNavigationModel.extra).");
@@ -258,17 +251,17 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "}"));
 
     IntentBuilderProcessor processor = hensonProcessorWithoutParceler();
-    Compilation compilation =
-        javac()
-            .withProcessors(processor)
-            .compile(source);
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
         .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
 
     TypeElement originatingElement = processor.getOriginatingElement(intentBuilderQualifiedName);
     TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
-    assertTrue(mostEnclosingElement.getQualifiedName().contentEquals("test.navigation.TestNavigationModel"));
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.navigation.TestNavigationModel"));
   }
 
   @Test
@@ -352,16 +345,16 @@ public class IntentBuilderGeneratorWithoutParcelerTest {
                     "}"));
 
     IntentBuilderProcessor processor = hensonProcessorWithoutParceler();
-    Compilation compilation =
-        javac()
-            .withProcessors(processor)
-            .compile(source);
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
         .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
 
     TypeElement originatingElement = processor.getOriginatingElement(intentBuilderQualifiedName);
     TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
-    assertTrue(mostEnclosingElement.getQualifiedName().contentEquals("test.navigation.TestNavigationModel"));
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.navigation.TestNavigationModel"));
   }
 }

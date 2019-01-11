@@ -36,14 +36,15 @@ final class ProcessorTestUtilities {
   }
 
   static TypeElement getMostEnclosingElement(Element element) {
-    if(element == null) {
+    if (element == null) {
       return null;
     }
 
-    while (element.getEnclosingElement() != null && element.getEnclosingElement().getKind().isClass() || element.getEnclosingElement().getKind().isInterface()) {
+    while (element.getEnclosingElement() != null
+            && element.getEnclosingElement().getKind().isClass()
+        || element.getEnclosingElement().getKind().isInterface()) {
       element = element.getEnclosingElement();
     }
     return (TypeElement) element;
   }
-
 }

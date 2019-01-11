@@ -94,9 +94,9 @@ public final class NavigationModelBinderProcessor extends AbstractProcessor {
 
       //we unfortunately can't test that nothing is generated in a TRUTH based test
       try {
-        NavigationModelBinderGenerator generator = new NavigationModelBinderGenerator(navigationModelBindingTarget);
-        fileUtil.writeFile(
-            generator, typeElement);
+        NavigationModelBinderGenerator generator =
+            new NavigationModelBinderGenerator(navigationModelBindingTarget);
+        fileUtil.writeFile(generator, typeElement);
         allRoundsGeneratedToTypeElement.put(generator.getFqcn(), typeElement);
       } catch (IOException e) {
         loggingUtil.error(
