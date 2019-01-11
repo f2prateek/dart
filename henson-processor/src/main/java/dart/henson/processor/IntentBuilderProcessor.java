@@ -57,7 +57,6 @@ public class IntentBuilderProcessor extends AbstractProcessor {
 
   private String hensonPackage;
   private boolean usesParceler = true;
-  private Map<TypeElement, ExtraBindingTarget> targetClassMap;
   private Map<String, TypeElement> allRoundsGeneratedToTypeElement = new HashMap<>();
 
   @Override
@@ -87,7 +86,7 @@ public class IntentBuilderProcessor extends AbstractProcessor {
     dartModelUtil.setRoundEnvironment(roundEnv);
     bindExtraUtil.setRoundEnvironment(roundEnv);
 
-    targetClassMap = findAndParseTargets();
+    final Map<TypeElement, ExtraBindingTarget> targetClassMap = findAndParseTargets();
     generateIntentBuilders(targetClassMap);
 
     //return false here to let dart process the annotations too
