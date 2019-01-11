@@ -19,10 +19,13 @@ package dart.henson.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
+import static dart.henson.processor.ProcessorTestUtilities.*;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
+import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
@@ -44,9 +47,10 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra String extra;",
                     "}"));
 
+    String intentBuilderQualifiedName = "test.navigation.Test__IntentBuilder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            intentBuilderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test.navigation;",
@@ -93,11 +97,18 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    IntentBuilderProcessor processor = hensonProcessor();
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
+
+    TypeElement originatingElement = processor.getOriginatingElement(intentBuilderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.navigation.TestNavigationModel"));
   }
 
   @Test
@@ -114,9 +125,10 @@ public class IntentBuilderGeneratorTest {
                     "public class TestNavigationModel {",
                     "}"));
 
+    String intentBuilderQualifiedName = "test.navigation.Test__IntentBuilder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            intentBuilderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test.navigation;",
@@ -152,11 +164,18 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    IntentBuilderProcessor processor = hensonProcessor();
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
+
+    TypeElement originatingElement = processor.getOriginatingElement(intentBuilderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.navigation.TestNavigationModel"));
   }
 
   @Test
@@ -173,9 +192,10 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra String extra;",
                     "}"));
 
+    String intentBuilderQualifiedName = "test.navigation.Test__IntentBuilder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            intentBuilderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test.navigation;",
@@ -222,11 +242,18 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    IntentBuilderProcessor processor = hensonProcessor();
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
+
+    TypeElement originatingElement = processor.getOriginatingElement(intentBuilderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.navigation.TestNavigationModel"));
   }
 
   @Test
@@ -244,9 +271,10 @@ public class IntentBuilderGeneratorTest {
                     "    @Nullable @BindExtra String extra;",
                     "}"));
 
+    String intentBuilderQualifiedName = "test.navigation.Test__IntentBuilder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            intentBuilderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test.navigation;",
@@ -287,11 +315,18 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    IntentBuilderProcessor processor = hensonProcessor();
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
+
+    TypeElement originatingElement = processor.getOriginatingElement(intentBuilderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.navigation.TestNavigationModel"));
   }
 
   @Test
@@ -310,9 +345,10 @@ public class IntentBuilderGeneratorTest {
                     "    @Nullable @BindExtra String extra2;",
                     "}"));
 
+    String intentBuilderQualifiedName = "test.navigation.Test__IntentBuilder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            intentBuilderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test.navigation;",
@@ -363,11 +399,18 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    IntentBuilderProcessor processor = hensonProcessor();
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
+
+    TypeElement originatingElement = processor.getOriginatingElement(intentBuilderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.navigation.TestNavigationModel"));
   }
 
   @Test
@@ -385,9 +428,10 @@ public class IntentBuilderGeneratorTest {
                     "    @Nullable @BindExtra(\"key2\") String extra2;",
                     "}"));
 
+    String intentBuilderQualifiedName = "test.navigation.Test__IntentBuilder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            intentBuilderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test.navigation;",
@@ -438,11 +482,18 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    IntentBuilderProcessor processor = hensonProcessor();
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
+
+    TypeElement originatingElement = processor.getOriginatingElement(intentBuilderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.navigation.TestNavigationModel"));
   }
 
   @Test
@@ -460,9 +511,10 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra(\"key\") String extra3;",
                     "}"));
 
+    String intentBuilderQualifiedName = "test.navigation.Test__IntentBuilder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            intentBuilderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test.navigation;",
@@ -508,12 +560,18 @@ public class IntentBuilderGeneratorTest {
                     "    }",
                     "  }",
                     "}"));
-
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    IntentBuilderProcessor processor = hensonProcessor();
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
+
+    TypeElement originatingElement = processor.getOriginatingElement(intentBuilderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(
+        mostEnclosingElement
+            .getQualifiedName()
+            .contentEquals("test.navigation.TestNavigationModel"));
   }
 
   @Test
@@ -531,8 +589,7 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "DartModel class TestNavigationModel must not be private, static or abstract.");
@@ -553,8 +610,7 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "DartModel class TestNavigationModel must not be private, static or abstract.");
@@ -573,8 +629,7 @@ public class IntentBuilderGeneratorTest {
                     "public abstract class TestNavigationModel {",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "DartModel class TestNavigationModel must not be private, static or abstract.");
@@ -593,8 +648,7 @@ public class IntentBuilderGeneratorTest {
                     "public interface TestNavigationModel {",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "DartModel class TestNavigationModel must not be private, static or abstract.");
@@ -615,8 +669,7 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining("DartModel class TestNavigationModel must be a top level class.");
   }
@@ -635,8 +688,7 @@ public class IntentBuilderGeneratorTest {
                     "  private TestNavigationModel() {}",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "DartModel class TestNavigationModel default constructor must not be private.");
@@ -657,8 +709,7 @@ public class IntentBuilderGeneratorTest {
                     "  public TestNavigationModel(String parameter) {}",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining("DartModel class TestNavigationModel must have a default constructor.");
   }
@@ -676,8 +727,7 @@ public class IntentBuilderGeneratorTest {
                     "class TestModel {",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "DartModel class TestModel does not follow the naming convention: my.package.TargetComponentNavigationModel.");
@@ -696,8 +746,7 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra private String extra;",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "@BindExtra field must not be private or static. (test.navigation.TestNavigationModel.extra)");
@@ -716,8 +765,7 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra static String extra;",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "@BindExtra field must not be private or static. (test.navigation.TestNavigationModel.extra)");
@@ -736,8 +784,7 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra Object extra;",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "The fields of class annotated with @DartModel must be primitive, Serializable or Parcelable (test.navigation.TestNavigationModel.extra).");
@@ -756,8 +803,7 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra(\"my.key\") String extra;",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "@BindExtra key has to be a valid java variable identifier (test.navigation.TestNavigationModel#extra).");
@@ -783,9 +829,10 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra double aDouble;",
                     "}"));
 
+    String intentBuilderQualifiedName = "test.navigation.Test__IntentBuilder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            intentBuilderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test.navigation;",
@@ -873,10 +920,9 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -903,9 +949,10 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra Extra extra;",
                     "}"));
 
+    String intentBuilderQualifiedName = "test.navigation.Test__IntentBuilder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            intentBuilderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test.navigation;",
@@ -951,10 +998,9 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -972,9 +1018,10 @@ public class IntentBuilderGeneratorTest {
                     "    @BindExtra ArrayList<String> list;",
                     "}"));
 
+    String intentBuilderQualifiedName = "test.navigation.Test__IntentBuilder";
     JavaFileObject builderSource =
         JavaFileObjects.forSourceString(
-            "test.navigation.Test__IntentBuilder",
+            intentBuilderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test.navigation;",
@@ -1023,11 +1070,9 @@ public class IntentBuilderGeneratorTest {
                     "}"));
 
     Compilation compilation =
-        javac()
-            .withProcessors(ProcessorTestUtilities.hensonProcessorWithoutParceler())
-            .compile(source);
+        javac().withProcessors(hensonProcessorWithoutParceler()).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test.navigation.Test__IntentBuilder")
+        .generatedSourceFile(intentBuilderQualifiedName)
         .hasSourceEquivalentTo(builderSource);
   }
 
@@ -1156,8 +1201,7 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource1);
@@ -1280,8 +1324,7 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource1);
@@ -1404,8 +1447,7 @@ public class IntentBuilderGeneratorTest {
                     "  } ",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource1);
@@ -1517,8 +1559,7 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource1);
@@ -1542,8 +1583,7 @@ public class IntentBuilderGeneratorTest {
                     "class SuperClass {",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .hadErrorContaining(
             "DartModel test.navigation.TestNavigationModel parent does not have an IntentBuilder. Is test.navigation.SuperClass annotated with @DartModel or contains @BindExtra fields?");
@@ -1704,8 +1744,7 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource1);
@@ -1883,8 +1922,7 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource1);
@@ -1966,8 +2004,7 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource1);
@@ -2043,8 +2080,7 @@ public class IntentBuilderGeneratorTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(ProcessorTestUtilities.hensonProcessors()).compile(source);
+    Compilation compilation = javac().withProcessors(hensonProcessor()).compile(source);
     assertThat(compilation)
         .generatedSourceFile("test.navigation.Test1__IntentBuilder")
         .hasSourceEquivalentTo(builderSource1);

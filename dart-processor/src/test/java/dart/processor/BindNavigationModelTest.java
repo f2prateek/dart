@@ -19,11 +19,14 @@ package dart.processor;
 
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
+import static dart.processor.ProcessorTestUtilities.getMostEnclosingElement;
 import static dart.processor.ProcessorTestUtilities.navigationModelBinderProcessors;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
+import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 import org.junit.Test;
 
@@ -51,9 +54,10 @@ public class BindNavigationModelTest {
                     "  }",
                     "}"));
 
+    String navigationModelBinderQualifiedName = "test.TestActivity__NavigationModelBinder";
     JavaFileObject binderSource =
         JavaFileObjects.forSourceString(
-            "test/TestActivity__NavigationModelBinder",
+            navigationModelBinderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test;",
@@ -68,11 +72,16 @@ public class BindNavigationModelTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(navigationModelBinderProcessors()).compile(source);
+    NavigationModelBinderProcessor processor = navigationModelBinderProcessors();
+    Compilation compilation = javac().withProcessors(processor).compile(source);
     assertThat(compilation)
-        .generatedSourceFile("test/TestActivity__NavigationModelBinder")
+        .generatedSourceFile(navigationModelBinderQualifiedName)
         .hasSourceEquivalentTo(binderSource);
+
+    TypeElement originatingElement =
+        processor.getOriginatingElement(navigationModelBinderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(mostEnclosingElement.getQualifiedName().contentEquals("test.TestActivity"));
   }
 
   @Test
@@ -192,9 +201,10 @@ public class BindNavigationModelTest {
                     "  }",
                     "}"));
 
+    String navigationModelBinderQualifiedName = "test.TestActivity__NavigationModelBinder";
     JavaFileObject binderSource1 =
         JavaFileObjects.forSourceString(
-            "test/TestActivity__NavigationModelBinder",
+            navigationModelBinderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test;",
@@ -211,9 +221,10 @@ public class BindNavigationModelTest {
                     "  }",
                     "}"));
 
+    String navigationModelBinderQualifiedName2 = "test.TestSuperActivity__NavigationModelBinder";
     JavaFileObject binderSource2 =
         JavaFileObjects.forSourceString(
-            "test/TestActivity__NavigationModelBinder",
+            navigationModelBinderQualifiedName2,
             Joiner.on('\n')
                 .join(
                     "package test;",
@@ -228,14 +239,26 @@ public class BindNavigationModelTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(navigationModelBinderProcessors()).compile(source);
+    NavigationModelBinderProcessor processor = navigationModelBinderProcessors();
+    Compilation compilation = javac().withProcessors(processor).compile(source);
+
     assertThat(compilation)
-        .generatedSourceFile("test/TestActivity__NavigationModelBinder")
+        .generatedSourceFile(navigationModelBinderQualifiedName)
         .hasSourceEquivalentTo(binderSource1);
+
+    TypeElement originatingElement =
+        processor.getOriginatingElement(navigationModelBinderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(mostEnclosingElement.getQualifiedName().contentEquals("test.TestActivity"));
+
     assertThat(compilation)
-        .generatedSourceFile("test/TestSuperActivity__NavigationModelBinder")
+        .generatedSourceFile(navigationModelBinderQualifiedName2)
         .hasSourceEquivalentTo(binderSource2);
+
+    TypeElement originatingElement2 =
+        processor.getOriginatingElement(navigationModelBinderQualifiedName2);
+    TypeElement mostEnclosingElement2 = getMostEnclosingElement(originatingElement2);
+    assertTrue(mostEnclosingElement2.getQualifiedName().contentEquals("test.TestSuperActivity"));
   }
 
   @Test
@@ -277,9 +300,10 @@ public class BindNavigationModelTest {
                     "  }",
                     "}"));
 
+    String navigationModelBinderQualifiedName = "test.TestActivity__NavigationModelBinder";
     JavaFileObject binderSource1 =
         JavaFileObjects.forSourceString(
-            "test/TestActivity__NavigationModelBinder",
+            navigationModelBinderQualifiedName,
             Joiner.on('\n')
                 .join(
                     "package test;",
@@ -296,9 +320,10 @@ public class BindNavigationModelTest {
                     "  }",
                     "}"));
 
+    String navigationModelBinderQualifiedName2 = "test.TestParentActivity__NavigationModelBinder";
     JavaFileObject binderSource2 =
         JavaFileObjects.forSourceString(
-            "test/TestParentActivity__NavigationModelBinder",
+            navigationModelBinderQualifiedName2,
             Joiner.on('\n')
                 .join(
                     "package test;",
@@ -315,9 +340,11 @@ public class BindNavigationModelTest {
                     "  }",
                     "}"));
 
+    String navigationModelBinderQualifiedName3 =
+        "test.TestGrandParentActivity__NavigationModelBinder";
     JavaFileObject binderSource3 =
         JavaFileObjects.forSourceString(
-            "test/TestGrandParentActivity__NavigationModelBinder",
+            navigationModelBinderQualifiedName3,
             Joiner.on('\n')
                 .join(
                     "package test;",
@@ -332,17 +359,36 @@ public class BindNavigationModelTest {
                     "  }",
                     "}"));
 
-    Compilation compilation =
-        javac().withProcessors(navigationModelBinderProcessors()).compile(source);
+    NavigationModelBinderProcessor processor = navigationModelBinderProcessors();
+    Compilation compilation = javac().withProcessors(processor).compile(source);
+
     assertThat(compilation)
-        .generatedSourceFile("test/TestActivity__NavigationModelBinder")
+        .generatedSourceFile(navigationModelBinderQualifiedName)
         .hasSourceEquivalentTo(binderSource1);
+
+    TypeElement originatingElement =
+        processor.getOriginatingElement(navigationModelBinderQualifiedName);
+    TypeElement mostEnclosingElement = getMostEnclosingElement(originatingElement);
+    assertTrue(mostEnclosingElement.getQualifiedName().contentEquals("test.TestActivity"));
+
     assertThat(compilation)
-        .generatedSourceFile("test/TestParentActivity__NavigationModelBinder")
+        .generatedSourceFile(navigationModelBinderQualifiedName2)
         .hasSourceEquivalentTo(binderSource2);
+
+    TypeElement originatingElement2 =
+        processor.getOriginatingElement(navigationModelBinderQualifiedName2);
+    TypeElement mostEnclosingElement2 = getMostEnclosingElement(originatingElement2);
+    assertTrue(mostEnclosingElement2.getQualifiedName().contentEquals("test.TestParentActivity"));
+
     assertThat(compilation)
-        .generatedSourceFile("test/TestGrandParentActivity__NavigationModelBinder")
+        .generatedSourceFile(navigationModelBinderQualifiedName3)
         .hasSourceEquivalentTo(binderSource3);
+
+    TypeElement originatingElement3 =
+        processor.getOriginatingElement(navigationModelBinderQualifiedName3);
+    TypeElement mostEnclosingElement3 = getMostEnclosingElement(originatingElement3);
+    assertTrue(
+        mostEnclosingElement3.getQualifiedName().contentEquals("test.TestGrandParentActivity"));
   }
 
   @Test
@@ -379,7 +425,7 @@ public class BindNavigationModelTest {
 
     JavaFileObject binderSource1 =
         JavaFileObjects.forSourceString(
-            "test/TestActivity__NavigationModelBinder",
+            "test.TestActivity__NavigationModelBinder",
             Joiner.on('\n')
                 .join(
                     "package test;",
@@ -398,7 +444,7 @@ public class BindNavigationModelTest {
 
     JavaFileObject binderSource2 =
         JavaFileObjects.forSourceString(
-            "test/TestActivity__NavigationModelBinder",
+            "test.TestActivity__NavigationModelBinder",
             Joiner.on('\n')
                 .join(
                     "package test;",

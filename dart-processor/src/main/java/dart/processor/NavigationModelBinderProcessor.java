@@ -24,6 +24,7 @@ import dart.common.util.LoggingUtil;
 import dart.common.util.NavigationModelBindingTargetUtil;
 import dart.common.util.NavigationModelFieldUtil;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +46,7 @@ public final class NavigationModelBinderProcessor extends AbstractProcessor {
   private FileUtil fileUtil;
   private NavigationModelBindingTargetUtil navigationModelBindingTargetUtil;
   private NavigationModelFieldUtil navigationModelFieldUtil;
+  private Map<String, TypeElement> allRoundsGeneratedToTypeElement = new HashMap<>();
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -92,8 +94,10 @@ public final class NavigationModelBinderProcessor extends AbstractProcessor {
 
       //we unfortunately can't test that nothing is generated in a TRUTH based test
       try {
-        fileUtil.writeFile(
-            new NavigationModelBinderGenerator(navigationModelBindingTarget), typeElement);
+        NavigationModelBinderGenerator generator =
+            new NavigationModelBinderGenerator(navigationModelBindingTarget);
+        fileUtil.writeFile(generator, typeElement);
+        allRoundsGeneratedToTypeElement.put(generator.getFqcn(), typeElement);
       } catch (IOException e) {
         loggingUtil.error(
             typeElement,
@@ -102,5 +106,10 @@ public final class NavigationModelBinderProcessor extends AbstractProcessor {
             e.getMessage());
       }
     }
+  }
+
+  /*visible for testing*/
+  TypeElement getOriginatingElement(String generatedQualifiedName) {
+    return allRoundsGeneratedToTypeElement.get(generatedQualifiedName);
   }
 }

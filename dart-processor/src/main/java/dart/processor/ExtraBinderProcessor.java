@@ -26,6 +26,7 @@ import dart.common.util.FileUtil;
 import dart.common.util.LoggingUtil;
 import dart.common.util.ParcelerUtil;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +51,7 @@ public final class ExtraBinderProcessor extends AbstractProcessor {
   private ExtraBindingTargetUtil extraBindingTargetUtil;
   private DartModelUtil dartModelUtil;
   private BindExtraUtil bindExtraUtil;
+  private Map<String, TypeElement> allRoundsGeneratedToTypeElement = new HashMap<>();
 
   private boolean usesParcelerOption = true;
 
@@ -112,7 +114,9 @@ public final class ExtraBinderProcessor extends AbstractProcessor {
 
       //we unfortunately can't test that nothing is generated in a TRUTH based test
       try {
-        fileUtil.writeFile(new ExtraBinderGenerator(extraBindingTarget), typeElement);
+        ExtraBinderGenerator generator = new ExtraBinderGenerator(extraBindingTarget);
+        fileUtil.writeFile(generator, typeElement);
+        allRoundsGeneratedToTypeElement.put(generator.getFqcn(), typeElement);
       } catch (IOException e) {
         loggingUtil.error(
             typeElement,
@@ -121,5 +125,10 @@ public final class ExtraBinderProcessor extends AbstractProcessor {
             e.getMessage());
       }
     }
+  }
+
+  /*visible for testing*/
+  TypeElement getOriginatingElement(String generatedQualifiedName) {
+    return allRoundsGeneratedToTypeElement.get(generatedQualifiedName);
   }
 }

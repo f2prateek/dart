@@ -17,21 +17,34 @@
 
 package dart.processor;
 
-import java.util.Arrays;
-import javax.annotation.processing.Processor;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 
 final class ProcessorTestUtilities {
-  static Iterable<? extends Processor> extraBinderProcessors() {
-    return Arrays.asList(new ExtraBinderProcessor());
+  static ExtraBinderProcessor extraBinderProcessors() {
+    return new ExtraBinderProcessor();
   }
 
-  static Iterable<? extends Processor> extraBinderProcessorsWithoutParceler() {
+  static ExtraBinderProcessor extraBinderProcessorsWithoutParceler() {
     ExtraBinderProcessor bindExtraProcessor = new ExtraBinderProcessor();
     bindExtraProcessor.enableParceler(false);
-    return Arrays.asList(bindExtraProcessor);
+    return bindExtraProcessor;
   }
 
-  static Iterable<? extends Processor> navigationModelBinderProcessors() {
-    return Arrays.asList(new NavigationModelBinderProcessor());
+  static NavigationModelBinderProcessor navigationModelBinderProcessors() {
+    return new NavigationModelBinderProcessor();
+  }
+
+  static TypeElement getMostEnclosingElement(Element element) {
+    if (element == null) {
+      return null;
+    }
+
+    while (element.getEnclosingElement() != null
+            && element.getEnclosingElement().getKind().isClass()
+        || element.getEnclosingElement().getKind().isInterface()) {
+      element = element.getEnclosingElement();
+    }
+    return (TypeElement) element;
   }
 }
