@@ -5,7 +5,7 @@
 Dart [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.f2prateek.dart/dart) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Dart-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1444)[![Build Status](https://travis-ci.org/f2prateek/dart.svg?branch=master)](https://travis-ci.org/f2prateek/dart)
 ============
 
-**** This is the README of the version 3 of Dart & Henson has been released. If you are looking for the README page of Dart & Henson 2, please visit [this wiki page](https://github.com/f2prateek/dart/wiki/Dart-&-Henson-v2-). ****
+This is the README of the version 3 of Dart & Henson has been released. If you are looking for the README page of Dart & Henson 2, please visit [this wiki page](https://github.com/f2prateek/dart/wiki/Dart-&-Henson-v2-). 
 
 ## Summary 
 Extra "binding" & intent builders library for Android. Dart & Henson (DH) uses annotation processing to bind intent's extras to pojo fields, and to generate intent builders via a fluent API.
@@ -122,6 +122,7 @@ Briefly:
 * DH3 fully supports modularization. It was the main motivation for the version 3, and it requested quite a few changes. 
 * DH3 supports navigation cycles between modules. As modules expose their navigation APIs in a different module, we avoid compile time cycles.
 * DH3 offers a gradle plugin. DH3 uses a lot of annotation processing internally, configurations, artifacts, custom tasks. Do not set it up manually unless you know gradle well. Use the plugin.
+* DH3.1+ supports incremental annotation processing when used with gradle 4.7+. All annotation processors are isolating.
 
 ProGuard
 --------
