@@ -11,11 +11,12 @@ dependencies {
     implementation project(':henson')
     implementation deps.javapoet
     implementation deps.parceler.runtime
-    implementation deps.android.runtime
+    compileOnly deps.android.runtime
 
     testImplementation files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
     testImplementation deps.junit
     testImplementation deps.compiletesting
     testImplementation deps.truth
     testImplementation deps.fest
+    testImplementation deps.android.runtime
 }

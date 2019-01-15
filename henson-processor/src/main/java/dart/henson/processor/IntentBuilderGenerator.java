@@ -21,7 +21,6 @@ import static com.squareup.javapoet.ClassName.get;
 import static dart.common.util.ExtraBindingTargetUtil.BUNDLE_BUILDER_SUFFIX;
 import static dart.common.util.ExtraBindingTargetUtil.NEXT_STATE_METHOD;
 
-import android.content.Intent;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -103,8 +102,8 @@ public class IntentBuilderGenerator extends BaseGenerator {
 
     initialStateGetterForHensonBuilder.addStatement(
         "final $T intent = new $T(context, getClassDynamically($S))",
-        Intent.class,
-        Intent.class,
+        ClassName.get("android.content", "Intent"),
+        ClassName.get("android.content", "Intent"),
         target.getFQN());
     initialStateGetterForHensonBuilder.addStatement(
         "final $T bundler = $T.create()", Bundler.class, Bundler.class);
