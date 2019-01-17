@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 3.1.1 *(2019-01-17)*
+----------------------------
+* support android x projects #230
+
 Version 3.1.0 *(2019-01-11)*
 ----------------------------
 * support incremental annotation processing #233
