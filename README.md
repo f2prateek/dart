@@ -85,7 +85,7 @@ Setup of a module using other modules navigation API via `HensonNavigator`:
 apply plugin: 'dart.henson-plugin'
 
 buildscript {
-  repostories {
+  repositories {
      jcenter()
   }
   dependencies {
