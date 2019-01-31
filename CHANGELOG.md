@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 3.1.2 *(2019-01-31)*
+----------------------------
+* Use AGP 3.3 API for Task Configuration Avoidance
+
 Version 3.1.1 *(2019-01-17)*
 ----------------------------
 * support android x projects #230
