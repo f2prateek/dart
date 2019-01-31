@@ -57,7 +57,7 @@ repositories {
 
 dependencies {
     compile localGroovy()
-    implementation 'com.android.tools.build:gradle:3.1.0'
+    implementation 'com.android.tools.build:gradle:3.3.0'
 
     functionalTestCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
         exclude group: 'org.codehaus.groovy'

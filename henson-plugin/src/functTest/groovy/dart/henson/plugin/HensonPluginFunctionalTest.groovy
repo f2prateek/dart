@@ -86,7 +86,7 @@ class HensonPluginFunctionalTest extends Specification {
             }
         
             dependencies {
-                classpath 'com.android.tools.build:gradle:3.0.1'
+                classpath 'com.android.tools.build:gradle:3.3.0'
             }
         }
 
@@ -170,7 +170,7 @@ class HensonPluginFunctionalTest extends Specification {
             }
 
             dependencies {
-                classpath 'com.android.tools.build:gradle:3.0.1'
+                classpath 'com.android.tools.build:gradle:3.3.0'
             }
         }
 
@@ -232,6 +232,7 @@ class HensonPluginFunctionalTest extends Specification {
                 .withArguments('--no-build-cache', 'clean', ':module1:assemble')
                 //.withArguments('--no-build-cache', 'clean', ':module1:assemble', '-d', '-s')
                 .withPluginClasspath()
+                //.forwardOutput()
 
         def projectDir = runner.projectDir
         def result = runner.build()
@@ -265,8 +266,8 @@ class HensonPluginFunctionalTest extends Specification {
             }
         
             dependencies {
-                classpath 'com.android.tools.build:gradle:3.1.0'
-                classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.50"
+                classpath 'com.android.tools.build:gradle:3.3.0'
+                classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
                 classpath "com.f2prateek.dart:henson-plugin:3.0.2-SNAPSHOT"
             }
         }
@@ -302,7 +303,7 @@ class HensonPluginFunctionalTest extends Specification {
         }
         
         dependencies {
-          implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50"
+          implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.20"
           implementation project(':module1-navigation')
         }
         
@@ -352,8 +353,8 @@ class HensonPluginFunctionalTest extends Specification {
             }
 
             dependencies {
-                classpath 'com.android.tools.build:gradle:3.1.0'
-                classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.50"
+                classpath 'com.android.tools.build:gradle:3.3.0'
+                classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
             }
         }
 
@@ -381,7 +382,7 @@ class HensonPluginFunctionalTest extends Specification {
         }
         
         dependencies {
-            implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50"
+            implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.20"
             implementation 'com.f2prateek.dart:dart-annotations:3.0.2-SNAPSHOT'
             implementation 'com.f2prateek.dart:dart:3.0.2-SNAPSHOT'
             implementation 'com.f2prateek.dart:henson:3.0.2-SNAPSHOT'
@@ -413,6 +414,7 @@ class HensonPluginFunctionalTest extends Specification {
                 //.withArguments('--no-build-cache', 'clean', ':module1:assembleDebug', '-d', '-s')
                 .withArguments('--no-build-cache', 'clean', ':module1:assembleDebug')
                 .withPluginClasspath()
+                //.forwardOutput()
 
         def projectDir = runner.projectDir
         def result = runner.build()

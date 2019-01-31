@@ -25,6 +25,7 @@ import java.io.File;
 import java.security.InvalidParameterException;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.tasks.TaskProvider;
 
 public class HensonManager {
   private final Project project;
@@ -41,14 +42,14 @@ public class HensonManager {
     this.hensonExtension = (HensonPluginExtension) project.getExtensions().getByName("henson");
   }
 
-  public GenerateHensonNavigatorTask createHensonNavigatorGenerationTask(
+  public TaskProvider<GenerateHensonNavigatorTask> createHensonNavigatorGenerationTask(
       BaseVariant variant, File destinationFolder) {
     if (hensonExtension == null || hensonExtension.getNavigatorPackageName() == null) {
       throw new InvalidParameterException(
           "The property 'henson.navigatorPackageName' must be defined in your build.gradle");
     }
     String hensonNavigatorPackageName = hensonExtension.getNavigatorPackageName();
-    GenerateHensonNavigatorTask generateHensonNavigatorTask =
+    TaskProvider<GenerateHensonNavigatorTask> generateHensonNavigatorTask =
         taskManager.createHensonNavigatorGenerationTask(
             variant, hensonNavigatorPackageName, destinationFolder);
     return generateHensonNavigatorTask;

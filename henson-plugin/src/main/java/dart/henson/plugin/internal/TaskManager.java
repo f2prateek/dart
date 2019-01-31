@@ -22,8 +22,10 @@ import static dart.henson.plugin.util.StringUtil.capitalize;
 import com.android.build.gradle.api.BaseVariant;
 import dart.henson.plugin.generator.HensonNavigatorGenerator;
 import java.io.File;
+import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.tasks.TaskProvider;
 
 public class TaskManager {
 
@@ -53,21 +55,25 @@ public class TaskManager {
    * @param variant the variant for which to create a builder.
    * @param hensonNavigatorPackageName the package name in which we create the class.
    */
-  public GenerateHensonNavigatorTask createHensonNavigatorGenerationTask(
+  public TaskProvider<GenerateHensonNavigatorTask> createHensonNavigatorGenerationTask(
       BaseVariant variant, String hensonNavigatorPackageName, File destinationFolder) {
-    GenerateHensonNavigatorTask generateHensonNavigatorTask =
+    TaskProvider<GenerateHensonNavigatorTask> generateHensonNavigatorTask =
         project
             .getTasks()
-            .create(
+            .register(
                 "generate" + capitalize(variant.getName()) + "HensonNavigator",
-                GenerateHensonNavigatorTask.class);
-    generateHensonNavigatorTask.hensonNavigatorPackageName = hensonNavigatorPackageName;
-    generateHensonNavigatorTask.destinationFolder = destinationFolder;
-    generateHensonNavigatorTask.variant = variant;
-    generateHensonNavigatorTask.logger = logger;
-    generateHensonNavigatorTask.project = project;
-    generateHensonNavigatorTask.hensonNavigatorGenerator = hensonNavigatorGenerator;
-
+                GenerateHensonNavigatorTask.class,
+                (Action<GenerateHensonNavigatorTask>)
+                    generateHensonNavigatorTask1 -> {
+                      generateHensonNavigatorTask1.hensonNavigatorPackageName =
+                          hensonNavigatorPackageName;
+                      generateHensonNavigatorTask1.destinationFolder = destinationFolder;
+                      generateHensonNavigatorTask1.variant = variant;
+                      generateHensonNavigatorTask1.logger = logger;
+                      generateHensonNavigatorTask1.project = project;
+                      generateHensonNavigatorTask1.hensonNavigatorGenerator =
+                          hensonNavigatorGenerator;
+                    });
     return generateHensonNavigatorTask;
   }
 }

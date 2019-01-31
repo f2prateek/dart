@@ -8,6 +8,7 @@ import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.PluginCollection
+import org.gradle.api.tasks.TaskProvider
 
 class HensonPlugin implements Plugin<Project> {
 
@@ -39,10 +40,10 @@ class HensonPlugin implements Plugin<Project> {
             File destinationFolder =
                     project.file(
                             new File(project.getBuildDir(), "generated/source/navigator/" + variant.getName()))
-            GenerateHensonNavigatorTask navigatorTask = hensonManager
+            TaskProvider<GenerateHensonNavigatorTask> navigatorTask = hensonManager
                     .createHensonNavigatorGenerationTask(variant, destinationFolder)
 
-            variant.registerJavaGeneratingTask(navigatorTask, destinationFolder)
+            variant.registerJavaGeneratingTask(navigatorTask.get(), destinationFolder)
             project.logger.debug("${navigatorTask.name} registered as Java Generating task")
         }
     }
