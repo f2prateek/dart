@@ -62,14 +62,18 @@ public class TaskManager {
             .getTasks()
             .register(
                 "generate" + capitalize(variant.getName()) + "HensonNavigator",
-                GenerateHensonNavigatorTask.class, (Action<GenerateHensonNavigatorTask>) generateHensonNavigatorTask1 -> {
-                  generateHensonNavigatorTask1.hensonNavigatorPackageName = hensonNavigatorPackageName;
-                  generateHensonNavigatorTask1.destinationFolder = destinationFolder;
-                  generateHensonNavigatorTask1.variant = variant;
-                  generateHensonNavigatorTask1.logger = logger;
-                  generateHensonNavigatorTask1.project = project;
-                  generateHensonNavigatorTask1.hensonNavigatorGenerator = hensonNavigatorGenerator;
-                });
+                GenerateHensonNavigatorTask.class,
+                (Action<GenerateHensonNavigatorTask>)
+                    generateHensonNavigatorTask1 -> {
+                      generateHensonNavigatorTask1.hensonNavigatorPackageName =
+                          hensonNavigatorPackageName;
+                      generateHensonNavigatorTask1.destinationFolder = destinationFolder;
+                      generateHensonNavigatorTask1.variant = variant;
+                      generateHensonNavigatorTask1.logger = logger;
+                      generateHensonNavigatorTask1.project = project;
+                      generateHensonNavigatorTask1.hensonNavigatorGenerator =
+                          hensonNavigatorGenerator;
+                    });
     return generateHensonNavigatorTask;
   }
 }
