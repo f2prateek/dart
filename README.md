@@ -123,6 +123,7 @@ Briefly:
 * DH3 supports navigation cycles between modules. As modules expose their navigation APIs in a different module, we avoid compile time cycles.
 * DH3 offers a gradle plugin. DH3 uses a lot of annotation processing internally, configurations, artifacts, custom tasks. Do not set it up manually unless you know gradle well. Use the plugin.
 * DH3.1+ supports incremental annotation processing when used with gradle 4.7+. All annotation processors are isolating.
+* DH3.1.2+ requires Android Gradle Plugin 3.3.0 as it uses Task Configuration Avoidance.
 
 ProGuard
 --------
