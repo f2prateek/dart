@@ -166,8 +166,9 @@ public class Dart {
       return bind;
     }
     String clsName = cls.getName();
-    if (clsName.startsWith("android.") || clsName.startsWith("java.")
-            || clsName.startsWith("androidx.")) {
+    if (clsName.startsWith("android.")
+        || clsName.startsWith("java.")
+        || clsName.startsWith("androidx.")) {
       if (debug) Log.d(TAG, "MISS: Reached framework class. Abandoning search.");
       return NO_OP;
     }
@@ -206,8 +207,9 @@ public class Dart {
       return bind;
     }
     String clsName = cls.getName();
-    if (clsName.startsWith("android.") || clsName.startsWith("java.")
-            || clsName.startsWith("androidx.")) {
+    if (clsName.startsWith("android.")
+        || clsName.startsWith("java.")
+        || clsName.startsWith("androidx.")) {
       if (debug) Log.d(TAG, "MISS: Reached framework class. Abandoning search.");
       return NO_OP;
     }
