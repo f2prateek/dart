@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 3.1.3 *(2019-07-02)*
+* Enable DH3 on dynamic feature modules: #240. 
+Thanks to Yusuf Cahyo Nugroho for this contribution!
+
 Version 3.1.2 *(2019-01-31)*
 ----------------------------
 * Use AGP 3.3 API for Task Configuration Avoidance
