@@ -64,7 +64,7 @@ class HensonPluginFunctionalTest extends Specification {
 
         then:
         org.gradle.testkit.runner.UnexpectedBuildFailure ex = thrown()
-        ex.message.contains("'android' or 'android-library' plugin required.")
+        ex.message.contains("'android' or 'android-library' or 'dynamic-feature' plugin required.")
     }
 
     def "applies to android java projects"() {

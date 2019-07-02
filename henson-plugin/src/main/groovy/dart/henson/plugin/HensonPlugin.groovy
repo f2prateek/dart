@@ -1,6 +1,7 @@
 package dart.henson.plugin
 
 import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.DynamicFeaturePlugin
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
 import dart.henson.plugin.internal.GenerateHensonNavigatorTask
@@ -24,7 +25,8 @@ class HensonPlugin implements Plugin<Project> {
         //check project
         def hasAppPlugin = project.plugins.withType(AppPlugin)
         def hasLibPlugin = project.plugins.withType(LibraryPlugin)
-        checkProject(hasAppPlugin, hasLibPlugin)
+        def hasDynamicFeaturePlugin = project.plugins.withType(DynamicFeaturePlugin)
+        checkProject(hasAppPlugin, hasLibPlugin, hasDynamicFeaturePlugin)
 
         hensonManager = new HensonManager(project)
 
@@ -55,18 +57,19 @@ class HensonPlugin implements Plugin<Project> {
     }
 
     private DomainObjectSet<? extends BaseVariant> getAndroidVariants(Project project) {
-        def hasApp = project.plugins.withType(AppPlugin)
-        if (hasApp) {
-            project.android.applicationVariants
-        } else {
+        def hasLib = project.plugins.withType(LibraryPlugin)
+        if (hasLib) {
             project.android.libraryVariants
+        } else {
+            project.android.applicationVariants
         }
     }
 
     private boolean checkProject(PluginCollection<AppPlugin> hasApp,
-                                 PluginCollection<LibraryPlugin> hasLib) {
-        if (!hasApp && !hasLib) {
-            throw new IllegalStateException("'android' or 'android-library' plugin required.")
+                                 PluginCollection<LibraryPlugin> hasLib,
+                                 PluginCollection<LibraryPlugin> hasDynamicFeature) {
+        if (!hasApp && !hasLib && !hasDynamicFeature) {
+            throw new IllegalStateException("'android' or 'android-library' or 'dynamic-feature' plugin required.")
         }
         return !hasApp
     }
