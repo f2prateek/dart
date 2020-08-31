@@ -39,6 +39,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.file.FileCollection;
+import org.gradle.api.internal.file.FileCollectionInternal;
 import org.gradle.api.internal.file.UnionFileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.CacheableTask;
@@ -95,9 +96,9 @@ public class GenerateHensonNavigatorTask extends DefaultTask {
     TaskProvider<JavaCompile> javaCompiler = variant.getJavaCompileProvider();
     FileCollection variantCompileClasspath = getJarDependencies();
     FileCollection uft =
-        new UnionFileCollection(
-            javaCompiler.get().getSource(), project.fileTree(destinationFolder));
-    javaCompiler.get().setSource(uft);
+                new UnionFileCollection(
+                        (FileCollectionInternal) javaCompiler.get().getSource(), (FileCollectionInternal) project.fileTree(destinationFolder));
+       javaCompiler.get().setSource(uft);
     logger.debug("Analyzing configuration: " + variantCompileClasspath.getFiles());
     Set<String> targetActivities = new HashSet<>();
     Streams.stream(variantCompileClasspath)
