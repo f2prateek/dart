@@ -1,0 +1,26 @@
+apply plugin: 'java-library'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+tasks.withType(JavaCompile) {
+    options.annotationProcessorPath = configurations.annotationProcessor
+}
+
+dependencies {
+    implementation project(':dart-annotations')
+    implementation project(':dart-common')
+    implementation project(':dart')
+    implementation deps.javapoet
+    implementation deps.parceler.runtime
+    compileOnly deps.android.runtime
+    annotationProcessor project(':dart-processor')
+    implementation project(':dart-processor')
+
+    testImplementation files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
+    testImplementation deps.junit
+    testImplementation deps.compiletesting
+    testImplementation deps.truth
+    testImplementation deps.fest
+    testImplementation deps.android.runtime
+}
