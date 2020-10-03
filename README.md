@@ -11,7 +11,7 @@ This is the README of the version 3 of Dart & Henson has been released. If you a
 Extra "binding" & intent builders library for Android. Dart & Henson (DH) uses annotation processing to bind intent's extras to pojo fields, and to generate intent builders via a fluent API.
 
 ## Description of DH 3
-Dart and Henson is a an Android Library that structures the navigation layer of your apps. It helps to create intents and consume them in a structured way. We believe it's the best way to organize your navigation layer, and make it less error-prone and easier to maintain.
+Dart and Henson is an Android Library that structures the navigation layer of your apps. It helps to create intents and consume them in a structured way. We believe it's the best way to organize your navigation layer and make it less error-prone and easier to maintain.
 
 It is made of 2 components: Dart and Henson. Both of them use annotated classes (navigation models) that describe the parameters (extras of the intent) of a target activity. DH3 provides a gradle plugin to generate the henson navigator class, and we strongly encourage to use the plugin. See the [samples](https://github.com/f2prateek/dart/tree/master/dart-sample) for more details.
 
