@@ -17,11 +17,8 @@
 
 package dart.henson.plugin.internal;
 
-import static com.android.build.gradle.internal.publishing.AndroidArtifacts.ARTIFACT_TYPE;
 import static java.util.Collections.singletonList;
 
-import com.android.build.gradle.api.BaseVariant;
-import com.android.build.gradle.internal.publishing.AndroidArtifacts;
 import com.google.common.collect.Streams;
 import dart.henson.plugin.generator.HensonNavigatorGenerator;
 import java.io.File;
@@ -42,8 +39,10 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.CacheableTask;
 
+import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
 
+import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
@@ -52,6 +51,11 @@ import org.gradle.api.tasks.TaskAction;
 public class GenerateHensonNavigatorTask extends DefaultTask {
 
 
+  @InputFiles
+  @Classpath
+  FileCollection getJarDependencies() {
+    return jarDependencies;
+  }
   @Input String hensonNavigatorPackageName;
 
   File destinationFolder;
@@ -66,18 +70,18 @@ public class GenerateHensonNavigatorTask extends DefaultTask {
 
 
 
-  FileCollection variantCompileClasspath;
+  FileCollection jarDependencies;
   Logger logger;
 
   HensonNavigatorGenerator hensonNavigatorGenerator;
 
   @TaskAction
   public void generateHensonNavigator() {
+    FileCollection variantCompileClasspath = getJarDependencies();
 
-
-    logger.debug("Analyzing configuration: " + variantCompileClasspath.getFiles());
+    logger.debug("Analyzing configuration: " + jarDependencies.getFiles());
     Set<String> targetActivities = new HashSet<>();
-    Streams.stream(variantCompileClasspath)
+    Streams.stream(jarDependencies)
         .forEach(
             dependency -> {
               logger.debug("Detected dependency: {}", dependency.getAbsolutePath());

@@ -91,7 +91,7 @@ public class TaskManager {
                                         generateHensonNavigatorTask1 -> {
                                             generateHensonNavigatorTask1.hensonNavigatorPackageName =
                                                     hensonNavigatorPackageName;
-                                            generateHensonNavigatorTask1.variantCompileClasspath = variant
+                                            generateHensonNavigatorTask1.jarDependencies = variant
                                                     .getCompileConfiguration()
                                                     .getIncoming()
                                                     .artifactView(
