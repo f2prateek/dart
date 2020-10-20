@@ -34,44 +34,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import org.gradle.api.Action;
+
 import org.gradle.api.DefaultTask;
-import org.gradle.api.Project;
-import org.gradle.api.attributes.AttributeContainer;
+
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.internal.file.UnionFileCollection;
+
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.CacheableTask;
-import org.gradle.api.tasks.Classpath;
+
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputFiles;
+
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.tasks.TaskProvider;
-import org.gradle.api.tasks.compile.JavaCompile;
+
 
 @CacheableTask
 public class GenerateHensonNavigatorTask extends DefaultTask {
-  @InputFiles
-  @Classpath
-  FileCollection getJarDependencies() {
-    //Thanks to Xavier Durcrohet for this
-    //https://android.googlesource.com/platform/tools/base/+/gradle_3.0.0/build-system/gradle-core/src/main/java/com/android/build/gradle/internal/scope/VariantScopeImpl.java#1037
-    Action<AttributeContainer> attributes =
-        container ->
-            container.attribute(ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.CLASSES.getType());
-    boolean lenientMode = false;
-    return variant
-        .getCompileConfiguration()
-        .getIncoming()
-        .artifactView(
-            config -> {
-              config.attributes(attributes);
-              config.lenient(lenientMode);
-            })
-        .getArtifacts()
-        .getArtifactFiles();
-  }
+
 
   @Input String hensonNavigatorPackageName;
 
@@ -85,19 +64,17 @@ public class GenerateHensonNavigatorTask extends DefaultTask {
     return new File(generatedFolder, "HensonNavigator.java");
   }
 
-  BaseVariant variant;
-  Project project;
+
+
+  FileCollection variantCompileClasspath;
   Logger logger;
+
   HensonNavigatorGenerator hensonNavigatorGenerator;
 
   @TaskAction
   public void generateHensonNavigator() {
-    TaskProvider<JavaCompile> javaCompiler = variant.getJavaCompileProvider();
-    FileCollection variantCompileClasspath = getJarDependencies();
-    FileCollection uft =
-        new UnionFileCollection(
-            javaCompiler.get().getSource(), project.fileTree(destinationFolder));
-    javaCompiler.get().setSource(uft);
+
+
     logger.debug("Analyzing configuration: " + variantCompileClasspath.getFiles());
     Set<String> targetActivities = new HashSet<>();
     Streams.stream(variantCompileClasspath)

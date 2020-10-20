@@ -17,63 +17,95 @@
 
 package dart.henson.plugin.internal;
 
+import static com.android.build.gradle.internal.publishing.AndroidArtifacts.ARTIFACT_TYPE;
 import static dart.henson.plugin.util.StringUtil.capitalize;
 
 import com.android.build.gradle.api.BaseVariant;
+import com.android.build.gradle.internal.publishing.AndroidArtifacts;
+
 import dart.henson.plugin.generator.HensonNavigatorGenerator;
+
 import java.io.File;
+
 import org.gradle.api.Action;
 import org.gradle.api.Project;
+import org.gradle.api.attributes.AttributeContainer;
+import org.gradle.api.file.FileCollection;
+import org.gradle.api.internal.file.FileCollectionInternal;
+import org.gradle.api.internal.file.UnionFileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.TaskProvider;
+import org.gradle.api.tasks.compile.JavaCompile;
 
 public class TaskManager {
 
-  private Project project;
-  private Logger logger;
-  private HensonNavigatorGenerator hensonNavigatorGenerator;
+    private Project project;
+    private Logger logger;
+    private HensonNavigatorGenerator hensonNavigatorGenerator;
 
-  public TaskManager(Project project, Logger logger) {
-    this.project = project;
-    this.logger = logger;
-    this.hensonNavigatorGenerator = new HensonNavigatorGenerator();
-  }
+    public TaskManager(Project project, Logger logger) {
+        this.project = project;
+        this.logger = logger;
+        this.hensonNavigatorGenerator = new HensonNavigatorGenerator();
+    }
 
-  /**
-   * A henson navigator is a class that helps a consumer to consume the navigation api that it
-   * declares in its dependencies. The henson navigator will wrap the intent builders. Thus, a
-   * henson navigator, is driven by consumption of intent builders, whereas the henson classes are
-   * driven by the production of an intent builder.
-   *
-   * <p>This task is created per android variant:
-   *
-   * <ul>
-   *   <li>we scan the variant compile configuration for navigation api dependencies
-   *   <li>we generate a henson navigator class for this variant that wraps the intent builders
-   * </ul>
-   *
-   * @param variant the variant for which to create a builder.
-   * @param hensonNavigatorPackageName the package name in which we create the class.
-   */
-  public TaskProvider<GenerateHensonNavigatorTask> createHensonNavigatorGenerationTask(
-      BaseVariant variant, String hensonNavigatorPackageName, File destinationFolder) {
-    TaskProvider<GenerateHensonNavigatorTask> generateHensonNavigatorTask =
-        project
-            .getTasks()
-            .register(
-                "generate" + capitalize(variant.getName()) + "HensonNavigator",
-                GenerateHensonNavigatorTask.class,
-                (Action<GenerateHensonNavigatorTask>)
-                    generateHensonNavigatorTask1 -> {
-                      generateHensonNavigatorTask1.hensonNavigatorPackageName =
-                          hensonNavigatorPackageName;
-                      generateHensonNavigatorTask1.destinationFolder = destinationFolder;
-                      generateHensonNavigatorTask1.variant = variant;
-                      generateHensonNavigatorTask1.logger = logger;
-                      generateHensonNavigatorTask1.project = project;
-                      generateHensonNavigatorTask1.hensonNavigatorGenerator =
-                          hensonNavigatorGenerator;
-                    });
-    return generateHensonNavigatorTask;
-  }
+    /**
+     * A henson navigator is a class that helps a consumer to consume the navigation api that it
+     * declares in its dependencies. The henson navigator will wrap the intent builders. Thus, a
+     * henson navigator, is driven by consumption of intent builders, whereas the henson classes are
+     * driven by the production of an intent builder.
+     *
+     * <p>This task is created per android variant:
+     *
+     * <ul>
+     *   <li>we scan the variant compile configuration for navigation api dependencies
+     *   <li>we generate a henson navigator class for this variant that wraps the intent builders
+     * </ul>
+     *
+     * @param variant                    the variant for which to create a builder.
+     * @param hensonNavigatorPackageName the package name in which we create the class.
+     */
+    public TaskProvider<GenerateHensonNavigatorTask> createHensonNavigatorGenerationTask(
+            BaseVariant variant, String hensonNavigatorPackageName, File destinationFolder) {
+
+        Action<AttributeContainer> attributes =
+                container ->
+                        container.attribute(ARTIFACT_TYPE, AndroidArtifacts.ArtifactType.CLASSES.getType());
+
+
+        TaskProvider<JavaCompile> javaCompiler = variant.getJavaCompileProvider();
+
+        FileCollection uft =
+                new UnionFileCollection(
+                        (FileCollectionInternal) javaCompiler.get().getSource(), (FileCollectionInternal) project.fileTree(destinationFolder));
+
+        javaCompiler.get().setSource(uft);
+
+        TaskProvider<GenerateHensonNavigatorTask> generateHensonNavigatorTask =
+                project
+                        .getTasks()
+                        .register(
+                                "generate" + capitalize(variant.getName()) + "HensonNavigator",
+                                GenerateHensonNavigatorTask.class,
+                                (Action<GenerateHensonNavigatorTask>)
+                                        generateHensonNavigatorTask1 -> {
+                                            generateHensonNavigatorTask1.hensonNavigatorPackageName =
+                                                    hensonNavigatorPackageName;
+                                            generateHensonNavigatorTask1.variantCompileClasspath = variant
+                                                    .getCompileConfiguration()
+                                                    .getIncoming()
+                                                    .artifactView(
+                                                            config -> {
+                                                                config.attributes(attributes);
+                                                                config.lenient(false);
+                                                            })
+                                                    .getArtifacts()
+                                                    .getArtifactFiles();
+                                            generateHensonNavigatorTask1.destinationFolder = destinationFolder;
+                                            generateHensonNavigatorTask1.logger = logger;
+                                            generateHensonNavigatorTask1.hensonNavigatorGenerator =
+                                                    hensonNavigatorGenerator;
+                                        });
+        return generateHensonNavigatorTask;
+    }
 }
