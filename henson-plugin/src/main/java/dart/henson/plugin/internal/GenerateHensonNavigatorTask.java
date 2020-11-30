@@ -49,8 +49,6 @@ import org.gradle.api.tasks.TaskAction;
 
 @CacheableTask
 public class GenerateHensonNavigatorTask extends DefaultTask {
-
-
   @InputFiles
   @Classpath
   FileCollection getJarDependencies() {
@@ -67,7 +65,6 @@ public class GenerateHensonNavigatorTask extends DefaultTask {
     generatedFolder.mkdirs();
     return new File(generatedFolder, "HensonNavigator.java");
   }
-
 
 
   FileCollection jarDependencies;
